@@ -4,3 +4,5 @@ site_description: Unofficial LoongArch Intrinsics Guide
 theme:
   name: readthedocs
 copyright: Copyright &copy; 2023 Jiajie Chen
+plugins:
+  - search

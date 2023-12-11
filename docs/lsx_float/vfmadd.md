@@ -22,3 +22,26 @@ for (int i = 0;i < 4;i++) {
     dst.fp32[i] = a.fp32[i] * b.fp32[i] + c.fp32[i];
 }
 ```
+
+## __m128d __lsx_vfmadd_d (__m128d a, __m128d b, __m128d c)
+
+### Synopsis
+
+```c++
+__m128d __lsx_vfmadd_d (__m128d a, __m128d b, __m128d c)
+#include <lsxintrin.h>
+Instruction: vfmadd.d vr, vr, vr
+CPU Flags: LSX
+```
+
+### Description
+
+Compute packed double precision floating point FMA(Fused Multiply-Add): multiply elements in `a` and `b`, accumulate to elements in `c` and store the result in `dst`.
+
+### Operation
+
+```c++
+for (int i = 0;i < 2;i++) {
+    dst.fp64[i] = a.fp64[i] * b.fp64[i] + c.fp64[i];
+}
+```
