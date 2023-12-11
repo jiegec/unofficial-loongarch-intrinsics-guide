@@ -6,25 +6,13 @@ Arranged from QEMU implementation and [GCC Intrinsics](https://gcc.gnu.org/onlin
 
 TODO List:
 
-### vld
-
-Vector Load
-
 ### vst
 
 Vector Store
 
-### vldrepl.d/w/h/b
-
-Vector Load Replicate
-
 ### vstelm.d/w/h/b
 
 Vector Store Element
-
-### vldx
-
-Vector Load with Register Offset
 
 ### vstx
 
