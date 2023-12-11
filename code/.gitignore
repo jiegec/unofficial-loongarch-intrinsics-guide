@@ -3,3 +3,5 @@
 !Makefile
 !*.h
 !*.cpp
+!*.sh
+!*.log
