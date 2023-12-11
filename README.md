@@ -286,8 +286,6 @@ Vector Multiplication High
 
 ### vffintrne.w.d
 
-### vshuf.h/w/d
-
 ### vseqi.b/h/w/d
 
 ### vslei.b/h/w/d/bu/hu/wu/du
