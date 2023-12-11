@@ -2,6 +2,8 @@
 
 从 QEMU 实现中整理。
 
+GCC Intrinsic: <https://gcc.gnu.org/onlinedocs/gcc/LoongArch-SX-Vector-Intrinsics.html>
+
 ## LSX
 
 ### vfmadd.s/d
