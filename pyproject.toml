@@ -1,0 +1,14 @@
+[tool.poetry]
+name = "loongarch-simd"
+version = "0.1.0"
+description = ""
+authors = ["Jiajie Chen <c@jia.je>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+mkdocs = "^1.5.3"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
