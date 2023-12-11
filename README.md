@@ -1,50 +1,16 @@
-# LoongArch SIMD 指令非官网文档
+# Unofficial LoongArch Intrinsics Guide
 
-从 QEMU 实现中整理。
+Visit <http://jia.je/unofficial-loongarch-intrinsics-guide/>
 
-GCC Intrinsic: <https://gcc.gnu.org/onlinedocs/gcc/LoongArch-SX-Vector-Intrinsics.html>
+Arranged from QEMU implementation and [GCC Intrinsics](https://gcc.gnu.org/onlinedocs/gcc/LoongArch-SX-Vector-Intrinsics.html)
 
-## LSX
-
-### vfmadd.s/d
-
-Vector Fused Multiply Add (`a * b + c`) Single/Double Precision
-
-- Single Precision: `__m128 __lsx_vfmadd_s (__m128 a, __m128 b, __m128 c)`
-- Double Precision: `__m128d __lsx_vfmadd_d (__m128d a, __m128d b, __m128d c)`
-
-### vfmsub.s/d
-
-Vector Fused Multiply Subtract (`a * b - c`) Single/Double Precision
-
-- Single Precision: `__m128 __lsx_vfmsub_s (__m128 a, __m128 b, __m128 c)`
-- Double Precision: `__m128d __lsx_vfmsub_d (__m128d a, __m128d b, __m128d c)`
-
-### vfnmadd.s/d
-
-Vector Fused Negative Multiply Add (`- a * b - c`) Single/Double Precision
-
-- Single Precision: `__m128 __lsx_vfnmadd_s (__m128 a, __m128 b, __m128 c)`
-- Double Precision: `__m128d __lsx_vfnmadd_d (__m128d a, __m128d b, __m128d c)`
-
-### vfnmsub.s/d
-
-Vector Fused Negative Multiply Subtract (`- a * b + c`) Single/Double Precision
-
-- Single Precision: `__m128 __lsx_vfnmsub_s (__m128 a, __m128 b, __m128 c)`
-- Double Precision: `__m128d __lsx_vfnmsub_d (__m128d a, __m128d b, __m128d c)`
+TODO List:
 
 ### vfcmp.cond.s/d
 
 Vector Float Compare
 
 <cmp>: See fcmp.cond.s/d instruction
-
-### vbitsel.v
-
-Vector Bit Selection: For each bit, `c ? b : a`
-
-`__m128i __lsx_vbitsel_v (__m128i a, __m128i b, __m128i c)`
 
 ### vshuf.b
 
