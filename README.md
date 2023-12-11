@@ -6,12 +6,6 @@ Arranged from QEMU implementation and [GCC Intrinsics](https://gcc.gnu.org/onlin
 
 TODO List:
 
-### vfcmp.cond.s/d
-
-Vector Float Compare
-
-<cmp>: See fcmp.cond.s/d instruction
-
 ### vld
 
 Vector Load
