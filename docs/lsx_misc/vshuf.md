@@ -48,7 +48,7 @@ Shuffle half words from `b` and `c` with indices from `a`.
 
 ```c++
 for (int i = 0;i < 8;i++) {
-    if ((c.half[i] % 16) < 8) {
+    if ((a.half[i] % 16) < 8) {
         dst.half[i] = c.half[a.half[i] % 8];
     } else {
         dst.half[i] = b.half[a.half[i] % 8];
@@ -75,7 +75,7 @@ Shuffle words from `b` and `c` with indices from `a`.
 
 ```c++
 for (int i = 0;i < 4;i++) {
-    if ((c.word[i] % 8) < 4) {
+    if ((a.word[i] % 8) < 4) {
         dst.word[i] = c.word[a.word[i] % 4];
     } else {
         dst.word[i] = b.word[a.word[i] % 4];
@@ -102,7 +102,7 @@ Shuffle words from `b` and `c` with indices from `a`.
 
 ```c++
 for (int i = 0;i < 2;i++) {
-    if ((c.word[i] % 4) < 2) {
+    if ((a.word[i] % 4) < 2) {
         dst.word[i] = c.word[a.word[i] % 2];
     } else {
         dst.word[i] = b.word[a.word[i] % 2];
