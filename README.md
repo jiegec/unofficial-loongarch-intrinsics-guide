@@ -12,12 +12,6 @@ Vector Float Compare
 
 <cmp>: See fcmp.cond.s/d instruction
 
-### vshuf.b
-
-Vector Shuffle
-
-`__m128i __lsx_vshuf_b (__m128i a, __m128i b, __m128i c)`
-
 ### vld
 
 Vector Load
