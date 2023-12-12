@@ -51,7 +51,7 @@ Shuffle half words from `b` and `c` with indices from `a`.
 
 ```c++
 for (int i = 0;i < 8;i++) {
-    if (c.byte[i] >= 64) {
+    if (a.half[i] >= 64) {
         // Caveat: observed in 3C5000, but not in QEMU
         dst.byte[i] = 0;
     } else if ((a.half[i] % 16) < 8) {
@@ -81,9 +81,9 @@ Shuffle words from `b` and `c` with indices from `a`.
 
 ```c++
 for (int i = 0;i < 4;i++) {
-    if (c.byte[i] >= 64) {
+    if (a.word[i] >= 64) {
         // Caveat: observed in 3C5000, but not in QEMU
-        dst.byte[i] = 0;
+        dst.word[i] = 0;
     } else if ((a.word[i] % 8) < 4) {
         dst.word[i] = c.word[a.word[i] % 4];
     } else {
@@ -105,19 +105,19 @@ CPU Flags: LSX
 
 ### Description
 
-Shuffle words from `b` and `c` with indices from `a`.
+Shuffle double words from `b` and `c` with indices from `a`.
 
 ### Operation
 
 ```c++
 for (int i = 0;i < 2;i++) {
-    if (c.byte[i] >= 64) {
+    if (a.dword[i] >= 64) {
         // Caveat: observed in 3C5000, but not in QEMU
-        dst.byte[i] = 0;
-    } else if ((a.word[i] % 4) < 2) {
-        dst.word[i] = c.word[a.word[i] % 2];
+        dst.dword[i] = 0;
+    } else if ((a.dword[i] % 4) < 2) {
+        dst.dword[i] = c.dword[a.dword[i] % 2];
     } else {
-        dst.word[i] = b.word[a.word[i] % 2];
+        dst.dword[i] = b.dword[a.dword[i] % 2];
     }
 }
 ```
