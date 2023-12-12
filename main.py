@@ -600,6 +600,15 @@ memory_store({width}, data.{member}[lane], addr + offset);
         )
 
     @env.macro
+    def vseqi(name):
+        width = widths[name]
+        return instruction(
+            intrinsic=f"__m128i __lsx_vseqi_{name} (__m128i a, imm_n16_15 imm)",
+            instr=f"vseqi.{name} vr, vr, imm",
+            desc=f"Compare the {width}-bit elements in `a` and `imm`, store all-ones to `dst` if equal, zero otherwise.",
+        )
+
+    @env.macro
     def vslt(name):
         width = widths[name]
         signedness = signednesses[name]
@@ -610,12 +619,40 @@ memory_store({width}, data.{member}[lane], addr + offset);
         )
 
     @env.macro
+    def vslti(name):
+        width = widths[name]
+        signedness = signednesses[name]
+        if signedness == "signed":
+            imm_range = "imm_n16_15"
+        else:
+            imm_range = "imm_0_31"
+        return instruction(
+            intrinsic=f"__m128i __lsx_vslti_{name} (__m128i a, {imm_range} imm)",
+            instr=f"vslti.{name} vr, vr, imm",
+            desc=f"Compare the {signedness} {width}-bit elements in `a` and `imm`, store all-ones to `dst` if corresponding element in `a` is less than `b`, zero otherwise.",
+        )
+
+    @env.macro
     def vsle(name):
         width = widths[name]
         signedness = signednesses[name]
         return instruction(
-            intrinsic=f"__m128i __lsx_vslt_{name} (__m128i a, __m128i b)",
-            instr=f"vslt.{name} vr, vr, vr",
+            intrinsic=f"__m128i __lsx_vsle_{name} (__m128i a, __m128i b)",
+            instr=f"vsle.{name} vr, vr, vr",
+            desc=f"Compare the {signedness} {width}-bit elements in `a` and `b`, store all-ones to `dst` if corresponding element in `a` is less than or equal `b`, zero otherwise.",
+        )
+
+    @env.macro
+    def vslei(name):
+        width = widths[name]
+        signedness = signednesses[name]
+        if signedness == "signed":
+            imm_range = "imm_n16_15"
+        else:
+            imm_range = "imm_0_31"
+        return instruction(
+            intrinsic=f"__m128i __lsx_vslei_{name} (__m128i a, {imm_range} imm)",
+            instr=f"vslei.{name} vr, vr, imm",
             desc=f"Compare the {signedness} {width}-bit elements in `a` and `b`, store all-ones to `dst` if corresponding element in `a` is less than or equal `b`, zero otherwise.",
         )
 

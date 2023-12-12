@@ -158,6 +158,13 @@ for width in ["b", "bu", "h", "hu", "w", "wu", "d", "du"]:
                 file=f,
             )
             print(f"}}", file=f)
+        with open(f"vs{name}i_{width}.h", "w") as f:
+            print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+            print(
+                f"  dst.{m}[i] = (({sign}{w})a.{m}[i] {op} imm) ? 0x{((1 << w) - 1):X} : 0;",
+                file=f,
+            )
+            print(f"}}", file=f)
     for op in ["sadd", "ssub"]:
         with open(f"v{op}_{width}.h", "w") as f:
             print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
@@ -348,6 +355,13 @@ for width in ["b", "h", "w", "d"]:
         print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
         print(
             f"  dst.{m}[i] = (a.{m}[i] == b.{m}[i]) ? 0x{((1 << w) - 1):X} : 0;",
+            file=f,
+        )
+        print(f"}}", file=f)
+    with open(f"vseqi_{width}.h", "w") as f:
+        print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+        print(
+            f"  dst.{m}[i] = ((s{w})a.{m}[i] == imm) ? 0x{((1 << w) - 1):X} : 0;",
             file=f,
         )
         print(f"}}", file=f)
