@@ -390,8 +390,6 @@ Vector Multiplication High
 
 ### vshuf4i.b/h/w/d
 
-### vbitseli.b
-
 ### vori.b
 
 ### vxori.b

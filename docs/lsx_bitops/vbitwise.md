@@ -21,6 +21,27 @@ Compute bitwise selection: for each bit position, if the bit in `c` equals to on
 {% include 'vbitsel_v.h' %}
 ```
 
+## __m128i __lsx_vbitseli_b (__m128i a, __m128i b, imm0_255 imm)
+
+### Synopsis
+
+```c++
+__m128i __lsx_vbitseli_b (__m128i a, __m128i b, imm0_255 imm)
+#include <lsxintrin.h>
+Instruction: vbitseli.b vr, vr, imm
+CPU Flags: LSX
+```
+
+### Description
+
+Compute bitwise selection: for each bit position, if the bit in `a` equals to one, copy the bit from `imm` to `dst`, otherwise copy from `b`.
+
+### Operation
+
+```c++
+{% include 'vbitseli_b.h' %}
+```
+
 {{ vbitclr('b') }}
 {{ vbitclr('h') }}
 {{ vbitclr('w') }}
