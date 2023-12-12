@@ -536,6 +536,13 @@ for width in ["b", "h", "w", "d"]:
             file=f,
         )
         print(f"}}", file=f)
+    with open(f"vrepli_{width}.h", "w") as f:
+        print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+        print(
+            f"  dst.{m}[i] = imm;",
+            file=f,
+        )
+        print(f"}}", file=f)
     with open(f"vsigncov_{width}.h", "w") as f:
         print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
         print(

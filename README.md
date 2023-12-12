@@ -155,5 +155,3 @@ TODO List:
 ### vssrarni.b.h/h.w/w.d/d.q
 
 ### vssrarni.bu.h/hu.w/wu.d/du.q
-
-### vldi

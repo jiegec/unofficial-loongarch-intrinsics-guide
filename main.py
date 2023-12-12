@@ -848,7 +848,7 @@ memory_store({width}, data.{member}[lane], addr + offset);
         return instruction(
             intrinsic=f"__m128i __lsx_vreplve_{name} (__m128i a, int idx)",
             instr=f"vreplve.{name} vr, vr, r",
-            desc=f"Repeat the element in lane `idx` of `a` to whole vector.",
+            desc=f"Repeat the element in lane `idx` of `a` to fill whole vector.",
         )
 
     @env.macro
@@ -858,7 +858,17 @@ memory_store({width}, data.{member}[lane], addr + offset);
         return instruction(
             intrinsic=f"__m128i __lsx_vreplvei_{name} (__m128i a, imm0_{imm_upper} idx)",
             instr=f"vreplvei.{name} vr, vr, imm",
-            desc=f"Repeat the element in lane `idx` of `a` to whole vector.",
+            desc=f"Repeat the element in lane `idx` of `a` to fill whole vector.",
+        )
+
+    @env.macro
+    def vrepli(name):
+        width = widths[name]
+        return instruction(
+            intrinsic=f"__m128i __lsx_vrepli_{name} (imm_n512_511 imm)",
+            instr=f"vldi.{name} vr, imm",
+            desc=f"Repeat `imm` to fill whole vector.",
+            code=include(f'vrepli_{name}.h')
         )
 
     @env.macro

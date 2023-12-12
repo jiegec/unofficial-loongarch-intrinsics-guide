@@ -53,6 +53,11 @@
 {{ vpickod('w') }}
 {{ vpickod('d') }}
 
+{{ vrepli('b') }}
+{{ vrepli('h') }}
+{{ vrepli('w') }}
+{{ vrepli('d') }}
+
 {{ vreplgr2vr('b') }}
 {{ vreplgr2vr('h') }}
 {{ vreplgr2vr('w') }}

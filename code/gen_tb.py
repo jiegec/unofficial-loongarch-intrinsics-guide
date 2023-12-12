@@ -87,6 +87,7 @@ tb = {
     "vpickod": (widths_signed, "v128 a, v128 b"),
     "vrotr": (widths_signed, "v128 a, v128 b"),
     "vrotri": (widths_signed, "v128 a, int imm", [0, 7]),
+    "vrepli": (widths_signed, "int imm", [0, 1, 511]),
     "vreplve": (widths_signed, "v128 a, int idx", [0, 1]),
     "vreplvei": (widths_signed, "v128 a, int idx", [0, 1]),
     "vreplgr2vr": (widths_signed, "int val", [0, 1, 256]),
