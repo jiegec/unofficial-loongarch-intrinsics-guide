@@ -306,8 +306,6 @@ Vector Multiplication High
 
 ### vsrari.b/h/w/d
 
-### vinsgr2vr.b/h/w/d
-
 ### vpickve2gr.b/h/w/d/bu/hu/wu/du
 
 ### vreplvei.b/h/w/d

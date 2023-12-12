@@ -233,6 +233,13 @@ for width in ["b", "h", "w", "d"]:
             file=f,
         )
         print(f"}}", file=f)
+    with open(f"vinsgr2vr_{width}.h", "w") as f:
+        print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+        print(
+            f"  dst.{m}[i] = (i == imm) ? b : a.{m}[i];",
+            file=f,
+        )
+        print(f"}}", file=f)
 
 for width in ["s", "d"]:
     m = members_fp[width]

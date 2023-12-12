@@ -384,6 +384,20 @@ for (int i = 0;i < 2;i++) {{
         )
 
     @env.macro
+    def vinsgr2vr(name):
+        width = widths[name]
+        imm_upper = 128 // width - 1
+        if name == "d":
+            long = "long "
+        else:
+            long = ""
+        return instruction(
+            intrinsic=f"__m128i __lsx_insgr2vr_{name} (__m128i a, {long}int b, imm0_{imm_upper} imm)",
+            instr=f"vinsgr2vr.{name} vr, r, imm",
+            desc=f"Insert {width}-bit element into lane indexed `imm`.",
+        )
+
+    @env.macro
     def vshuf_hwd(name):
         width = widths[name]
         return instruction(
