@@ -1,4 +1,5 @@
 import math
+import os
 
 def define_env(env):
     widths = {
@@ -30,6 +31,10 @@ def define_env(env):
 
     def instruction(intrinsic, instr, desc):
         file_name = instr.split(" ")[0].replace(".", "_")
+        if os.path.exists(f"code/{file_name}.cpp"):
+            tested = "Tested on real machine."
+        else:
+            tested = ""
         return f"""
 ## {intrinsic}
 
@@ -51,6 +56,9 @@ CPU Flags: LSX
 ```c++
 {include(f'{file_name}.h')}
 ```
+
+{tested}
+
 """
 
     @env.macro
