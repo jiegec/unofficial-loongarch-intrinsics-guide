@@ -140,5 +140,19 @@ for width in ["b", "h", "w", "d"]:
             file=f,
         )
         print(f"}}", file=f)
+    with open(f"vclo_{width}.h", "w") as f:
+        print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+        print(
+            f"  dst.{m}[i] = clo(a.{m}[i]);",
+            file=f,
+        )
+        print(f"}}", file=f)
+    with open(f"vclz_{width}.h", "w") as f:
+        print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+        print(
+            f"  dst.{m}[i] = clz(a.{m}[i]);",
+            file=f,
+        )
+        print(f"}}", file=f)
 
 os.system("clang-format -i *.cpp *.h")

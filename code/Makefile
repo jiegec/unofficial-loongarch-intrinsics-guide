@@ -11,5 +11,5 @@ run: all
 clean:
 	rm -rf $(EXES)
 
-%: %.cpp $(HDRS)
+%: %.cpp %.h
 	$(CXX) $< -mlsx -mlasx -o $@

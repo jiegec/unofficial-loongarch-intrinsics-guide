@@ -71,3 +71,13 @@ Compute bitwise selection: for each bit position, if the bit in `a` equals to on
 {{ vbitrevi('h') }}
 {{ vbitrevi('w') }}
 {{ vbitrevi('d') }}
+
+{{ vclo('b') }}
+{{ vclo('h') }}
+{{ vclo('w') }}
+{{ vclo('d') }}
+
+{{ vclz('b') }}
+{{ vclz('h') }}
+{{ vclz('w') }}
+{{ vclz('d') }}

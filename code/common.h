@@ -20,6 +20,24 @@ typedef unsigned __int128 u128;
 #define MACHINE_3C5000 0
 #endif
 
+template <typename T> u8 clo(T num) {
+  for (int i = sizeof(T) * 8 - 1; i >= 0; i--) {
+    if ((num & ((T)1 << i)) == 0) {
+      return sizeof(T) * 8 - 1 - i;
+    }
+  }
+  return sizeof(T) * 8;
+}
+
+template <typename T> u8 clz(T num) {
+  for (int i = sizeof(T) * 8 - 1; i >= 0; i--) {
+    if ((num & ((T)1 << i)) != 0) {
+      return sizeof(T) * 8 - 1 - i;
+    }
+  }
+  return sizeof(T) * 8;
+}
+
 union v128 {
   __m128i m128i;
   __m128 m128;

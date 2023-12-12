@@ -214,6 +214,24 @@ CPU Flags: LSX
         )
 
     @env.macro
+    def vclo(name):
+        width = widths[name]
+        return instruction(
+            intrinsic=f"__m128i __lsx_clo_{name} (__m128i a)",
+            instr=f"vclo.{name} vr, vr",
+            desc=f"Count leading ones of {width}-bit elements in `a`.",
+        )
+
+    @env.macro
+    def vclz(name):
+        width = widths[name]
+        return instruction(
+            intrinsic=f"__m128i __lsx_clz_{name} (__m128i a)",
+            instr=f"vclz.{name} vr, vr",
+            desc=f"Count leading zeros of {width}-bit elements in `a`.",
+        )
+
+    @env.macro
     def vshuf_hwd(name):
         width = widths[name]
         return instruction(
