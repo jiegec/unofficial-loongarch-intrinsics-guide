@@ -5,8 +5,11 @@ CXX?=g++
 
 all: $(EXES)
 
-run: all
-	./run.sh $(EXES)
+run: $(patsubst %,run-%,$(EXES))
+
+run-%: %
+	echo "Running $<"
+	./$<
 
 clean:
 	rm -rf $(EXES)

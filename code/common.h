@@ -116,9 +116,11 @@ void print(const char *s, __m128d num) {
 
 #define PRINT(x) print(#x, x)
 
+#define FUZZ_N 128
+
 #define FUZZ1(func, ...)                                                       \
   do {                                                                         \
-    for (int i = 0; i < 64; i++) {                                             \
+    for (int i = 0; i < FUZZ_N; i++) {                                         \
       v128 a;                                                                  \
       if (func(a __VA_OPT__(, ) __VA_ARGS__) !=                                \
           __lsx_##func(a __VA_OPT__(, ) __VA_ARGS__)) {                        \
@@ -133,7 +135,7 @@ void print(const char *s, __m128d num) {
 
 #define FUZZ2(func, ...)                                                       \
   do {                                                                         \
-    for (int i = 0; i < 64; i++) {                                             \
+    for (int i = 0; i < FUZZ_N; i++) {                                         \
       v128 a, b;                                                               \
       if (func(a, b __VA_OPT__(, ) __VA_ARGS__) !=                             \
           __lsx_##func(a, b __VA_OPT__(, ) __VA_ARGS__)) {                     \
@@ -149,7 +151,7 @@ void print(const char *s, __m128d num) {
 
 #define FUZZ3(func)                                                            \
   do {                                                                         \
-    for (int i = 0; i < 64; i++) {                                             \
+    for (int i = 0; i < FUZZ_N; i++) {                                         \
       v128 a, b, c;                                                            \
       if (func(a, b, c) != __lsx_##func(a, b, c)) {                            \
         PRINT(a);                                                              \
