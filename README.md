@@ -118,11 +118,7 @@ Vector Multiplication High
 
 ### vmaddwod.h.bu/w.hu/d.wu/q.du
 
-### vdiv.b/h/w/d
-
 ### vmod.b/h/w/d
-
-### vdiv.bu/hu/wu/du
 
 ### vmod.bu/hu/wu/du
 
@@ -331,8 +327,6 @@ Vector Multiplication High
 ### vftintrnel.l.s
 
 ### vftintrneh.l.s
-
-### vexth.h.b/w.h/d.w/q.d/hu.bu/wu.hu/du.wu/qu.du
 
 ### vreplgr2vr.b/h/w/d
 

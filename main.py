@@ -24,6 +24,7 @@ def define_env(env):
         "d": "signed",
         "du": "unsigned",
         "q": "signed",
+        "qu": "unsigned",
     }
 
     def include(file):
@@ -234,10 +235,22 @@ CPU Flags: LSX
     @env.macro
     def vdiv(name):
         width = widths[name]
+        signedness = signednesses[name]
         return instruction(
             intrinsic=f"__m128i __lsx_div_{name} (__m128i a, __m128i b)",
             instr=f"vdiv.{name} vr, vr, vr",
-            desc=f"Divide {width}-bit elements in `a` by elements in `b`.",
+            desc=f"Divide {signedness} {width}-bit elements in `a` by elements in `b`.",
+        )
+
+    @env.macro
+    def vexth(name, name2):
+        width = widths[name[0]]
+        width2 = widths[name2[0]]
+        signedness = signednesses[name]
+        return instruction(
+            intrinsic=f"__m128i __lsx_vexth_{name}_{name2} (__m128i a)",
+            instr=f"vexth.{name}.{name2} vr, vr",
+            desc=f"Extend {signedness} {width2}-bit elements in the higher half of `a` to {width}-bit.",
         )
 
     @env.macro

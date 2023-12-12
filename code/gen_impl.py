@@ -24,6 +24,17 @@ double_widths = {
     "du": "q",
 }
 
+double_widths_same_signedness = {
+    "b": "h",
+    "bu": "hu",
+    "h": "w",
+    "hu": "wu",
+    "w": "d",
+    "wu": "du",
+    "d": "q",
+    "du": "qu",
+}
+
 members = {
     "b": "byte",
     "bu": "byte",
@@ -62,6 +73,16 @@ for width in ["b", "bu", "h", "hu", "w", "wu", "d", "du"]:
         print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
         print(
             f"  dst.{m}[i] = (b.{m}[i] == 0) ? 0 : ({sign}{w})a.{m}[i] / (({sign}{w})b.{m}[i]);",
+            file=f,
+        )
+        print(f"}}", file=f)
+    double_width = double_widths_same_signedness[width]
+    double_w = widths[double_width]
+    double_m = members[double_width]
+    with open(f"vexth_{double_width}_{width}.h", "w") as f:
+        print(f"for (int i = 0;i < {128 // double_w};i++) {{", file=f)
+        print(
+            f"  dst.{double_m}[i] = ({sign}{double_w})({sign}{w})a.{m}[{128 // double_w} + i];",
             file=f,
         )
         print(f"}}", file=f)

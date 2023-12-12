@@ -81,3 +81,12 @@ Compute bitwise selection: for each bit position, if the bit in `a` equals to on
 {{ vclz('h') }}
 {{ vclz('w') }}
 {{ vclz('d') }}
+
+{{ vexth('h', 'b') }}
+{{ vexth('hu', 'bu') }}
+{{ vexth('w', 'h') }}
+{{ vexth('wu', 'hu') }}
+{{ vexth('d', 'w') }}
+{{ vexth('du', 'wu') }}
+{{ vexth('q', 'd') }}
+{{ vexth('qu', 'du') }}
