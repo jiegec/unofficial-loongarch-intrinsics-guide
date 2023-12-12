@@ -168,6 +168,15 @@
 {{ vmsub('w') }}
 {{ vmsub('d') }}
 
+{{ vmuh('b') }}
+{{ vmuh('bu') }}
+{{ vmuh('h') }}
+{{ vmuh('hu') }}
+{{ vmuh('w') }}
+{{ vmuh('wu') }}
+{{ vmuh('d') }}
+{{ vmuh('du') }}
+
 {{ vmul('b') }}
 {{ vmul('h') }}
 {{ vmul('w') }}

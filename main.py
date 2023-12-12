@@ -518,6 +518,16 @@ for (int i = 0;i < 2;i++) {{
         )
 
     @env.macro
+    def vmuh(name):
+        width = widths[name]
+        signedness = signednesses[name]
+        return instruction(
+            intrinsic=f"__m128i __lsx_vmuh_{name} (__m128i a, __m128i b)",
+            instr=f"vmuh.{name} vr, vr, vr",
+            desc=f"Multiply {signedness} {width}-bit elements in `a` and `b`, save the high {width}-bit result in `dst`.",
+        )
+
+    @env.macro
     def vmsub(name):
         width = widths[name]
         return instruction(

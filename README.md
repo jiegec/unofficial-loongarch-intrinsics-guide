@@ -6,10 +6,6 @@ Arranged from QEMU implementation and [GCC Intrinsics](https://gcc.gnu.org/onlin
 
 TODO List:
 
-### vmuh.b/h/w/d/bu/hu/wu/du
-
-Vector Multiplication High
-
 ### vmod.b/h/w/d
 
 ### vmod.bu/hu/wu/du
