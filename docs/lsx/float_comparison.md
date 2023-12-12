@@ -1,4 +1,4 @@
-# Float Comparison
+# Floating Point Comparison
 
 ## __m128i __lsx_vfcmp_cond_s (__m128 a, __m128 b)
 

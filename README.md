@@ -188,8 +188,6 @@ Vector Multiplication High
 
 ### vsignconv.b/h/w/d
 
-### vfadd.s/d
-
 ### vfsub.s/d
 
 ### vfmul.s/d
@@ -259,8 +257,6 @@ Vector Multiplication High
 ### vsetanynez.b/h/w/d
 
 ### vflogb.s/d
-
-### vfclass.s/d
 
 ### vfsqrt.s/d
 
