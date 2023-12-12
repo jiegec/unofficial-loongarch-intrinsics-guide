@@ -60,8 +60,6 @@ TODO List:
 
 ### vfrstpi.b/h
 
-### vmskltz.b/h/w/d
-
 ### vmskgez.b
 
 ### vmsknz.b

@@ -817,3 +817,12 @@ memory_store({width}, data.{member}[lane], addr + offset);
             instr=f"vneg.{name} vr, vr",
             desc=f"Negate {width}-bit elements in `a` and save the result in `dst`.",
         )
+
+    @env.macro
+    def vmskltz(name):
+        width = widths[name]
+        return instruction(
+            intrinsic=f"__m128i __lsx_vmskltz_{name} (__m128i a)",
+            instr=f"vmskltz.{name} vr, vr",
+            desc=f"For each {width}-bit element in `a`, if the element is less than zero, set one bit in `dst`, otherwise clear it.",
+        )
