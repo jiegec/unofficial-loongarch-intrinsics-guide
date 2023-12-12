@@ -351,6 +351,34 @@ for width in ["b", "h", "w", "d"]:
             file=f,
         )
         print(f"}}", file=f)
+    with open(f"vsll_{width}.h", "w") as f:
+        print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+        print(
+            f"  dst.{m}[i] = a.{m}[i] << (b.{m}[i] & 0x{w-1:x});",
+            file=f,
+        )
+        print(f"}}", file=f)
+    with open(f"vsrl_{width}.h", "w") as f:
+        print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+        print(
+            f"  dst.{m}[i] = a.{m}[i] >> (b.{m}[i] & 0x{w-1:x});",
+            file=f,
+        )
+        print(f"}}", file=f)
+    with open(f"vsra_{width}.h", "w") as f:
+        print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+        print(
+            f"  dst.{m}[i] = ((s{w})a.{m}[i]) >> (b.{m}[i] & 0x{w-1:x});",
+            file=f,
+        )
+        print(f"}}", file=f)
+    with open(f"vrotr_{width}.h", "w") as f:
+        print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+        print(
+            f"  dst.{m}[i] = (a.{m}[i] >> (b.{m}[i] & 0x{w-1:x})) | (a.{m}[i] << ({w} - (b.{m}[i] & 0x{w-1:x})));",
+            file=f,
+        )
+        print(f"}}", file=f)
 
 for width in ["s", "d"]:
     m = members_fp[width]

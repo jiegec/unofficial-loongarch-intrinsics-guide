@@ -638,3 +638,43 @@ memory_store({width}, data.{member}[lane], addr + offset);
             instr=f"vsadd.{name} vr, vr, vr",
             desc=f"Saturing add the {signedness} {width}-bit elements in `a` and `b`, store the result to `dst`.",
         )
+
+    @env.macro
+    def vsll(name):
+        width = widths[name]
+        signedness = signednesses[name]
+        return instruction(
+            intrinsic=f"__m128i __lsx_vsll_{name} (__m128i a, __m128i b)",
+            instr=f"vsll.{name} vr, vr, vr",
+            desc=f"Logical left shift the unsigned {width}-bit elements in `a` by elements in `b`, store the result to `dst`.",
+        )
+
+    @env.macro
+    def vsrl(name):
+        width = widths[name]
+        signedness = signednesses[name]
+        return instruction(
+            intrinsic=f"__m128i __lsx_vsrl_{name} (__m128i a, __m128i b)",
+            instr=f"vsrl.{name} vr, vr, vr",
+            desc=f"Logical right shift the unsigned {width}-bit elements in `a` by elements in `b`, store the result to `dst`.",
+        )
+
+    @env.macro
+    def vsra(name):
+        width = widths[name]
+        signedness = signednesses[name]
+        return instruction(
+            intrinsic=f"__m128i __lsx_vsra_{name} (__m128i a, __m128i b)",
+            instr=f"vsra.{name} vr, vr, vr",
+            desc=f"Arithmetic right shift the signed {width}-bit elements in `a` by elements in `b`, store the result to `dst`.",
+        )
+
+    @env.macro
+    def vrotr(name):
+        width = widths[name]
+        signedness = signednesses[name]
+        return instruction(
+            intrinsic=f"__m128i __lsx_vrotr_{name} (__m128i a, __m128i b)",
+            instr=f"vrotr.{name} vr, vr, vr",
+            desc=f"Rotate right the unsigned {width}-bit elements in `a` by elements in `b`, store the result to `dst`.",
+        )

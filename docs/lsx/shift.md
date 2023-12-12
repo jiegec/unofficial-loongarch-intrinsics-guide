@@ -41,3 +41,23 @@ Compute 128-bit `a` shifted right by `imm * 8` bits.
 ```c++
 {% include 'vbsrl_v.h' %}
 ```
+
+{{ vsll('b') }}
+{{ vsll('h') }}
+{{ vsll('w') }}
+{{ vsll('d') }}
+
+{{ vsrl('b') }}
+{{ vsrl('h') }}
+{{ vsrl('w') }}
+{{ vsrl('d') }}
+
+{{ vsra('b') }}
+{{ vsra('h') }}
+{{ vsra('w') }}
+{{ vsra('d') }}
+
+{{ vrotr('b') }}
+{{ vrotr('h') }}
+{{ vrotr('w') }}
+{{ vrotr('d') }}

@@ -6,14 +6,6 @@ Arranged from QEMU implementation and [GCC Intrinsics](https://gcc.gnu.org/onlin
 
 TODO List:
 
-### vsll.b/h/w/d
-
-### vsrl.b/h/w/d
-
-### vsra.b/h/w/d
-
-### vrotr.b/h/w/d
-
 ### vsrlr.b/h/w/d
 
 ### vsrar.b/h/w/d
