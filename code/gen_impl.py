@@ -421,6 +421,20 @@ for width in ["b", "h", "w", "d"]:
             file=f,
         )
         print(f"}}", file=f)
+    with open(f"vpickev_{width}.h", "w") as f:
+        print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+        print(
+            f"  dst.{m}[i] = (i < {64 // w}) ? b.{m}[i * 2] : a.{m}[(i - {64 // w}) * 2];",
+            file=f,
+        )
+        print(f"}}", file=f)
+    with open(f"vpickod_{width}.h", "w") as f:
+        print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+        print(
+            f"  dst.{m}[i] = (i < {64 // w}) ? b.{m}[i * 2 + 1] : a.{m}[(i - {64 // w}) * 2 + 1];",
+            file=f,
+        )
+        print(f"}}", file=f)
 
 for width in ["s", "d"]:
     m = members_fp[width]

@@ -716,3 +716,21 @@ memory_store({width}, data.{member}[lane], addr + offset);
             instr=f"vpackod.{name} vr, vr, vr",
             desc=f"Collect and pack odd-positioned {width}-bit elements in `a` and `b` and store `dst`.",
         )
+
+    @env.macro
+    def vpickev(name):
+        width = widths[name]
+        return instruction(
+            intrinsic=f"__m128i __lsx_vpickev_{name} (__m128i a, __m128i b)",
+            instr=f"vpickev.{name} vr, vr, vr",
+            desc=f"Pick even-positioned {width}-bit elements in `b` first, then pick even-positioned {width}-bit elements in `a`.",
+        )
+
+    @env.macro
+    def vpickod(name):
+        width = widths[name]
+        return instruction(
+            intrinsic=f"__m128i __lsx_vpickod_{name} (__m128i a, __m128i b)",
+            instr=f"vpickod.{name} vr, vr, vr",
+            desc=f"Pick odd-positioned {width}-bit elements in `b` first, then pick odd-positioned {width}-bit elements in `a`.",
+        )

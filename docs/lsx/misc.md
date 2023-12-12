@@ -24,3 +24,13 @@
 {{ vpackod('h') }}
 {{ vpackod('w') }}
 {{ vpackod('d') }}
+
+{{ vpickev('b') }}
+{{ vpickev('h') }}
+{{ vpickev('w') }}
+{{ vpickev('d') }}
+
+{{ vpickod('b') }}
+{{ vpickod('h') }}
+{{ vpickod('w') }}
+{{ vpickod('d') }}

@@ -77,6 +77,8 @@ tb = {
     "vpackev": (widths_signed, "v128 a, v128 b"),
     "vpackod": (widths_signed, "v128 a, v128 b"),
     "vpcnt": (widths_signed, "v128 a"),
+    "vpickev": (widths_signed, "v128 a, v128 b"),
+    "vpickod": (widths_signed, "v128 a, v128 b"),
     "vrotr": (widths_signed, "v128 a, v128 b"),
     "vsadd": (widths_all, "v128 a, v128 b"),
     "vssub": (widths_all, "v128 a, v128 b"),
