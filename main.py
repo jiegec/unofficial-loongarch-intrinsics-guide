@@ -808,3 +808,12 @@ memory_store({width}, data.{member}[lane], addr + offset);
             instr=f"vsigncov.{name} vr, vr, vr",
             desc=f"If the {width}-bit element in `a` equals to zero, set the result to zero. If the signed {width}-bit element in `a` is posiive, copy element in `b` to result. Otherwise, copy negated element in `b` to result.",
         )
+
+    @env.macro
+    def vneg(name):
+        width = widths[name]
+        return instruction(
+            intrinsic=f"__m128i __lsx_vneg_{name} (__m128i a)",
+            instr=f"vneg.{name} vr, vr",
+            desc=f"Negate {width}-bit elements in `a` and save the result in `dst`.",
+        )

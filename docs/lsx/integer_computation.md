@@ -204,6 +204,11 @@
 {{ vmulwev('q', 'du') }}
 {{ vmulwev('q', 'du', 'd') }}
 
+{{ vneg('b') }}
+{{ vneg('h') }}
+{{ vneg('w') }}
+{{ vneg('d') }}
+
 {{ vsadd('b') }}
 {{ vsadd('h') }}
 {{ vsadd('w') }}
