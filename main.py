@@ -30,8 +30,11 @@ def define_env(env):
     def include(file):
         return open(f"code/{file}").read().strip()
 
-    def instruction(intrinsic, instr, desc):
+    def instruction(intrinsic, instr, desc, code=None):
         file_name = instr.split(" ")[0].replace(".", "_")
+        if code is None:
+            code = include(f'{file_name}.h')
+        code = code.strip()
         if os.path.exists(f"code/{file_name}.cpp"):
             tested = "Tested on real machine."
         else:
@@ -55,7 +58,7 @@ CPU Flags: LSX
 ### Operation
 
 ```c++
-{include(f'{file_name}.h')}
+{code}
 ```
 
 {tested}
@@ -271,6 +274,53 @@ CPU Flags: LSX
             intrinsic=f"__m128i __lsx_vextrins_{name} (__m128i a, __m128i b, imm0_255 imm)",
             instr=f"vextrins.{name} vr, vr, imm",
             desc=f"Extract one {width}-bit element in `b` and insert it to `a` according to `imm`.",
+        )
+
+    @env.macro
+    def vfcmp(cond):
+        if cond[0] == "c":
+            trap = "Do not trap for QNaN."
+        else:
+            trap = "Trap for QNaN."
+        desc = {
+            "af": "AF(Always False)",
+            "un": "UN(Unordered)",
+            "eq": "EQ(Equal)",
+            "ueq": "UEQ(Unordered or Equal)",
+            "lt": "LT(Less than)",
+            "ult": "ULT(Unordered or Less than)",
+            "le": "LE(Less than or Equal)",
+            "ule": "ULE(Unordered, Less than or Equal)",
+            "ne": "NE(Not Equal)",
+            "or": "OR(Ordered)",
+            "une": "UNE(Unordered or Not Equal)",
+        }[cond[1:]]
+        return instruction(
+            intrinsic=f"__m128i __lsx_vfcmp_{cond}_s (__m128 a, __m128 b)",
+            instr=f"vfcmp.{cond}.s vr, vr, vr",
+            desc=f"Compare single precision elements in `a` and `b`, save the comparison result (all ones if {desc}, all zeros otherwise) into `dst`. {trap}",
+            code=f"""
+for (int i = 0;i < 4;i++) {{
+    if (fp_compare_{cond}(a.fp32[i], b.fp32[i])) {{
+        dst.word[i] = 0xFFFFFFFF;
+    }} else {{
+        dst.word[i] = 0;
+    }}
+}}
+            """
+        ) + "\n" + instruction(
+            intrinsic=f"__m128i __lsx_vfcmp_{cond}_d (__m128d a, __m128d b)",
+            instr=f"vfcmp.{cond}.d vr, vr, vr",
+            desc=f"Compare double precision elements in `a` and `b`, save the comparison result (all ones if {desc}, all zeros otherwise) into `dst`. {trap}",
+            code=f"""
+for (int i = 0;i < 2;i++) {{
+    if (fp_compare_{cond}(a.fp64[i], b.fp64[i])) {{
+        dst.word[i] = 0xFFFFFFFFFFFFFFFF;
+    }} else {{
+        dst.word[i] = 0;
+    }}
+}}
+            """
         )
 
     @env.macro
