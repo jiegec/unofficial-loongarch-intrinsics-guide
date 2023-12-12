@@ -87,6 +87,15 @@ for width in ["b", "bu", "h", "hu", "w", "wu", "d", "du"]:
         )
         print(f"}}", file=f)
 
+    if width == "d" or width == "du":
+        with open(f"vextl_{double_width}_{width}.h", "w") as f:
+            print(f"for (int i = 0;i < {128 // double_w};i++) {{", file=f)
+            print(
+                f"  dst.{double_m}[i] = ({sign}{double_w})({sign}{w})a.{m}[i];",
+                file=f,
+            )
+            print(f"}}", file=f)
+
 for width in ["b", "bu", "h", "hu", "w", "wu", "d", "du"]:
     double_width = double_widths[width]
     w = widths[width]

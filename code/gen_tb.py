@@ -43,6 +43,7 @@ tb = {
     "vclz": (widths_signed, "v128 a"),
     "vdiv": (widths_all, "v128 a, v128 b"),
     "vexth": (widths_vexth, "v128 a"),
+    "vextl": (["q_d", "qu_du"], "v128 a"),
 }
 
 for name in tb:

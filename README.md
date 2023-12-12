@@ -344,11 +344,7 @@ Vector Multiplication High
 
 ### vsllwil.h.b/w.h/d.w
 
-### vextl.q.d
-
 ### vsllwil.hu.bu/wu.hu/du.wu
-
-### vextl.qu.du
 
 ### vsat.b/h/w/d/bu/hu/wu/du
 

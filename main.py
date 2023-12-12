@@ -254,6 +254,17 @@ CPU Flags: LSX
         )
 
     @env.macro
+    def vextl(name, name2):
+        width = widths[name[0]]
+        width2 = widths[name2[0]]
+        signedness = signednesses[name]
+        return instruction(
+            intrinsic=f"__m128i __lsx_vextl_{name}_{name2} (__m128i a)",
+            instr=f"vextl.{name}.{name2} vr, vr",
+            desc=f"Extend {signedness} {width2}-bit elements in the lower half of `a` to {width}-bit.",
+        )
+
+    @env.macro
     def vshuf_hwd(name):
         width = widths[name]
         return instruction(

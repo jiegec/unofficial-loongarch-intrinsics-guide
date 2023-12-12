@@ -90,3 +90,6 @@ Compute bitwise selection: for each bit position, if the bit in `a` equals to on
 {{ vexth('du', 'wu') }}
 {{ vexth('q', 'd') }}
 {{ vexth('qu', 'du') }}
+
+{{ vextl('q', 'd') }}
+{{ vextl('qu', 'du') }}
