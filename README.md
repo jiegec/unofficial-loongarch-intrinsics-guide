@@ -205,8 +205,6 @@ Vector Multiplication High
 
 ### vnor.v
 
-### vandn.v
-
 ### vorn.v
 
 ### vfrstp.b/h
@@ -420,8 +418,6 @@ Vector Multiplication High
 ### vshuf4i.b/h/w/d
 
 ### vbitseli.b
-
-### vandi.b
 
 ### vori.b
 
