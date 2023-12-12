@@ -46,17 +46,7 @@ Vector Multiplication
 
 Vector Multiplication High
 
-### vmadd.b/h/w/d
-
 ### vmsub.b/h/w/d
-
-### vmaddwev.h.b/w.h/d.w/q.d
-
-### vmaddwod.h.b/w.h/d.w/q.d
-
-### vmaddwev.h.bu/w.hu/d.wu/q.du
-
-### vmaddwod.h.bu/w.hu/d.wu/q.du
 
 ### vmod.b/h/w/d
 

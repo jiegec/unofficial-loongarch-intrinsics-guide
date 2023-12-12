@@ -101,6 +101,32 @@
 {{ vmadd('w') }}
 {{ vmadd('d') }}
 
+{{ vmaddwev('h', 'b') }}
+{{ vmaddwev('h', 'bu') }}
+{{ vmaddwev('h', 'bu', 'b') }}
+{{ vmaddwev('w', 'h') }}
+{{ vmaddwev('w', 'hu') }}
+{{ vmaddwev('w', 'hu', 'h') }}
+{{ vmaddwev('d', 'w') }}
+{{ vmaddwev('d', 'wu') }}
+{{ vmaddwev('d', 'wu', 'w') }}
+{{ vmaddwev('q', 'd') }}
+{{ vmaddwev('q', 'du') }}
+{{ vmaddwev('q', 'du', 'd') }}
+
+{{ vmaddwod('h', 'b') }}
+{{ vmaddwod('h', 'bu') }}
+{{ vmaddwod('h', 'bu', 'b') }}
+{{ vmaddwod('w', 'h') }}
+{{ vmaddwod('w', 'hu') }}
+{{ vmaddwod('w', 'hu', 'h') }}
+{{ vmaddwod('d', 'w') }}
+{{ vmaddwod('d', 'wu') }}
+{{ vmaddwod('d', 'wu', 'w') }}
+{{ vmaddwod('q', 'd') }}
+{{ vmaddwod('q', 'du') }}
+{{ vmaddwod('q', 'du', 'd') }}
+
 {{ vminmax('max', 'b') }}
 {{ vminmax('max', 'bu') }}
 {{ vminmax('max', 'h') }}

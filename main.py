@@ -480,3 +480,30 @@ for (int i = 0;i < 2;i++) {{
             instr=f"vmadd.{name} vr, vr, vr",
             desc=f"Multiply {width}-bit elements in `b` and `c`, add to elements in `a`, save the result in `dst`.",
         )
+
+    @env.macro
+    def vmaddw_ev_od(name, even_odd, wide, narrow, narrow2=None):
+        wide_width = widths[wide]
+        if narrow2 is None:
+            narrow2 = narrow
+            inst_suffix = ""
+            intrinsic_suffix = ""
+        else:
+            inst_suffix = f".{narrow2}"
+            intrinsic_suffix = f"_{narrow2}"
+        narrow_width = widths[narrow]
+        signedness = signednesses[narrow]
+        signedness2 = signednesses[narrow2]
+        return instruction(
+            intrinsic=f"__m128i __lsx_vmaddw{name}_{wide}_{narrow}{intrinsic_suffix} (__m128i a, __m128i b, __m128i c)",
+            instr=f"vmaddw{name}.{wide}.{narrow}{inst_suffix} vr, vr, vr",
+            desc=f"Multiply {even_odd}-positioned {signedness} {narrow_width}-bit elements in `b` and {signedness2} elements in `c`, add to {wide_width}-bit elements in `a`.",
+        )
+
+    @env.macro
+    def vmaddwev(wide, narrow, narrow2=None):
+        return vmaddw_ev_od("ev", "even", wide, narrow, narrow2)
+
+    @env.macro
+    def vmaddwod(wide, narrow, narrow2=None):
+        return vmaddw_ev_od("od", "odd", wide, narrow, narrow2)

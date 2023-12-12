@@ -182,6 +182,20 @@ for width in ["b", "bu", "h", "hu", "w", "wu", "d", "du"]:
                     file=f,
                 )
                 print(f"}}", file=f)
+        with open(f"vmaddwev_{double_width}_{width}{suffix}.h", "w") as f:
+            print(f"for (int i = 0;i < {128 // double_w};i++) {{", file=f)
+            print(
+                f"  dst.{double_m}[i] = ({sign}{double_w})({sign}{w})b.{m}[2 * i] * ({sign2}{double_w})({sign2}{w})c.{m}[2 * i] + ({sign2}{double_w})a.{double_m}[i];",
+                file=f,
+            )
+            print(f"}}", file=f)
+        with open(f"vmaddwod_{double_width}_{width}{suffix}.h", "w") as f:
+            print(f"for (int i = 0;i < {128 // double_w};i++) {{", file=f)
+            print(
+                f"  dst.{double_m}[i] = ({sign}{double_w})({sign}{w})b.{m}[2 * i + 1] * ({sign2}{double_w})({sign2}{w})c.{m}[2 * i + 1] + ({sign2}{double_w})a.{double_m}[i];",
+                file=f,
+            )
+            print(f"}}", file=f)
 
 for width in ["b", "h", "w", "d"]:
     w = widths[width]

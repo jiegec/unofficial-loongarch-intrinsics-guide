@@ -62,6 +62,8 @@ tb = {
         ["0, 0", "1234, 1", "5678, 1"],
     ),
     "vmadd": (widths_signed, "v128 a, v128 b, v128 c"),
+    "vmaddwev": (widths_vaddw, "v128 a, v128 b, v128 c"),
+    "vmaddwod": (widths_vaddw, "v128 a, v128 b, v128 c"),
     "vmax": (widths_all, "v128 a, v128 b"),
     "vmaxi": (widths_all, "v128 a, int imm", [0, 3, 15]),
     "vmin": (widths_all, "v128 a, v128 b"),
