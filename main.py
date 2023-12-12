@@ -726,6 +726,16 @@ memory_store({width}, data.{member}[lane], addr + offset);
         )
 
     @env.macro
+    def vrotri(name):
+        width = widths[name]
+        signedness = signednesses[name]
+        return instruction(
+            intrinsic=f"__m128i __lsx_vrotri_{name} (__m128i a, imm0_{width-1} imm)",
+            instr=f"vrotri.{name} vr, vr, imm",
+            desc=f"Rotate right the unsigned {width}-bit elements in `a` by `imm`, store the result to `dst`.",
+        )
+
+    @env.macro
     def vsrlr(name):
         width = widths[name]
         signedness = signednesses[name]
@@ -733,6 +743,16 @@ memory_store({width}, data.{member}[lane], addr + offset);
             intrinsic=f"__m128i __lsx_vsrlr_{name} (__m128i a, __m128i b)",
             instr=f"vsrlr.{name} vr, vr, vr",
             desc=f"Logical right shift (with rounding) the unsigned {width}-bit elements in `a` by elements in `b`, store the result to `dst`.",
+        )
+
+    @env.macro
+    def vsrlri(name):
+        width = widths[name]
+        signedness = signednesses[name]
+        return instruction(
+            intrinsic=f"__m128i __lsx_vsrlri_{name} (__m128i a, imm0_{width-1} imm)",
+            instr=f"vsrlri.{name} vr, vr, imm",
+            desc=f"Logical right shift (with rounding) the unsigned {width}-bit elements in `a` by `imm`, store the result to `dst`.",
         )
 
     @env.macro
@@ -744,6 +764,17 @@ memory_store({width}, data.{member}[lane], addr + offset);
             instr=f"vsrar.{name} vr, vr, vr",
             desc=f"Arithmetic right shift (with rounding) the signed {width}-bit elements in `a` by elements in `b`, store the result to `dst`.",
         )
+
+    @env.macro
+    def vsrari(name):
+        width = widths[name]
+        signedness = signednesses[name]
+        return instruction(
+            intrinsic=f"__m128i __lsx_vsrari_{name} (__m128i a, imm0_{width-1} imm)",
+            instr=f"vsrari.{name} vr, vr, imm",
+            desc=f"Arithmetic right shift (with rounding) the signed {width}-bit elements in `a` by `imm`, store the result to `dst`.",
+        )
+
 
     @env.macro
     def vpackev(name):

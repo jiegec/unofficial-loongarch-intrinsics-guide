@@ -57,6 +57,11 @@ Compute 128-bit `a` shifted right by `imm * 8` bits.
 {{ vsrlr('w') }}
 {{ vsrlr('d') }}
 
+{{ vsrlri('b') }}
+{{ vsrlri('h') }}
+{{ vsrlri('w') }}
+{{ vsrlri('d') }}
+
 {{ vsra('b') }}
 {{ vsra('h') }}
 {{ vsra('w') }}
@@ -67,7 +72,17 @@ Compute 128-bit `a` shifted right by `imm * 8` bits.
 {{ vsrar('w') }}
 {{ vsrar('d') }}
 
+{{ vsrari('b') }}
+{{ vsrari('h') }}
+{{ vsrari('w') }}
+{{ vsrari('d') }}
+
 {{ vrotr('b') }}
 {{ vrotr('h') }}
 {{ vrotr('w') }}
 {{ vrotr('d') }}
+
+{{ vrotri('b') }}
+{{ vrotri('h') }}
+{{ vrotri('w') }}
+{{ vrotri('d') }}

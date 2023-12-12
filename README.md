@@ -132,12 +132,6 @@ TODO List:
 
 ### vftintrneh.l.s
 
-### vrotri.b/h/w/d
-
-### vsrlri.b/h/w/d
-
-### vsrari.b/h/w/d
-
 ### vpickve2gr.b/h/w/d/bu/hu/wu/du
 
 ### vsllwil.h.b/w.h/d.w

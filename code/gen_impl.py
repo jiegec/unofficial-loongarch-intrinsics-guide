@@ -401,6 +401,13 @@ for width in ["b", "h", "w", "d"]:
             file=f,
         )
         print(f"}}", file=f)
+    with open(f"vrotri_{width}.h", "w") as f:
+        print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+        print(
+            f"  dst.{m}[i] = (a.{m}[i] >> imm) | (a.{m}[i] << ({w} - imm));",
+            file=f,
+        )
+        print(f"}}", file=f)
     with open(f"vsrlr_{width}.h", "w") as f:
         print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
         print(f"  if ((b.{m}[i] & 0x{w-1:x}) == 0) {{", file=f)
@@ -415,6 +422,20 @@ for width in ["b", "h", "w", "d"]:
         )
         print(f"  }}", file=f)
         print(f"}}", file=f)
+    with open(f"vsrlri_{width}.h", "w") as f:
+        print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+        print(f"  if (imm == 0) {{", file=f)
+        print(
+            f"    dst.{m}[i] = a.{m}[i];",
+            file=f,
+        )
+        print(f"  }} else {{", file=f)
+        print(
+            f"    dst.{m}[i] = (a.{m}[i] >> imm) + ((a.{m}[i] >> (imm - 1)) & 0x1);",
+            file=f,
+        )
+        print(f"  }}", file=f)
+        print(f"}}", file=f)
     with open(f"vsrar_{width}.h", "w") as f:
         print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
         print(f"  if ((b.{m}[i] & 0x{w-1:x}) == 0) {{", file=f)
@@ -425,6 +446,20 @@ for width in ["b", "h", "w", "d"]:
         print(f"  }} else {{", file=f)
         print(
             f"    dst.{m}[i] = ((s{w})a.{m}[i] >> (b.{m}[i] & 0x{w-1:x})) + (((s{w})a.{m}[i] >> ((b.{m}[i] & 0x{w-1:x}) - 1)) & 0x1);",
+            file=f,
+        )
+        print(f"  }}", file=f)
+        print(f"}}", file=f)
+    with open(f"vsrari_{width}.h", "w") as f:
+        print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+        print(f"  if (imm == 0) {{", file=f)
+        print(
+            f"    dst.{m}[i] = a.{m}[i];",
+            file=f,
+        )
+        print(f"  }} else {{", file=f)
+        print(
+            f"    dst.{m}[i] = ((s{w})a.{m}[i] >> imm) + (((s{w})a.{m}[i] >> (imm - 1)) & 0x1);",
             file=f,
         )
         print(f"  }}", file=f)
