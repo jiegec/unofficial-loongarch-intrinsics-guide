@@ -39,6 +39,16 @@ template <typename T> u8 clz(T num) {
   return sizeof(T) * 8;
 }
 
+template <typename T> u8 popcount(T num) {
+  u8 res = 0;
+  for (int i = sizeof(T) * 8 - 1; i >= 0; i--) {
+    if ((num & ((T)1 << i)) != 0) {
+      res++;
+    }
+  }
+  return res;
+}
+
 using std::max;
 using std::min;
 

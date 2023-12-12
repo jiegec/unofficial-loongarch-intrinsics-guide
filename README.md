@@ -132,12 +132,6 @@ Vector Multiplication High
 
 ### vfrstpi.b/h
 
-### vclo.b/h/w/d
-
-### vclz.b/h/w/d
-
-### vpcnt.b/h/w/d
-
 ### vneg.b/h/w/d
 
 ### vmskltz.b/h/w/d
@@ -248,7 +242,7 @@ Vector Multiplication High
 
 ### vssrlni.b.h/h.w/w.d/d.q/bu.h/hu.w/wu.d/du.q
 
-### vssrlrni.b.h/h.w/w.d/d.q/bu.h/bhu.w/wu.d/du.q
+### vssrlrni.b.h/h.w/w.d/d.q/bu.h/hu.w/wu.d/du.q
 
 ### vsrani.b.h/h.w/w.d/d.q
 

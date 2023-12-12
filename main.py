@@ -525,3 +525,12 @@ for (int i = 0;i < 2;i++) {{
             instr=f"vmsub.{name} vr, vr, vr",
             desc=f"Multiply {width}-bit elements in `b` and `c`, negate and add elements in `a`, save the result in `dst`.",
         )
+
+    @env.macro
+    def vpcnt(name):
+        width = widths[name]
+        return instruction(
+            intrinsic=f"__m128i __lsx_pcnt_{name} (__m128i a)",
+            instr=f"vpcnt.{name} vr, vr",
+            desc=f"Count the number of ones in {width}-bit elements in `a`.",
+        )

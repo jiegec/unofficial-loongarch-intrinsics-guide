@@ -98,3 +98,8 @@ Compute bitwise selection: for each bit position, if the bit in `a` equals to on
 {{ vextrins('h') }}
 {{ vextrins('w') }}
 {{ vextrins('d') }}
+
+{{ vpcnt('b') }}
+{{ vpcnt('h') }}
+{{ vpcnt('w') }}
+{{ vpcnt('d') }}

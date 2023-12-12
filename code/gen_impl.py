@@ -278,6 +278,13 @@ for width in ["b", "h", "w", "d"]:
             file=f,
         )
         print(f"}}", file=f)
+    with open(f"vpcnt_{width}.h", "w") as f:
+        print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+        print(
+            f"  dst.{m}[i] = popcount(a.{m}[i]);",
+            file=f,
+        )
+        print(f"}}", file=f)
     with open(f"vextrins_{width}.h", "w") as f:
         print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
         mask = 128 // w - 1
