@@ -55,9 +55,14 @@ union v128 {
   u16 half[8];
   u32 word[4];
   u64 dword[2];
-  __int128 qword[1];
+  u128 qword[1];
+
+  float fp32[4];
+  double fp64[2];
 
   v128(__m128i other) { m128i = other; }
+  v128(__m128d other) { m128d = other; }
+  v128(__m128 other) { m128 = other; }
   v128() {
     for (int i = 0; i < 8; i++) {
       half[i] = rand();
@@ -65,6 +70,8 @@ union v128 {
   }
 
   operator __m128i() { return m128i; }
+  operator __m128() { return m128; }
+  operator __m128d() { return m128d; }
   // duplicate with __m128i
   // operator v2i64() { return __v2i64; }
   operator v2u64() { return __v2u64; }
@@ -77,9 +84,19 @@ union v128 {
   bool operator==(const v128 &other) const {
     return memcmp(byte, other.byte, 16) == 0;
   }
+  bool operator!=(const v128 &other) const {
+    return memcmp(byte, other.byte, 16) != 0;
+  }
 };
 
 void test();
+
+void print(const char *s, v128 num) {
+  printf("v128 as __m128i %s: %016lx %016lx\n", s, num.dword[0], num.dword[1]);
+  printf("v128 as __m128 %s: %f %f %f %f\n", s, num.fp32[0], num.fp32[1],
+         num.fp32[2], num.fp32[3]);
+  printf("v128 as __m128d %s: %lf %lf\n", s, num.fp64[0], num.fp64[1]);
+}
 
 void print(const char *s, __m128i num) {
   printf("__m128i %s: %016llx %016llx\n", s, num[0], num[1]);
@@ -99,11 +116,14 @@ void print(const char *s, __m128d num) {
   do {                                                                         \
     for (int i = 0; i < 64; i++) {                                             \
       v128 a;                                                                  \
-      PRINT(a);                                                                \
-      PRINT(__lsx_##func(a __VA_OPT__(, ) __VA_ARGS__));                       \
-      PRINT(func(a __VA_OPT__(, ) __VA_ARGS__));                               \
-      assert(func(a __VA_OPT__(, ) __VA_ARGS__) ==                             \
-             __lsx_##func(a __VA_OPT__(, ) __VA_ARGS__));                      \
+      if (func(a __VA_OPT__(, ) __VA_ARGS__) !=                                \
+          __lsx_##func(a __VA_OPT__(, ) __VA_ARGS__)) {                        \
+        PRINT(a);                                                              \
+        PRINT(__lsx_##func(a __VA_OPT__(, ) __VA_ARGS__));                     \
+        PRINT(func(a __VA_OPT__(, ) __VA_ARGS__));                             \
+        assert(func(a __VA_OPT__(, ) __VA_ARGS__) ==                           \
+               __lsx_##func(a __VA_OPT__(, ) __VA_ARGS__));                    \
+      }                                                                        \
     }                                                                          \
   } while (0);
 
@@ -111,12 +131,15 @@ void print(const char *s, __m128d num) {
   do {                                                                         \
     for (int i = 0; i < 64; i++) {                                             \
       v128 a, b;                                                               \
-      PRINT(a);                                                                \
-      PRINT(b);                                                                \
-      PRINT(__lsx_##func(a, b __VA_OPT__(, ) __VA_ARGS__));                    \
-      PRINT(func(a, b __VA_OPT__(, ) __VA_ARGS__));                            \
-      assert(func(a, b __VA_OPT__(, ) __VA_ARGS__) ==                          \
-             __lsx_##func(a, b __VA_OPT__(, ) __VA_ARGS__));                   \
+      if (func(a, b __VA_OPT__(, ) __VA_ARGS__) !=                             \
+          __lsx_##func(a, b __VA_OPT__(, ) __VA_ARGS__)) {                     \
+        PRINT(a);                                                              \
+        PRINT(b);                                                              \
+        PRINT(__lsx_##func(a, b __VA_OPT__(, ) __VA_ARGS__));                  \
+        PRINT(func(a, b __VA_OPT__(, ) __VA_ARGS__));                          \
+        assert(func(a, b __VA_OPT__(, ) __VA_ARGS__) ==                        \
+               __lsx_##func(a, b __VA_OPT__(, ) __VA_ARGS__));                 \
+      }                                                                        \
     }                                                                          \
   } while (0);
 
@@ -124,12 +147,14 @@ void print(const char *s, __m128d num) {
   do {                                                                         \
     for (int i = 0; i < 64; i++) {                                             \
       v128 a, b, c;                                                            \
-      PRINT(a);                                                                \
-      PRINT(b);                                                                \
-      PRINT(c);                                                                \
-      PRINT(__lsx_##func(a, b, c));                                            \
-      PRINT(func(a, b, c));                                                    \
-      assert(func(a, b, c) == __lsx_##func(a, b, c));                          \
+      if (func(a, b, c) != __lsx_##func(a, b, c)) {                            \
+        PRINT(a);                                                              \
+        PRINT(b);                                                              \
+        PRINT(c);                                                              \
+        PRINT(__lsx_##func(a, b, c));                                          \
+        PRINT(func(a, b, c));                                                  \
+        assert(func(a, b, c) == __lsx_##func(a, b, c));                        \
+      }                                                                        \
     }                                                                          \
   } while (0);
 

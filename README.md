@@ -202,7 +202,7 @@ Vector Multiplication High
 
 ### vfmina.s/d
 
-### vfcvf.h.s/s.d
+### vfcvt.h.s
 
 ### vffint.s.l
 
@@ -281,10 +281,6 @@ Vector Multiplication High
 ### vfcvtl.s.h
 
 ### vfcvth.s.h
-
-### vfcvtl.d.s
-
-### vfcvth.d.s
 
 ### vffint.s.w/wu/d.l/d.lu
 

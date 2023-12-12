@@ -13,3 +13,5 @@ clean:
 
 %: %.cpp %.h
 	$(CXX) $< -mlsx -mlasx -o $@
+
+.SUFFIXES:
