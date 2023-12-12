@@ -2,9 +2,7 @@
 
 v128 vbitsel_v(v128 a, v128 b, v128 c) {
   v128 dst;
-  for (int i = 0; i < 2; i++) {
-    dst.dword[i] = (c.dword[i] & b.dword[i]) | (~c.dword[i] & a.dword[i]);
-  }
+#include "vbitsel_v.h"
   return dst;
 }
 

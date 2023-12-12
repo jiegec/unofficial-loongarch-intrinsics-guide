@@ -18,7 +18,5 @@ Compute bitwise selection: for each bit position, if the bit in `c` equals to on
 ### Operation
 
 ```c++
-for (int i = 0;i < 128;i++) {
-    dst.bit[i] = a.bit[i] ? b.bit[i] : c.bit[i];
-}
+{% include 'vbitsel_v.h' %}
 ```

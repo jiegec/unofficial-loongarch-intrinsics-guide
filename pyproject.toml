@@ -8,6 +8,7 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.9"
 mkdocs = "^1.5.3"
+mkdocs-macros-plugin = "^1.0.5"
 
 [build-system]
 requires = ["poetry-core"]

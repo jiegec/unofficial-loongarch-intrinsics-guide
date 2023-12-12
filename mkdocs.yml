@@ -6,3 +6,5 @@ theme:
 copyright: Copyright &copy; 2023 Jiajie Chen
 plugins:
   - search
+  - macros:
+      include_dir: code

@@ -20,16 +20,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics they ar
 ### Operation
 
 ```c++
-for (int i = 0;i < 16;i++) {
-    if (c.byte[i] >= 64) {
-        // Caveat: observed in 3C5000, but not in QEMU
-        dst.byte[i] = 0;
-    } else if ((c.byte[i] % 32) < 16) {
-        dst.byte[i] = b.byte[c.byte[i] % 16];
-    } else {
-        dst.byte[i] = a.byte[c.byte[i] % 16];
-    }
-}
+{% include 'vshuf_b.h' %}
 ```
 
 ## __m128i __lsx_vshuf_h (__m128i a, __m128i b, __m128i c)
@@ -50,16 +41,7 @@ Shuffle half words from `b` and `c` with indices from `a`.
 ### Operation
 
 ```c++
-for (int i = 0;i < 8;i++) {
-    if ((a.half[i] % 256) >= 64) {
-        // Caveat: observed in 3C5000, but not in QEMU
-        dst.half[i] = 0;
-    } else if ((a.half[i] % 16) < 8) {
-        dst.half[i] = c.half[a.half[i] % 8];
-    } else {
-        dst.half[i] = b.half[a.half[i] % 8];
-    }
-}
+{% include 'vshuf_h.h' %}
 ```
 
 ## __m128i __lsx_vshuf_w (__m128i a, __m128i b, __m128i c)
@@ -80,16 +62,7 @@ Shuffle words from `b` and `c` with indices from `a`.
 ### Operation
 
 ```c++
-for (int i = 0;i < 4;i++) {
-    if ((a.word[i] % 256) >= 64) {
-        // Caveat: observed in 3C5000, but not in QEMU
-        dst.word[i] = 0;
-    } else if ((a.word[i] % 8) < 4) {
-        dst.word[i] = c.word[a.word[i] % 4];
-    } else {
-        dst.word[i] = b.word[a.word[i] % 4];
-    }
-}
+{% include 'vshuf_w.h' %}
 ```
 
 ## __m128i __lsx_vshuf_d (__m128i a, __m128i b, __m128i c)
@@ -110,14 +83,5 @@ Shuffle double words from `b` and `c` with indices from `a`.
 ### Operation
 
 ```c++
-for (int i = 0;i < 2;i++) {
-    if ((a.dword[i] % 256) >= 64) {
-        // Caveat: observed in 3C5000, but not in QEMU
-        dst.dword[i] = 0;
-    } else if ((a.dword[i] % 4) < 2) {
-        dst.dword[i] = c.dword[a.dword[i] % 2];
-    } else {
-        dst.dword[i] = b.dword[a.dword[i] % 2];
-    }
-}
+{% include 'vshuf_d.h' %}
 ```
