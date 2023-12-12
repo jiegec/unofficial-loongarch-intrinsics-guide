@@ -7,9 +7,9 @@ v128 vbitseli_b(v128 a, v128 b, int imm) {
 }
 
 void test() {
-	FUZZ2(vbitseli_b, 0x00);
-	FUZZ2(vbitseli_b, 0x01);
-	FUZZ2(vbitseli_b, 0x01);
-	FUZZ2(vbitseli_b, 0x80);
-	FUZZ2(vbitseli_b, 0xFF);
-	}
+  FUZZ2(vbitseli_b, 0x00);
+  FUZZ2(vbitseli_b, 0x01);
+  FUZZ2(vbitseli_b, 0x01);
+  FUZZ2(vbitseli_b, 0x80);
+  FUZZ2(vbitseli_b, 0xFF);
+}

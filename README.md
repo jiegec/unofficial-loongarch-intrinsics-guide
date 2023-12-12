@@ -230,10 +230,6 @@ Vector Multiplication High
 
 ### vsubi.bu/hu/wu/du
 
-### vbsll.v
-
-### vbsrl.v
-
 ### vmaxi.b/h/w/d
 
 ### vmini.b/h/w/d
