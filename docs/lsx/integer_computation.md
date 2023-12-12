@@ -220,6 +220,11 @@
 {{ vsub('d') }}
 {{ vsub('q') }}
 
+{{ vsubi('bu') }}
+{{ vsubi('hu') }}
+{{ vsubi('wu') }}
+{{ vsubi('du') }}
+
 {{ vsubwev('h', 'b') }}
 {{ vsubwev('h', 'bu') }}
 {{ vsubwev('w', 'h') }}

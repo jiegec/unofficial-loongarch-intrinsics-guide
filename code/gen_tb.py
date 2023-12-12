@@ -1,6 +1,7 @@
 import os
 
 widths_signed = ["b", "h", "w", "d"]
+widths_unsigned = ["bu", "hu", "wu", "du"]
 widths_fp = ["s", "d"]
 widths_all = ["b", "bu", "h", "hu", "w", "wu", "d", "du"]
 widths_vexth = ["h_b", "hu_bu", "w_h", "wu_hu", "d_w", "du_wu", "q_d", "qu_du"]
@@ -32,6 +33,7 @@ widths_vsubw = [
 tb = {
     # widths, args, extra args for imm
     "vadd": (widths_signed, "v128 a, v128 b"),
+    "vaddi": (widths_unsigned, "v128 a, int imm", [0, 31]),
     "vavg": (widths_all, "v128 a, v128 b"),
     "vavgr": (widths_all, "v128 a, v128 b"),
     "vaddwev": (widths_vaddw, "v128 a, v128 b"),
@@ -83,10 +85,12 @@ tb = {
     "vreplve": (widths_signed, "v128 a, int idx", [0, 1]),
     "vreplvei": (widths_signed, "v128 a, int idx", [0, 1]),
     "vsadd": (widths_all, "v128 a, v128 b"),
-    "vsigncov": (widths_signed, "v128 a, v128 b"),
-    "vssub": (widths_all, "v128 a, v128 b"),
     "vseq": (widths_signed, "v128 a, v128 b"),
     "vseqi": (widths_signed, "v128 a, int imm", [-16, 0, 15]),
+    "vsigncov": (widths_signed, "v128 a, v128 b"),
+    "vssub": (widths_all, "v128 a, v128 b"),
+    "vsub": (widths_signed, "v128 a, v128 b"),
+    "vsubi": (widths_unsigned, "v128 a, int imm", [0, 31]),
     "vsll": (widths_signed, "v128 a, v128 b"),
     "vslt": (widths_all, "v128 a, v128 b"),
     "vslti": (widths_all, "v128 a, int imm", [0, 15]),

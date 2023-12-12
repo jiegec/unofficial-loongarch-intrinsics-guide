@@ -58,8 +58,6 @@ TODO List:
 
 ### vffintrne.w.d
 
-### vsubi.bu/hu/wu/du
-
 ### vfrstpi.b/h
 
 ### vneg.b/h/w/d

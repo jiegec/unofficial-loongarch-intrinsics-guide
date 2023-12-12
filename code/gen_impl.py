@@ -245,6 +245,14 @@ for width in ["b", "h", "w", "d"]:
                 file=f,
             )
             print(f"}}", file=f)
+    for name, op in [("add", "+"), ("sub", "-")]:
+        with open(f"v{name}i_{width}u.h", "w") as f:
+            print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+            print(
+                f"  dst.{m}[i] = a.{m}[i] {op} imm;",
+                file=f,
+            )
+            print(f"}}", file=f)
     with open(f"vmadd_{width}.h", "w") as f:
         print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
         print(

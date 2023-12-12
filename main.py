@@ -113,6 +113,15 @@ CPU Flags: LSX
         )
 
     @env.macro
+    def vsubi(name):
+        width = widths[name]
+        return instruction(
+            intrinsic=f"__m128i __lsx_vsubi_{name} (__m128i a, imm0_31 imm)",
+            instr=f"vsubi.{name} vr, vr, imm",
+            desc=f"Subtract {width}-bit elements in `a` by `imm`, save the result in `dst`.",
+        )
+
+    @env.macro
     def vadd_mul_sub_w_ev_od(op, desc, even_odd, wide, narrow, narrow2=None):
         wide_width = widths[wide]
         if narrow2 is None:

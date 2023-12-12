@@ -7,6 +7,6 @@ v128 vaddi_du(v128 a, int imm) {
 }
 
 void test() {
-  FUZZ1(vaddi_du, 1);
+  FUZZ1(vaddi_du, 0);
   FUZZ1(vaddi_du, 31);
 }
