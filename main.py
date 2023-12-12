@@ -62,6 +62,16 @@ CPU Flags: LSX
 """
 
     @env.macro
+    def vabsd(name):
+        width = widths[name]
+        signedness = signednesses[name]
+        return instruction(
+            intrinsic=f"__m128i __lsx_vabsd_{name} (__m128i a, __m128i b)",
+            instr=f"vabsd.{name} vr, vr, vr",
+            desc=f"Compute absolute difference of {signedness} {width}-bit elements in `a` and `b`, save the result in `dst`.",
+        )
+
+    @env.macro
     def vadd(name):
         width = widths[name]
         return instruction(
@@ -71,13 +81,21 @@ CPU Flags: LSX
         )
 
     @env.macro
-    def vabsd(name):
+    def vadda(name):
         width = widths[name]
-        signedness = signednesses[name]
         return instruction(
-            intrinsic=f"__m128i __lsx_vabsd_{name} (__m128i a, __m128i b)",
-            instr=f"vabsd.{name} vr, vr, vr",
-            desc=f"Compute absolute difference of {signedness} {width}-bit elements in `a` and `b`, save the result in `dst`.",
+            intrinsic=f"__m128i __lsx_vadda_{name} (__m128i a, __m128i b)",
+            instr=f"vadda.{name} vr, vr, vr",
+            desc=f"Add absolute of {width}-bit elements in `a` and `b`, save the result in `dst`.",
+        )
+
+    @env.macro
+    def vaddi(name):
+        width = widths[name]
+        return instruction(
+            intrinsic=f"__m128i __lsx_vaddi_{name} (__m128i a, imm0_31 imm)",
+            instr=f"vaddi.{name} vr, vr, imm",
+            desc=f"Add {width}-bit elements in `a` and `imm`, save the result in `dst`.",
         )
 
     @env.macro
@@ -100,11 +118,3 @@ CPU Flags: LSX
             desc=f"Read {width}-bit data from memory address `addr + (offset << {shift})`, replicate the data to all vector lanes and save into `dst`.",
         )
 
-    @env.macro
-    def vadda(name):
-        width = widths[name]
-        return instruction(
-            intrinsic=f"__m128i __lsx_vadda_{name} (__m128i a, __m128i b)",
-            instr=f"vadda.{name} vr, vr, vr",
-            desc=f"Add absolute of {width}-bit elements in `a` and `b`, save the result in `dst`.",
-        )

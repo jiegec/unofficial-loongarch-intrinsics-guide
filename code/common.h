@@ -23,6 +23,9 @@ union v128 {
   __m128 m128;
   __m128d m128d;
   v4i32 __v4i32;
+  v8i16 __v8i16;
+  v16i8 __v16i8;
+
   u8 byte[16];
   u16 half[8];
   u32 word[4];
@@ -38,6 +41,8 @@ union v128 {
 
   operator __m128i() { return m128i; }
   operator v4i32() { return __v4i32; }
+  operator v8i16() { return __v8i16; }
+  operator v16i8() { return __v16i8; }
   bool operator==(const v128 &other) const {
     return memcmp(byte, other.byte, 16) == 0;
   }

@@ -19,3 +19,8 @@
 {{ vadda('h') }}
 {{ vadda('w') }}
 {{ vadda('d') }}
+
+{{ vaddi('bu') }}
+{{ vaddi('hu') }}
+{{ vaddi('wu') }}
+{{ vaddi('du') }}
