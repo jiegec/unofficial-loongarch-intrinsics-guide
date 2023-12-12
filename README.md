@@ -30,10 +30,6 @@ TODO List:
 
 ### vssrarn.bu.h/hu.w/wu.d
 
-### vpackev.b/h/w/d
-
-### vpackod.b/h/w/d
-
 ### vpickev.b/h/w/d
 
 ### vpickod.b/h/w/d

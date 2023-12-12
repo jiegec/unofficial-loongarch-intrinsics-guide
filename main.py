@@ -698,3 +698,21 @@ memory_store({width}, data.{member}[lane], addr + offset);
             instr=f"vsrar.{name} vr, vr, vr",
             desc=f"Arithmetic right shift (with rounding) the signed {width}-bit elements in `a` by elements in `b`, store the result to `dst`.",
         )
+
+    @env.macro
+    def vpackev(name):
+        width = widths[name]
+        return instruction(
+            intrinsic=f"__m128i __lsx_vpackev_{name} (__m128i a, __m128i b)",
+            instr=f"vpackev.{name} vr, vr, vr",
+            desc=f"Collect and pack even-positioned {width}-bit elements in `a` and `b` and store `dst`.",
+        )
+
+    @env.macro
+    def vpackod(name):
+        width = widths[name]
+        return instruction(
+            intrinsic=f"__m128i __lsx_vpackod_{name} (__m128i a, __m128i b)",
+            instr=f"vpackod.{name} vr, vr, vr",
+            desc=f"Collect and pack odd-positioned {width}-bit elements in `a` and `b` and store `dst`.",
+        )
