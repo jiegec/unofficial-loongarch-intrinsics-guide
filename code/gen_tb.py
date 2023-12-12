@@ -73,6 +73,8 @@ tb = {
     "vmulwev": (widths_vaddw, "v128 a, v128 b"),
     "vmulwod": (widths_vaddw, "v128 a, v128 b"),
     "vpcnt": (widths_signed, "v128 a"),
+    "vsadd": (widths_all, "v128 a, v128 b"),
+    "vssub": (widths_all, "v128 a, v128 b"),
     "vseq": (widths_signed, "v128 a, v128 b"),
     "vslt": (widths_all, "v128 a, v128 b"),
     "vsle": (widths_all, "v128 a, v128 b"),

@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <assert.h>
+#include <limits>
 #include <lsxintrin.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -47,6 +48,31 @@ template <typename T> u8 popcount(T num) {
     }
   }
   return res;
+}
+
+// saturating add/sub
+// Adapted from:
+// https://codereview.stackexchange.com/questions/179172/c17-saturating-integer-arithmetic-type-library
+template <typename T> T sadd(T a, T b) {
+  T result;
+  if (b < 0) {
+    return __builtin_add_overflow(a, b, &result) ? std::numeric_limits<T>::min()
+                                                 : result;
+  } else {
+    return __builtin_add_overflow(a, b, &result) ? std::numeric_limits<T>::max()
+                                                 : result;
+  }
+}
+
+template <typename T> T ssub(T a, T b) {
+  T result;
+  if (b < 0) {
+    return __builtin_sub_overflow(a, b, &result) ? std::numeric_limits<T>::max()
+                                                 : result;
+  } else {
+    return __builtin_sub_overflow(a, b, &result) ? std::numeric_limits<T>::min()
+                                                 : result;
+  }
 }
 
 using std::max;

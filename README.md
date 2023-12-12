@@ -6,22 +6,6 @@ Arranged from QEMU implementation and [GCC Intrinsics](https://gcc.gnu.org/onlin
 
 TODO List:
 
-### vsadd.b/h/w/d
-
-Vector Saturated Add
-
-### vssub.b/h/w/d
-
-Vector Saturated Subtract
-
-### vsadd.bu/hu/wu/du
-
-Vector Saturated Add Unsigned
-
-### vssub.bu/hu/wu/du
-
-Vector Saturated Subtract Unsigned
-
 ### vmuh.b/h/w/d/bu/hu/wu/du
 
 Vector Multiplication High

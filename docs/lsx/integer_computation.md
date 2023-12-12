@@ -186,6 +186,16 @@
 {{ vmulwev('q', 'du') }}
 {{ vmulwev('q', 'du', 'd') }}
 
+{{ vsadd('b') }}
+{{ vsadd('h') }}
+{{ vsadd('w') }}
+{{ vsadd('d') }}
+
+{{ vssub('b') }}
+{{ vssub('h') }}
+{{ vssub('w') }}
+{{ vssub('d') }}
+
 {{ vsub('b') }}
 {{ vsub('h') }}
 {{ vsub('w') }}

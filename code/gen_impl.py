@@ -151,6 +151,14 @@ for width in ["b", "bu", "h", "hu", "w", "wu", "d", "du"]:
                 file=f,
             )
             print(f"}}", file=f)
+    for op in ["sadd", "ssub"]:
+        with open(f"v{op}_{width}.h", "w") as f:
+            print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+            print(
+                f"  dst.{m}[i] = ({sign}{w}){op}(({sign}{w})a.{m}[i], ({sign}{w})b.{m}[i]);",
+                file=f,
+            )
+            print(f"}}", file=f)
 
 for width in ["b", "bu", "h", "hu", "w", "wu", "d", "du"]:
     double_width = double_widths[width]

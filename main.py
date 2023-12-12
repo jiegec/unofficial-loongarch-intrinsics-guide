@@ -559,7 +559,7 @@ memory_store({width}, data.{member}[lane], addr + offset);
         width = widths[name]
         return instruction(
             intrinsic=f"__m128i __lsx_vseq_{name} (__m128i a, __m128i b)",
-            instr=f"vseq.{name} vr, vr",
+            instr=f"vseq.{name} vr, vr, vr",
             desc=f"Compare the {width}-bit elements in `a` and `b`, store all-ones to `dst` if equal, zero otherwise.",
         )
 
@@ -569,7 +569,7 @@ memory_store({width}, data.{member}[lane], addr + offset);
         signedness = signednesses[name]
         return instruction(
             intrinsic=f"__m128i __lsx_vslt_{name} (__m128i a, __m128i b)",
-            instr=f"vslt.{name} vr, vr",
+            instr=f"vslt.{name} vr, vr, vr",
             desc=f"Compare the {signedness} {width}-bit elements in `a` and `b`, store all-ones to `dst` if corresponding element in `a` is less than `b`, zero otherwise.",
         )
 
@@ -579,6 +579,26 @@ memory_store({width}, data.{member}[lane], addr + offset);
         signedness = signednesses[name]
         return instruction(
             intrinsic=f"__m128i __lsx_vslt_{name} (__m128i a, __m128i b)",
-            instr=f"vslt.{name} vr, vr",
+            instr=f"vslt.{name} vr, vr, vr",
             desc=f"Compare the {signedness} {width}-bit elements in `a` and `b`, store all-ones to `dst` if corresponding element in `a` is less than or equal `b`, zero otherwise.",
+        )
+
+    @env.macro
+    def vsadd(name):
+        width = widths[name]
+        signedness = signednesses[name]
+        return instruction(
+            intrinsic=f"__m128i __lsx_vsadd_{name} (__m128i a, __m128i b)",
+            instr=f"vsadd.{name} vr, vr, vr",
+            desc=f"Saturing add the {signedness} {width}-bit elements in `a` and `b`, store the result to `dst`.",
+        )
+
+    @env.macro
+    def vssub(name):
+        width = widths[name]
+        signedness = signednesses[name]
+        return instruction(
+            intrinsic=f"__m128i __lsx_vsadd_{name} (__m128i a, __m128i b)",
+            instr=f"vsadd.{name} vr, vr, vr",
+            desc=f"Saturing add the {signedness} {width}-bit elements in `a` and `b`, store the result to `dst`.",
         )
