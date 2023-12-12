@@ -26,20 +26,12 @@ Vector Set Equal/Less than or Equal/Less Than
 
 Vector Subtract
 
-### vaddwev.h.b/w.h/d.w/q.d
-
-Vector Add with Width Extension
-
 ### vsubwev.h.b/w.h/d.w/q.d
 
 Vector Subtract with Width Extension
 
 ### vaddwod.h.b/w.h/d.w/q.d
 ### vsubwod.h.b/w.h/d.w/q.d
-
-### vaddwev.h.bu/w.hu/d.wu/q.du
-
-Vector Add with Width Extension Unsigned
 
 ### vsubwev.h.bu/w.hu/d.wu/q.du
 
@@ -48,7 +40,6 @@ Vector Subtract with Width Extension Unsigned
 ### vaddwod.h.bu/w.hu/d.wu/q.du
 ### vsubwod.h.bu/w.hu/d.wu/q.du
 
-### vaddwev.h.bu.b/w.hu.h/q.wu.w/q.du.d
 ### vaddwod.h.bu.b/w.hu.h/q.wu.w/q.du.d
 
 ### vsadd.b/h/w/d
@@ -259,8 +250,6 @@ Vector Multiplication High
 ### vslei.b/h/w/d/bu/hu/wu/du
 
 ### vslti.b/h/w/d/bu/hu/wu/du
-
-### vaddi.bu/hu/wu/du
 
 ### vsubi.bu/hu/wu/du
 

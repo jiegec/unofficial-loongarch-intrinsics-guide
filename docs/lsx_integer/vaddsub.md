@@ -24,3 +24,16 @@
 {{ vaddi('hu') }}
 {{ vaddi('wu') }}
 {{ vaddi('du') }}
+
+{{ vaddwev('h', 'b') }}
+{{ vaddwev('h', 'bu') }}
+{{ vaddwev('h', 'bu', 'b') }}
+{{ vaddwev('w', 'h') }}
+{{ vaddwev('w', 'hu') }}
+{{ vaddwev('w', 'hu', 'h') }}
+{{ vaddwev('d', 'w') }}
+{{ vaddwev('d', 'wu') }}
+{{ vaddwev('d', 'wu', 'w') }}
+{{ vaddwev('q', 'd') }}
+{{ vaddwev('q', 'du') }}
+{{ vaddwev('q', 'du', 'd') }}
