@@ -163,6 +163,11 @@
 {{ vminmaxi('min', 'd') }}
 {{ vminmaxi('min', 'du') }}
 
+{{ vmsub('b') }}
+{{ vmsub('h') }}
+{{ vmsub('w') }}
+{{ vmsub('d') }}
+
 {{ vmul('b') }}
 {{ vmul('h') }}
 {{ vmul('w') }}

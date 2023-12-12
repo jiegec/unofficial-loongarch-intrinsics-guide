@@ -42,8 +42,6 @@ Vector Saturated Subtract Unsigned
 
 Vector Multiplication High
 
-### vmsub.b/h/w/d
-
 ### vmod.b/h/w/d
 
 ### vmod.bu/hu/wu/du

@@ -516,3 +516,12 @@ for (int i = 0;i < 2;i++) {{
             instr=f"vmul.{name} vr, vr, vr",
             desc=f"Multiply {width}-bit elements in `a` and `b`, save the result in `dst`.",
         )
+
+    @env.macro
+    def vmsub(name):
+        width = widths[name]
+        return instruction(
+            intrinsic=f"__m128i __lsx_vmsub_{name} (__m128i a, __m128i b, __m128i c)",
+            instr=f"vmsub.{name} vr, vr, vr",
+            desc=f"Multiply {width}-bit elements in `b` and `c`, negate and add elements in `a`, save the result in `dst`.",
+        )
