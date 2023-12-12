@@ -81,6 +81,7 @@ for width in ["b", "bu", "h", "hu", "w", "wu", "d", "du"]:
             file=f,
         )
         print(f"}}", file=f)
+
     double_width = double_widths_same_signedness[width]
     double_w = widths[double_width]
     double_m = members[double_width]
@@ -88,6 +89,20 @@ for width in ["b", "bu", "h", "hu", "w", "wu", "d", "du"]:
         print(f"for (int i = 0;i < {128 // double_w};i++) {{", file=f)
         print(
             f"  dst.{double_m}[i] = ({sign}{double_w})({sign}{w})a.{m}[{128 // double_w} + i];",
+            file=f,
+        )
+        print(f"}}", file=f)
+    with open(f"vhaddw_{double_width}_{width}.h", "w") as f:
+        print(f"for (int i = 0;i < {128 // double_w};i++) {{", file=f)
+        print(
+            f"  dst.{double_m}[i] = ({sign}{double_w})({sign}{w})a.{m}[2 * i + 1] + ({sign}{double_w})({sign}{w})b.{m}[2 * i];",
+            file=f,
+        )
+        print(f"}}", file=f)
+    with open(f"vhsubw_{double_width}_{width}.h", "w") as f:
+        print(f"for (int i = 0;i < {128 // double_w};i++) {{", file=f)
+        print(
+            f"  dst.{double_m}[i] = ({sign}{double_w})({sign}{w})a.{m}[2 * i + 1] - ({sign}{double_w})({sign}{w})b.{m}[2 * i];",
             file=f,
         )
         print(f"}}", file=f)

@@ -77,3 +77,21 @@
 {{ vdiv('wu') }}
 {{ vdiv('d') }}
 {{ vdiv('du') }}
+
+{{ vhaddw('h', 'b') }}
+{{ vhaddw('hu', 'bu') }}
+{{ vhaddw('w', 'h') }}
+{{ vhaddw('wu', 'hu') }}
+{{ vhaddw('d', 'w') }}
+{{ vhaddw('du', 'wu') }}
+{{ vhaddw('q', 'd') }}
+{{ vhaddw('qu', 'du') }}
+
+{{ vhsubw('h', 'b') }}
+{{ vhsubw('hu', 'bu') }}
+{{ vhsubw('w', 'h') }}
+{{ vhsubw('wu', 'hu') }}
+{{ vhsubw('d', 'w') }}
+{{ vhsubw('du', 'wu') }}
+{{ vhsubw('q', 'd') }}
+{{ vhsubw('qu', 'du') }}

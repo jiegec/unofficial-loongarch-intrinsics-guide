@@ -54,22 +54,6 @@ Vector Saturated Add Unsigned
 
 Vector Saturated Subtract Unsigned
 
-### vhaddw.h.b/w.h/d.w/q.d
-
-Vector Half Add
-
-### vhsubw.h.b/w.h/d.w/q.d
-
-Vector Half Add
-
-### vhaddw.hu.bu/wu.hu/du.wu/qu.du
-
-Vector Half Add Unsigned
-
-### vhsubw.hu.bu/wu.hu/du.wu/qu.du
-
-Vector Half Sub Unsigned
-
 ### vmax.b/h/w/d
 
 Vector Maximum

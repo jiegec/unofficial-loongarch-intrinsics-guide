@@ -344,6 +344,28 @@ for (int i = 0;i < 2;i++) {{
         )
 
     @env.macro
+    def vhaddw(name, name2):
+        width = widths[name[0]]
+        width2 = widths[name2[0]]
+        signedness = signednesses[name]
+        return instruction(
+            intrinsic=f"__m128i __lsx_vhaddw_{name}_{name2} (__m128i a, __m128i b)",
+            instr=f"vhaddw.{name}.{name2} vr, vr, vr",
+            desc=f"Add odd-positioned {signedness} {width2}-bit elements in `a` to even-positioned {signedness} {width2}-bit elements in 'b' to get {width}-bit result.",
+        )
+
+    @env.macro
+    def vhsubw(name, name2):
+        width = widths[name[0]]
+        width2 = widths[name2[0]]
+        signedness = signednesses[name]
+        return instruction(
+            intrinsic=f"__m128i __lsx_vhsubw_{name}_{name2} (__m128i a, __m128i b)",
+            instr=f"vhsubw.{name}.{name2} vr, vr, vr",
+            desc=f"Subtract odd-positioned {signedness} {width2}-bit elements in `a` by even-positioned {signedness} {width2}-bit elements in 'b' to get {width}-bit result.",
+        )
+
+    @env.macro
     def vshuf_hwd(name):
         width = widths[name]
         return instruction(
