@@ -265,6 +265,15 @@ CPU Flags: LSX
         )
 
     @env.macro
+    def vextrins(name):
+        width = widths[name[0]]
+        return instruction(
+            intrinsic=f"__m128i __lsx_vextrins_{name} (__m128i a, __m128i b, imm0_255 imm)",
+            instr=f"vextrins.{name} vr, vr, imm",
+            desc=f"Extract one {width}-bit element in `b` and insert it to `a` according to `imm`.",
+        )
+
+    @env.macro
     def vshuf_hwd(name):
         width = widths[name]
         return instruction(

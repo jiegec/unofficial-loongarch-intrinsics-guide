@@ -191,5 +191,13 @@ for width in ["b", "h", "w", "d"]:
             file=f,
         )
         print(f"}}", file=f)
+    with open(f"vextrins_{width}.h", "w") as f:
+        print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+        mask = 128 // w - 1
+        print(
+            f"  dst.{m}[i] = (i == ((imm >> 4) & {mask})) ? b.{m}[imm & {mask}] : a.{m}[i];",
+            file=f,
+        )
+        print(f"}}", file=f)
 
 os.system("clang-format -i *.cpp *.h")

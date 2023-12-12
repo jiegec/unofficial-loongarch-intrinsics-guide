@@ -93,3 +93,8 @@ Compute bitwise selection: for each bit position, if the bit in `a` equals to on
 
 {{ vextl('q', 'd') }}
 {{ vextl('qu', 'du') }}
+
+{{ vextrins('b') }}
+{{ vextrins('h') }}
+{{ vextrins('w') }}
+{{ vextrins('d') }}

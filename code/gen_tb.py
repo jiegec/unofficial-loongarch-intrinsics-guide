@@ -2,16 +2,7 @@ import os
 
 widths_signed = ["b", "h", "w", "d"]
 widths_all = ["b", "bu", "h", "hu", "w", "wu", "d", "du"]
-widths_vexth = [
-    "h_b",
-    "hu_bu",
-    "w_h",
-    "wu_hu",
-    "d_w",
-    "du_wu",
-    "q_d",
-    "qu_du"
-]
+widths_vexth = ["h_b", "hu_bu", "w_h", "wu_hu", "d_w", "du_wu", "q_d", "qu_du"]
 widths_vaddw = [
     "h_b",
     "h_bu",
@@ -44,6 +35,7 @@ tb = {
     "vdiv": (widths_all, "v128 a, v128 b"),
     "vexth": (widths_vexth, "v128 a"),
     "vextl": (["q_d", "qu_du"], "v128 a"),
+    "vextrins": (widths_signed, "v128 a, v128 b, int imm", [0, 3, 7, 15, 16, 32, 64, 128, 255]),
 }
 
 for name in tb:

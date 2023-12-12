@@ -372,8 +372,6 @@ Vector Multiplication High
 
 ### vssrarni.bu.h/hu.w/wu.d/du.q
 
-### vextrins.d/w/h/b
-
 ### vshuf4i.b/h/w/d
 
 ### vori.b
