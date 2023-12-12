@@ -219,6 +219,20 @@ for width in ["b", "h", "w", "d"]:
             file=f,
         )
         print(f"}}", file=f)
+    with open(f"vilvh_{width}.h", "w") as f:
+        print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+        print(
+            f"  dst.{m}[i] = (i % 2 == 1) ? a.{m}[i / 2 + {64 // w}] : b.{m}[i / 2 + {64 // w}];",
+            file=f,
+        )
+        print(f"}}", file=f)
+    with open(f"vilvl_{width}.h", "w") as f:
+        print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+        print(
+            f"  dst.{m}[i] = (i % 2 == 1) ? a.{m}[i / 2] : b.{m}[i / 2];",
+            file=f,
+        )
+        print(f"}}", file=f)
 
 for width in ["s", "d"]:
     m = members_fp[width]

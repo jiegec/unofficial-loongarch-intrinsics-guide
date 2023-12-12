@@ -146,10 +146,6 @@ Vector Multiplication High
 
 ### vpackod.b/h/w/d
 
-### vilvl.b/h/w/d
-
-### vilvh.b/h/w/d
-
 ### vpickev.b/h/w/d
 
 ### vpickod.b/h/w/d

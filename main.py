@@ -366,6 +366,24 @@ for (int i = 0;i < 2;i++) {{
         )
 
     @env.macro
+    def vilvh(name):
+        width = widths[name]
+        return instruction(
+            intrinsic=f"__m128i __lsx_vilvh_{name} (__m128i a, __m128i b)",
+            instr=f"vilvh.{name} vr, vr, vr",
+            desc=f"Interleave {width}-bit elements in higher half of `a` and `b`.",
+        )
+
+    @env.macro
+    def vilvl(name):
+        width = widths[name]
+        return instruction(
+            intrinsic=f"__m128i __lsx_vilvl_{name} (__m128i a, __m128i b)",
+            instr=f"vilvl.{name} vr, vr, vr",
+            desc=f"Interleave {width}-bit elements in lower half of `a` and `b`.",
+        )
+
+    @env.macro
     def vshuf_hwd(name):
         width = widths[name]
         return instruction(

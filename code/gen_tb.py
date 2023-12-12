@@ -39,6 +39,8 @@ tb = {
     "vextrins": (widths_signed, "v128 a, v128 b, int imm", [0, 3, 7, 15, 16, 32, 64, 128, 255]),
     "vhaddw": (widths_vexth, "v128 a, v128 b"),
     "vhsubw": (widths_vexth, "v128 a, v128 b"),
+    "vilvh": (widths_signed, "v128 a, v128 b"),
+    "vilvl": (widths_signed, "v128 a, v128 b"),
 }
 
 for name in tb:
