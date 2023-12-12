@@ -51,9 +51,9 @@ Shuffle half words from `b` and `c` with indices from `a`.
 
 ```c++
 for (int i = 0;i < 8;i++) {
-    if (a.half[i] >= 64) {
+    if ((a.half[i] % 256) >= 64) {
         // Caveat: observed in 3C5000, but not in QEMU
-        dst.byte[i] = 0;
+        dst.half[i] = 0;
     } else if ((a.half[i] % 16) < 8) {
         dst.half[i] = c.half[a.half[i] % 8];
     } else {
@@ -81,7 +81,7 @@ Shuffle words from `b` and `c` with indices from `a`.
 
 ```c++
 for (int i = 0;i < 4;i++) {
-    if (a.word[i] >= 64) {
+    if ((a.word[i] % 256) >= 64) {
         // Caveat: observed in 3C5000, but not in QEMU
         dst.word[i] = 0;
     } else if ((a.word[i] % 8) < 4) {
@@ -111,7 +111,7 @@ Shuffle double words from `b` and `c` with indices from `a`.
 
 ```c++
 for (int i = 0;i < 2;i++) {
-    if (a.dword[i] >= 64) {
+    if ((a.dword[i] % 256) >= 64) {
         // Caveat: observed in 3C5000, but not in QEMU
         dst.dword[i] = 0;
     } else if ((a.dword[i] % 4) < 2) {
