@@ -1,6 +1,6 @@
 # Bitwise Selection
 
-## __m128d __lsx_vfnmsub_d (__m128d a, __m128d b, __m128d c)
+## __m128i __lsx_vbitsel_v (__m128i a, __m128i b, __m128i c)
 
 ### Synopsis
 
