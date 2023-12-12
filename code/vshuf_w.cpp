@@ -6,6 +6,4 @@ v128 vshuf_w(v128 a, v128 b, v128 c) {
   return dst;
 }
 
-void test() {
-  FUZZ3(vshuf_w);
-}
+void test() { FUZZ3(vshuf_w); }

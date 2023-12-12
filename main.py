@@ -118,6 +118,25 @@ CPU Flags: LSX
         )
 
     @env.macro
+    def vaddwod(wide, narrow, narrow2=None):
+        wide_width = widths[wide]
+        if narrow2 is None:
+            narrow2 = narrow
+            inst_suffix = ""
+            intrinsic_suffix = ""
+        else:
+            inst_suffix = f".{narrow2}"
+            intrinsic_suffix = f"_{narrow2}"
+        narrow_width = widths[narrow]
+        signedness = signednesses[narrow]
+        signedness2 = signednesses[narrow2]
+        return instruction(
+            intrinsic=f"__m128i __lsx_vaddwod_{wide}_{narrow}{intrinsic_suffix} (__m128i a, __m128i b)",
+            instr=f"vaddwod.{wide}.{narrow}{inst_suffix} vr, vr, vr",
+            desc=f"Add odd-positioned {signedness} {narrow_width}-bit elements in `a` and {signedness2} elements in `b`, save the {wide_width}-bit result in `dst`.",
+        )
+
+    @env.macro
     def vavg(name):
         width = widths[name]
         signedness = signednesses[name]

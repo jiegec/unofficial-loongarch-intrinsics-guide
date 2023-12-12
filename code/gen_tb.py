@@ -1,8 +1,26 @@
+import os
+
 widths_all = ["b", "bu", "h", "hu", "w", "wu", "d", "du"]
+widths_vaddw = [
+    "h_b",
+    "h_bu",
+    "h_bu_b",
+    "w_h",
+    "w_hu",
+    "w_hu_h",
+    "d_w",
+    "d_wu",
+    "d_wu_w",
+    "q_d",
+    "q_du",
+    "q_du_d",
+]
 
 tb = {
     "vavg": (widths_all, "v128 a, v128 b"),
-    "vavgr": (widths_all, "v128 a, v128 b")
+    "vavgr": (widths_all, "v128 a, v128 b"),
+    "vaddwev": (widths_vaddw, "v128 a, v128 b"),
+    "vaddwod": (widths_vaddw, "v128 a, v128 b"),
 }
 
 for name in tb:
@@ -14,20 +32,22 @@ for name in tb:
         inst_name = name + "_" + width
 
         fuzz_args = 0
-        for arg in args.split(', '):
-            if 'v128' in arg:
+        for arg in args.split(", "):
+            if "v128" in arg:
                 fuzz_args += 1
 
-        print(f'Saving {inst_name}.cpp')
-        with open(f'{inst_name}.cpp', 'w') as f:
+        print(f"Saving {inst_name}.cpp")
+        with open(f"{inst_name}.cpp", "w") as f:
             print('#include "common.h"', file=f)
-            print('', file=f)
-            print(f'v128 {inst_name}({args}) {{', file=f)
-            print('  v128 dst;', file=f)
+            print("", file=f)
+            print(f"v128 {inst_name}({args}) {{", file=f)
+            print("  v128 dst;", file=f)
             print(f'#include "{inst_name}.h"', file=f)
-            print('  return dst;', file=f)
-            print('}', file=f)
-            print('', file=f)
-            print('void test() {', file=f)
-            print(f'  FUZZ{fuzz_args}({inst_name});', file=f)
-            print('}', file=f)
+            print("  return dst;", file=f)
+            print("}", file=f)
+            print("", file=f)
+            print("void test() {", file=f)
+            print(f"  FUZZ{fuzz_args}({inst_name});", file=f)
+            print("}", file=f)
+
+os.system("clang-format -i *.cpp *.h")

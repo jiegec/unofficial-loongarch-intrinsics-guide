@@ -7,4 +7,3 @@ v128 vadda_w(v128 a, v128 b) {
 }
 
 void test() { FUZZ2(vadda_w); }
-

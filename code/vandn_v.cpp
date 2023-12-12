@@ -6,6 +6,4 @@ v128 vandn_v(v128 a, v128 b) {
   return dst;
 }
 
-void test() {
-  FUZZ2(vandn_v);
-}
+void test() { FUZZ2(vandn_v); }

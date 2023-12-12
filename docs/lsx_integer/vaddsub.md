@@ -38,6 +38,19 @@
 {{ vaddwev('q', 'du') }}
 {{ vaddwev('q', 'du', 'd') }}
 
+{{ vaddwod('h', 'b') }}
+{{ vaddwod('h', 'bu') }}
+{{ vaddwod('h', 'bu', 'b') }}
+{{ vaddwod('w', 'h') }}
+{{ vaddwod('w', 'hu') }}
+{{ vaddwod('w', 'hu', 'h') }}
+{{ vaddwod('d', 'w') }}
+{{ vaddwod('d', 'wu') }}
+{{ vaddwod('d', 'wu', 'w') }}
+{{ vaddwod('q', 'd') }}
+{{ vaddwod('q', 'du') }}
+{{ vaddwod('q', 'du', 'd') }}
+
 {{ vavg('b') }}
 {{ vavg('bu') }}
 {{ vavg('h') }}

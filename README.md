@@ -30,17 +30,13 @@ Vector Subtract
 
 Vector Subtract with Width Extension
 
-### vaddwod.h.b/w.h/d.w/q.d
 ### vsubwod.h.b/w.h/d.w/q.d
 
 ### vsubwev.h.bu/w.hu/d.wu/q.du
 
 Vector Subtract with Width Extension Unsigned
 
-### vaddwod.h.bu/w.hu/d.wu/q.du
 ### vsubwod.h.bu/w.hu/d.wu/q.du
-
-### vaddwod.h.bu.b/w.hu.h/q.wu.w/q.du.d
 
 ### vsadd.b/h/w/d
 
