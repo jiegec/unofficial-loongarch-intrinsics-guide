@@ -24,8 +24,12 @@ union v128 {
   __m128i m128i;
   __m128 m128;
   __m128d m128d;
+  v2i64 __v2i64;
+  v2u64 __v2u64;
   v4i32 __v4i32;
+  v4u32 __v4u32;
   v8i16 __v8i16;
+  v8u16 __v8u16;
   v16i8 __v16i8;
   v16u8 __v16u8;
 
@@ -43,8 +47,13 @@ union v128 {
   }
 
   operator __m128i() { return m128i; }
+  // duplicate with __m128i
+  // operator v2i64() { return __v2i64; }
+  operator v2u64() { return __v2u64; }
   operator v4i32() { return __v4i32; }
+  operator v4u32() { return __v4u32; }
   operator v8i16() { return __v8i16; }
+  operator v8u16() { return __v8u16; }
   operator v16i8() { return __v16i8; }
   operator v16u8() { return __v16u8; }
   bool operator==(const v128 &other) const {

@@ -1,5 +1,6 @@
 import os
 
+widths_signed = ["b", "h", "w", "d"]
 widths_all = ["b", "bu", "h", "hu", "w", "wu", "d", "du"]
 widths_vaddw = [
     "h_b",
@@ -17,10 +18,13 @@ widths_vaddw = [
 ]
 
 tb = {
+    # widths, args, extra args for imm
     "vavg": (widths_all, "v128 a, v128 b"),
     "vavgr": (widths_all, "v128 a, v128 b"),
     "vaddwev": (widths_vaddw, "v128 a, v128 b"),
     "vaddwod": (widths_vaddw, "v128 a, v128 b"),
+    "vbitclr": (widths_signed, "v128 a, v128 b"),
+    "vbitclri": (widths_signed, "v128 a, int imm", [0, 3, 7]),
 }
 
 for name in tb:
@@ -47,7 +51,11 @@ for name in tb:
             print("}", file=f)
             print("", file=f)
             print("void test() {", file=f)
-            print(f"  FUZZ{fuzz_args}({inst_name});", file=f)
+            if len(t) >= 3:
+                for imm in t[2]:
+                    print(f"  FUZZ{fuzz_args}({inst_name}, {imm});", file=f)
+            else:
+                print(f"  FUZZ{fuzz_args}({inst_name});", file=f)
             print("}", file=f)
 
 os.system("clang-format -i *.cpp *.h")

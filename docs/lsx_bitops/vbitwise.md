@@ -1,4 +1,4 @@
-# Bitwise Selection
+# Bitwise Operations
 
 ## __m128i __lsx_vbitsel_v (__m128i a, __m128i b, __m128i c)
 
@@ -20,3 +20,13 @@ Compute bitwise selection: for each bit position, if the bit in `c` equals to on
 ```c++
 {% include 'vbitsel_v.h' %}
 ```
+
+{{ vbitclr('b') }}
+{{ vbitclr('h') }}
+{{ vbitclr('w') }}
+{{ vbitclr('d') }}
+
+{{ vbitclri('b') }}
+{{ vbitclri('h') }}
+{{ vbitclri('w') }}
+{{ vbitclri('d') }}

@@ -95,4 +95,22 @@ for width in ["b", "bu", "h", "hu", "w", "wu", "d", "du"]:
             )
             print(f"}}", file=f)
 
+for width in ["b", "h", "w", "d"]:
+    w = widths[width]
+    m = members[width]
+    with open(f"vbitclr_{width}.h", "w") as f:
+        print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+        print(
+            f"  dst.{m}[i] = a.{m}[i] & (~((u{w})1 << (b.{m}[i] % {w})));",
+            file=f,
+        )
+        print(f"}}", file=f)
+    with open(f"vbitclri_{width}.h", "w") as f:
+        print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+        print(
+            f"  dst.{m}[i] = a.{m}[i] & (~((u{w})1 << imm));",
+            file=f,
+        )
+        print(f"}}", file=f)
+
 os.system("clang-format -i *.cpp *.h")
