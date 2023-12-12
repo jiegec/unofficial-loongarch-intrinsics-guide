@@ -44,3 +44,8 @@
 {{ vreplvei('h') }}
 {{ vreplvei('w') }}
 {{ vreplvei('d') }}
+
+{{ vsigncov('b') }}
+{{ vsigncov('h') }}
+{{ vsigncov('w') }}
+{{ vsigncov('d') }}

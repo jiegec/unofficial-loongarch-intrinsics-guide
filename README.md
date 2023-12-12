@@ -32,8 +32,6 @@ TODO List:
 
 ### vfrstp.b/h
 
-### vsignconv.b/h/w/d
-
 ### vfsub.s/d
 
 ### vfmul.s/d

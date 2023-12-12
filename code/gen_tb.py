@@ -83,6 +83,7 @@ tb = {
     "vreplve": (widths_signed, "v128 a, int idx", [0, 1]),
     "vreplvei": (widths_signed, "v128 a, int idx", [0, 1]),
     "vsadd": (widths_all, "v128 a, v128 b"),
+    "vsigncov": (widths_signed, "v128 a, v128 b"),
     "vssub": (widths_all, "v128 a, v128 b"),
     "vseq": (widths_signed, "v128 a, v128 b"),
     "vsll": (widths_signed, "v128 a, v128 b"),

@@ -753,3 +753,12 @@ memory_store({width}, data.{member}[lane], addr + offset);
             instr=f"vreplvei.{name} vr, vr, imm",
             desc=f"Repeat the element in lane `idx` of `a` to whole vector.",
         )
+
+    @env.macro
+    def vsigncov(name):
+        width = widths[name]
+        return instruction(
+            intrinsic=f"__m128i __lsx_vsigncov_{name} (__m128i a, __m128i b)",
+            instr=f"vsigncov.{name} vr, vr, vr",
+            desc=f"If the {width}-bit element in `a` equals to zero, set the result to zero. If the signed {width}-bit element in `a` is posiive, copy element in `b` to result. Otherwise, copy negated element in `b` to result.",
+        )
