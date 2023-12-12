@@ -145,6 +145,13 @@
 {{ vmulwev('q', 'du') }}
 {{ vmulwev('q', 'du', 'd') }}
 
+{{ vsub('b') }}
+{{ vsub('h') }}
+{{ vsub('w') }}
+{{ vsub('d') }}
+{{ vsub('q') }}
+
+
 {{ vsubwev('h', 'b') }}
 {{ vsubwev('h', 'bu') }}
 {{ vsubwev('w', 'h') }}

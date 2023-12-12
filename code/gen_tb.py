@@ -31,6 +31,7 @@ widths_vsubw = [
 
 tb = {
     # widths, args, extra args for imm
+    "vadd": (widths_signed, "v128 a, v128 b"),
     "vavg": (widths_all, "v128 a, v128 b"),
     "vavgr": (widths_all, "v128 a, v128 b"),
     "vaddwev": (widths_vaddw, "v128 a, v128 b"),
@@ -66,6 +67,7 @@ tb = {
     "vmini": (widths_all, "v128 a, int imm", [0, 3, 15]),
     "vmulwev": (widths_vaddw, "v128 a, v128 b"),
     "vmulwod": (widths_vaddw, "v128 a, v128 b"),
+    "vsub": (widths_signed, "v128 a, v128 b"),
     "vsubwev": (widths_vsubw, "v128 a, v128 b"),
     "vsubwod": (widths_vsubw, "v128 a, v128 b"),
 }

@@ -22,10 +22,6 @@ Vector Store with Register Offset
 
 Vector Set Equal/Less than or Equal/Less Than
 
-### vsub.b/h/w/d
-
-Vector Subtract
-
 ### vsadd.b/h/w/d
 
 Vector Saturated Add
@@ -123,8 +119,6 @@ Vector Multiplication High
 ### vorn.v
 
 ### vfrstp.b/h
-
-### vsub.q
 
 ### vsignconv.b/h/w/d
 

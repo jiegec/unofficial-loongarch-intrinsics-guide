@@ -447,3 +447,11 @@ for (int i = 0;i < 2;i++) {{
             desc=f"Read {width}-bit data from memory address `addr + (offset << {shift})`, replicate the data to all vector lanes and save into `dst`.",
         )
 
+    @env.macro
+    def vsub(name):
+        width = widths[name]
+        return instruction(
+            intrinsic=f"__m128i __lsx_vsub_{name} (__m128i a, __m128i b)",
+            instr=f"vsub.{name} vr, vr, vr",
+            desc=f"Subtract {width}-bit elements in `a` and `b`, save the result in `dst`.",
+        )
