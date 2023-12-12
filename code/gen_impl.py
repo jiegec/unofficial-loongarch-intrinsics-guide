@@ -115,6 +115,34 @@ for width in ["b", "bu", "h", "hu", "w", "wu", "d", "du"]:
                 file=f,
             )
             print(f"}}", file=f)
+    with open(f"vmax_{width}.h", "w") as f:
+        print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+        print(
+            f"  dst.{m}[i] = max(({sign}{w})a.{m}[i], ({sign}{w})b.{m}[i]);",
+            file=f,
+        )
+        print(f"}}", file=f)
+    with open(f"vmaxi_{width}.h", "w") as f:
+        print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+        print(
+            f"  dst.{m}[i] = max(({sign}{w})a.{m}[i], ({sign}{w})imm);",
+            file=f,
+        )
+        print(f"}}", file=f)
+    with open(f"vmin_{width}.h", "w") as f:
+        print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+        print(
+            f"  dst.{m}[i] = min(({sign}{w})a.{m}[i], ({sign}{w})b.{m}[i]);",
+            file=f,
+        )
+        print(f"}}", file=f)
+    with open(f"vmini_{width}.h", "w") as f:
+        print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+        print(
+            f"  dst.{m}[i] = min(({sign}{w})a.{m}[i], ({sign}{w})imm);",
+            file=f,
+        )
+        print(f"}}", file=f)
 
 for width in ["b", "bu", "h", "hu", "w", "wu", "d", "du"]:
     double_width = double_widths[width]

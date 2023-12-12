@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <assert.h>
 #include <lsxintrin.h>
 #include <stdint.h>
@@ -37,6 +38,9 @@ template <typename T> u8 clz(T num) {
   }
   return sizeof(T) * 8;
 }
+
+using std::max;
+using std::min;
 
 union v128 {
   __m128i m128i;

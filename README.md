@@ -54,22 +54,6 @@ Vector Saturated Add Unsigned
 
 Vector Saturated Subtract Unsigned
 
-### vmax.b/h/w/d
-
-Vector Maximum
-
-### vmin.b/h/w/d
-
-Vector Minimum
-
-### vmax.bu/hu/wu/du
-
-Vector Maximum Unsigned
-
-### vmin.bu/hu/wu/du
-
-Vector Minimum Unsigned
-
 ### vmul.b/h/w/d
 
 Vector Multiplication
@@ -201,14 +185,6 @@ Vector Multiplication High
 ### vslti.b/h/w/d/bu/hu/wu/du
 
 ### vsubi.bu/hu/wu/du
-
-### vmaxi.b/h/w/d
-
-### vmini.b/h/w/d
-
-### vmaxi.bu/hu/wu/du
-
-### vmini.bu/hu/wu/du
 
 ### vfrstpi.b/h
 

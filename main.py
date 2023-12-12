@@ -398,6 +398,30 @@ for (int i = 0;i < 2;i++) {{
         )
 
     @env.macro
+    def vminmax(min_max, name):
+        width = widths[name]
+        signedness = signednesses[name]
+        return instruction(
+            intrinsic=f"__m128i __lsx_v{min_max}_{name} (__m128i a, __m128i b)",
+            instr=f"v{min_max}.{name} vr, vr, vr",
+            desc=f"Compute elementwise {min_max}imum for {signedness} {width}-bit elements in `a` and `b`.",
+        )
+
+    @env.macro
+    def vminmaxi(min_max, name):
+        width = widths[name]
+        signedness = signednesses[name]
+        if signedness == "unsigned":
+            imm_range = "0_31"
+        else:
+            imm_range = "n16_15"
+        return instruction(
+            intrinsic=f"__m128i __lsx_v{min_max}i_{name} (__m128i a, imm_{imm_range} imm)",
+            instr=f"v{min_max}i.{name} vr, vr, imm",
+            desc=f"Compute elementwise {min_max}imum for {signedness} {width}-bit elements in `a` and `imm`.",
+        )
+
+    @env.macro
     def vshuf_hwd(name):
         width = widths[name]
         return instruction(

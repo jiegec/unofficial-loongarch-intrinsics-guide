@@ -42,6 +42,10 @@ tb = {
     "vilvh": (widths_signed, "v128 a, v128 b"),
     "vilvl": (widths_signed, "v128 a, v128 b"),
     "vinsgr2vr": (widths_signed, "v128 a, long int b, int imm", ["0, 0", "1234, 1", "5678, 1"]),
+    "vmax": (widths_all, "v128 a, v128 b"),
+    "vmaxi": (widths_all, "v128 a, int imm", [0, 3, 15]),
+    "vmin": (widths_all, "v128 a, v128 b"),
+    "vmini": (widths_all, "v128 a, int imm", [0, 3, 15]),
 }
 
 for name in tb:

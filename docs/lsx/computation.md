@@ -95,3 +95,39 @@
 {{ vhsubw('du', 'wu') }}
 {{ vhsubw('q', 'd') }}
 {{ vhsubw('qu', 'du') }}
+
+{{ vminmax('max', 'b') }}
+{{ vminmax('max', 'bu') }}
+{{ vminmax('max', 'h') }}
+{{ vminmax('max', 'hu') }}
+{{ vminmax('max', 'w') }}
+{{ vminmax('max', 'wu') }}
+{{ vminmax('max', 'd') }}
+{{ vminmax('max', 'du') }}
+
+{{ vminmaxi('max', 'b') }}
+{{ vminmaxi('max', 'bu') }}
+{{ vminmaxi('max', 'h') }}
+{{ vminmaxi('max', 'hu') }}
+{{ vminmaxi('max', 'w') }}
+{{ vminmaxi('max', 'wu') }}
+{{ vminmaxi('max', 'd') }}
+{{ vminmaxi('max', 'du') }}
+
+{{ vminmax('min', 'b') }}
+{{ vminmax('min', 'bu') }}
+{{ vminmax('min', 'h') }}
+{{ vminmax('min', 'hu') }}
+{{ vminmax('min', 'w') }}
+{{ vminmax('min', 'wu') }}
+{{ vminmax('min', 'd') }}
+{{ vminmax('min', 'du') }}
+
+{{ vminmaxi('min', 'b') }}
+{{ vminmaxi('min', 'bu') }}
+{{ vminmaxi('min', 'h') }}
+{{ vminmaxi('min', 'hu') }}
+{{ vminmaxi('min', 'w') }}
+{{ vminmaxi('min', 'wu') }}
+{{ vminmaxi('min', 'd') }}
+{{ vminmaxi('min', 'du') }}
