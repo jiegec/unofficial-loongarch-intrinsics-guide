@@ -200,7 +200,7 @@ for width in ["b", "bu", "h", "hu", "w", "wu", "d", "du"]:
 for width in ["b", "h", "w", "d"]:
     w = widths[width]
     m = members[width]
-    for name, op in [("add", "+"), ("sub", "-")]:
+    for name, op in [("add", "+"), ("sub", "-"), ("mul", "*")]:
         with open(f"v{name}_{width}.h", "w") as f:
             print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
             print(

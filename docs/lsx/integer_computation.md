@@ -163,6 +163,11 @@
 {{ vminmaxi('min', 'd') }}
 {{ vminmaxi('min', 'du') }}
 
+{{ vmul('b') }}
+{{ vmul('h') }}
+{{ vmul('w') }}
+{{ vmul('d') }}
+
 {{ vmulwev('h', 'b') }}
 {{ vmulwev('h', 'bu') }}
 {{ vmulwev('h', 'bu', 'b') }}
@@ -181,7 +186,6 @@
 {{ vsub('w') }}
 {{ vsub('d') }}
 {{ vsub('q') }}
-
 
 {{ vsubwev('h', 'b') }}
 {{ vsubwev('h', 'bu') }}

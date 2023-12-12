@@ -507,3 +507,12 @@ for (int i = 0;i < 2;i++) {{
     @env.macro
     def vmaddwod(wide, narrow, narrow2=None):
         return vmaddw_ev_od("od", "odd", wide, narrow, narrow2)
+
+    @env.macro
+    def vmul(name):
+        width = widths[name]
+        return instruction(
+            intrinsic=f"__m128i __lsx_vmul_{name} (__m128i a, __m128i b)",
+            instr=f"vmul.{name} vr, vr, vr",
+            desc=f"Multiply {width}-bit elements in `a` and `b`, save the result in `dst`.",
+        )

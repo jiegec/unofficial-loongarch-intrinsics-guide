@@ -38,10 +38,6 @@ Vector Saturated Add Unsigned
 
 Vector Saturated Subtract Unsigned
 
-### vmul.b/h/w/d
-
-Vector Multiplication
-
 ### vmuh.b/h/w/d/bu/hu/wu/du
 
 Vector Multiplication High
