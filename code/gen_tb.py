@@ -93,6 +93,7 @@ tb = {
     "vsadd": (widths_all, "v128 a, v128 b"),
     "vseq": (widths_signed, "v128 a, v128 b"),
     "vseqi": (widths_signed, "v128 a, int imm", [-16, 0, 15]),
+    "vshuf4i": (["b", "h", "w"], "v128 a, int imm", [0, 13, 100, 128, 255]),
     "vsigncov": (widths_signed, "v128 a, v128 b"),
     "vssub": (widths_all, "v128 a, v128 b"),
     "vsub": (widths_signed, "v128 a, v128 b"),

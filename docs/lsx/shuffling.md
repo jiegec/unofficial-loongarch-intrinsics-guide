@@ -26,3 +26,8 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics they ar
 {{ vshuf_hwd('h') }}
 {{ vshuf_hwd('w') }}
 {{ vshuf_hwd('d') }}
+
+{{ vshuf4i('b') }}
+{{ vshuf4i('h') }}
+{{ vshuf4i('w') }}
+{{ vshuf4i('d') }}

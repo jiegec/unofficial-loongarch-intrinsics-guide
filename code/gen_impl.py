@@ -550,6 +550,14 @@ for width in ["b", "h", "w", "d"]:
             file=f,
         )
         print(f"}}", file=f)
+    if width != "d":
+        with open(f"vshuf4i_{width}.h", "w") as f:
+            print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+            print(
+                f"  dst.{m}[i] = a.{m}[(i & ~0x3) + ((imm >> (2 * (i & 0x3))) & 0x3)];",
+                file=f,
+            )
+            print(f"}}", file=f)
 
 for width in ["s", "d"]:
     m = members_fp[width]

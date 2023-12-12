@@ -156,6 +156,4 @@ TODO List:
 
 ### vssrarni.bu.h/hu.w/wu.d/du.q
 
-### vshuf4i.b/h/w/d
-
 ### vldi

@@ -937,3 +937,18 @@ memory_store({width}, data.{member}[lane], addr + offset);
             instr=f"vpickve2gr.{name} r, vr, imm",
             desc=f"Pick the `lane` specified by `idx` from `a` and store into `dst`.",
         )
+
+    @env.macro
+    def vshuf4i(name):
+        width = widths[name]
+        if name == "d":
+            b = " __m128i b,"
+            b_desc = " and `b`"
+        else:
+            b = ""
+            b_desc = ""
+        return instruction(
+            intrinsic=f"__m128i __lsx_vshuf4i_{name} (__m128i a,{b} imm0_255 imm)",
+            instr=f"vshuf4i.{name} vr, vr, imm",
+            desc=f"Shuffle every four {width}-bit elements in `a`{b_desc} with indices packed in `imm`, save the result to `dst`.",
+        )
