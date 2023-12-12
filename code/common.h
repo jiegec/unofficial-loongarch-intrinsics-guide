@@ -18,6 +18,7 @@ union v128 {
   u16 half[8];
   u32 word[4];
   u64 dword[2];
+  __int128 qword[1];
 
   v128(__m128i other) { m128i = other; }
   v128() {
@@ -47,6 +48,18 @@ void print(const char *s, __m128d num) {
 }
 
 #define PRINT(x) print(#x, x)
+
+#define FUZZ2(func)                                                            \
+  do {                                                                         \
+    for (int i = 0; i < 64; i++) {                                             \
+      v128 a, b;                                                               \
+      PRINT(a);                                                                \
+      PRINT(b);                                                                \
+      PRINT(__lsx_##func(a, b));                                               \
+      PRINT(func(a, b));                                                       \
+      assert(func(a, b) == __lsx_##func(a, b));                                \
+    }                                                                          \
+  } while (0);
 
 #define FUZZ3(func)                                                            \
   do {                                                                         \
