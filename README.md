@@ -162,10 +162,6 @@ Vector Multiplication High
 
 ### vssrarn.bu.h/hu.w/wu.d
 
-### vbitset.b/h/w/d
-
-### vbitrev.b/h/w/d
-
 ### vpackev.b/h/w/d
 
 ### vpackod.b/h/w/d
@@ -363,10 +359,6 @@ Vector Multiplication High
 ### vsllwil.hu.bu/wu.hu/du.wu
 
 ### vextl.qu.du
-
-### vbitseti.b/h/w/d
-
-### vbitrevi.b/h/w/d
 
 ### vsat.b/h/w/d/bu/hu/wu/du
 

@@ -126,5 +126,19 @@ for width in ["b", "h", "w", "d"]:
             file=f,
         )
         print(f"}}", file=f)
+    with open(f"vbitrev_{width}.h", "w") as f:
+        print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+        print(
+            f"  dst.{m}[i] = a.{m}[i] ^ ((u{w})1 << (b.{m}[i] % {w}));",
+            file=f,
+        )
+        print(f"}}", file=f)
+    with open(f"vbitrevi_{width}.h", "w") as f:
+        print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+        print(
+            f"  dst.{m}[i] = a.{m}[i] ^ ((u{w})1 << imm);",
+            file=f,
+        )
+        print(f"}}", file=f)
 
 os.system("clang-format -i *.cpp *.h")

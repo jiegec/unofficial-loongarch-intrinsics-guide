@@ -195,6 +195,25 @@ CPU Flags: LSX
         )
 
     @env.macro
+    def vbitrev(name):
+        width = widths[name]
+        return instruction(
+            intrinsic=f"__m128i __lsx_vbitrev_{name} (__m128i a, __m128i b)",
+            instr=f"vbitrev.{name} vr, vr, vr",
+            desc=f"Toggle the bit specified by elements in `b` from {width}-bit elements in `a`, save the result in `dst`.",
+        )
+
+    @env.macro
+    def vbitrevi(name):
+        width = widths[name]
+        imm_upper = width - 1
+        return instruction(
+            intrinsic=f"__m128i __lsx_vbitrevi_{name} (__m128i a, imm0_{imm_upper} imm)",
+            instr=f"vbitrevi.{name} vr, vr, imm",
+            desc=f"Toggle the bit specified by `imm` from {width}-bit elements in `a`, save the result in `dst`.",
+        )
+
+    @env.macro
     def vshuf_hwd(name):
         width = widths[name]
         return instruction(
