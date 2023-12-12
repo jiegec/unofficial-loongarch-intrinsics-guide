@@ -77,7 +77,14 @@ for width in ["b", "bu", "h", "hu", "w", "wu", "d", "du"]:
     with open(f"vdiv_{width}.h", "w") as f:
         print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
         print(
-            f"  dst.{m}[i] = (b.{m}[i] == 0) ? 0 : ({sign}{w})a.{m}[i] / (({sign}{w})b.{m}[i]);",
+            f"  dst.{m}[i] = (b.{m}[i] == 0) ? 0 : (({sign}{w})a.{m}[i] / ({sign}{w})b.{m}[i]);",
+            file=f,
+        )
+        print(f"}}", file=f)
+    with open(f"vmod_{width}.h", "w") as f:
+        print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+        print(
+            f"  dst.{m}[i] = (b.{m}[i] == 0) ? 0 : (({sign}{w})a.{m}[i] % ({sign}{w})b.{m}[i]);",
             file=f,
         )
         print(f"}}", file=f)

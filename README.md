@@ -6,10 +6,6 @@ Arranged from QEMU implementation and [GCC Intrinsics](https://gcc.gnu.org/onlin
 
 TODO List:
 
-### vmod.b/h/w/d
-
-### vmod.bu/hu/wu/du
-
 ### vsll.b/h/w/d
 
 ### vsrl.b/h/w/d

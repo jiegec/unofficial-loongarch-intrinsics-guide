@@ -127,41 +127,50 @@
 {{ vmaddwod('q', 'du') }}
 {{ vmaddwod('q', 'du', 'd') }}
 
-{{ vminmax('max', 'b') }}
-{{ vminmax('max', 'bu') }}
-{{ vminmax('max', 'h') }}
-{{ vminmax('max', 'hu') }}
-{{ vminmax('max', 'w') }}
-{{ vminmax('max', 'wu') }}
-{{ vminmax('max', 'd') }}
-{{ vminmax('max', 'du') }}
+{{ vmax('b') }}
+{{ vmax('bu') }}
+{{ vmax('h') }}
+{{ vmax('hu') }}
+{{ vmax('w') }}
+{{ vmax('wu') }}
+{{ vmax('d') }}
+{{ vmax('du') }}
 
-{{ vminmaxi('max', 'b') }}
-{{ vminmaxi('max', 'bu') }}
-{{ vminmaxi('max', 'h') }}
-{{ vminmaxi('max', 'hu') }}
-{{ vminmaxi('max', 'w') }}
-{{ vminmaxi('max', 'wu') }}
-{{ vminmaxi('max', 'd') }}
-{{ vminmaxi('max', 'du') }}
+{{ vmaxi('b') }}
+{{ vmaxi('bu') }}
+{{ vmaxi('h') }}
+{{ vmaxi('hu') }}
+{{ vmaxi('w') }}
+{{ vmaxi('wu') }}
+{{ vmaxi('d') }}
+{{ vmaxi('du') }}
 
-{{ vminmax('min', 'b') }}
-{{ vminmax('min', 'bu') }}
-{{ vminmax('min', 'h') }}
-{{ vminmax('min', 'hu') }}
-{{ vminmax('min', 'w') }}
-{{ vminmax('min', 'wu') }}
-{{ vminmax('min', 'd') }}
-{{ vminmax('min', 'du') }}
+{{ vmin('b') }}
+{{ vmin('bu') }}
+{{ vmin('h') }}
+{{ vmin('hu') }}
+{{ vmin('w') }}
+{{ vmin('wu') }}
+{{ vmin('d') }}
+{{ vmin('du') }}
 
-{{ vminmaxi('min', 'b') }}
-{{ vminmaxi('min', 'bu') }}
-{{ vminmaxi('min', 'h') }}
-{{ vminmaxi('min', 'hu') }}
-{{ vminmaxi('min', 'w') }}
-{{ vminmaxi('min', 'wu') }}
-{{ vminmaxi('min', 'd') }}
-{{ vminmaxi('min', 'du') }}
+{{ vmini('b') }}
+{{ vmini('bu') }}
+{{ vmini('h') }}
+{{ vmini('hu') }}
+{{ vmini('w') }}
+{{ vmini('wu') }}
+{{ vmini('d') }}
+{{ vmini('du') }}
+
+{{ vmod('b') }}
+{{ vmod('bu') }}
+{{ vmod('h') }}
+{{ vmod('hu') }}
+{{ vmod('w') }}
+{{ vmod('wu') }}
+{{ vmod('d') }}
+{{ vmod('du') }}
 
 {{ vmsub('b') }}
 {{ vmsub('h') }}

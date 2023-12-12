@@ -262,6 +262,16 @@ CPU Flags: LSX
         )
 
     @env.macro
+    def vmod(name):
+        width = widths[name]
+        signedness = signednesses[name]
+        return instruction(
+            intrinsic=f"__m128i __lsx_vmod_{name} (__m128i a, __m128i b)",
+            instr=f"vmod.{name} vr, vr, vr",
+            desc=f"Modulo residual {signedness} {width}-bit elements in `a` by elements in `b`.",
+        )
+
+    @env.macro
     def vexth(name, name2):
         width = widths[name[0]]
         width2 = widths[name2[0]]
@@ -414,6 +424,14 @@ for (int i = 0;i < 2;i++) {{
         )
 
     @env.macro
+    def vmin(name):
+        return vminmax("min", name)
+
+    @env.macro
+    def vmax(name):
+        return vminmax("max", name)
+
+    @env.macro
     def vminmaxi(min_max, name):
         width = widths[name]
         signedness = signednesses[name]
@@ -426,6 +444,14 @@ for (int i = 0;i < 2;i++) {{
             instr=f"v{min_max}i.{name} vr, vr, imm",
             desc=f"Compute elementwise {min_max}imum for {signedness} {width}-bit elements in `a` and `imm`.",
         )
+
+    @env.macro
+    def vmini(name):
+        return vminmaxi("min", name)
+
+    @env.macro
+    def vmaxi(name):
+        return vminmaxi("max", name)
 
     @env.macro
     def vshuf_hwd(name):

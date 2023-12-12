@@ -68,6 +68,7 @@ tb = {
     "vmaxi": (widths_all, "v128 a, int imm", [0, 3, 15]),
     "vmin": (widths_all, "v128 a, v128 b"),
     "vmini": (widths_all, "v128 a, int imm", [0, 3, 15]),
+    "vmod": (widths_all, "v128 a, v128 b"),
     "vmsub": (widths_signed, "v128 a, v128 b, v128 c"),
     "vmuh": (widths_all, "v128 a, v128 b"),
     "vmul": (widths_signed, "v128 a, v128 b"),
