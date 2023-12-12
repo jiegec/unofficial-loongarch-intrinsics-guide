@@ -30,8 +30,6 @@ TODO List:
 
 ### vssrarn.bu.h/hu.w/wu.d
 
-### vreplve.b/h/w/d
-
 ### vfrstp.b/h
 
 ### vsignconv.b/h/w/d
@@ -161,8 +159,6 @@ TODO List:
 ### vsrari.b/h/w/d
 
 ### vpickve2gr.b/h/w/d/bu/hu/wu/du
-
-### vreplvei.b/h/w/d
 
 ### vsllwil.h.b/w.h/d.w
 

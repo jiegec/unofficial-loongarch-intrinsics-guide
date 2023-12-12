@@ -734,3 +734,22 @@ memory_store({width}, data.{member}[lane], addr + offset);
             instr=f"vpickod.{name} vr, vr, vr",
             desc=f"Pick odd-positioned {width}-bit elements in `b` first, then pick odd-positioned {width}-bit elements in `a`.",
         )
+
+    @env.macro
+    def vreplve(name):
+        width = widths[name]
+        return instruction(
+            intrinsic=f"__m128i __lsx_vreplve_{name} (__m128i a, int idx)",
+            instr=f"vreplve.{name} vr, vr, r",
+            desc=f"Repeat the element in lane `idx` of `a` to whole vector.",
+        )
+
+    @env.macro
+    def vreplvei(name):
+        width = widths[name]
+        imm_upper = 128 // width - 1
+        return instruction(
+            intrinsic=f"__m128i __lsx_vreplvei_{name} (__m128i a, imm0_{imm_upper} idx)",
+            instr=f"vreplvei.{name} vr, vr, imm",
+            desc=f"Repeat the element in lane `idx` of `a` to whole vector.",
+        )

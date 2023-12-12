@@ -80,6 +80,8 @@ tb = {
     "vpickev": (widths_signed, "v128 a, v128 b"),
     "vpickod": (widths_signed, "v128 a, v128 b"),
     "vrotr": (widths_signed, "v128 a, v128 b"),
+    "vreplve": (widths_signed, "v128 a, int idx", [0, 1]),
+    "vreplvei": (widths_signed, "v128 a, int idx", [0, 1]),
     "vsadd": (widths_all, "v128 a, v128 b"),
     "vssub": (widths_all, "v128 a, v128 b"),
     "vseq": (widths_signed, "v128 a, v128 b"),

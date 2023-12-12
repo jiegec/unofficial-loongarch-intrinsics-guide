@@ -34,3 +34,13 @@
 {{ vpickod('h') }}
 {{ vpickod('w') }}
 {{ vpickod('d') }}
+
+{{ vreplve('b') }}
+{{ vreplve('h') }}
+{{ vreplve('w') }}
+{{ vreplve('d') }}
+
+{{ vreplvei('b') }}
+{{ vreplvei('h') }}
+{{ vreplvei('w') }}
+{{ vreplvei('d') }}

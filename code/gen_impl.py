@@ -435,6 +435,20 @@ for width in ["b", "h", "w", "d"]:
             file=f,
         )
         print(f"}}", file=f)
+    with open(f"vreplve_{width}.h", "w") as f:
+        print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+        print(
+            f"  dst.{m}[i] = a.{m}[idx % {128 // w}];",
+            file=f,
+        )
+        print(f"}}", file=f)
+    with open(f"vreplvei_{width}.h", "w") as f:
+        print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+        print(
+            f"  dst.{m}[i] = a.{m}[idx];",
+            file=f,
+        )
+        print(f"}}", file=f)
 
 for width in ["s", "d"]:
     m = members_fp[width]
