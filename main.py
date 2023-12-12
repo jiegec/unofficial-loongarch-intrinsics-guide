@@ -232,6 +232,15 @@ CPU Flags: LSX
         )
 
     @env.macro
+    def vdiv(name):
+        width = widths[name]
+        return instruction(
+            intrinsic=f"__m128i __lsx_div_{name} (__m128i a, __m128i b)",
+            instr=f"vdiv.{name} vr, vr, vr",
+            desc=f"Divide {width}-bit elements in `a` by elements in `b`.",
+        )
+
+    @env.macro
     def vshuf_hwd(name):
         width = widths[name]
         return instruction(

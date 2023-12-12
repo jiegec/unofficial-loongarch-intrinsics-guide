@@ -58,6 +58,13 @@ for width in ["b", "bu", "h", "hu", "w", "wu", "d", "du"]:
             file=f,
         )
         print(f"}}", file=f)
+    with open(f"vdiv_{width}.h", "w") as f:
+        print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+        print(
+            f"  dst.{m}[i] = (b.{m}[i] == 0) ? 0 : ({sign}{w})a.{m}[i] / (({sign}{w})b.{m}[i]);",
+            file=f,
+        )
+        print(f"}}", file=f)
 
 for width in ["b", "bu", "h", "hu", "w", "wu", "d", "du"]:
     double_width = double_widths[width]

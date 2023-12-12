@@ -1,4 +1,4 @@
-# Add, Subtract, Absolute and Average
+# Integer Computation
 
 {{ vadd('b') }}
 {{ vadd('h') }}
@@ -68,3 +68,12 @@
 {{ vavgr('wu') }}
 {{ vavgr('d') }}
 {{ vavgr('du') }}
+
+{{ vdiv('b') }}
+{{ vdiv('bu') }}
+{{ vdiv('h') }}
+{{ vdiv('hu') }}
+{{ vdiv('w') }}
+{{ vdiv('wu') }}
+{{ vdiv('d') }}
+{{ vdiv('du') }}

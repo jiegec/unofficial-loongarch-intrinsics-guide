@@ -1,4 +1,4 @@
-# Shift
+# Integer Shift
 
 ## __m128i __lsx_vbsll_v (__m128i a, imm0_31 imm)
 

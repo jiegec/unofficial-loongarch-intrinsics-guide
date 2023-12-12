@@ -31,6 +31,7 @@ tb = {
     "vbitrevi": (widths_signed, "v128 a, int imm", [0, 3, 7]),
     "vclo": (widths_signed, "v128 a"),
     "vclz": (widths_signed, "v128 a"),
+    "vdiv": (widths_all, "v128 a, v128 b"),
 }
 
 for name in tb:
