@@ -314,6 +314,13 @@ for width in ["b", "h", "w", "d"]:
             file=f,
         )
         print(f"}}", file=f)
+    with open(f"vseq_{width}.h", "w") as f:
+        print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+        print(
+            f"  dst.{m}[i] = (a.{m}[i] == b.{m}[i]) ? 0x{((1 << w) - 1):X} : 0;",
+            file=f,
+        )
+        print(f"}}", file=f)
 
 for width in ["s", "d"]:
     m = members_fp[width]

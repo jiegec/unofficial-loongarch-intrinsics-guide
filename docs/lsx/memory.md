@@ -68,6 +68,27 @@ Write 128-bit data in `data` to memory address `addr + offset`.
 memory_store(128, data, addr + offset);
 ```
 
+## void __lsx_vstx (__m128i data, void * addr, long int offset)
+
+### Synopsis
+
+```c++
+void __lsx_vstx (__m128i data, void * addr, long int offset)
+#include <lsxintrin.h>
+Instruction: vstx vr, r, r
+CPU Flags: LSX
+```
+
+### Description
+
+Write 128-bit data in `data` to memory address `addr + offset`.
+
+### Operation
+
+```c++
+memory_store(128, data, addr + offset);
+```
+
 {{ vstelm('b') }}
 {{ vstelm('h') }}
 {{ vstelm('w') }}

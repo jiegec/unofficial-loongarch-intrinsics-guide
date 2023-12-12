@@ -6,11 +6,7 @@ Arranged from QEMU implementation and [GCC Intrinsics](https://gcc.gnu.org/onlin
 
 TODO List:
 
-### vstx
-
-Vector Store with Register Offset
-
-### vseq/le/lt.b/h/w/d
+### vle/lt.b/h/w/d
 
 Vector Set Equal/Less than or Equal/Less Than
 

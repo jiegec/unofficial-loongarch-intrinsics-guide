@@ -553,3 +553,12 @@ for (int i = 0;i < 2;i++) {{
 memory_store({width}, data.{member}[lane], addr + offset);
 """
         )
+
+    @env.macro
+    def vseq(name):
+        width = widths[name]
+        return instruction(
+            intrinsic=f"__m128i __lsx_vseq_{name} (__m128i a, __m128i b)",
+            instr=f"vseq.{name} vr, vr",
+            desc=f"Compare the {width}-bit elements in `a` and `b`, store all-ones to `dst` if equal, zero otherwise.",
+        )
