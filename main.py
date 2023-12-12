@@ -562,3 +562,23 @@ memory_store({width}, data.{member}[lane], addr + offset);
             instr=f"vseq.{name} vr, vr",
             desc=f"Compare the {width}-bit elements in `a` and `b`, store all-ones to `dst` if equal, zero otherwise.",
         )
+
+    @env.macro
+    def vslt(name):
+        width = widths[name]
+        signedness = signednesses[name]
+        return instruction(
+            intrinsic=f"__m128i __lsx_vslt_{name} (__m128i a, __m128i b)",
+            instr=f"vslt.{name} vr, vr",
+            desc=f"Compare the {signedness} {width}-bit elements in `a` and `b`, store all-ones to `dst` if corresponding element in `a` is less than `b`, zero otherwise.",
+        )
+
+    @env.macro
+    def vsle(name):
+        width = widths[name]
+        signedness = signednesses[name]
+        return instruction(
+            intrinsic=f"__m128i __lsx_vslt_{name} (__m128i a, __m128i b)",
+            instr=f"vslt.{name} vr, vr",
+            desc=f"Compare the {signedness} {width}-bit elements in `a` and `b`, store all-ones to `dst` if corresponding element in `a` is less than or equal `b`, zero otherwise.",
+        )

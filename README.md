@@ -6,10 +6,6 @@ Arranged from QEMU implementation and [GCC Intrinsics](https://gcc.gnu.org/onlin
 
 TODO List:
 
-### vle/lt.b/h/w/d
-
-Vector Set Equal/Less than or Equal/Less Than
-
 ### vsadd.b/h/w/d
 
 Vector Saturated Add

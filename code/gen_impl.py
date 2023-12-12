@@ -143,6 +143,14 @@ for width in ["b", "bu", "h", "hu", "w", "wu", "d", "du"]:
             file=f,
         )
         print(f"}}", file=f)
+    for name, op in [("lt", "<"), ("le", "<=")]:
+        with open(f"vs{name}_{width}.h", "w") as f:
+            print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+            print(
+                f"  dst.{m}[i] = (({sign}{w})a.{m}[i] {op} ({sign}{w})b.{m}[i]) ? 0x{((1 << w) - 1):X} : 0;",
+                file=f,
+            )
+            print(f"}}", file=f)
 
 for width in ["b", "bu", "h", "hu", "w", "wu", "d", "du"]:
     double_width = double_widths[width]
