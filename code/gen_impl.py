@@ -380,6 +380,13 @@ for width in ["b", "h", "w", "d"]:
             file=f,
         )
         print(f"}}", file=f)
+    with open(f"vslli_{width}.h", "w") as f:
+        print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+        print(
+            f"  dst.{m}[i] = a.{m}[i] << imm;",
+            file=f,
+        )
+        print(f"}}", file=f)
     with open(f"vsrl_{width}.h", "w") as f:
         print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
         print(
@@ -387,10 +394,24 @@ for width in ["b", "h", "w", "d"]:
             file=f,
         )
         print(f"}}", file=f)
+    with open(f"vsrli_{width}.h", "w") as f:
+        print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+        print(
+            f"  dst.{m}[i] = a.{m}[i] >> imm;",
+            file=f,
+        )
+        print(f"}}", file=f)
     with open(f"vsra_{width}.h", "w") as f:
         print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
         print(
             f"  dst.{m}[i] = ((s{w})a.{m}[i]) >> (b.{m}[i] & 0x{w-1:x});",
+            file=f,
+        )
+        print(f"}}", file=f)
+    with open(f"vsrai_{width}.h", "w") as f:
+        print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+        print(
+            f"  dst.{m}[i] = ((s{w})a.{m}[i]) >> imm;",
             file=f,
         )
         print(f"}}", file=f)

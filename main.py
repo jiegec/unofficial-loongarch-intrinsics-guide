@@ -696,6 +696,16 @@ memory_store({width}, data.{member}[lane], addr + offset);
         )
 
     @env.macro
+    def vslli(name):
+        width = widths[name]
+        signedness = signednesses[name]
+        return instruction(
+            intrinsic=f"__m128i __lsx_vslli_{name} (__m128i a, imm0_{width-1} imm)",
+            instr=f"vslli.{name} vr, vr, imm",
+            desc=f"Logical left shift the unsigned {width}-bit elements in `a` by `imm`, store the result to `dst`.",
+        )
+
+    @env.macro
     def vsrl(name):
         width = widths[name]
         signedness = signednesses[name]
@@ -706,6 +716,16 @@ memory_store({width}, data.{member}[lane], addr + offset);
         )
 
     @env.macro
+    def vsrli(name):
+        width = widths[name]
+        signedness = signednesses[name]
+        return instruction(
+            intrinsic=f"__m128i __lsx_vsrli_{name} (__m128i a, imm0_{width-1} imm)",
+            instr=f"vsrli.{name} vr, vr, imm",
+            desc=f"Logical right shift the unsigned {width}-bit elements in `a` by `imm`, store the result to `dst`.",
+        )
+
+    @env.macro
     def vsra(name):
         width = widths[name]
         signedness = signednesses[name]
@@ -713,6 +733,16 @@ memory_store({width}, data.{member}[lane], addr + offset);
             intrinsic=f"__m128i __lsx_vsra_{name} (__m128i a, __m128i b)",
             instr=f"vsra.{name} vr, vr, vr",
             desc=f"Arithmetic right shift the signed {width}-bit elements in `a` by elements in `b`, store the result to `dst`.",
+        )
+
+    @env.macro
+    def vsrai(name):
+        width = widths[name]
+        signedness = signednesses[name]
+        return instruction(
+            intrinsic=f"__m128i __lsx_vsrai_{name} (__m128i a, imm0_{width-1} imm)",
+            instr=f"vsrai.{name} vr, vr, imm",
+            desc=f"Arithmetic right shift the signed {width}-bit elements in `a` by `imm`, store the result to `dst`.",
         )
 
     @env.macro

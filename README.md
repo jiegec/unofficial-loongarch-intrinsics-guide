@@ -140,12 +140,6 @@ TODO List:
 
 ### vsat.b/h/w/d/bu/hu/wu/du
 
-### vslli.b/h/w/d
-
-### vsrli.b/h/w/d
-
-### vsrai.b/h/w/d
-
 ### vsrlni.b.h/h.w/w.d/d.q
 
 ### vsrlrni.b.h/h.w/w.d/d.q
