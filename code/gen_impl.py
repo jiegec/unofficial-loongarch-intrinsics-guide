@@ -48,6 +48,11 @@ members = {
     "qu": "qword",
 }
 
+members_fp = {
+    "s": "fp32",
+    "d": "fp64",
+}
+
 for width in ["b", "bu", "h", "hu", "w", "wu", "d", "du"]:
     w = widths[width]
     m = members[width]
@@ -196,6 +201,16 @@ for width in ["b", "h", "w", "d"]:
         mask = 128 // w - 1
         print(
             f"  dst.{m}[i] = (i == ((imm >> 4) & {mask})) ? b.{m}[imm & {mask}] : a.{m}[i];",
+            file=f,
+        )
+        print(f"}}", file=f)
+
+for width in ["s", "d"]:
+    m = members_fp[width]
+    with open(f"vfdiv_{width}.h", "w") as f:
+        print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+        print(
+            f"  dst.{m}[i] = a.{m}[i] / b.{m}[i];",
             file=f,
         )
         print(f"}}", file=f)

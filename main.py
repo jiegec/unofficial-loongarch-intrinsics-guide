@@ -27,6 +27,16 @@ def define_env(env):
         "qu": "unsigned",
     }
 
+    precisions = {
+        "s": "single",
+        "d": "double"
+    }
+
+    fp_types = {
+        "s": "__m128",
+        "d": "__m128d"
+    }
+
     def include(file):
         return open(f"code/{file}").read().strip()
 
@@ -321,6 +331,16 @@ for (int i = 0;i < 2;i++) {{
     }}
 }}
             """
+        )
+
+    @env.macro
+    def vfdiv(name):
+        precision = precisions[name]
+        fp_type = fp_types[name]
+        return instruction(
+            intrinsic=f"{fp_type} __lsx_vfdiv_{name} ({fp_type} a, {fp_type} b)",
+            instr=f"vfdiv.{name} vr, vr, vr",
+            desc=f"Divide {fp_type} precision floating point elements in `a` by elements in `b`.",
         )
 
     @env.macro

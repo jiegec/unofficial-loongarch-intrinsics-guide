@@ -1,6 +1,7 @@
 import os
 
 widths_signed = ["b", "h", "w", "d"]
+widths_fp = ["s", "d"]
 widths_all = ["b", "bu", "h", "hu", "w", "wu", "d", "du"]
 widths_vexth = ["h_b", "hu_bu", "w_h", "wu_hu", "d_w", "du_wu", "q_d", "qu_du"]
 widths_vaddw = [

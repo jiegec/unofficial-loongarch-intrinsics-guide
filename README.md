@@ -192,8 +192,6 @@ Vector Multiplication High
 
 ### vfmul.s/d
 
-### vfdiv.s/d
-
 ### vfmax.s/d
 
 ### vfmin.s/d
