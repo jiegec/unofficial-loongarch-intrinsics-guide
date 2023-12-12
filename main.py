@@ -471,3 +471,12 @@ for (int i = 0;i < 2;i++) {{
             instr=f"v{op}i.b vr, vr, imm",
             desc=f"Compute bitwise {op.upper()} between elements in `a` and `imm`.",
         )
+
+    @env.macro
+    def vmadd(name):
+        width = widths[name]
+        return instruction(
+            intrinsic=f"__m128i __lsx_vmadd_{name} (__m128i a, __m128i b, __m128i c)",
+            instr=f"vmadd.{name} vr, vr, vr",
+            desc=f"Multiply {width}-bit elements in `b` and `c`, add to elements in `a`, save the result in `dst`.",
+        )

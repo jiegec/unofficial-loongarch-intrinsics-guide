@@ -194,6 +194,13 @@ for width in ["b", "h", "w", "d"]:
                 file=f,
             )
             print(f"}}", file=f)
+    with open(f"vmadd_{width}.h", "w") as f:
+        print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+        print(
+            f"  dst.{m}[i] = b.{m}[i] * c.{m}[i] + a.{m}[i];",
+            file=f,
+        )
+        print(f"}}", file=f)
     with open(f"vbitclr_{width}.h", "w") as f:
         print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
         print(

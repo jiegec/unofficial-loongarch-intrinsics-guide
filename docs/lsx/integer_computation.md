@@ -96,6 +96,11 @@
 {{ vhsubw('q', 'd') }}
 {{ vhsubw('qu', 'du') }}
 
+{{ vmadd('b') }}
+{{ vmadd('h') }}
+{{ vmadd('w') }}
+{{ vmadd('d') }}
+
 {{ vminmax('max', 'b') }}
 {{ vminmax('max', 'bu') }}
 {{ vminmax('max', 'h') }}
