@@ -34,3 +34,7 @@ for width in widths_all:
         print(f'for (int i = 0;i < {128 // w};i++) {{', file=f)
         print(f'  dst.{m}[i] = (({sign}{w})a.{m}[i] >> 1) + (({sign}{w})b.{m}[i] >> 1) + (a.{m}[i] & b.{m}[i] & 1);', file=f)
         print(f'}}', file=f)
+    with open(f"vavgr_{width}.h", 'w') as f:
+        print(f'for (int i = 0;i < {128 // w};i++) {{', file=f)
+        print(f'  dst.{m}[i] = (({sign}{w})a.{m}[i] >> 1) + (({sign}{w})b.{m}[i] >> 1) + ((a.{m}[i] | b.{m}[i]) & 1);', file=f)
+        print(f'}}', file=f)

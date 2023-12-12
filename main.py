@@ -124,7 +124,17 @@ CPU Flags: LSX
         return instruction(
             intrinsic=f"__m128i __lsx_vavg_{name} (__m128i a, __m128i b)",
             instr=f"vavg.{name} vr, vr, vr",
-            desc=f"Compute the average of {signedness} {width}-bit elements in `a` and `b`, save the result in `dst`.",
+            desc=f"Compute the average (rounded towards negative infinity) of {signedness} {width}-bit elements in `a` and `b`, save the result in `dst`.",
+        )
+
+    @env.macro
+    def vavgr(name):
+        width = widths[name]
+        signedness = signednesses[name]
+        return instruction(
+            intrinsic=f"__m128i __lsx_vavgr_{name} (__m128i a, __m128i b)",
+            instr=f"vavgr.{name} vr, vr, vr",
+            desc=f"Compute the average (rounded towards positive infinity) of {signedness} {width}-bit elements in `a` and `b`, save the result in `dst`.",
         )
 
     @env.macro

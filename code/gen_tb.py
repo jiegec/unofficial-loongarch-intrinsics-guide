@@ -1,7 +1,8 @@
 widths_all = ["b", "bu", "h", "hu", "w", "wu", "d", "du"]
 
 tb = {
-    "vavg": (widths_all, "v128 a, v128 b")
+    "vavg": (widths_all, "v128 a, v128 b"),
+    "vavgr": (widths_all, "v128 a, v128 b")
 }
 
 for name in tb:

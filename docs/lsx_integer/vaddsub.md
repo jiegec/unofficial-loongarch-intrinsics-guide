@@ -46,3 +46,12 @@
 {{ vavg('wu') }}
 {{ vavg('d') }}
 {{ vavg('du') }}
+
+{{ vavgr('b') }}
+{{ vavgr('bu') }}
+{{ vavgr('h') }}
+{{ vavgr('hu') }}
+{{ vavgr('w') }}
+{{ vavgr('wu') }}
+{{ vavgr('d') }}
+{{ vavgr('du') }}

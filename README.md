@@ -74,9 +74,6 @@ Vector Half Add Unsigned
 
 Vector Half Sub Unsigned
 
-### vavgr.b/h/w/d
-### vavgr.bu/hu/wu/du
-
 ### vmax.b/h/w/d
 
 Vector Maximum
