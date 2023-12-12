@@ -1,4 +1,4 @@
-# Fused Multiply-Add and Variants
+# Fused Multiply-Add
 
 ## __m128 __lsx_vfmadd_s (__m128 a, __m128 b, __m128 c)
 

@@ -1,4 +1,4 @@
-# Bitwise Logical
+# Logical
 
 ## __m128i __lsx_vandi_b (__m128i a, imm0_255 imm)
 
