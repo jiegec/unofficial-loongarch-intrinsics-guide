@@ -14,6 +14,10 @@ typedef uint32_t u32;
 typedef int64_t s64;
 typedef uint64_t u64;
 
+#ifndef MACHINE_3C5000
+#define MACHINE_3C5000 0
+#endif
+
 union v128 {
   __m128i m128i;
   __m128 m128;

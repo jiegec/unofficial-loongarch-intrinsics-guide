@@ -1,6 +1,7 @@
 SRCS=$(wildcard *.cpp)
 HDRS=$(wildcard *.h)
 EXES=$(patsubst %.cpp,%,$(SRCS))
+CXX?=g++
 
 all: $(EXES)
 
@@ -11,4 +12,4 @@ clean:
 	rm -rf $(EXES)
 
 %: %.cpp $(HDRS)
-	g++ $< -mlsx -mlasx -o $@
+	$(CXX) $< -mlsx -mlasx -o $@
