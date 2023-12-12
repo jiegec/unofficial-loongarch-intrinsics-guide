@@ -801,6 +801,19 @@ memory_store({width}, data.{member}[lane], addr + offset);
         )
 
     @env.macro
+    def vreplgr2vr(name):
+        width = widths[name]
+        if name == "d":
+            long = "long "
+        else:
+            long = ""
+        return instruction(
+            intrinsic=f"__m128i __lsx_vreplgr2vr_{name} ({long}int val)",
+            instr=f"vreplgr2vr.{name} vr, r",
+            desc=f"Repeat `val` to whole vector.",
+        )
+
+    @env.macro
     def vsigncov(name):
         width = widths[name]
         return instruction(

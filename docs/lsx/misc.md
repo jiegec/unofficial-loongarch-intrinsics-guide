@@ -44,6 +44,11 @@
 {{ vpickod('w') }}
 {{ vpickod('d') }}
 
+{{ vreplgr2vr('b') }}
+{{ vreplgr2vr('h') }}
+{{ vreplgr2vr('w') }}
+{{ vreplgr2vr('d') }}
+
 {{ vreplve('b') }}
 {{ vreplve('h') }}
 {{ vreplve('w') }}

@@ -154,6 +154,17 @@ void print(const char *s, __m128d num) {
 
 #define FUZZ_N 128
 
+#define FUZZ0(func, ...)                                                       \
+  do {                                                                         \
+    for (int i = 0; i < FUZZ_N; i++) {                                         \
+      if (func(__VA_ARGS__) != __lsx_##func(__VA_ARGS__)) {                    \
+        PRINT(__lsx_##func(__VA_ARGS__));                                      \
+        PRINT(func(__VA_ARGS__));                                              \
+        assert(func(__VA_ARGS__) == __lsx_##func(__VA_ARGS__));                \
+      }                                                                        \
+    }                                                                          \
+  } while (0);
+
 #define FUZZ1(func, ...)                                                       \
   do {                                                                         \
     for (int i = 0; i < FUZZ_N; i++) {                                         \
