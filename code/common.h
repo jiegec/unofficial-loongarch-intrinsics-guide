@@ -5,15 +5,20 @@
 #include <stdlib.h>
 #include <string.h>
 
+typedef int8_t s8;
 typedef uint8_t u8;
+typedef int16_t s16;
 typedef uint16_t u16;
+typedef int32_t s32;
 typedef uint32_t u32;
+typedef int64_t s64;
 typedef uint64_t u64;
 
 union v128 {
   __m128i m128i;
   __m128 m128;
   __m128d m128d;
+  v4i32 __v4i32;
   u8 byte[16];
   u16 half[8];
   u32 word[4];
@@ -28,6 +33,7 @@ union v128 {
   }
 
   operator __m128i() { return m128i; }
+  operator v4i32() { return __v4i32; }
   bool operator==(const v128 &other) const {
     return memcmp(byte, other.byte, 16) == 0;
   }
@@ -49,15 +55,28 @@ void print(const char *s, __m128d num) {
 
 #define PRINT(x) print(#x, x)
 
-#define FUZZ2(func)                                                            \
+#define FUZZ1(func, ...)                                                       \
+  do {                                                                         \
+    for (int i = 0; i < 64; i++) {                                             \
+      v128 a;                                                                  \
+      PRINT(a);                                                                \
+      PRINT(__lsx_##func(a __VA_OPT__(, ) __VA_ARGS__));                       \
+      PRINT(func(a __VA_OPT__(, ) __VA_ARGS__));                               \
+      assert(func(a __VA_OPT__(, ) __VA_ARGS__) ==                             \
+             __lsx_##func(a __VA_OPT__(, ) __VA_ARGS__));                      \
+    }                                                                          \
+  } while (0);
+
+#define FUZZ2(func, ...)                                                       \
   do {                                                                         \
     for (int i = 0; i < 64; i++) {                                             \
       v128 a, b;                                                               \
       PRINT(a);                                                                \
       PRINT(b);                                                                \
-      PRINT(__lsx_##func(a, b));                                               \
-      PRINT(func(a, b));                                                       \
-      assert(func(a, b) == __lsx_##func(a, b));                                \
+      PRINT(__lsx_##func(a, b __VA_OPT__(, ) __VA_ARGS__));                    \
+      PRINT(func(a, b __VA_OPT__(, ) __VA_ARGS__));                            \
+      assert(func(a, b __VA_OPT__(, ) __VA_ARGS__) ==                          \
+             __lsx_##func(a, b __VA_OPT__(, ) __VA_ARGS__));                   \
     }                                                                          \
   } while (0);
 
