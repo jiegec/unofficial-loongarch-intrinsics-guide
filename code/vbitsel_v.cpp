@@ -15,13 +15,5 @@ void test() {
   PRINT(c);
   PRINT(__lsx_vbitsel_v(a, b, c));
 
-  for (int i = 0; i < 64; i++) {
-    v128 a, b, c;
-    PRINT(a);
-    PRINT(b);
-    PRINT(c);
-    PRINT(__lsx_vbitsel_v(a, b, c));
-    PRINT(vbitsel_v(a, b, c));
-    assert(vbitsel_v(a, b, c) == __lsx_vbitsel_v(a, b, c));
-  }
+  FUZZ3(vbitsel_v);
 }

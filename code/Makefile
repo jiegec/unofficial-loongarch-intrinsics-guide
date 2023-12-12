@@ -1,4 +1,5 @@
 SRCS=$(wildcard *.cpp)
+HDRS=$(wildcard *.h)
 EXES=$(patsubst %.cpp,%,$(SRCS))
 
 all: $(EXES)
@@ -9,5 +10,5 @@ run: all
 clean:
 	rm -rf $(EXES)
 
-%: %.cpp common.h
+%: %.cpp $(HDRS)
 	g++ $< -mlsx -mlasx -o $@

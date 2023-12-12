@@ -2,7 +2,7 @@
 
 v128 vshuf_h(v128 a, v128 b, v128 c) {
   v128 dst;
-#include "vshuf_w.h"
+#include "vshuf_h.h"
   return dst;
 }
 
@@ -53,4 +53,5 @@ void test() {
     PRINT(vshuf_h(a, b, c));
     assert(vshuf_h(a, b, c) == __lsx_vshuf_h(a, b, c));
   }
+  FUZZ3(vshuf_h);
 }

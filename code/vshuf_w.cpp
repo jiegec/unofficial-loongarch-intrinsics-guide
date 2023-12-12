@@ -44,8 +44,5 @@ void test() {
     PRINT(__lsx_vshuf_w(a, b, c));
   }
 
-  for (int i = 0; i < 64; i++) {
-    v128 a, b, c;
-    assert(vshuf_w(a, b, c) == __lsx_vshuf_w(a, b, c));
-  }
+  FUZZ3(vshuf_w);
 }

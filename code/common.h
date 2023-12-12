@@ -48,6 +48,19 @@ void print(const char *s, __m128d num) {
 
 #define PRINT(x) print(#x, x)
 
+#define FUZZ3(func)                                                            \
+  do {                                                                         \
+    for (int i = 0; i < 64; i++) {                                             \
+      v128 a, b, c;                                                            \
+      PRINT(a);                                                                \
+      PRINT(b);                                                                \
+      PRINT(c);                                                                \
+      PRINT(__lsx_##func(a, b, c));                                            \
+      PRINT(func(a, b, c));                                                    \
+      assert(func(a, b, c) == __lsx_##func(a, b, c));                          \
+    }                                                                          \
+  } while (0);
+
 int main(int argc, char *argv[]) {
   printf("Testing %s\n", argv[0]);
   test();
