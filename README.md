@@ -108,16 +108,6 @@ Vector Multiplication High
 
 ### vreplve.b/h/w/d
 
-### vand.v
-
-### vor.v
-
-### vxor.v
-
-### vnor.v
-
-### vorn.v
-
 ### vfrstp.b/h
 
 ### vsignconv.b/h/w/d
@@ -287,11 +277,5 @@ Vector Multiplication High
 ### vssrarni.bu.h/hu.w/wu.d/du.q
 
 ### vshuf4i.b/h/w/d
-
-### vori.b
-
-### vxori.b
-
-### vnori.b
 
 ### vldi

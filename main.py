@@ -455,3 +455,19 @@ for (int i = 0;i < 2;i++) {{
             instr=f"vsub.{name} vr, vr, vr",
             desc=f"Subtract {width}-bit elements in `a` and `b`, save the result in `dst`.",
         )
+
+    @env.macro
+    def vlogical(op):
+        return instruction(
+            intrinsic=f"__m128i __lsx_v{op}_v (__m128i a, __m128i b)",
+            instr=f"v{op}.v vr, vr, vr",
+            desc=f"Compute bitwise {op.upper()} between elements in `a` and `b`.",
+        )
+
+    @env.macro
+    def vlogicali(op):
+        return instruction (
+            intrinsic=f"__m128i __lsx_v{op}i_b (__m128i a, imm0_255 imm)",
+            instr=f"v{op}i.b vr, vr, imm",
+            desc=f"Compute bitwise {op.upper()} between elements in `a` and `imm`.",
+        )
