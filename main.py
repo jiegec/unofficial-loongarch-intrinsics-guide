@@ -534,3 +534,22 @@ for (int i = 0;i < 2;i++) {{
             instr=f"vpcnt.{name} vr, vr",
             desc=f"Count the number of ones in {width}-bit elements in `a`.",
         )
+
+    @env.macro
+    def vstelm(name):
+        width = widths[name]
+        member = {
+            "b": "byte",
+            "h": "half",
+            "w": "word",
+            "d": "dword"
+        }[name]
+        imm_upper = 128 // width - 1
+        return instruction(
+            intrinsic=f"void __lsx_vstelm_{name} (__m128i data, void * addr, imm_n128_127 offset, imm0_{imm_upper} lane)",
+            instr=f"vstelm.{name} vr, r, imm, imm",
+            desc=f"Store the element in `data` specified by `lane` to memory address `addr + offset`.",
+            code=f"""
+memory_store({width}, data.{member}[lane], addr + offset);
+"""
+        )

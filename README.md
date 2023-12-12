@@ -6,14 +6,6 @@ Arranged from QEMU implementation and [GCC Intrinsics](https://gcc.gnu.org/onlin
 
 TODO List:
 
-### vst
-
-Vector Store
-
-### vstelm.d/w/h/b
-
-Vector Store Element
-
 ### vstx
 
 Vector Store with Register Offset
