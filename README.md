@@ -83,10 +83,6 @@ Vector Half Add Unsigned
 
 Vector Half Sub Unsigned
 
-### vadda.b/h/w/d
-
-Vector Add Absolute
-
 ### vavg.b/h/w/d
 
 Vector Average

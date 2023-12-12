@@ -1,4 +1,4 @@
-# Add/Subtract/Absolute Difference
+# Add/Subtract/Absolute
 
 {{ vadd('b') }}
 {{ vadd('h') }}
@@ -14,3 +14,8 @@
 {{ vabsd('wu') }}
 {{ vabsd('d') }}
 {{ vabsd('du') }}
+
+{{ vadda('b') }}
+{{ vadda('h') }}
+{{ vadda('w') }}
+{{ vadda('d') }}

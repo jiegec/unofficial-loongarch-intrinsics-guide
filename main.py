@@ -91,3 +91,12 @@ CPU Flags: LSX
             instr=f"vldrepl.{name} vr, r, imm",
             desc=f"Read {width}-bit data from memory address `addr + (offset << {shift})`, replicate the data to all vector lanes and save into `dst`.",
         )
+
+    @env.macro
+    def vadda(name):
+        width = widths[name]
+        return instruction(
+            intrinsic=f"__m128i __lsx_vadda_{name} (__m128i a, __m128i b)",
+            instr=f"vadda.{name} vr, vr, vr",
+            desc=f"Add absolute of {width}-bit elements in `a` and `b`, save the result in `dst`.",
+        )
