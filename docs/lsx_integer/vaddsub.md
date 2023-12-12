@@ -1,4 +1,4 @@
-# Add/Subtract/Absolute
+# Add, Subtract, Absolute and Average
 
 {{ vadd('b') }}
 {{ vadd('h') }}
@@ -37,3 +37,12 @@
 {{ vaddwev('q', 'd') }}
 {{ vaddwev('q', 'du') }}
 {{ vaddwev('q', 'du', 'd') }}
+
+{{ vavg('b') }}
+{{ vavg('bu') }}
+{{ vavg('h') }}
+{{ vavg('hu') }}
+{{ vavg('w') }}
+{{ vavg('wu') }}
+{{ vavg('d') }}
+{{ vavg('du') }}

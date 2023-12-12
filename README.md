@@ -74,14 +74,6 @@ Vector Half Add Unsigned
 
 Vector Half Sub Unsigned
 
-### vavg.b/h/w/d
-
-Vector Average
-
-### vavg.bu/hu/wu/du
-
-Vector Average Unsigned
-
 ### vavgr.b/h/w/d
 ### vavgr.bu/hu/wu/du
 
