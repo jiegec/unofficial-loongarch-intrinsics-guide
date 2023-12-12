@@ -87,10 +87,6 @@ Vector Half Sub Unsigned
 
 Vector Add Absolute
 
-### vabsd.b/h/w/d
-
-Vector Absolute Difference
-
 ### vavg.b/h/w/d
 
 Vector Average
@@ -449,5 +445,3 @@ Vector Multiplication High
 ### vnori.b
 
 ### vldi
-
-### vpermi.w
