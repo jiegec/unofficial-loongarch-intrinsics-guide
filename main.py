@@ -678,3 +678,23 @@ memory_store({width}, data.{member}[lane], addr + offset);
             instr=f"vrotr.{name} vr, vr, vr",
             desc=f"Rotate right the unsigned {width}-bit elements in `a` by elements in `b`, store the result to `dst`.",
         )
+
+    @env.macro
+    def vsrlr(name):
+        width = widths[name]
+        signedness = signednesses[name]
+        return instruction(
+            intrinsic=f"__m128i __lsx_vsrlr_{name} (__m128i a, __m128i b)",
+            instr=f"vsrlr.{name} vr, vr, vr",
+            desc=f"Logical right shift (with rounding) the unsigned {width}-bit elements in `a` by elements in `b`, store the result to `dst`.",
+        )
+
+    @env.macro
+    def vsrar(name):
+        width = widths[name]
+        signedness = signednesses[name]
+        return instruction(
+            intrinsic=f"__m128i __lsx_vsrar_{name} (__m128i a, __m128i b)",
+            instr=f"vsrar.{name} vr, vr, vr",
+            desc=f"Arithmetic right shift (with rounding) the signed {width}-bit elements in `a` by elements in `b`, store the result to `dst`.",
+        )

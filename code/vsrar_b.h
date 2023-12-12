@@ -1,0 +1,8 @@
+for (int i = 0; i < 16; i++) {
+  if ((b.byte[i] & 0x7) == 0) {
+    dst.byte[i] = a.byte[i];
+  } else {
+    dst.byte[i] = ((s8)a.byte[i] >> (b.byte[i] & 0x7)) +
+                  (((s8)a.byte[i] >> ((b.byte[i] & 0x7) - 1)) & 0x1);
+  }
+}
