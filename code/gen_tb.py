@@ -25,6 +25,8 @@ tb = {
     "vaddwod": (widths_vaddw, "v128 a, v128 b"),
     "vbitclr": (widths_signed, "v128 a, v128 b"),
     "vbitclri": (widths_signed, "v128 a, int imm", [0, 3, 7]),
+    "vbitset": (widths_signed, "v128 a, v128 b"),
+    "vbitseti": (widths_signed, "v128 a, int imm", [0, 3, 7]),
 }
 
 for name in tb:

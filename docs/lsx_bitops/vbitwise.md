@@ -30,3 +30,13 @@ Compute bitwise selection: for each bit position, if the bit in `c` equals to on
 {{ vbitclri('h') }}
 {{ vbitclri('w') }}
 {{ vbitclri('d') }}
+
+{{ vbitset('b') }}
+{{ vbitset('h') }}
+{{ vbitset('w') }}
+{{ vbitset('d') }}
+
+{{ vbitseti('b') }}
+{{ vbitseti('h') }}
+{{ vbitseti('w') }}
+{{ vbitseti('d') }}
