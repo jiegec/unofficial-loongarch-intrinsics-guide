@@ -918,3 +918,22 @@ memory_store({width}, data.{member}[lane], addr + offset);
             instr=f"vmsknz.{name} vr, vr",
             desc=f"For each {width}-bit element in `a`, if the element is non-zero, set one bit in `dst`, otherwise clear it.",
         )
+
+    @env.macro
+    def vpickve2gr(name):
+        width = widths[name]
+        return_type = {
+            "b": "int",
+            "bu": "unsigned int",
+            "h": "int",
+            "hu": "unsigned int",
+            "w": "int",
+            "wu": "unsigned int",
+            "d": "long int",
+            "du": "unsigned long int",
+        }[name]
+        return instruction(
+            intrinsic=f"{return_type} __lsx_vpickve2gr_{name} (__m128i a, imm0_{128 // width - 1} idx)",
+            instr=f"vpickve2gr.{name} r, vr, imm",
+            desc=f"Pick the `lane` specified by `idx` from `a` and store into `dst`.",
+        )

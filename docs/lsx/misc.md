@@ -39,6 +39,15 @@
 {{ vpickev('w') }}
 {{ vpickev('d') }}
 
+{{ vpickve2gr('b') }}
+{{ vpickve2gr('bu') }}
+{{ vpickve2gr('h') }}
+{{ vpickve2gr('hu') }}
+{{ vpickve2gr('w') }}
+{{ vpickve2gr('wu') }}
+{{ vpickve2gr('d') }}
+{{ vpickve2gr('du') }}
+
 {{ vpickod('b') }}
 {{ vpickod('h') }}
 {{ vpickod('w') }}

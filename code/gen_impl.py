@@ -180,6 +180,8 @@ for width in ["b", "bu", "h", "hu", "w", "wu", "d", "du"]:
             file=f,
         )
         print(f"}}", file=f)
+    with open(f"vpickve2gr_{width}.h", "w") as f:
+        print(f"dst = a.{m}[idx];", file=f)
 
 for width in ["b", "bu", "h", "hu", "w", "wu", "d", "du"]:
     double_width = double_widths[width]

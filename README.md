@@ -132,8 +132,6 @@ TODO List:
 
 ### vftintrneh.l.s
 
-### vpickve2gr.b/h/w/d/bu/hu/wu/du
-
 ### vsllwil.h.b/w.h/d.w
 
 ### vsllwil.hu.bu/wu.hu/du.wu
