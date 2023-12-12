@@ -3,8 +3,8 @@ EXES=$(patsubst %.cpp,%,$(SRCS))
 
 all: $(EXES)
 
-run:
-	./run.sh $(EXES) | tee run.log
+run: all
+	./run.sh $(EXES)
 
 clean:
 	rm -rf $(EXES)
