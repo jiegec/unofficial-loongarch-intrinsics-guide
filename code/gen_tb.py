@@ -73,6 +73,8 @@ tb = {
     "vmod": (widths_all, "v128 a, v128 b"),
     "vmsub": (widths_signed, "v128 a, v128 b, v128 c"),
     "vmskltz": (widths_signed, "v128 a"),
+    "vmskgez": (["b"], "v128 a"),
+    "vmsknz": (["b"], "v128 a"),
     "vmuh": (widths_all, "v128 a, v128 b"),
     "vmul": (widths_signed, "v128 a, v128 b"),
     "vmulwev": (widths_vaddw, "v128 a, v128 b"),

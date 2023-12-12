@@ -1,0 +1,15 @@
+u64 m = 0x7F7F7F7F7F7F7F7F;
+u64 c = ~(((a.dword[0] & m) + m) | a.dword[0] | m);
+c |= c << 7;
+c |= c << 14;
+c |= c << 28;
+c >>= 56;
+dst.dword[0] = c;
+c = ~(((a.dword[1] & m) + m) | a.dword[1] | m);
+c |= c << 7;
+c |= c << 14;
+c |= c << 28;
+c >>= 56;
+dst.dword[0] |= c << 8;
+dst.dword[0] = (u16)~dst.dword[0];
+dst.dword[1] = 0;

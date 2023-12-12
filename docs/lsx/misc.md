@@ -15,10 +15,14 @@
 {{ vinsgr2vr('w') }}
 {{ vinsgr2vr('d') }}
 
+{{ vmskgez('b') }}
+
 {{ vmskltz('b') }}
 {{ vmskltz('h') }}
 {{ vmskltz('w') }}
 {{ vmskltz('d') }}
+
+{{ vmsknz('b') }}
 
 {{ vpackev('b') }}
 {{ vpackev('h') }}

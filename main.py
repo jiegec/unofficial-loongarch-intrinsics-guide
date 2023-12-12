@@ -826,3 +826,21 @@ memory_store({width}, data.{member}[lane], addr + offset);
             instr=f"vmskltz.{name} vr, vr",
             desc=f"For each {width}-bit element in `a`, if the element is less than zero, set one bit in `dst`, otherwise clear it.",
         )
+
+    @env.macro
+    def vmskgez(name):
+        width = widths[name]
+        return instruction(
+            intrinsic=f"__m128i __lsx_vmskgez_{name} (__m128i a)",
+            instr=f"vmskgez.{name} vr, vr",
+            desc=f"For each {width}-bit element in `a`, if the element is greater than or equal to zero, set one bit in `dst`, otherwise clear it.",
+        )
+
+    @env.macro
+    def vmsknz(name):
+        width = widths[name]
+        return instruction(
+            intrinsic=f"__m128i __lsx_vmsknz_{name} (__m128i a)",
+            instr=f"vmsknz.{name} vr, vr",
+            desc=f"For each {width}-bit element in `a`, if the element is non-zero, set one bit in `dst`, otherwise clear it.",
+        )
