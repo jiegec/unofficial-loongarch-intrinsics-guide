@@ -113,7 +113,7 @@ CPU Flags: LSX
         )
 
     @env.macro
-    def vaddwev(wide, narrow, narrow2=None):
+    def vadd_mul_sub_w_ev_od(op, desc, even_odd, wide, narrow, narrow2=None):
         wide_width = widths[wide]
         if narrow2 is None:
             narrow2 = narrow
@@ -126,29 +126,35 @@ CPU Flags: LSX
         signedness = signednesses[narrow]
         signedness2 = signednesses[narrow2]
         return instruction(
-            intrinsic=f"__m128i __lsx_vaddwev_{wide}_{narrow}{intrinsic_suffix} (__m128i a, __m128i b)",
-            instr=f"vaddwev.{wide}.{narrow}{inst_suffix} vr, vr, vr",
-            desc=f"Add even-positioned {signedness} {narrow_width}-bit elements in `a` and {signedness2} elements in `b`, save the {wide_width}-bit result in `dst`.",
+            intrinsic=f"__m128i __lsx_v{op}wev_{wide}_{narrow}{intrinsic_suffix} (__m128i a, __m128i b)",
+            instr=f"v{op}wev.{wide}.{narrow}{inst_suffix} vr, vr, vr",
+            desc=f"{desc} {even_odd}-positioned {signedness} {narrow_width}-bit elements in `a` and {signedness2} elements in `b`, save the {wide_width}-bit result in `dst`.",
         )
 
     @env.macro
+    def vaddwev(wide, narrow, narrow2=None):
+        return vadd_mul_sub_w_ev_od("add", "Add", "even", wide, narrow, narrow2)
+
+    @env.macro
+    def vmulwev(wide, narrow, narrow2=None):
+        return vadd_mul_sub_w_ev_od("mul", "Multiply", "even", wide, narrow, narrow2)
+
+    @env.macro
+    def vsubwev(wide, narrow):
+        return vadd_mul_sub_w_ev_od("sub", "Subtract", "even", wide, narrow)
+
+    @env.macro
     def vaddwod(wide, narrow, narrow2=None):
-        wide_width = widths[wide]
-        if narrow2 is None:
-            narrow2 = narrow
-            inst_suffix = ""
-            intrinsic_suffix = ""
-        else:
-            inst_suffix = f".{narrow2}"
-            intrinsic_suffix = f"_{narrow2}"
-        narrow_width = widths[narrow]
-        signedness = signednesses[narrow]
-        signedness2 = signednesses[narrow2]
-        return instruction(
-            intrinsic=f"__m128i __lsx_vaddwod_{wide}_{narrow}{intrinsic_suffix} (__m128i a, __m128i b)",
-            instr=f"vaddwod.{wide}.{narrow}{inst_suffix} vr, vr, vr",
-            desc=f"Add odd-positioned {signedness} {narrow_width}-bit elements in `a` and {signedness2} elements in `b`, save the {wide_width}-bit result in `dst`.",
-        )
+        return vadd_mul_sub_w_ev_od("add", "Add", "odd", wide, narrow, narrow2)
+
+    @env.macro
+    def vmulwod(wide, narrow, narrow2=None):
+        return vadd_mul_sub_w_ev_od("mul", "Multiply", "odd", wide, narrow, narrow2)
+
+    @env.macro
+    def vsubwod(wide, narrow):
+        return vadd_mul_sub_w_ev_od("sub", "Subtract", "odd", wide, narrow)
+
 
     @env.macro
     def vavg(name):

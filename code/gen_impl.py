@@ -165,20 +165,23 @@ for width in ["b", "bu", "h", "hu", "w", "wu", "d", "du"]:
             sign2 = "s"
         else:
             sign2 = "u"
-        with open(f"vaddwev_{double_width}_{width}{suffix}.h", "w") as f:
-            print(f"for (int i = 0;i < {128 // double_w};i++) {{", file=f)
-            print(
-                f"  dst.{double_m}[i] = ({sign}{double_w})({sign}{w})a.{m}[2 * i] + ({sign2}{double_w})({sign2}{w})b.{m}[2 * i];",
-                file=f,
-            )
-            print(f"}}", file=f)
-        with open(f"vaddwod_{double_width}_{width}{suffix}.h", "w") as f:
-            print(f"for (int i = 0;i < {128 // double_w};i++) {{", file=f)
-            print(
-                f"  dst.{double_m}[i] = ({sign}{double_w})({sign}{w})a.{m}[2 * i + 1] + ({sign2}{double_w})({sign2}{w})b.{m}[2 * i + 1];",
-                file=f,
-            )
-            print(f"}}", file=f)
+        for arith, op in [("add", "+"), ("sub", "-"), ("mul", "*")]:
+            if suffix != "" and arith == "sub":
+                continue
+            with open(f"v{arith}wev_{double_width}_{width}{suffix}.h", "w") as f:
+                print(f"for (int i = 0;i < {128 // double_w};i++) {{", file=f)
+                print(
+                    f"  dst.{double_m}[i] = ({sign}{double_w})({sign}{w})a.{m}[2 * i] {op} ({sign2}{double_w})({sign2}{w})b.{m}[2 * i];",
+                    file=f,
+                )
+                print(f"}}", file=f)
+            with open(f"v{arith}wod_{double_width}_{width}{suffix}.h", "w") as f:
+                print(f"for (int i = 0;i < {128 // double_w};i++) {{", file=f)
+                print(
+                    f"  dst.{double_m}[i] = ({sign}{double_w})({sign}{w})a.{m}[2 * i + 1] {op} ({sign2}{double_w})({sign2}{w})b.{m}[2 * i + 1];",
+                    file=f,
+                )
+                print(f"}}", file=f)
 
 for width in ["b", "h", "w", "d"]:
     w = widths[width]

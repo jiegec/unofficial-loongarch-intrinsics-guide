@@ -18,6 +18,16 @@ widths_vaddw = [
     "q_du",
     "q_du_d",
 ]
+widths_vsubw = [
+    "h_b",
+    "h_bu",
+    "w_h",
+    "w_hu",
+    "d_w",
+    "d_wu",
+    "q_d",
+    "q_du",
+]
 
 tb = {
     # widths, args, extra args for imm
@@ -36,16 +46,28 @@ tb = {
     "vdiv": (widths_all, "v128 a, v128 b"),
     "vexth": (widths_vexth, "v128 a"),
     "vextl": (["q_d", "qu_du"], "v128 a"),
-    "vextrins": (widths_signed, "v128 a, v128 b, int imm", [0, 3, 7, 15, 16, 32, 64, 128, 255]),
+    "vextrins": (
+        widths_signed,
+        "v128 a, v128 b, int imm",
+        [0, 3, 7, 15, 16, 32, 64, 128, 255],
+    ),
     "vhaddw": (widths_vexth, "v128 a, v128 b"),
     "vhsubw": (widths_vexth, "v128 a, v128 b"),
     "vilvh": (widths_signed, "v128 a, v128 b"),
     "vilvl": (widths_signed, "v128 a, v128 b"),
-    "vinsgr2vr": (widths_signed, "v128 a, long int b, int imm", ["0, 0", "1234, 1", "5678, 1"]),
+    "vinsgr2vr": (
+        widths_signed,
+        "v128 a, long int b, int imm",
+        ["0, 0", "1234, 1", "5678, 1"],
+    ),
     "vmax": (widths_all, "v128 a, v128 b"),
     "vmaxi": (widths_all, "v128 a, int imm", [0, 3, 15]),
     "vmin": (widths_all, "v128 a, v128 b"),
     "vmini": (widths_all, "v128 a, int imm", [0, 3, 15]),
+    "vmulwev": (widths_vaddw, "v128 a, v128 b"),
+    "vmulwod": (widths_vaddw, "v128 a, v128 b"),
+    "vsubwev": (widths_vsubw, "v128 a, v128 b"),
+    "vsubwod": (widths_vsubw, "v128 a, v128 b"),
 }
 
 for name in tb:

@@ -131,3 +131,25 @@
 {{ vminmaxi('min', 'wu') }}
 {{ vminmaxi('min', 'd') }}
 {{ vminmaxi('min', 'du') }}
+
+{{ vmulwev('h', 'b') }}
+{{ vmulwev('h', 'bu') }}
+{{ vmulwev('h', 'bu', 'b') }}
+{{ vmulwev('w', 'h') }}
+{{ vmulwev('w', 'hu') }}
+{{ vmulwev('w', 'hu', 'h') }}
+{{ vmulwev('d', 'w') }}
+{{ vmulwev('d', 'wu') }}
+{{ vmulwev('d', 'wu', 'w') }}
+{{ vmulwev('q', 'd') }}
+{{ vmulwev('q', 'du') }}
+{{ vmulwev('q', 'du', 'd') }}
+
+{{ vsubwev('h', 'b') }}
+{{ vsubwev('h', 'bu') }}
+{{ vsubwev('w', 'h') }}
+{{ vsubwev('w', 'hu') }}
+{{ vsubwev('d', 'w') }}
+{{ vsubwev('d', 'wu') }}
+{{ vsubwev('q', 'd') }}
+{{ vsubwev('q', 'du') }}

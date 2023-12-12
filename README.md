@@ -26,18 +26,6 @@ Vector Set Equal/Less than or Equal/Less Than
 
 Vector Subtract
 
-### vsubwev.h.b/w.h/d.w/q.d
-
-Vector Subtract with Width Extension
-
-### vsubwod.h.b/w.h/d.w/q.d
-
-### vsubwev.h.bu/w.hu/d.wu/q.du
-
-Vector Subtract with Width Extension Unsigned
-
-### vsubwod.h.bu/w.hu/d.wu/q.du
-
 ### vsadd.b/h/w/d
 
 Vector Saturated Add
@@ -61,18 +49,6 @@ Vector Multiplication
 ### vmuh.b/h/w/d/bu/hu/wu/du
 
 Vector Multiplication High
-
-### vmulwev.h.b/w.h/d.w/q.d
-
-### vmulwod.h.b/w.h/d.w/q.d
-
-### vmulwev.h.bu/w.hu/d.wu/q.du
-
-### vmulwod.h.bu/w.hu/d.wu/q.du
-
-### vmulwev.h.bu.b/w.hu.h/d.wu.d/q.du.d
-
-### vmulwod.h.bu.b/w.hu.h/d.wu.d/q.du.d
 
 ### vmadd.b/h/w/d
 
