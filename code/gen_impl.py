@@ -96,7 +96,7 @@ for width in ["b", "bu", "h", "hu", "w", "wu", "d", "du"]:
             )
             print(f"}}", file=f)
 
-    if width != "d":
+    if width != "d" and width != "du":
         with open(f"vsllwil_{double_width}_{width}.h", "w") as f:
             print(f"for (int i = 0;i < {128 // double_w};i++) {{", file=f)
             print(
@@ -134,26 +134,52 @@ for width in ["b", "bu", "h", "hu", "w", "wu", "d", "du"]:
                     print(f"}}", file=f)
         for name, shift_sign in [("srl", "u"), ("sra", "s")]:
             double_width_signed = double_width[:1]
-            with open(f"vs{name}n_{width}_{double_width_signed}.h", "w") as f:
-                if shift_sign == "u":
-                    min = 0
-                    if sign == "u":
-                        max = (2**w) - 1
-                    else:
-                        max = (2**(w - 1)) - 1
+            if shift_sign == "u":
+                min = 0
+                if sign == "u":
+                    max = (2**w) - 1
                 else:
-                    if sign == "u":
-                        min = 0
-                        max = (2**w) - 1
-                    else:
-                        min = -(2 ** (w - 1))
-                        max = (2 ** (w - 1)) - 1
+                    max = (2**(w - 1)) - 1
+            else:
+                if sign == "u":
+                    min = 0
+                    max = (2**w) - 1
+                else:
+                    min = -(2 ** (w - 1))
+                    max = (2 ** (w - 1)) - 1
+            with open(f"vs{name}n_{width}_{double_width_signed}.h", "w") as f:
                 print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
                 print(f"if (i < {64 // w}) {{", file=f)
                 print(
                     f"  {shift_sign}{double_w} temp = ({shift_sign}{double_w})a.{double_m}[i] >> (b.{double_m}[i] & {double_w-1});",
                     file=f,
                 )
+                print(
+                    f"  dst.{m}[i] = clamp<{shift_sign}{double_w}>(temp, {min}, {max});",
+                    file=f,
+                )
+                print(f"}} else {{", file=f)
+                print(
+                    f"  dst.{m}[i] = 0;",
+                    file=f,
+                )
+                print(f"}}", file=f)
+                print(f"}}", file=f)
+            with open(f"vs{name}rn_{width}_{double_width_signed}.h", "w") as f:
+                print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+                print(f"if (i < {64 // w}) {{", file=f)
+                print(f"{shift_sign}{double_w} temp;", file=f)
+                print(f"if ((b.{double_m}[i] & {double_w-1}) == 0) {{", file=f)
+                print(
+                    f"  temp = ({shift_sign}{double_w})a.{double_m}[i];",
+                    file=f,
+                )
+                print(f"}} else {{", file=f)
+                print(
+                    f"  temp = (({shift_sign}{double_w})a.{double_m}[i] >> (b.{double_m}[i] & {double_w-1})) + ((({shift_sign}{double_w})a.{double_m}[i] >> ((b.{double_m}[i] & {double_w-1}) - 1)) & 1);",
+                    file=f,
+                )
+                print(f"}}", file=f)
                 print(
                     f"  dst.{m}[i] = clamp<{shift_sign}{double_w}>(temp, {min}, {max});",
                     file=f,
