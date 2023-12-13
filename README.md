@@ -56,14 +56,6 @@ TODO List:
 
 ### vffinth.d.w
 
-### vftint.w.s/l.d
-
-### vftintrm.w.s/l.d
-
-### vftintrz.w.s/l.d
-
-### vftintrne.w.s/l.d
-
 ### vftint.wu.s/lu.d
 
 ### vftintrz.wu.s/lu.d

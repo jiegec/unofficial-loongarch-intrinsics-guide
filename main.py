@@ -1257,12 +1257,7 @@ memory_store({width}, data.{member}[lane], addr + offset);
             desc=f"Clamp {signedness} {width}-bit elements in `a` to range specified by `imm`.",
         )
 
-    @env.macro
-    def vftint_l_s(rounding, low_high):
-        if low_high == "l":
-            half = "lower"
-        else:
-            half = "higher"
+    def get_rounding_mode(rounding):
         if rounding == "":
             rounding_mode = "using current rounding mode specified in `fscr`"
         elif rounding == "rm":
@@ -1275,8 +1270,34 @@ memory_store({width}, data.{member}[lane], addr + offset);
             rounding_mode = "rounding towards nearest even"
         else:
             assert False
+        return rounding_mode
+
+    @env.macro
+    def vftint_l_s(rounding, low_high):
+        if low_high == "l":
+            half = "lower"
+        else:
+            half = "higher"
+        rounding_mode = get_rounding_mode(rounding)
         return instruction(
-            intrinsic=f"__m128i __lsx_vftint{rounding}{low_high}_l_s (__m128i a)",
+            intrinsic=f"__m128i __lsx_vftint{rounding}{low_high}_l_s (__m128 a)",
             instr=f"vftint{rounding}{low_high}.l.s vr, vr",
             desc=f"Convert single-precision floating point elements in {half} part of `a` to 64-bit integer, {rounding_mode}.",
+        )
+
+    @env.macro
+    def vftint(rounding, name, name2):
+        if name2 == "d":
+            arg_type = "__m128d"
+            precision = "double"
+            int_width = 64
+        else:
+            arg_type = "__m128"
+            precision = "single"
+            int_width = 32
+        rounding_mode = get_rounding_mode(rounding)
+        return instruction(
+            intrinsic=f"__m128i __lsx_vftint{rounding}_{name}_{name2} ({arg_type} a)",
+            instr=f"vftint{rounding}.{name}.{name2} vr, vr",
+            desc=f"Convert {precision}-precision floating point elements in `a` to {int_width}-bit integer, {rounding_mode}.",
         )
