@@ -6,18 +6,6 @@ Arranged from QEMU implementation and [GCC Intrinsics](https://gcc.gnu.org/onlin
 
 TODO List:
 
-### vssrln.b.h/h.w/w.d
-
-### vssran.b.h/h.w/w.d
-
-### vssrlrn.b.h/h.w/w.d
-
-### vssrarn.b.h/h.w/w.d
-
-### vssrln.bu.h/hu.w/wu.d
-
-### vssran.bu.h/hu.w/wu.d
-
 ### vssrlrn.bu.h/hu.w/wu.d
 
 ### vssrarn.bu.h/hu.w/wu.d
@@ -118,11 +106,7 @@ TODO List:
 
 ### vsat.b/h/w/d/bu/hu/wu/du
 
-### vssrlni.b.h/h.w/w.d/d.q/bu.h/hu.w/wu.d/du.q
-
 ### vssrlrni.b.h/h.w/w.d/d.q/bu.h/hu.w/wu.d/du.q
-
-### vssrani.b.h/h.w/w.d/d.q/bu.h/hu.w/wu.d/du.q
 
 ### vssrarni.b.h/h.w/w.d/d.q
 
