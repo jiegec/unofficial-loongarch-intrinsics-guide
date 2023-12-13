@@ -521,7 +521,7 @@ for (int i = 0;i < 2;i++) {{
         if signedness == "unsigned":
             imm_range = "0_31"
         else:
-            imm_range = "n16_15"
+            imm_range = "_n16_15"
         return instruction(
             intrinsic=f"__m128i __lsx_v{min_max}i_{name} (__m128i a, imm{imm_range} imm)",
             instr=f"v{min_max}i.{name} vr, vr, imm",
