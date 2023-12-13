@@ -204,6 +204,19 @@
 {{ vmulwev('q', 'du') }}
 {{ vmulwev('q', 'du', 'd') }}
 
+{{ vmulwod('h', 'b') }}
+{{ vmulwod('h', 'bu') }}
+{{ vmulwod('h', 'bu', 'b') }}
+{{ vmulwod('w', 'h') }}
+{{ vmulwod('w', 'hu') }}
+{{ vmulwod('w', 'hu', 'h') }}
+{{ vmulwod('d', 'w') }}
+{{ vmulwod('d', 'wu') }}
+{{ vmulwod('d', 'wu', 'w') }}
+{{ vmulwod('q', 'd') }}
+{{ vmulwod('q', 'du') }}
+{{ vmulwod('q', 'du', 'd') }}
+
 {{ vneg('b') }}
 {{ vneg('h') }}
 {{ vneg('w') }}

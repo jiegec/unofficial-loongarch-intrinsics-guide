@@ -85,12 +85,12 @@ Convert half precision floating point elements in higher half of `a` to single p
 {% include('vfcvth_s_h.h') %}
 ```
 
-## __m128d __lsx_vfcvtl_s_h (__m128i a)
+## __m128 __lsx_vfcvtl_s_h (__m128i a)
 
 ### Synopsis
 
 ```c++
-__m128d __lsx_vfcvtl_s_h (__m128i a)
+__m128 __lsx_vfcvtl_s_h (__m128i a)
 #include <lsxintrin.h>
 Instruction: vfcvtl.s.h vr, vr
 CPU Flags: LSX

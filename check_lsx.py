@@ -6,10 +6,26 @@ import glob
 # Update gh-pages before running:
 # git fetch origin gh-pages && git -C ../gh-pages reset origin/gh-pages --hard
 
+def parse_fn(line, skip_last):
+    before_paren = line.split("(")[0].split(" ")
+    between_parens = line.split("(")[1].split(")")[0]
+    args = between_parens.split(",")
+
+    result = before_paren
+    result.append("(")
+    for arg in args:
+        if skip_last:
+            result += arg.split(" ")[:-1]
+        else:
+            result += arg.split(" ")
+    result.append(")")
+
+    return tuple(result)
+
 # gcc intrinsics
 gcc_intrinsics = set()
 for line in open('gcc_lsxintrin.h', 'r'):
-    gcc_intrinsics.add(tuple(line.strip()[:-1].split(' ')))
+    gcc_intrinsics.add(parse_fn(line, False))
 #print(gcc_intrinsics)
 
 # find documented intrinsics
@@ -19,28 +35,11 @@ for f in glob.glob("../gh-pages/**/*.html", recursive=True):
     for line in open(f, 'r'):
         if "h2" in line:
             intrinsics = line.split(">")[1].split("<")[0]
-
-            # strip off names that gcc does not have
-            parts = intrinsics.split(" ")
-            begin_params = False
-            i = 0
-            while i < len(parts):
-                if "(" in parts[i]:
-                    begin_params = True
-                    i += 1
-                elif "," in parts[i]:
-                    parts = parts[:i] + parts[i+1:]
-                elif ")" in parts[i]:
-                    parts = parts[:i] + parts[i+1:]
-                    parts[i-1] += ")"
-                    i += 1
-                elif begin_params:
-                    parts[i-1] += ","
-                    i += 1
-                else:
-                    i += 1
-            documented_intrinsics.add(tuple(parts))
+            documented_intrinsics.add(parse_fn(intrinsics, True))
 
 undocumented = gcc_intrinsics - documented_intrinsics
 for entry in undocumented:
     print("Undocumented:", " ".join(entry))
+    for e in documented_intrinsics:
+        if e[1] == entry[1]:
+            print("Matching:", " ".join(e))

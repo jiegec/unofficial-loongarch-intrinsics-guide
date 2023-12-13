@@ -140,7 +140,7 @@ CPU Flags: LSX
             suffix = "od"
         return instruction(
             intrinsic=f"__m128i __lsx_v{op}w{suffix}_{wide}_{narrow}{intrinsic_suffix} (__m128i a, __m128i b)",
-            instr=f"v{op}wev.{wide}.{narrow}{inst_suffix} vr, vr, vr",
+            instr=f"v{op}w{suffix}.{wide}.{narrow}{inst_suffix} vr, vr, vr",
             desc=f"{desc} {even_odd}-positioned {signedness} {narrow_width}-bit elements in `a` and {signedness2} elements in `b`, save the {wide_width}-bit result in `dst`.",
         )
 
@@ -269,7 +269,7 @@ CPU Flags: LSX
         width = widths[name]
         signedness = signednesses[name]
         return instruction(
-            intrinsic=f"__m128i __lsx_div_{name} (__m128i a, __m128i b)",
+            intrinsic=f"__m128i __lsx_vdiv_{name} (__m128i a, __m128i b)",
             instr=f"vdiv.{name} vr, vr, vr",
             desc=f"Divide {signedness} {width}-bit elements in `a` by elements in `b`.",
         )
