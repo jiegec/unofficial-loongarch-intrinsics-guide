@@ -337,30 +337,12 @@ CPU Flags: LSX
                 intrinsic=f"__m128i __lsx_vfcmp_{cond}_s (__m128 a, __m128 b)",
                 instr=f"vfcmp.{cond}.s vr, vr, vr",
                 desc=f"Compare single precision elements in `a` and `b`, save the comparison result (all ones if {desc}, all zeros otherwise) into `dst`. {trap}",
-                code=f"""
-for (int i = 0;i < 4;i++) {{
-    if (fp_compare_{cond}(a.fp32[i], b.fp32[i])) {{
-        dst.word[i] = 0xFFFFFFFF;
-    }} else {{
-        dst.word[i] = 0;
-    }}
-}}
-            """,
             )
             + "\n"
             + instruction(
                 intrinsic=f"__m128i __lsx_vfcmp_{cond}_d (__m128d a, __m128d b)",
                 instr=f"vfcmp.{cond}.d vr, vr, vr",
                 desc=f"Compare double precision elements in `a` and `b`, save the comparison result (all ones if {desc}, all zeros otherwise) into `dst`. {trap}",
-                code=f"""
-for (int i = 0;i < 2;i++) {{
-    if (fp_compare_{cond}(a.fp64[i], b.fp64[i])) {{
-        dst.word[i] = 0xFFFFFFFFFFFFFFFF;
-    }} else {{
-        dst.word[i] = 0;
-    }}
-}}
-            """,
             )
         )
 
@@ -673,15 +655,11 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
     @env.macro
     def vstelm(name):
         width = widths[name]
-        member = {"b": "byte", "h": "half", "w": "word", "d": "dword"}[name]
         imm_upper = 128 // width - 1
         return instruction(
             intrinsic=f"void __lsx_vstelm_{name} (__m128i data, void * addr, imm_n128_127 offset, imm0_{imm_upper} lane)",
             instr=f"vstelm.{name} vr, r, imm, imm",
-            desc=f"Store the element in `data` specified by `lane` to memory address `addr + offset`.",
-            code=f"""
-memory_store({width}, data.{member}[lane], addr + offset);
-""",
+            desc=f"Store the {width}-bit element in `data` specified by `lane` to memory address `addr + offset`.",
         )
 
     @env.macro

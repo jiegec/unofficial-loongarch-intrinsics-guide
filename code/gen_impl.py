@@ -801,6 +801,8 @@ for width in ["b", "h", "w", "d"]:
             print(f"}}", file=f)
             print(f"}}", file=f)
             print(f"  dst.{m}[imm % {128 // w}] = i;", file=f)
+    with open(f"vstelm_{width}.h", "w") as f:
+        print(f"memory_store({w}, data.{m}[lane], addr + offset);", file=f)
 
 for width in ["s", "d"]:
     m = members_fp[width]
@@ -948,5 +950,20 @@ for width in ["s", "d"]:
                 file=f,
             )
             print(f"}}", file=f)
+    for cond in ["af", "un", "eq", "ueq", "lt", "ult", "le", "ule", "ne", "or", "une"]:
+        for signal in ["c", "s"]:
+            with open(f"vfcmp_{signal}{cond}_{width}.h", "w") as f:
+                print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+                print(f"if (fp_compare_{signal}{cond}(a.{m}[i], b.{m}[i])) {{", file=f)
+                print(
+                    f"  dst.{int_m}[i] = 0x{2 ** w - 1:X};",
+                    file=f,
+                )
+                print(f"}} else {{", file=f)
+                print(
+                    f"  dst.{int_m}[i] = 0;",
+                    file=f,
+                )
+                print(f"}}", file=f)
 
 os.system("clang-format -i *.cpp *.h")
