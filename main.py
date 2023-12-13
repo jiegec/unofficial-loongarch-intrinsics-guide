@@ -1589,6 +1589,34 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
         )
 
     @env.macro
+    def vldi():
+        return instruction(
+            intrinsic=f"__m128i __lsx_vldi (imm_n1024_1023 imm)",
+            instr=f"vldi vr, imm",
+            desc=f"""
+Initialize `dst` using predefined patterns:
+
+- `imm[12:10]=0b000`: broadcast `imm[7:0]` as 8-bit elements to all lanes
+- `imm[12:10]=0b001`: broadcast sign-extended `imm[9:0]` as 16-bit elements to all lanes
+- `imm[12:10]=0b010`: broadcast sign-extended `imm[9:0]` as 32-bit elements to all lanes
+- `imm[12:10]=0b011`: broadcast sign-extended `imm[9:0]` as 64-bit elements to all lanes
+- `imm[12:8]=0b10000`: broadcast `imm[7:0]` as 32-bit elements to all lanes
+- `imm[12:8]=0b10001`: broadcast `imm[7:0] << 8` as 32-bit elements to all lanes
+- `imm[12:8]=0b10010`: broadcast `imm[7:0] << 16` as 32-bit elements to all lanes
+- `imm[12:8]=0b10011`: broadcast `imm[7:0] << 24` as 32-bit elements to all lanes
+- `imm[12:8]=0b10100`: broadcast `imm[7:0]` as 16-bit elements to all lanes
+- `imm[12:8]=0b10101`: broadcast `imm[7:0] << 8` as 16-bit elements to all lanes
+- `imm[12:8]=0b10110`: broadcast `(imm[7:0] << 8) | 0xFF` as 32-bit elements to all lanes
+- `imm[12:8]=0b10111`: broadcast `(imm[7:0] << 16) | 0xFFFF` as 32-bit elements to all lanes
+- `imm[12:8]=0b11000`: broadcast `imm[7:0]` as 8-bit elements to all lanes
+- `imm[12:8]=0b11001`: repeat each bit of `imm[7:0]` eight times, and broadcast the result as 64-bit elements to all lanes
+- `imm[12:8]=0b11010`: broadcast `(imm[7] << 31) | ((1-imm[6]) << 30) | ((imm[6] * 0x1F) << 25) | (imm[5:0] << 19)` as 32-bit elements to all lanes
+- `imm[12:8]=0b11011`: broadcast `(imm[7] << 31) | ((1-imm[6]) << 30) | ((imm[6] * 0x1F) << 25) | (imm[5:0] << 19)` as 64-bit elements to all lanes
+- `imm[12:8]=0b11100`: broadcast `(imm[7] << 63) | ((1-imm[6]) << 62) | ((imm[6] * 0xFF) << 54) | (imm[5:0] << 48)` as 64-bit elements to all lanes
+""",
+        )
+
+    @env.macro
     def all_intrinsics():
         result = []
         for file in glob.glob("docs/lsx/*.md"):

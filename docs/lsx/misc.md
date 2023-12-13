@@ -92,3 +92,5 @@
 {{ vsigncov('h') }}
 {{ vsigncov('w') }}
 {{ vsigncov('d') }}
+
+{{ vldi() }}
