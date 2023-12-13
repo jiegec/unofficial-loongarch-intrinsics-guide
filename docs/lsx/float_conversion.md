@@ -64,6 +64,70 @@ Convert double precision floating point elements in `a` and `b` to double precis
 {% include('vfcvt_s_d.h') %}
 ```
 
+## __m128 __lsx_vfcvth_s_h (__m128i a)
+
+### Synopsis
+
+```c++
+__m128 __lsx_vfcvth_s_h (__m128i a)
+#include <lsxintrin.h>
+Instruction: vfcvth.s.h vr, vr
+CPU Flags: LSX
+```
+
+### Description
+
+Convert half precision floating point elements in higher half of `a` to single precision.
+
+### Operation
+
+```c++
+{% include('vfcvth_s_h.h') %}
+```
+
+## __m128d __lsx_vfcvtl_s_h (__m128i a)
+
+### Synopsis
+
+```c++
+__m128d __lsx_vfcvtl_s_h (__m128i a)
+#include <lsxintrin.h>
+Instruction: vfcvtl.s.h vr, vr
+CPU Flags: LSX
+```
+
+### Description
+
+Convert half precision floating point elements in lower half of `a` to single precision.
+
+### Operation
+
+```c++
+{% include('vfcvtl_s_h.h') %}
+```
+
+
+## __m128i __lsx_vfcvt_h_s (__m128 a, __m128 b)
+
+### Synopsis
+
+```c++
+__m128i __lsx_vfcvt_h_s (__m128, __m128 b)
+#include <lsxintrin.h>
+Instruction: vfcvt.h.s vr, vr, vr
+CPU Flags: LSX
+```
+
+### Description
+
+Convert single precision floating point elements in `a` and `b` to half precision.
+
+### Operation
+
+```c++
+{% include('vfcvt_h_s.h') %}
+```
+
 {{ vftint_l_s('', 'l') }}
 {{ vftint_l_s('', 'h') }}
 {{ vftint_l_s('rm', 'l') }}

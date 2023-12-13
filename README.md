@@ -8,8 +8,6 @@ TODO List:
 
 ### vfrstp.b/h
 
-### vfcvt.h.s
-
 ### vffint.s.l
 
 ### vffint.w.d
@@ -23,10 +21,6 @@ TODO List:
 ### vffintrne.w.d
 
 ### vfrstpi.b/h
-
-### vfcvtl.s.h
-
-### vfcvth.s.h
 
 ### vffint.s.w/wu/d.l/d.lu
 
