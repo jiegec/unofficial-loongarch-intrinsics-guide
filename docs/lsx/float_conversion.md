@@ -154,3 +154,9 @@ Convert single precision floating point elements in `a` and `b` to half precisio
 {{ vftint('', 'wu', 's') }}
 {{ vftint('rz', 'lu', 'd') }}
 {{ vftint('rz', 'wu', 's') }}
+
+{{ vftint_w_d('') }}
+{{ vftint_w_d('rm') }}
+{{ vftint_w_d('rp') }}
+{{ vftint_w_d('rz') }}
+{{ vftint_w_d('rne') }}

@@ -1286,6 +1286,15 @@ memory_store({width}, data.{member}[lane], addr + offset);
         )
 
     @env.macro
+    def vftint_w_d(rounding):
+        rounding_mode = get_rounding_mode(rounding)
+        return instruction(
+            intrinsic=f"__m128i __lsx_vftint{rounding}_w_d (__m128 a, __m128 b)",
+            instr=f"vftint{rounding}.w.d vr, vr",
+            desc=f"Convert double-precision floating point elements in `a` and `b` to 32-bit integer, {rounding_mode}.",
+        )
+
+    @env.macro
     def vftint(rounding, name, name2):
         if name2 == "d":
             arg_type = "__m128d"

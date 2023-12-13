@@ -819,6 +819,15 @@ for width in ["s", "d"]:
                 file=f,
             )
             print(f"}}", file=f)
+    if width == "d":
+        for rounding in ["", "rm", "rp", "rz", "rne"]:
+            with open(f"vftint{rounding}_w_{width}.h", "w") as f:
+                print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+                print(
+                    f"  dst.{int_m}[i] = (i < {64 // w}) ? (s{int_w})a.{m}[i] : (s{int_w})b.{m}[i]; // rounding mode is not expressed in C",
+                    file=f,
+                )
+                print(f"}}", file=f)
 
     for name in ["max", "min"]:
         with open(f"vf{name}_{width}.h", "w") as f:

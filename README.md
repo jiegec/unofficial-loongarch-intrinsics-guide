@@ -10,19 +10,9 @@ TODO List:
 
 ### vffint.s.l
 
-### vffint.w.d
-
-### vffintrm.w.d
-
-### vffintrp.w.d
-
-### vffintrz.w.d
-
-### vffintrne.w.d
-
 ### vfrstpi.b/h
 
-### vffint.s.w/wu/d.l/d.lu
+### vffint.s.w/s.wu/d.l/d.lu
 
 ### vffintl.d.w
 
