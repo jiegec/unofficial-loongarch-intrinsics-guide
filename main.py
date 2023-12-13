@@ -1,6 +1,7 @@
 import math
 import os
 
+
 def define_env(env):
     widths = {
         "b": 8,
@@ -27,15 +28,9 @@ def define_env(env):
         "qu": "unsigned",
     }
 
-    precisions = {
-        "s": "single",
-        "d": "double"
-    }
+    precisions = {"s": "single", "d": "double"}
 
-    fp_types = {
-        "s": "__m128",
-        "d": "__m128d"
-    }
+    fp_types = {"s": "__m128", "d": "__m128d"}
 
     def include(file):
         return open(f"code/{file}").read().strip()
@@ -43,7 +38,7 @@ def define_env(env):
     def instruction(intrinsic, instr, desc, code=None):
         file_name = instr.split(" ")[0].replace(".", "_")
         if code is None:
-            code = include(f'{file_name}.h')
+            code = include(f"{file_name}.h")
         code = code.strip()
         if os.path.exists(f"code/{file_name}.cpp"):
             tested = "Tested on real machine."
@@ -167,7 +162,6 @@ CPU Flags: LSX
     @env.macro
     def vsubwod(wide, narrow):
         return vadd_mul_sub_w_ev_od("sub", "Subtract", "odd", wide, narrow)
-
 
     @env.macro
     def vavg(name):
@@ -334,11 +328,12 @@ CPU Flags: LSX
             "or": "OR(Ordered)",
             "une": "UNE(Unordered or Not Equal)",
         }[cond[1:]]
-        return instruction(
-            intrinsic=f"__m128i __lsx_vfcmp_{cond}_s (__m128 a, __m128 b)",
-            instr=f"vfcmp.{cond}.s vr, vr, vr",
-            desc=f"Compare single precision elements in `a` and `b`, save the comparison result (all ones if {desc}, all zeros otherwise) into `dst`. {trap}",
-            code=f"""
+        return (
+            instruction(
+                intrinsic=f"__m128i __lsx_vfcmp_{cond}_s (__m128 a, __m128 b)",
+                instr=f"vfcmp.{cond}.s vr, vr, vr",
+                desc=f"Compare single precision elements in `a` and `b`, save the comparison result (all ones if {desc}, all zeros otherwise) into `dst`. {trap}",
+                code=f"""
 for (int i = 0;i < 4;i++) {{
     if (fp_compare_{cond}(a.fp32[i], b.fp32[i])) {{
         dst.word[i] = 0xFFFFFFFF;
@@ -346,12 +341,14 @@ for (int i = 0;i < 4;i++) {{
         dst.word[i] = 0;
     }}
 }}
-            """
-        ) + "\n" + instruction(
-            intrinsic=f"__m128i __lsx_vfcmp_{cond}_d (__m128d a, __m128d b)",
-            instr=f"vfcmp.{cond}.d vr, vr, vr",
-            desc=f"Compare double precision elements in `a` and `b`, save the comparison result (all ones if {desc}, all zeros otherwise) into `dst`. {trap}",
-            code=f"""
+            """,
+            )
+            + "\n"
+            + instruction(
+                intrinsic=f"__m128i __lsx_vfcmp_{cond}_d (__m128d a, __m128d b)",
+                instr=f"vfcmp.{cond}.d vr, vr, vr",
+                desc=f"Compare double precision elements in `a` and `b`, save the comparison result (all ones if {desc}, all zeros otherwise) into `dst`. {trap}",
+                code=f"""
 for (int i = 0;i < 2;i++) {{
     if (fp_compare_{cond}(a.fp64[i], b.fp64[i])) {{
         dst.word[i] = 0xFFFFFFFFFFFFFFFF;
@@ -359,7 +356,8 @@ for (int i = 0;i < 2;i++) {{
         dst.word[i] = 0;
     }}
 }}
-            """
+            """,
+            )
         )
 
     @env.macro
@@ -575,7 +573,7 @@ for (int i = 0;i < 2;i++) {{
 
     @env.macro
     def vlogicali(op):
-        return instruction (
+        return instruction(
             intrinsic=f"__m128i __lsx_v{op}i_b (__m128i a, imm0_255 imm)",
             instr=f"v{op}i.b vr, vr, imm",
             desc=f"Compute bitwise {op.upper()} between elements in `a` and `imm`.",
@@ -657,12 +655,7 @@ for (int i = 0;i < 2;i++) {{
     @env.macro
     def vstelm(name):
         width = widths[name]
-        member = {
-            "b": "byte",
-            "h": "half",
-            "w": "word",
-            "d": "dword"
-        }[name]
+        member = {"b": "byte", "h": "half", "w": "word", "d": "dword"}[name]
         imm_upper = 128 // width - 1
         return instruction(
             intrinsic=f"void __lsx_vstelm_{name} (__m128i data, void * addr, imm_n128_127 offset, imm0_{imm_upper} lane)",
@@ -670,7 +663,7 @@ for (int i = 0;i < 2;i++) {{
             desc=f"Store the element in `data` specified by `lane` to memory address `addr + offset`.",
             code=f"""
 memory_store({width}, data.{member}[lane], addr + offset);
-"""
+""",
         )
 
     @env.macro
@@ -879,7 +872,6 @@ memory_store({width}, data.{member}[lane], addr + offset);
             desc=f"Arithmetic right shift (with rounding) the signed {width}-bit elements in `a` by `imm`, store the result to `dst`.",
         )
 
-
     @env.macro
     def vpackev(name):
         width = widths[name]
@@ -942,7 +934,7 @@ memory_store({width}, data.{member}[lane], addr + offset);
             intrinsic=f"__m128i __lsx_vrepli_{name} (imm_n512_511 imm)",
             instr=f"vldi.{name} vr, imm",
             desc=f"Repeat `imm` to fill whole vector.",
-            code=include(f'vrepli_{name}.h')
+            code=include(f"vrepli_{name}.h"),
         )
 
     @env.macro
@@ -1044,7 +1036,6 @@ memory_store({width}, data.{member}[lane], addr + offset);
             instr=f"vseteqz.v vr, vr; bcnez",
             desc=f"Expected to be used in branches: branch if the 128-bit vector `a` equals to zero.",
         )
-
 
     @env.macro
     def bnz_v():

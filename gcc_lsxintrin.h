@@ -615,7 +615,7 @@ __m128i __lsx_vsrlri_w (__m128i, imm0_31);
 __m128i __lsx_vsrlrn_b_h (__m128i, __m128i);
 __m128i __lsx_vsrlrn_h_w (__m128i, __m128i);
 __m128i __lsx_vsrlrni_b_h (__m128i, __m128i, imm0_15);
-__m128i __lsx_vsrlrni_d_q (__m128i, __m128i, imm0_127)
+__m128i __lsx_vsrlrni_d_q (__m128i, __m128i, imm0_127);
 __m128i __lsx_vsrlrni_h_w (__m128i, __m128i, imm0_31);
 __m128i __lsx_vsrlrni_w_d (__m128i, __m128i, imm0_63);
 __m128i __lsx_vsrlrn_w_d (__m128i, __m128i);

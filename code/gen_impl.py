@@ -46,7 +46,6 @@ members = {
     "du": "dword",
     "q": "qword",
     "qu": "qword",
-
     # fp to int
     "s": "word",
 }
@@ -338,7 +337,6 @@ for width in ["b", "bu", "h", "hu", "w", "wu", "d", "du"]:
                 file=f,
             )
             print(f"}}", file=f)
-
 
     for name, op in [("lt", "<"), ("le", "<=")]:
         with open(f"vs{name}_{width}.h", "w") as f:
