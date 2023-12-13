@@ -9,4 +9,5 @@ v128 vsrani_d_q(v128 a, v128 b, int imm) {
 void test() {
   FUZZ2(vsrani_d_q, 0);
   FUZZ2(vsrani_d_q, 7);
+  FUZZ2(vsrani_d_q, 15);
 }

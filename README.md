@@ -118,13 +118,9 @@ TODO List:
 
 ### vsat.b/h/w/d/bu/hu/wu/du
 
-### vsrlrni.b.h/h.w/w.d/d.q
-
 ### vssrlni.b.h/h.w/w.d/d.q/bu.h/hu.w/wu.d/du.q
 
 ### vssrlrni.b.h/h.w/w.d/d.q/bu.h/hu.w/wu.d/du.q
-
-### vsrarni.b.h/h.w/w.d/d.q
 
 ### vssrani.b.h/h.w/w.d/d.q/bu.h/hu.w/wu.d/du.q
 

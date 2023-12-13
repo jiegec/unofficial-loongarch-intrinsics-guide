@@ -1068,3 +1068,23 @@ memory_store({width}, data.{member}[lane], addr + offset);
             instr=f"vsrarn.{name}.{name2} vr, vr, vr",
             desc=f"Arithmetic right shift (with rounding) the signed {width2}-bit elements in `a` by elements in `b`, truncate to {width}-bit and store the result to `dst`.",
         )
+
+    @env.macro
+    def vsrlrni(name, name2):
+        width = widths[name[0]]
+        width2 = widths[name2[0]]
+        return instruction(
+            intrinsic=f"__m128i __lsx_vsrlrni_{name}_{name2} (__m128i a, __m128i b, imm0_{width2-1} imm)",
+            instr=f"vsrlrni.{name}.{name2} vr, vr, imm",
+            desc=f"Logical right shift (with rounding) the unsigned {width2}-bit elements in `a` and `b` by `imm`, truncate to {width}-bit and store the result to `dst`.",
+        )
+
+    @env.macro
+    def vsrarni(name, name2):
+        width = widths[name[0]]
+        width2 = widths[name2[0]]
+        return instruction(
+            intrinsic=f"__m128i __lsx_vsrarni_{name}_{name2} (__m128i a, __m128i b, imm0_{width2-1} imm)",
+            instr=f"vsrarni.{name}.{name2} vr, vr, imm",
+            desc=f"Arithemtic right shift (with rounding) the signed {width2}-bit elements in `a` and `b` by `imm`, truncate to {width}-bit and store the result to `dst`.",
+        )

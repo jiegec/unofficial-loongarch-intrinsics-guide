@@ -189,6 +189,63 @@ for width in ["b", "bu", "h", "hu", "w", "wu", "d", "du"]:
                 file=f,
             )
             print(f"}}", file=f)
+        with open(f"vsrlrni_{width}_{double_width}.h", "w") as f:
+            print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+            print(f"if (i < {64 // w}) {{", file=f)
+            print(f"if (imm == 0) {{", file=f)
+            print(
+                f"  dst.{m}[i] = (u{w})(u{double_w})b.{double_m}[i];",
+                file=f,
+            )
+            print(f"}} else {{", file=f)
+            print(
+                f"  dst.{m}[i] = (u{w})(((u{double_w})b.{double_m}[i] >> imm) + (((u{double_w})b.{double_m}[i] >> (imm - 1)) & 0x1));",
+                file=f,
+            )
+            print(f"}}", file=f)
+            print(f"}} else {{", file=f)
+            print(f"if (imm == 0) {{", file=f)
+            print(
+                f"  dst.{m}[i] = (u{w})(u{double_w})a.{double_m}[i - {64 // w}];",
+                file=f,
+            )
+            print(f"}} else {{", file=f)
+            print(
+                f"  dst.{m}[i] = (u{w})(((u{double_w})a.{double_m}[i - {64 // w}] >> imm) + (((u{double_w})a.{double_m}[i - {64 // w}] >> (imm - 1)) & 0x1));",
+                file=f,
+            )
+            print(f"}}", file=f)
+            print(f"}}", file=f)
+            print(f"}}", file=f)
+        with open(f"vsrarni_{width}_{double_width}.h", "w") as f:
+            print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+            print(f"if (i < {64 // w}) {{", file=f)
+            print(f"if (imm == 0) {{", file=f)
+            print(
+                f"  dst.{m}[i] = (s{w})(s{double_w})b.{double_m}[i];",
+                file=f,
+            )
+            print(f"}} else {{", file=f)
+            print(
+                f"  dst.{m}[i] = (s{w})(((s{double_w})b.{double_m}[i] >> imm) + (((s{double_w})b.{double_m}[i] >> (imm - 1)) & 0x1));",
+                file=f,
+            )
+            print(f"}}", file=f)
+            print(f"}} else {{", file=f)
+            print(f"if (imm == 0) {{", file=f)
+            print(
+                f"  dst.{m}[i] = (s{w})(s{double_w})a.{double_m}[i - {64 // w}];",
+                file=f,
+            )
+            print(f"}} else {{", file=f)
+            print(
+                f"  dst.{m}[i] = (u{w})(((s{double_w})a.{double_m}[i - {64 // w}] >> imm) + (((s{double_w})a.{double_m}[i - {64 // w}] >> (imm - 1)) & 0x1));",
+                file=f,
+            )
+            print(f"}}", file=f)
+            print(f"}}", file=f)
+            print(f"}}", file=f)
+
 
     if width == "d" or width == "du":
         with open(f"vextl_{double_width}_{width}.h", "w") as f:
