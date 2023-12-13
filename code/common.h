@@ -75,6 +75,7 @@ template <typename T> T ssub(T a, T b) {
   }
 }
 
+using std::clamp;
 using std::max;
 using std::min;
 

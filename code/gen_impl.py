@@ -132,6 +132,39 @@ for width in ["b", "bu", "h", "hu", "w", "wu", "d", "du"]:
                     print(f"  dst.{m}[i] = 0;", file=f)
                     print(f"}}", file=f)
                     print(f"}}", file=f)
+        for name, shift_sign in [("srl", "u"), ("sra", "s")]:
+            double_width_signed = double_width[:1]
+            with open(f"vs{name}n_{width}_{double_width_signed}.h", "w") as f:
+                if shift_sign == "u":
+                    min = 0
+                    if sign == "u":
+                        max = (2**w) - 1
+                    else:
+                        max = (2**(w - 1)) - 1
+                else:
+                    if sign == "u":
+                        min = 0
+                        max = (2**w) - 1
+                    else:
+                        min = -(2 ** (w - 1))
+                        max = (2 ** (w - 1)) - 1
+                print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+                print(f"if (i < {64 // w}) {{", file=f)
+                print(
+                    f"  {shift_sign}{double_w} temp = ({shift_sign}{double_w})a.{double_m}[i] >> (b.{double_m}[i] & {double_w-1});",
+                    file=f,
+                )
+                print(
+                    f"  dst.{m}[i] = clamp<{shift_sign}{double_w}>(temp, {min}, {max});",
+                    file=f,
+                )
+                print(f"}} else {{", file=f)
+                print(
+                    f"  dst.{m}[i] = 0;",
+                    file=f,
+                )
+                print(f"}}", file=f)
+                print(f"}}", file=f)
 
     if sign == "s":
         for name, sign in [("srl", "u"), ("sra", "s")]:
@@ -170,7 +203,6 @@ for width in ["b", "bu", "h", "hu", "w", "wu", "d", "du"]:
                 print(f"}}", file=f)
                 print(f"}}", file=f)
                 print(f"}}", file=f)
-
 
     if width == "d" or width == "du":
         with open(f"vextl_{double_width}_{width}.h", "w") as f:

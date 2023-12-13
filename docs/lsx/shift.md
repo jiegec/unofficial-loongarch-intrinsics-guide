@@ -135,6 +135,20 @@ Compute 128-bit `a` shifted right by `imm * 8` bits.
 {{ vsrlrni('w', 'd') }}
 {{ vsrlrni('d', 'q') }}
 
+{{ vssran('b', 'h') }}
+{{ vssran('bu', 'h') }}
+{{ vssran('h', 'w') }}
+{{ vssran('hu', 'w') }}
+{{ vssran('w', 'd') }}
+{{ vssran('wu', 'd') }}
+
+{{ vssrln('b', 'h') }}
+{{ vssrln('bu', 'h') }}
+{{ vssrln('h', 'w') }}
+{{ vssrln('hu', 'w') }}
+{{ vssrln('w', 'd') }}
+{{ vssrln('wu', 'd') }}
+
 {{ vrotr('b') }}
 {{ vrotr('h') }}
 {{ vrotr('w') }}
