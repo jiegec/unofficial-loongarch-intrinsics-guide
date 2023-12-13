@@ -1458,3 +1458,148 @@ memory_store({width}, data.{member}[lane], addr + offset);
             instr=f"vstx vr, r, r",
             desc=f"Write 128-bit data in `data` to memory address `addr + offset`.",
         )
+
+    @env.macro
+    def vbitsel_v():
+        return instruction(
+            intrinsic=f"__m128i __lsx_vbitsel_v (__m128i a, __m128i b, __m128i c)",
+            instr=f"vbitsel.v vr, vr, vr",
+            desc=f"Compute bitwise selection: for each bit position, if the bit in `c` equals to one, copy the bit from `b` to `dst`, otherwise copy from `a`.",
+        )
+
+    @env.macro
+    def vbitseli_b():
+        return instruction(
+            intrinsic=f"__m128i __lsx_vbitseli_b (__m128i a, __m128i b, imm0_255 imm)",
+            instr=f"vbitseli.b vr, vr, imm",
+            desc=f"Compute bitwise selection: for each bit position, if the bit in `a` equals to one, copy the bit from `imm` to `dst`, otherwise copy from `b`.",
+        )
+
+    @env.macro
+    def vfcvth_d_s():
+        return instruction(
+            intrinsic=f"__m128d __lsx_vfcvth_d_s (__m128 a)",
+            instr=f"vfcvth.d.s vr, vr",
+            desc=f"Convert single precision floating point elements in higher half of `a` to double precision.",
+        )
+
+    @env.macro
+    def vfcvtl_d_s():
+        return instruction(
+            intrinsic=f"__m128d __lsx_vfcvtl_d_s (__m128 a)",
+            instr=f"vfcvtl.d.s vr, vr",
+            desc=f"Convert single precision floating point elements in lower half of `a` to double precision.",
+        )
+
+    @env.macro
+    def vfcvt_s_d():
+        return instruction(
+            intrinsic=f"__m128 __lsx_vfcvt_s_d (__m128d a, __m128d b)",
+            instr=f"vfcvt.s.d vr, vr, vr",
+            desc=f"Convert double precision floating point elements in `a` and `b` to double precision.",
+        )
+
+    @env.macro
+    def vfcvth_s_h():
+        return instruction(
+            intrinsic=f"__m128 __lsx_vfcvth_s_h (__m128i a)",
+            instr=f"vfcvth.s.h vr, vr",
+            desc=f"Convert half precision floating point elements in higher half of `a` to single precision.",
+        )
+
+    @env.macro
+    def vfcvtl_s_h():
+        return instruction(
+            intrinsic=f"__m128 __lsx_vfcvtl_s_h (__m128i a)",
+            instr=f"vfcvtl.s.h vr, vr",
+            desc=f"Convert half precision floating point elements in lower half of `a` to single precision.",
+        )
+
+
+    @env.macro
+    def vfcvt_h_s():
+        return instruction(
+            intrinsic=f"__m128i __lsx_vfcvt_h_s (__m128 a, __m128 b)",
+            instr=f"vfcvt.h.s vr, vr, vr",
+            desc=f"Convert single precision floating point elements in `a` and `b` to half precision.",
+        )
+
+    @env.macro
+    def vfclass_d():
+        return instruction(
+            intrinsic=f"__m128i __lsx_vfclass_d (__m128d a)",
+            instr=f"vfclass.d vr, vr",
+            desc=f"Classifiy each double precision floating point elements in `a`.",
+        )
+
+    @env.macro
+    def vfclass_s():
+        return instruction(
+            intrinsic=f"__m128i __lsx_vfclass_s (__m128 a)",
+            instr=f"vfclass.s vr, vr",
+            desc=f"Classifiy each single precision floating point elements in `a`.",
+        )
+
+    @env.macro
+    def vfmadd_s():
+        return instruction(
+            intrinsic=f"__m128 __lsx_vfmadd_s (__m128 a, __m128 b, __m128 c)",
+            instr=f"vfmadd.s vr, vr, vr",
+            desc=f"Compute packed single precision floating point FMA(Fused Multiply-Add): multiply elements in `a` and `b`, accumulate to elements in `c` and store the result in `dst`.",
+        )
+
+    @env.macro
+    def vfmadd_d():
+        return instruction(
+            intrinsic=f"__m128d __lsx_vfmadd_d (__m128d a, __m128d b, __m128d c)",
+            instr=f"vfmadd.d vr, vr, vr",
+            desc=f"Compute packed double precision floating point FMA(Fused Multiply-Add): multiply elements in `a` and `b`, accumulate to elements in `c` and store the result in `dst`.",
+        )
+
+    @env.macro
+    def vfmsub_s():
+        return instruction(
+            intrinsic=f"__m128 __lsx_vfmsub_s (__m128 a, __m128 b, __m128 c)",
+            instr=f"vfmsub.s vr, vr, vr",
+            desc=f"Compute packed single precision floating point FMA(Fused Multiply-Add): multiply elements in `a` and `b`, subtract elements in `c` and store the result in `dst`.",
+        )
+
+    @env.macro
+    def vfmsub_d():
+        return instruction(
+            intrinsic=f"__m128d __lsx_vfmsub_d (__m128d a, __m128d b, __m128d c)",
+            instr=f"vfmsub.d vr, vr, vr",
+            desc=f"Compute packed double precision floating point FMA(Fused Multiply-Add): multiply elements in `a` and `b`, subtract elements in `c` and store the result in `dst`.",
+        )
+
+    @env.macro
+    def vfnmadd_s():
+        return instruction(
+            intrinsic=f"__m128 __lsx_vfnmadd_s (__m128 a, __m128 b, __m128 c)",
+            instr=f"vfnmadd.s vr, vr, vr",
+            desc=f"Compute packed single precision floating point FMA(Fused Multiply-Add): multiply elements in `a` and `b`, accumulate to elements in `c` and store the negated result in `dst`.",
+        )
+
+    @env.macro
+    def vfnmadd_d():
+        return instruction(
+            intrinsic=f"__m128d __lsx_vfnmadd_d (__m128d a, __m128d b, __m128d c)",
+            instr=f"vfnmadd.d vr, vr, vr",
+            desc=f"Compute packed double precision floating point FMA(Fused Multiply-Add): multiply elements in `a` and `b`, accumulate to elements in `c` and store the negated result in `dst`.",
+        )
+
+    @env.macro
+    def vfnmsub_s():
+        return instruction(
+            intrinsic=f"__m128 __lsx_vfnmsub_s (__m128 a, __m128 b, __m128 c)",
+            instr=f"vfnmsub.s vr, vr, vr",
+            desc=f"Compute packed single precision floating point FMA(Fused Multiply-Add): multiply elements in `a` and `b`, subtract elements in `c` and store the negated result in `dst`.",
+        )
+
+    @env.macro
+    def vfnmsub_d():
+        return instruction(
+            intrinsic=f"__m128d __lsx_vfnmsub_d (__m128d a, __m128d b, __m128d c)",
+            instr=f"vfnmsub.d vr, vr, vr",
+            desc=f"Compute packed double precision floating point FMA(Fused Multiply-Add): multiply elements in `a` and `b`, subtract elements in `c` and store the negated result in `dst`.",
+        )

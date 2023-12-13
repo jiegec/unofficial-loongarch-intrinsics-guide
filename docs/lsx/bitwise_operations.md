@@ -1,46 +1,8 @@
 # Bitwise Operations
 
-## __m128i __lsx_vbitsel_v (__m128i a, __m128i b, __m128i c)
+{{ vbitsel_v() }}
 
-### Synopsis
-
-```c++
-__m128i __lsx_vbitsel_v (__m128i a, __m128i b, __m128i c)
-#include <lsxintrin.h>
-Instruction: vbitsel.v vr, vr, vr
-CPU Flags: LSX
-```
-
-### Description
-
-Compute bitwise selection: for each bit position, if the bit in `c` equals to one, copy the bit from `b` to `dst`, otherwise copy from `a`.
-
-### Operation
-
-```c++
-{% include 'vbitsel_v.h' %}
-```
-
-## __m128i __lsx_vbitseli_b (__m128i a, __m128i b, imm0_255 imm)
-
-### Synopsis
-
-```c++
-__m128i __lsx_vbitseli_b (__m128i a, __m128i b, imm0_255 imm)
-#include <lsxintrin.h>
-Instruction: vbitseli.b vr, vr, imm
-CPU Flags: LSX
-```
-
-### Description
-
-Compute bitwise selection: for each bit position, if the bit in `a` equals to one, copy the bit from `imm` to `dst`, otherwise copy from `b`.
-
-### Operation
-
-```c++
-{% include 'vbitseli_b.h' %}
-```
+{{ vbitseli_b() }}
 
 {{ vbitclr('b') }}
 {{ vbitclr('h') }}
