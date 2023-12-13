@@ -99,5 +99,3 @@ TODO List:
 ### vftintrnel.l.s
 
 ### vftintrneh.l.s
-
-### vsat.b/h/w/d/bu/hu/wu/du

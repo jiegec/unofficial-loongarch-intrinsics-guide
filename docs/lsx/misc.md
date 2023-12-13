@@ -73,6 +73,15 @@
 {{ vreplvei('w') }}
 {{ vreplvei('d') }}
 
+{{ vsat('b') }}
+{{ vsat('bu') }}
+{{ vsat('h') }}
+{{ vsat('hu') }}
+{{ vsat('w') }}
+{{ vsat('wu') }}
+{{ vsat('d') }}
+{{ vsat('du') }}
+
 {{ vsigncov('b') }}
 {{ vsigncov('h') }}
 {{ vsigncov('w') }}

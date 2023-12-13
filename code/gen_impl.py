@@ -331,6 +331,7 @@ for width in ["b", "bu", "h", "hu", "w", "wu", "d", "du"]:
             )
             print(f"}}", file=f)
 
+
     for name, op in [("lt", "<"), ("le", "<=")]:
         with open(f"vs{name}_{width}.h", "w") as f:
             print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
@@ -416,6 +417,19 @@ for width in ["b", "bu", "h", "hu", "w", "wu", "d", "du"]:
                 file=f,
             )
             print(f"}}", file=f)
+    with open(f"vsat_{width}.h", "w") as f:
+        if sign == "s":
+            min = "-(1 << imm)"
+            max = "(1 << imm) - 1"
+        else:
+            min = "0"
+            max = "(1 << (imm+1)) - 1"
+        print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+        print(
+            f"  dst.{m}[i] = clamp<{sign}{w}>(a.{m}[i], {min}, {max});",
+            file=f,
+        )
+        print(f"}}", file=f)
 
 for width in ["b", "h", "w", "d"]:
     w = widths[width]

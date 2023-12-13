@@ -1176,3 +1176,13 @@ memory_store({width}, data.{member}[lane], addr + offset);
             instr=f"vssrarni.{name}.{name2} vr, vr, imm",
             desc=f"Arithemtic right shift (with rounding) the signed {width2}-bit elements in `a` and `b` by `imm`, clamp to fit in {signedness} {width}-bit integer and store the result to `dst`.",
         )
+
+    @env.macro
+    def vsat(name):
+        width = widths[name]
+        signedness = signednesses[name]
+        return instruction(
+            intrinsic=f"__m128i __lsx_vsat_{name} (__m128i a, imm0_{width - 1} imm)",
+            instr=f"vsat.{name} vr, vr, imm",
+            desc=f"Clamp {signedness} {width}-bit elements in `a` to range specified by `imm`.",
+        )

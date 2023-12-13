@@ -97,6 +97,7 @@ tb = {
     "vreplvei": (widths_signed, "v128 a, int idx", [0, 1]),
     "vreplgr2vr": (widths_signed, "int val", [0, 1, 256]),
     "vsadd": (widths_all, "v128 a, v128 b"),
+    "vsat": (widths_all, "v128 a, int imm", [0, 7]),
     "vseq": (widths_signed, "v128 a, v128 b"),
     "vseqi": (widths_signed, "v128 a, int imm", [-16, 0, 15]),
     "vshuf4i": (["b", "h", "w"], "v128 a, int imm", [0, 13, 100, 128, 255]),
