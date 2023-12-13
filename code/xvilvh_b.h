@@ -1,3 +1,7 @@
-for (int i = 0; i < 32; i++) {
-  dst.byte[i] = (i % 2 == 1) ? a.byte[i / 2 + 16] : b.byte[i / 2 + 8];
+int i;
+for (i = 0; i < 16; i++) {
+  dst.byte[i] = (i % 2 == 1) ? a.byte[i / 2 + 8] : b.byte[i / 2 + 8];
+}
+for (; i < 32; i++) {
+  dst.byte[i] = (i % 2 == 1) ? a.byte[i / 2 + 16] : b.byte[i / 2 + 16];
 }

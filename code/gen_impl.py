@@ -565,20 +565,50 @@ for vlen, prefix in [(128, "v"), (256, "xv")]:
             )
             print(f"}}", file=f)
         with open(f"{prefix}extrins_{width}.h", "w") as f:
-            print(f"for (int i = 0;i < {vlen // w};i++) {{", file=f)
-            mask = vlen // w - 1
-            print(
-                f"  dst.{m}[i] = (i == ((imm >> 4) & {mask})) ? b.{m}[imm & {mask}] : a.{m}[i];",
-                file=f,
-            )
-            print(f"}}", file=f)
+            mask = 128 // w - 1 # not vlen
+            if prefix == "v":
+                print(f"for (int i = 0;i < {vlen // w};i++) {{", file=f)
+                print(
+                    f"  dst.{m}[i] = (i == ((imm >> 4) & {mask})) ? b.{m}[imm & {mask}] : a.{m}[i];",
+                    file=f,
+                )
+                print(f"}}", file=f)
+            else:
+                print(f"int i;", file=f)
+                print(f"for (i = 0;i < {vlen // 2 // w};i++) {{", file=f)
+                print(
+                    f"  dst.{m}[i] = (i == ((imm >> 4) & {mask})) ? b.{m}[imm & {mask}] : a.{m}[i];",
+                    file=f,
+                )
+                print(f"}}", file=f)
+                print(f"for (;i < {vlen // w};i++) {{", file=f)
+                print(
+                    f"  dst.{m}[i] = (i - {vlen // 2 // w} == ((imm >> 4) & {mask})) ? b.{m}[(imm & {mask}) + {vlen // 2 // w}] : a.{m}[i];",
+                    file=f,
+                )
+                print(f"}}", file=f)
         with open(f"{prefix}ilvh_{width}.h", "w") as f:
-            print(f"for (int i = 0;i < {vlen // w};i++) {{", file=f)
-            print(
-                f"  dst.{m}[i] = (i % 2 == 1) ? a.{m}[i / 2 + {vlen // 2 // w}] : b.{m}[i / 2 + {64 // w}];",
-                file=f,
-            )
-            print(f"}}", file=f)
+            if prefix == "v":
+                print(f"for (int i = 0;i < {vlen // w};i++) {{", file=f)
+                print(
+                    f"  dst.{m}[i] = (i % 2 == 1) ? a.{m}[i / 2 + {vlen // 2 // w}] : b.{m}[i / 2 + {vlen // 2 // w}];",
+                    file=f,
+                )
+                print(f"}}", file=f)
+            else:
+                print(f"int i;", file=f)
+                print(f"for (i = 0;i < {vlen // 2 // w};i++) {{", file=f)
+                print(
+                    f"  dst.{m}[i] = (i % 2 == 1) ? a.{m}[i / 2 + {vlen // 4 // w}] : b.{m}[i / 2 + {vlen // 4 // w}];",
+                    file=f,
+                )
+                print(f"}}", file=f)
+                print(f"for (;i < {vlen // w};i++) {{", file=f)
+                print(
+                    f"  dst.{m}[i] = (i % 2 == 1) ? a.{m}[i / 2 + {vlen // 2 // w}] : b.{m}[i / 2 + {vlen // 2 // w}];",
+                    file=f,
+                )
+                print(f"}}", file=f)
         with open(f"{prefix}ilvl_{width}.h", "w") as f:
             print(f"for (int i = 0;i < {vlen // w};i++) {{", file=f)
             print(
@@ -738,14 +768,14 @@ for vlen, prefix in [(128, "v"), (256, "xv")]:
         with open(f"{prefix}pickev_{width}.h", "w") as f:
             print(f"for (int i = 0;i < {vlen // w};i++) {{", file=f)
             print(
-                f"  dst.{m}[i] = (i < {vlen // 2 // w}) ? b.{m}[i * 2] : a.{m}[(i - {64 // w}) * 2];",
+                f"  dst.{m}[i] = (i < {vlen // 2 // w}) ? b.{m}[i * 2] : a.{m}[(i - {vlen // 2 // w}) * 2];",
                 file=f,
             )
             print(f"}}", file=f)
         with open(f"{prefix}pickod_{width}.h", "w") as f:
             print(f"for (int i = 0;i < {vlen // w};i++) {{", file=f)
             print(
-                f"  dst.{m}[i] = (i < {vlen // 2 // w}) ? b.{m}[i * 2 + 1] : a.{m}[(i - {64 // w}) * 2 + 1];",
+                f"  dst.{m}[i] = (i < {vlen // 2 // w}) ? b.{m}[i * 2 + 1] : a.{m}[(i - {vlen // 2 // w}) * 2 + 1];",
                 file=f,
             )
             print(f"}}", file=f)
@@ -801,22 +831,50 @@ for vlen, prefix in [(128, "v"), (256, "xv")]:
                 print(f"}}", file=f)
         if width == "b" or width == "h":
             with open(f"{prefix}frstp_{width}.h", "w") as f:
-                print(f"for (int i = 0;i < {vlen // w};i++) {{", file=f)
-                print(
-                    f"  dst.{m}[i] = a.{m}[i];",
-                    file=f,
-                )
-                print(f"}}", file=f)
-                print(f"int i;", file=f)
-                print(f"for (i = 0;i < {vlen // w};i++) {{", file=f)
-                print(
-                    f"  if ((s{w})b.{m}[i] < 0) {{",
-                    file=f,
-                )
-                print(f"break;", file=f)
-                print(f"}}", file=f)
-                print(f"}}", file=f)
-                print(f"  dst.{m}[c.{m}[0] % {vlen // w}] = i;", file=f)
+                if prefix == "v":
+                    print(f"for (int i = 0;i < {vlen // w};i++) {{", file=f)
+                    print(
+                        f"  dst.{m}[i] = a.{m}[i];",
+                        file=f,
+                    )
+                    print(f"}}", file=f)
+                    print(f"int i;", file=f)
+                    print(f"for (i = 0;i < {vlen // w};i++) {{", file=f)
+                    print(
+                        f"  if ((s{w})b.{m}[i] < 0) {{",
+                        file=f,
+                    )
+                    print(f"break;", file=f)
+                    print(f"}}", file=f)
+                    print(f"}}", file=f)
+                    print(f"  dst.{m}[c.{m}[0] % {vlen // w}] = i;", file=f)
+                else:
+                    print(f"for (int i = 0;i < {vlen // w};i++) {{", file=f)
+                    print(
+                        f"  dst.{m}[i] = a.{m}[i];",
+                        file=f,
+                    )
+                    print(f"}}", file=f)
+                    print(f"int i;", file=f)
+                    print(f"for (i = 0;i < {vlen // 2 // w};i++) {{", file=f)
+                    print(
+                        f"  if ((s{w})b.{m}[i] < 0) {{",
+                        file=f,
+                    )
+                    print(f"break;", file=f)
+                    print(f"}}", file=f)
+                    print(f"}}", file=f)
+                    mask = 128 // w # not vlen
+                    print(f"  dst.{m}[c.{m}[0] % {mask}] = i;", file=f)
+                    print(f"for (i = {vlen // 2 // w};i < {vlen // w};i++) {{", file=f)
+                    print(
+                        f"  if ((s{w})b.{m}[i] < 0) {{",
+                        file=f,
+                    )
+                    print(f"break;", file=f)
+                    print(f"}}", file=f)
+                    print(f"}}", file=f)
+                    print(f"  dst.{m}[(c.{m}[{vlen // 2 // w}] % {mask}) + {vlen // 2 // w}] = i - {vlen // 2 // w};", file=f)
             with open(f"{prefix}frstpi_{width}.h", "w") as f:
                 print(f"for (int i = 0;i < {vlen // w};i++) {{", file=f)
                 print(
