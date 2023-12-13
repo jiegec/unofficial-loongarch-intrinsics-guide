@@ -1343,3 +1343,43 @@ memory_store({width}, data.{member}[lane], addr + offset);
             instr=f"vfrint{rounding}.{name} vr, vr",
             desc=f"Round single-precision floating point elements in `a` to integers, {rounding_mode}, and store as floating point numbers.",
         )
+
+    @env.macro
+    def vffint_d_w(low_high):
+        if low_high == "l":
+            half = "lower"
+        else:
+            half = "higher"
+        return instruction(
+            intrinsic=f"__m128d __lsx_vffint{low_high}_d_w (__m128i a)",
+            instr=f"vffint{low_high}.d.w vr, vr",
+            desc=f"Convert 32-bit integer elements in {half} part of `a` to double precision floating point numbers.",
+        )
+
+    @env.macro
+    def vffint(name, name2):
+        if name == "d":
+            arg_type = "__m128d"
+            precision = "double"
+            int_width = 64
+        else:
+            arg_type = "__m128"
+            precision = "single"
+            int_width = 32
+        if len(name2) == 1:
+            signedness = "signed"
+        else:
+            signedness = "unsigned"
+        return instruction(
+            intrinsic=f"{arg_type} __lsx_vffint_{name}_{name2} (__m128i a)",
+            instr=f"vffint.{name}.{name2} vr, vr",
+            desc=f"Convert {signedness} {int_width}-bit integer elements in `a` to {precision}-precision floating point numbers.",
+        )
+
+    @env.macro
+    def vffint_s_l():
+        return instruction(
+            intrinsic=f"__m128 __lsx_vffint_s_l (__m128i a, __m128i b)",
+            instr=f"vffint.s.l vr, vr, vr",
+            desc=f"Convert 64-bit integer elements in `a` and `b` to double-precision floating point numbers.",
+        )

@@ -828,6 +828,20 @@ for width in ["s", "d"]:
                     file=f,
                 )
                 print(f"}}", file=f)
+    with open(f"vffint_{width}_{int_width}.h", "w") as f:
+        print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+        print(
+            f"  dst.{m}[i] = (f{int_w})(s{int_w})a.{int_m}[i]; // rounding mode is not expressed in C",
+            file=f,
+        )
+        print(f"}}", file=f)
+    with open(f"vffint_{width}_{int_width}u.h", "w") as f:
+        print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+        print(
+            f"  dst.{m}[i] = (f{int_w})(u{int_w})a.{int_m}[i]; // rounding mode is not expressed in C",
+            file=f,
+        )
+        print(f"}}", file=f)
 
     for name in ["max", "min"]:
         with open(f"vf{name}_{width}.h", "w") as f:

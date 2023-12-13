@@ -128,6 +128,16 @@ Convert single precision floating point elements in `a` and `b` to half precisio
 {% include('vfcvt_h_s.h') %}
 ```
 
+{{ vffint_d_w('h') }}
+{{ vffint_d_w('l') }}
+
+{{ vffint('d', 'l') }}
+{{ vffint('d', 'lu') }}
+{{ vffint('s', 'w') }}
+{{ vffint('s', 'wu') }}
+
+{{ vffint_s_l() }}
+
 {{ vftint_l_s('', 'l') }}
 {{ vftint_l_s('', 'h') }}
 {{ vftint_l_s('rm', 'l') }}
