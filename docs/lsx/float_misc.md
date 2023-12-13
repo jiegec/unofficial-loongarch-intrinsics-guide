@@ -1,7 +1,7 @@
 # Floatint Point Misc
 
-{{ vclass_d() }}
-{{ vclass_s() }}
+{{ vfclass_d() }}
+{{ vfclass_s() }}
 
 {{ vfrint('', 's') }}
 {{ vfrint('', 'd') }}
