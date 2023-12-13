@@ -69,6 +69,10 @@ Compute 128-bit `a` shifted right by `imm * 8` bits.
 {{ vsrli('w') }}
 {{ vsrli('d') }}
 
+{{ vsrln('b', 'h') }}
+{{ vsrln('h', 'w') }}
+{{ vsrln('w', 'd') }}
+
 {{ vsrlr('b') }}
 {{ vsrlr('h') }}
 {{ vsrlr('w') }}
