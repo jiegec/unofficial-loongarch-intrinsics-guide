@@ -259,41 +259,109 @@ for vlen, prefix in [(128, "v"), (256, "xv")]:
                 with open(
                     f"{prefix}s{name}rn_{width}_{double_width_signed}.h", "w"
                 ) as f:
-                    print(f"for (int i = 0;i < {vlen // w};i++) {{", file=f)
-                    print(f"if (i < {vlen // 2 // w}) {{", file=f)
-                    print(f"{shift_sign}{double_w} temp;", file=f)
-                    print(f"if ((b.{double_m}[i] & {double_w-1}) == 0) {{", file=f)
-                    print(
-                        f"  temp = ({shift_sign}{double_w})a.{double_m}[i];",
-                        file=f,
-                    )
-                    print(f"}} else {{", file=f)
-                    print(
-                        f"  temp = (({shift_sign}{double_w})a.{double_m}[i] >> (b.{double_m}[i] & {double_w-1})) + ((({shift_sign}{double_w})a.{double_m}[i] >> ((b.{double_m}[i] & {double_w-1}) - 1)) & 1);",
-                        file=f,
-                    )
-                    print(f"}}", file=f)
-                    print(
-                        f"  dst.{m}[i] = clamp<{shift_sign}{double_w}>(temp, {min}, {max});",
-                        file=f,
-                    )
-                    print(f"}} else {{", file=f)
-                    print(
-                        f"  dst.{m}[i] = 0;",
-                        file=f,
-                    )
-                    print(f"}}", file=f)
-                    print(f"}}", file=f)
+                    if prefix == "v":
+                        print(f"for (int i = 0;i < {vlen // w};i++) {{", file=f)
+                        print(f"if (i < {vlen // 2 // w}) {{", file=f)
+                        print(f"{shift_sign}{double_w} temp;", file=f)
+                        print(f"if ((b.{double_m}[i] & {double_w-1}) == 0) {{", file=f)
+                        print(
+                            f"  temp = ({shift_sign}{double_w})a.{double_m}[i];",
+                            file=f,
+                        )
+                        print(f"}} else {{", file=f)
+                        print(
+                            f"  temp = (({shift_sign}{double_w})a.{double_m}[i] >> (b.{double_m}[i] & {double_w-1})) + ((({shift_sign}{double_w})a.{double_m}[i] >> ((b.{double_m}[i] & {double_w-1}) - 1)) & 1);",
+                            file=f,
+                        )
+                        print(f"}}", file=f)
+                        print(
+                            f"  dst.{m}[i] = clamp<{shift_sign}{double_w}>(temp, {min}, {max});",
+                            file=f,
+                        )
+                        print(f"}} else {{", file=f)
+                        print(
+                            f"  dst.{m}[i] = 0;",
+                            file=f,
+                        )
+                        print(f"}}", file=f)
+                        print(f"}}", file=f)
+                    else:
+                        print(f"for (int i = 0;i < {vlen // 2 // w};i++) {{", file=f)
+                        print(f"if (i < {vlen // 4 // w}) {{", file=f)
+                        print(f"{shift_sign}{double_w} temp;", file=f)
+                        print(f"if ((b.{double_m}[i] & {double_w-1}) == 0) {{", file=f)
+                        print(
+                            f"  temp = ({shift_sign}{double_w})a.{double_m}[i];",
+                            file=f,
+                        )
+                        print(f"}} else {{", file=f)
+                        print(
+                            f"  temp = (({shift_sign}{double_w})a.{double_m}[i] >> (b.{double_m}[i] & {double_w-1})) + ((({shift_sign}{double_w})a.{double_m}[i] >> ((b.{double_m}[i] & {double_w-1}) - 1)) & 1);",
+                            file=f,
+                        )
+                        print(f"}}", file=f)
+                        print(
+                            f"  dst.{m}[i] = clamp<{shift_sign}{double_w}>(temp, {min}, {max});",
+                            file=f,
+                        )
+                        print(f"}} else {{", file=f)
+                        print(
+                            f"  dst.{m}[i] = 0;",
+                            file=f,
+                        )
+                        print(f"}}", file=f)
+                        print(f"}}", file=f)
+
+                        print(f"for (int i = {vlen // 2 // w};i < {vlen // w};i++) {{", file=f)
+                        print(f"if (i < {3 * vlen // 4 // w}) {{", file=f)
+                        print(f"{shift_sign}{double_w} temp;", file=f)
+                        print(f"if ((b.{double_m}[i - {vlen // 4 // w}] & {double_w-1}) == 0) {{", file=f)
+                        print(
+                            f"  temp = ({shift_sign}{double_w})a.{double_m}[i - {vlen // 4 // w}];",
+                            file=f,
+                        )
+                        print(f"}} else {{", file=f)
+                        print(
+                            f"  temp = (({shift_sign}{double_w})a.{double_m}[i - {vlen // 4 // w}] >> (b.{double_m}[i - {vlen // 4 // w}] & {double_w-1})) + ((({shift_sign}{double_w})a.{double_m}[i - {vlen // 4 // w}] >> ((b.{double_m}[i - {vlen // 4 // w}] & {double_w-1}) - 1)) & 1);",
+                            file=f,
+                        )
+                        print(f"}}", file=f)
+                        print(
+                            f"  dst.{m}[i] = clamp<{shift_sign}{double_w}>(temp, {min}, {max});",
+                            file=f,
+                        )
+                        print(f"}} else {{", file=f)
+                        print(
+                            f"  dst.{m}[i] = 0;",
+                            file=f,
+                        )
+                        print(f"}}", file=f)
+                        print(f"}}", file=f)
 
         if sign == "s":
             for name, sign in [("srl", "u"), ("sra", "s")]:
                 with open(f"{prefix}{name}ni_{width}_{double_width}.h", "w") as f:
-                    print(f"for (int i = 0;i < {vlen // w};i++) {{", file=f)
-                    print(
-                        f"  dst.{m}[i] = (i < {vlen // 2 // w}) ? ({sign}{w})(({sign}{double_w})b.{double_m}[i] >> imm) : ({sign}{w})(({sign}{double_w})a.{double_m}[i - {vlen // 2 // w}] >> imm);",
-                        file=f,
-                    )
-                    print(f"}}", file=f)
+                    if prefix == "v":
+                        print(f"for (int i = 0;i < {vlen // w};i++) {{", file=f)
+                        print(
+                            f"  dst.{m}[i] = (i < {vlen // 2 // w}) ? ({sign}{w})(({sign}{double_w})b.{double_m}[i] >> imm) : ({sign}{w})(({sign}{double_w})a.{double_m}[i - {vlen // 2 // w}] >> imm);",
+                            file=f,
+                        )
+                        print(f"}}", file=f)
+                    else:
+                        print(f"for (int i = 0;i < {vlen // 2 // w};i++) {{", file=f)
+                        print(
+                            f"  dst.{m}[i] = (i < {vlen // 4 // w}) ? ({sign}{w})(({sign}{double_w})b.{double_m}[i] >> imm) : ({sign}{w})(({sign}{double_w})a.{double_m}[i - {vlen // 4 // w}] >> imm);",
+                            file=f,
+                        )
+                        print(f"}}", file=f)
+
+                        print(f"for (int i = {vlen // 2 // w};i < {vlen // w};i++) {{", file=f)
+                        print(
+                            f"  dst.{m}[i] = (i < {3 * vlen // 4 // w}) ? ({sign}{w})(({sign}{double_w})b.{double_m}[i - {vlen // 4 // w}] >> imm) : ({sign}{w})(({sign}{double_w})a.{double_m}[i - {vlen // 2 // w}] >> imm);",
+                            file=f,
+                        )
+                        print(f"}}", file=f)
                 with open(f"{prefix}{name}rni_{width}_{double_width}.h", "w") as f:
                     if prefix == "v":
                         print(f"for (int i = 0;i < {vlen // w};i++) {{", file=f)
