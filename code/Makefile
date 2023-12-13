@@ -14,7 +14,7 @@ run-%: %
 clean:
 	rm -rf $(EXES)
 
-%: %.cpp %.h
+%: %.cpp %.h common.h
 	$(CXX) $< -mlsx -mlasx -o $@
 
 .SUFFIXES:
