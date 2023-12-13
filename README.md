@@ -8,14 +8,6 @@ TODO List:
 
 ### vfrstp.b/h
 
-### vfmax.s/d
-
-### vfmin.s/d
-
-### vfmaxa.s/d
-
-### vfmina.s/d
-
 ### vfcvt.h.s
 
 ### vffint.s.l

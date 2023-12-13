@@ -399,6 +399,46 @@ for (int i = 0;i < 2;i++) {{
         )
 
     @env.macro
+    def vfmax(name):
+        precision = precisions[name]
+        fp_type = fp_types[name]
+        return instruction(
+            intrinsic=f"{fp_type} __lsx_vfmax_{name} ({fp_type} a, {fp_type} b)",
+            instr=f"vfmax.{name} vr, vr, vr",
+            desc=f"Compute maximum of {precision} precision floating point elements in `a` and `b`.",
+        )
+
+    @env.macro
+    def vfmaxa(name):
+        precision = precisions[name]
+        fp_type = fp_types[name]
+        return instruction(
+            intrinsic=f"{fp_type} __lsx_vfmaxa_{name} ({fp_type} a, {fp_type} b)",
+            instr=f"vfmaxa.{name} vr, vr, vr",
+            desc=f"Compute maximum of {precision} precision floating point elements in `a` and `b` by magnitude.",
+        )
+
+    @env.macro
+    def vfmin(name):
+        precision = precisions[name]
+        fp_type = fp_types[name]
+        return instruction(
+            intrinsic=f"{fp_type} __lsx_vfmin_{name} ({fp_type} a, {fp_type} b)",
+            instr=f"vfmax.{name} vr, vr, vr",
+            desc=f"Compute minimum of {precision} precision floating point elements in `a` and `b`.",
+        )
+
+    @env.macro
+    def vfmina(name):
+        precision = precisions[name]
+        fp_type = fp_types[name]
+        return instruction(
+            intrinsic=f"{fp_type} __lsx_vfmina_{name} ({fp_type} a, {fp_type} b)",
+            instr=f"vfmina.{name} vr, vr, vr",
+            desc=f"Compute minimum of {precision} precision floating point elements in `a` and `b` by magnitude.",
+        )
+
+    @env.macro
     def vhaddw(name, name2):
         width = widths[name[0]]
         width2 = widths[name2[0]]
