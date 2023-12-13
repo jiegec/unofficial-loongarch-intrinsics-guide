@@ -1305,3 +1305,17 @@ memory_store({width}, data.{member}[lane], addr + offset);
             instr=f"vftint{rounding}.{name}.{name2} vr, vr",
             desc=f"Convert {precision}-precision floating point elements in `a` to {signedness} {int_width}-bit integer, {rounding_mode}.",
         )
+
+    @env.macro
+    def vfop(desc, name, ty):
+        if ty == "s":
+            precision = "single"
+            arg_type = "__m128"
+        else:
+            precision = "double"
+            arg_type = "__m128d"
+        return instruction(
+            intrinsic=f"{arg_type} __lsx_vf{name}_{ty} ({arg_type} a)",
+            instr=f"vf{name}.{ty} vr, vr",
+            desc=f"Compute {desc} of {precision} precision floating point elements in `a`.",
+        )

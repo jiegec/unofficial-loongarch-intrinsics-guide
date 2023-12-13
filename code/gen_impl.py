@@ -842,5 +842,47 @@ for width in ["s", "d"]:
             file=f,
         )
         print(f"}}", file=f)
+    with open(f"vflogb_{width}.h", "w") as f:
+        print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+        print(
+            f"  dst.{m}[i] = log2(a.{m}[i]);",
+            file=f,
+        )
+        print(f"}}", file=f)
+    with open(f"vfsqrt_{width}.h", "w") as f:
+        print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+        print(
+            f"  dst.{m}[i] = sqrt(a.{m}[i]);",
+            file=f,
+        )
+        print(f"}}", file=f)
+    with open(f"vfrsqrt_{width}.h", "w") as f:
+        print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+        print(
+            f"  dst.{m}[i] = 1.0 / sqrt(a.{m}[i]);",
+            file=f,
+        )
+        print(f"}}", file=f)
+    with open(f"vfrecip_{width}.h", "w") as f:
+        print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+        print(
+            f"  dst.{m}[i] = 1 / a.{m}[i];",
+            file=f,
+        )
+        print(f"}}", file=f)
+    with open(f"vfrsqrte_{width}.h", "w") as f:
+        print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+        print(
+            f"  dst.{m}[i] = 1.0 / sqrt(a.{m}[i]); // estimated",
+            file=f,
+        )
+        print(f"}}", file=f)
+    with open(f"vfrecipe_{width}.h", "w") as f:
+        print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+        print(
+            f"  dst.{m}[i] = 1 / a.{m}[i]; // estimated",
+            file=f,
+        )
+        print(f"}}", file=f)
 
 os.system("clang-format -i *.cpp *.h")

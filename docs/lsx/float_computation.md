@@ -23,3 +23,21 @@
 
 {{ vfsub('s') }}
 {{ vfsub('d') }}
+
+{{ vfop('2-based logarithm', 'logb', 's') }}
+{{ vfop('2-based logarithm', 'logb', 'd') }}
+
+{{ vfop('square root', 'sqrt', 's') }}
+{{ vfop('square root', 'sqrt', 'd') }}
+
+{{ vfop('reciprocal of square root', 'rsqrt', 's') }}
+{{ vfop('reciprocal of square root', 'rsqrt', 'd') }}
+
+{{ vfop('reciprocal', 'recip', 's') }}
+{{ vfop('reciprocal', 'recip', 'd') }}
+
+{{ vfop('estimated reciprocal of square root', 'rsqrte', 's') }}
+{{ vfop('estimated reciprocal of square root', 'rsqrte', 'd') }}
+
+{{ vfop('estimated reciprocal', 'recipe', 's') }}
+{{ vfop('estimated reciprocal', 'recipe', 'd') }}
