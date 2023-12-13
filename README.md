@@ -60,14 +60,6 @@ TODO List:
 
 ### vfrstpi.b/h
 
-### vseteqz.v
-
-### vsetnez.v
-
-### vsetanyeqz.b/h/w/d
-
-### vsetanynez.b/h/w/d
-
 ### vflogb.s/d
 
 ### vfsqrt.s/d

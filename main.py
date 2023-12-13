@@ -962,3 +962,38 @@ memory_store({width}, data.{member}[lane], addr + offset);
             instr=f"vshuf4i.{name} vr, vr, imm",
             desc=f"Shuffle every four {width}-bit elements in `a`{b_desc} with indices packed in `imm`, save the result to `dst`.",
         )
+
+    @env.macro
+    def bz_v():
+        return instruction(
+            intrinsic=f"int __lsx_bz_v (__m128i a)",
+            instr=f"vseteqz.v vr, vr; bcnez",
+            desc=f"Expected to be used in branches: branch if the 128-bit vector `a` equals to zero.",
+        )
+
+
+    @env.macro
+    def bnz_v():
+        return instruction(
+            intrinsic=f"int __lsx_bnz_v (__m128i a)",
+            instr=f"vsetnez.v vr, vr; bcnez",
+            desc=f"Expected to be used in branches: branch if the 128-bit vector `a` is non-zero.",
+        )
+
+    @env.macro
+    def bz(name):
+        width = widths[name]
+        return instruction(
+            intrinsic=f"int __lsx_bz_{name} (__m128i a)",
+            instr=f"vsetanyeqz.{name} vr, vr; bcnez",
+            desc=f"Expected to be used in branches: branch if any {width}-bit element in `a` equals to zero.",
+        )
+
+    @env.macro
+    def bnz(name):
+        width = widths[name]
+        return instruction(
+            intrinsic=f"int __lsx_bnz_{name} (__m128i a)",
+            instr=f"vsetallnez.{name} vr, vr; bcnez",
+            desc=f"Expected to be used in branches: branch if all {width}-bit elements in `a` are non-zero.",
+        )
