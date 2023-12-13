@@ -7,6 +7,7 @@ widths_all = ["b", "bu", "h", "hu", "w", "wu", "d", "du"]
 widths_vexth = ["h_b", "hu_bu", "w_h", "wu_hu", "d_w", "du_wu", "q_d", "qu_du"]
 widths_vsllwil = ["h_b", "hu_bu", "w_h", "wu_hu", "d_w", "du_wu"]
 widths_vsrln = ["b_h", "h_w", "w_d"]
+widths_vsrlni = ["b_h", "h_w", "w_d", "d_q"]
 widths_vaddw = [
     "h_b",
     "h_bu",
@@ -108,15 +109,18 @@ tb = {
     "vslti": (widths_all, "v128 a, int imm", [0, 15]),
     "vsle": (widths_all, "v128 a, v128 b"),
     "vslei": (widths_all, "v128 a, int imm", [0, 15]),
+    "vsra": (widths_signed, "v128 a, v128 b"),
+    "vsrai": (widths_signed, "v128 a, int imm", [0, 7]),
+    "vsran": (widths_vsrln, "v128 a, v128 b"),
+    "vsrani": (widths_vsrlni, "v128 a, v128 b, int imm", [0, 7]),
+    "vsrar": (widths_signed, "v128 a, v128 b"),
+    "vsrari": (widths_signed, "v128 a, int imm", [0, 7]),
     "vsrl": (widths_signed, "v128 a, v128 b"),
     "vsrli": (widths_signed, "v128 a, int imm", [0, 7]),
     "vsrln": (widths_vsrln, "v128 a, v128 b"),
+    "vsrlni": (widths_vsrlni, "v128 a, v128 b, int imm", [0, 7]),
     "vsrlr": (widths_signed, "v128 a, v128 b"),
     "vsrlri": (widths_signed, "v128 a, int imm", [0, 7]),
-    "vsra": (widths_signed, "v128 a, v128 b"),
-    "vsrai": (widths_signed, "v128 a, int imm", [0, 7]),
-    "vsrar": (widths_signed, "v128 a, v128 b"),
-    "vsrari": (widths_signed, "v128 a, int imm", [0, 7]),
     "vsub": (widths_signed, "v128 a, v128 b"),
     "vsubwev": (widths_vsubw, "v128 a, v128 b"),
     "vsubwod": (widths_vsubw, "v128 a, v128 b"),

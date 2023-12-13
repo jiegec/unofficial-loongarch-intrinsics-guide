@@ -129,6 +129,28 @@ for width in ["b", "bu", "h", "hu", "w", "wu", "d", "du"]:
                     file=f,
                 )
                 print(f"}}", file=f)
+            with open(f"vsran_{width}_{double_width}.h", "w") as f:
+                print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+                print(
+                    f"  dst.{m}[i] = (i < {64 // w}) ? (s{w})((s{double_w})a.{double_m}[i] >> (b.{double_m}[i] & {double_w-1})) : 0;",
+                    file=f,
+                )
+                print(f"}}", file=f)
+    if sign == "s":
+        with open(f"vsrlni_{width}_{double_width}.h", "w") as f:
+            print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+            print(
+                f"  dst.{m}[i] = (i < {64 // w}) ? (u{w})((u{double_w})b.{double_m}[i] >> imm) : (u{w})((u{double_w})a.{double_m}[i - {64 // w}] >> imm);",
+                file=f,
+            )
+            print(f"}}", file=f)
+        with open(f"vsrani_{width}_{double_width}.h", "w") as f:
+            print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+            print(
+                f"  dst.{m}[i] = (i < {64 // w}) ? (s{w})((s{double_w})b.{double_m}[i] >> imm) : (s{w})((s{double_w})a.{double_m}[i - {64 // w}] >> imm);",
+                file=f,
+            )
+            print(f"}}", file=f)
 
     if width == "d" or width == "du":
         with open(f"vextl_{double_width}_{width}.h", "w") as f:

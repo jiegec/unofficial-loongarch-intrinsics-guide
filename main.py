@@ -1018,3 +1018,33 @@ memory_store({width}, data.{member}[lane], addr + offset);
             instr=f"vsrln.{name}.{name2} vr, vr, vr",
             desc=f"Logical right shift the unsigned {width2}-bit elements in `a` by elements in `b`, truncate to {width}-bit and store the result to `dst`.",
         )
+
+    @env.macro
+    def vsran(name, name2):
+        width = widths[name[0]]
+        width2 = widths[name2[0]]
+        return instruction(
+            intrinsic=f"__m128i __lsx_vsran_{name}_{name2} (__m128i a, __m128i b)",
+            instr=f"vsran.{name}.{name2} vr, vr, vr",
+            desc=f"Arithmetic right shift the signed {width2}-bit elements in `a` by elements in `b`, truncate to {width}-bit and store the result to `dst`.",
+        )
+
+    @env.macro
+    def vsrlni(name, name2):
+        width = widths[name[0]]
+        width2 = widths[name2[0]]
+        return instruction(
+            intrinsic=f"__m128i __lsx_vsrlni_{name}_{name2} (__m128i a, __m128i b, imm0_{width2-1} imm)",
+            instr=f"vsrlni.{name}.{name2} vr, vr, imm",
+            desc=f"Logical right shift the unsigned {width2}-bit elements in `a` and `b` by `imm`, truncate to {width}-bit and store the result to `dst`.",
+        )
+
+    @env.macro
+    def vsrani(name, name2):
+        width = widths[name[0]]
+        width2 = widths[name2[0]]
+        return instruction(
+            intrinsic=f"__m128i __lsx_vsrani_{name}_{name2} (__m128i a, __m128i b, imm0_{width2-1} imm)",
+            instr=f"vsrani.{name}.{name2} vr, vr, imm",
+            desc=f"Arithemtic right shift the signed {width2}-bit elements in `a` and `b` by `imm`, truncate to {width}-bit and store the result to `dst`.",
+        )
