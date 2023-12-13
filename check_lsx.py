@@ -28,7 +28,6 @@ def parse_fn(line, skip_last):
 gcc_intrinsics = set()
 for line in open("gcc_lsxintrin.h", "r"):
     gcc_intrinsics.add(parse_fn(line, False))
-# print(gcc_intrinsics)
 
 # find documented intrinsics
 documented_intrinsics = set()

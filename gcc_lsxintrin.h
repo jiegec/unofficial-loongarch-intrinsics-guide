@@ -511,10 +511,6 @@ __m128i __lsx_vsigncov_b (__m128i, __m128i);
 __m128i __lsx_vsigncov_d (__m128i, __m128i);
 __m128i __lsx_vsigncov_h (__m128i, __m128i);
 __m128i __lsx_vsigncov_w (__m128i, __m128i);
-__m128i __lsx_vsigncov_b (__m128i, __m128i);
-__m128i __lsx_vsigncov_d (__m128i, __m128i);
-__m128i __lsx_vsigncov_h (__m128i, __m128i);
-__m128i __lsx_vsigncov_w (__m128i, __m128i);
 __m128i __lsx_vsle_b (__m128i, __m128i);
 __m128i __lsx_vsle_bu (__m128i, __m128i);
 __m128i __lsx_vsle_d (__m128i, __m128i);
@@ -628,7 +624,7 @@ __m128i __lsx_vssran_h_w (__m128i, __m128i);
 __m128i __lsx_vssrani_b_h (__m128i, __m128i, imm0_15);
 __m128i __lsx_vssrani_bu_h (__m128i, __m128i, imm0_15);
 __m128i __lsx_vssrani_d_q (__m128i, __m128i, imm0_127);
-__m128i __lsx_vssrani_du_q (__m128i, __m128i, imm0_127)
+__m128i __lsx_vssrani_du_q (__m128i, __m128i, imm0_127);
 __m128i __lsx_vssrani_hu_w (__m128i, __m128i, imm0_31);
 __m128i __lsx_vssrani_h_w (__m128i, __m128i, imm0_31);
 __m128i __lsx_vssrani_w_d (__m128i, __m128i, imm0_63);
@@ -656,7 +652,7 @@ __m128i __lsx_vssrln_h_w (__m128i, __m128i);
 __m128i __lsx_vssrlni_b_h (__m128i, __m128i, imm0_15);
 __m128i __lsx_vssrlni_bu_h (__m128i, __m128i, imm0_15);
 __m128i __lsx_vssrlni_d_q (__m128i, __m128i, imm0_127);
-__m128i __lsx_vssrlni_du_q (__m128i, __m128i, imm0_127)
+__m128i __lsx_vssrlni_du_q (__m128i, __m128i, imm0_127);
 __m128i __lsx_vssrlni_hu_w (__m128i, __m128i, imm0_31);
 __m128i __lsx_vssrlni_h_w (__m128i, __m128i, imm0_31);
 __m128i __lsx_vssrlni_w_d (__m128i, __m128i, imm0_63);
