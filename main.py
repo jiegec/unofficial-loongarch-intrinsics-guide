@@ -491,7 +491,7 @@ for (int i = 0;i < 2;i++) {{
         else:
             long = ""
         return instruction(
-            intrinsic=f"__m128i __lsx_insgr2vr_{name} (__m128i a, {long}int b, imm0_{imm_upper} imm)",
+            intrinsic=f"__m128i __lsx_vinsgr2vr_{name} (__m128i a, {long}int b, imm0_{imm_upper} imm)",
             instr=f"vinsgr2vr.{name} vr, r, imm",
             desc=f"Insert {width}-bit element into lane indexed `imm`.",
         )

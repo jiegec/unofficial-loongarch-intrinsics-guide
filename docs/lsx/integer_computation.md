@@ -251,3 +251,12 @@
 {{ vsubwev('d', 'wu') }}
 {{ vsubwev('q', 'd') }}
 {{ vsubwev('q', 'du') }}
+
+{{ vsubwod('h', 'b') }}
+{{ vsubwod('h', 'bu') }}
+{{ vsubwod('w', 'h') }}
+{{ vsubwod('w', 'hu') }}
+{{ vsubwod('d', 'w') }}
+{{ vsubwod('d', 'wu') }}
+{{ vsubwod('q', 'd') }}
+{{ vsubwod('q', 'du') }}
