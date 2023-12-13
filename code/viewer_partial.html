@@ -1,0 +1,52 @@
+{% raw %}
+<div id="app">
+
+<input v-model="search">
+
+<div v-for="group in allGroups">
+  <input type="checkbox" :id="group" :value="group" v-model="groups" />
+  <label :for="group">{{ group }}</label>
+</div>
+
+<details v-for="intrinsic in intrinsics">
+  <summary>{{ intrinsic.name }}</summary>
+  <div v-html="intrinsic.content"></div>
+</details>
+</div>
+
+<script type="module">
+  import { createApp, ref, computed } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
+
+  const allIntrinsics = {% endraw %} {{ all_intrinsics() }} {% raw %};
+
+  createApp({
+    setup() {
+      const search = ref("");
+      const allGroups = {% endraw %} {{ all_groups() }} {% raw %};
+      const groups = ref(allGroups);
+
+      const intrinsics = computed(() => {
+        let result = [];
+        for (let val of allIntrinsics) {
+          if (!groups.value.includes(val.group)) {
+            continue;
+          } else if (val.name.includes(search.value)) {
+            result.push(val);
+          } else if (val.content.includes(search.value)) {
+            result.push(val);
+          }
+        }
+        return result;
+      });
+
+      return {
+        intrinsics,
+        search,
+        groups,
+        allGroups
+      }
+    }
+  }).mount('#app')
+</script>
+
+{% endraw %}
