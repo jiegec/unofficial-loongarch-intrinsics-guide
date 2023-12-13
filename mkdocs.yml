@@ -5,7 +5,8 @@ theme:
   name: readthedocs
 copyright: Copyright &copy; 2023 Jiajie Chen
 plugins:
-  - search:
-      separator: '[\s\-\._]+' # add "_" and "."
+  # we use our own search
+  # - search:
+  #     separator: '[\s\-\._]+' # add "_" and "."
   - macros:
       include_dir: code

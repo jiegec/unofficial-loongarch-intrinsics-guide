@@ -8,6 +8,9 @@
 {{ vldrepl('w') }}
 {{ vldrepl('d') }}
 
+{{ vst() }}
+{{ vstx() }}
+
 {{ vstelm('b') }}
 {{ vstelm('h') }}
 {{ vstelm('w') }}
