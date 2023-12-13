@@ -1,5 +1,8 @@
 import math
+import glob
 import os
+import json
+import markdown
 
 
 def define_env(env):
@@ -1603,3 +1606,39 @@ memory_store({width}, data.{member}[lane], addr + offset);
             instr=f"vfnmsub.d vr, vr, vr",
             desc=f"Compute packed double precision floating point FMA(Fused Multiply-Add): multiply elements in `a` and `b`, subtract elements in `c` and store the negated result in `dst`.",
         )
+
+    @env.macro
+    def all_intrinsics():
+        result = []
+        for file in glob.glob("docs/lsx/*.md"):
+            for line in open(file, 'r'):
+                if line.startswith('#'):
+                    title = line[1:].strip()
+                if '{{' in line and '}}' in line:
+                    code = line.split("{{")[1].split("}}")[0]
+                    # Dangerous! But we trust ourselves.
+                    content = eval(code, env.macros)
+                    lines = content.split('\n')
+                    for i in range(len(lines)):
+                        line = lines[i]
+                        if line.startswith('##'):
+                            body = '\n'.join(lines[i+1:])
+                            intrinsic = line[2:].strip()
+                            result.append({
+                                'name': intrinsic,
+                                'content': markdown.markdown(body, extensions=['fenced_code', 'codehilite']),
+                                'group': title
+                            })
+                            break
+        return json.dumps(result)
+
+    @env.macro
+    def all_groups():
+        result = []
+        for file in glob.glob("docs/lsx/*.md"):
+            for line in open(file, 'r'):
+                if line.startswith('#'):
+                    title = line[1:].strip()
+                    result.append(title)
+                    break
+        return json.dumps(result)

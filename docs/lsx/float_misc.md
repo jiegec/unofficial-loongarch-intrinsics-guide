@@ -1,4 +1,4 @@
-# Floatint Point Misc
+# Floating Point Misc
 
 {{ vfclass_d() }}
 {{ vfclass_s() }}
