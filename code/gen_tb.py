@@ -5,6 +5,7 @@ widths_unsigned = ["bu", "hu", "wu", "du"]
 widths_fp = ["s", "d"]
 widths_all = ["b", "bu", "h", "hu", "w", "wu", "d", "du"]
 widths_vexth = ["h_b", "hu_bu", "w_h", "wu_hu", "d_w", "du_wu", "q_d", "qu_du"]
+widths_vsllwil = ["h_b", "hu_bu", "w_h", "wu_hu", "d_w", "du_wu"]
 widths_vaddw = [
     "h_b",
     "h_bu",
@@ -96,6 +97,7 @@ tb = {
     "vseqi": (widths_signed, "v128 a, int imm", [-16, 0, 15]),
     "vshuf4i": (["b", "h", "w"], "v128 a, int imm", [0, 13, 100, 128, 255]),
     "vsigncov": (widths_signed, "v128 a, v128 b"),
+    "vsllwil": (widths_vsllwil, "v128 a, int imm", [0, 7]),
     "vssub": (widths_all, "v128 a, v128 b"),
     "vsub": (widths_signed, "v128 a, v128 b"),
     "vsubi": (widths_unsigned, "v128 a, int imm", [0, 31]),

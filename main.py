@@ -997,3 +997,14 @@ memory_store({width}, data.{member}[lane], addr + offset);
             instr=f"vsetallnez.{name} vr, vr; bcnez",
             desc=f"Expected to be used in branches: branch if all {width}-bit elements in `a` are non-zero.",
         )
+
+    @env.macro
+    def vsllwil(name, name2):
+        width = widths[name[0]]
+        width2 = widths[name2[0]]
+        signedness = signednesses[name]
+        return instruction(
+            intrinsic=f"__m128i __lsx_vsllwil_{name}_{name2} (__m128i a, imm0_{width2-1} imm)",
+            instr=f"vsllwil.{name}.{name2} vr, vr, imm",
+            desc=f"Extend and shift {signedness} {width2}-bit elements in `a` by `imm` to {signedness} {width}-bit result.",
+        )

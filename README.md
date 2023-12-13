@@ -124,10 +124,6 @@ TODO List:
 
 ### vftintrneh.l.s
 
-### vsllwil.h.b/w.h/d.w
-
-### vsllwil.hu.bu/wu.hu/du.wu
-
 ### vsat.b/h/w/d/bu/hu/wu/du
 
 ### vsrlni.b.h/h.w/w.d/d.q
