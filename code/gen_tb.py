@@ -150,29 +150,41 @@ for name in tb:
     args = t[1]
 
     for width in widths:
-        inst_name = name + "_" + width
+        # LSX & LASX
+        for prefix in ["", "x"]:
+            inst_name = prefix + name + "_" + width
 
-        fuzz_args = 0
-        for arg in args.split(", "):
-            if "v128" in arg:
-                fuzz_args += 1
+            # skip xvinsgr2vr_b/h
+            if inst_name in ["xvinsgr2vr_b", "xvinsgr2vr_h"]:
+                continue
 
-        print(f"Saving {inst_name}.cpp")
-        with open(f"{inst_name}.cpp", "w") as f:
-            print('#include "common.h"', file=f)
-            print("", file=f)
-            print(f"v128 {inst_name}({args}) {{", file=f)
-            print("  v128 dst;", file=f)
-            print(f'#include "{inst_name}.h"', file=f)
-            print("  return dst;", file=f)
-            print("}", file=f)
-            print("", file=f)
-            print("void test() {", file=f)
-            if len(t) >= 3:
-                for imm in t[2]:
-                    print(f"  FUZZ{fuzz_args}({inst_name}, {imm});", file=f)
-            else:
-                print(f"  FUZZ{fuzz_args}({inst_name});", file=f)
-            print("}", file=f)
+            fuzz_args = 0
+            for arg in args.split(", "):
+                if "v128" in arg:
+                    fuzz_args += 1
+
+            print(f"Saving {inst_name}.cpp")
+            with open(f"{inst_name}.cpp", "w") as f:
+                if prefix == "":
+                    vtype = "v128"
+                    fuzz = "FUZZ"
+                else:
+                    vtype = "v256"
+                    fuzz = "XFUZZ"
+                print('#include "common.h"', file=f)
+                print("", file=f)
+                print(f"{vtype} {inst_name}({args.replace('v128', vtype)}) {{", file=f)
+                print(f"  {vtype} dst;", file=f)
+                print(f'#include "{inst_name}.h"', file=f)
+                print("  return dst;", file=f)
+                print("}", file=f)
+                print("", file=f)
+                print("void test() {", file=f)
+                if len(t) >= 3:
+                    for imm in t[2]:
+                        print(f"  {fuzz}{fuzz_args}({inst_name}, {imm});", file=f)
+                else:
+                    print(f"  {fuzz}{fuzz_args}({inst_name});", file=f)
+                print("}", file=f)
 
 os.system("clang-format -i *.cpp *.h")

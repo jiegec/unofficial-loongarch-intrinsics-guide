@@ -1,0 +1,9 @@
+#include "common.h"
+
+v256 xvmod_w(v256 a, v256 b) {
+  v256 dst;
+#include "xvmod_w.h"
+  return dst;
+}
+
+void test() { XFUZZ2(xvmod_w); }

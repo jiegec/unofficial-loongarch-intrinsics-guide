@@ -1,0 +1,14 @@
+for (int i = 0; i < 8; i++) {
+  if (i < 4) {
+    s64 temp;
+    if ((b.dword[i] & 63) == 0) {
+      temp = (s64)a.dword[i];
+    } else {
+      temp = ((s64)a.dword[i] >> (b.dword[i] & 63)) +
+             (((s64)a.dword[i] >> ((b.dword[i] & 63) - 1)) & 1);
+    }
+    dst.word[i] = clamp<s64>(temp, -2147483648, 2147483647);
+  } else {
+    dst.word[i] = 0;
+  }
+}

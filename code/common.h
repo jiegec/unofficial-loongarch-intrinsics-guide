@@ -290,7 +290,7 @@ void print(const char *s, __m256d num) {
 
 #define XFUZZ0(func, ...)                                                      \
   do {                                                                         \
-    for (int i = 0; i < XFUZZ_N; i++) {                                        \
+    for (int i = 0; i < FUZZ_N; i++) {                                         \
       if (func(__VA_ARGS__) != __lasx_##func(__VA_ARGS__)) {                   \
         PRINT(__lasx_##func(__VA_ARGS__));                                     \
         PRINT(func(__VA_ARGS__));                                              \
@@ -301,7 +301,7 @@ void print(const char *s, __m256d num) {
 
 #define XFUZZ1(func, ...)                                                      \
   do {                                                                         \
-    for (int i = 0; i < XFUZZ_N; i++) {                                        \
+    for (int i = 0; i < FUZZ_N; i++) {                                         \
       v256 a;                                                                  \
       if (func(a __VA_OPT__(, ) __VA_ARGS__) !=                                \
           __lasx_##func(a __VA_OPT__(, ) __VA_ARGS__)) {                       \
@@ -316,7 +316,7 @@ void print(const char *s, __m256d num) {
 
 #define XFUZZ2(func, ...)                                                      \
   do {                                                                         \
-    for (int i = 0; i < XFUZZ_N; i++) {                                        \
+    for (int i = 0; i < FUZZ_N; i++) {                                         \
       v256 a, b;                                                               \
       if (func(a, b __VA_OPT__(, ) __VA_ARGS__) !=                             \
           __lasx_##func(a, b __VA_OPT__(, ) __VA_ARGS__)) {                    \
@@ -332,7 +332,7 @@ void print(const char *s, __m256d num) {
 
 #define XFUZZ3(func)                                                           \
   do {                                                                         \
-    for (int i = 0; i < XFUZZ_N; i++) {                                        \
+    for (int i = 0; i < FUZZ_N; i++) {                                         \
       v256 a, b, c;                                                            \
       if (func(a, b, c) != __lasx_##func(a, b, c)) {                           \
         PRINT(a);                                                              \
