@@ -649,7 +649,7 @@ for (int i = 0;i < 2;i++) {{
         return instruction(
             intrinsic=f"__m128i __lsx_vpcnt_{name} (__m128i a)",
             instr=f"vpcnt.{name} vr, vr",
-            desc=f"Count the number of ones in {width}-bit elements in `a`.",
+            desc=f"Count the number of ones (population, popcount) in {width}-bit elements in `a`.",
         )
 
     @env.macro
