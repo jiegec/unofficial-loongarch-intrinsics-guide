@@ -5,6 +5,24 @@ import json
 import markdown
 import re
 
+# dirty way to reduce code
+cur_simd = "lsx"
+
+# depends on implementation of env.macro()
+def my_macro(env):
+    def wrap(fn):
+        def vfn(*args):
+            global cur_simd
+            cur_simd = "lsx"
+            return fn(*args)
+        env.macros[f"{fn.__name__}"] = vfn
+        def xvfn(*args):
+            global cur_simd
+            cur_simd = "lasx"
+            return fn(*args)
+        env.macros[f"x{fn.__name__}"] = xvfn
+        return fn
+    return wrap
 
 def define_env(env):
     widths = {
@@ -36,17 +54,21 @@ def define_env(env):
 
     fp_types = {"s": "__m128", "d": "__m128d"}
 
-    def instruction(intrinsic, instr, desc, code=None):
+    def instruction(intrinsic, instr, desc):
+        global cur_simd
         # try to be smart
         file_name = None
         for part in intrinsic.split(" "):
             if part.startswith("__lsx_"):
                 file_name = part[6:]
+        if cur_simd == "lasx":
+            file_name = "x" + file_name
+            instr = "x" + instr
+            intrinsic = intrinsic.replace("m128", "m256").replace("_lsx_", "_lasx_")
         if not os.path.exists(f"code/{file_name}.h"):
             file_name = instr.split(" ")[0].replace(".", "_")
 
-        if code is None:
-            code = open(f"code/{file_name}.h").read().strip()
+        code = open(f"code/{file_name}.h").read().strip()
         code = code.strip()
         if os.path.exists(f"code/{file_name}.cpp"):
             tested = "Tested on real machine."
@@ -59,9 +81,9 @@ def define_env(env):
 
 ```c++
 {intrinsic}
-#include <lsxintrin.h>
+#include <{cur_simd}intrin.h>
 Instruction: {instr}
-CPU Flags: LSX
+CPU Flags: {cur_simd.upper()}
 ```
 
 ### Description
@@ -78,7 +100,7 @@ CPU Flags: LSX
 
 """
 
-    @env.macro
+    @my_macro(env)
     def vabsd(name):
         width = widths[name]
         signedness = signednesses[name]
@@ -88,7 +110,7 @@ CPU Flags: LSX
             desc=f"Compute absolute difference of {signedness} {width}-bit elements in `a` and `b`, save the result in `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vadd(name):
         width = widths[name]
         return instruction(
@@ -97,7 +119,7 @@ CPU Flags: LSX
             desc=f"Add {width}-bit elements in `a` and `b`, save the result in `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vadda(name):
         width = widths[name]
         return instruction(
@@ -106,7 +128,7 @@ CPU Flags: LSX
             desc=f"Add absolute of {width}-bit elements in `a` and `b`, save the result in `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vaddi(name):
         width = widths[name]
         return instruction(
@@ -115,7 +137,7 @@ CPU Flags: LSX
             desc=f"Add {width}-bit elements in `a` and `imm`, save the result in `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vsubi(name):
         width = widths[name]
         return instruction(
@@ -124,7 +146,7 @@ CPU Flags: LSX
             desc=f"Subtract {width}-bit elements in `a` by `imm`, save the result in `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vadd_mul_sub_w_ev_od(op, desc, even_odd, wide, narrow, narrow2=None):
         wide_width = widths[wide]
         if narrow2 is None:
@@ -147,31 +169,31 @@ CPU Flags: LSX
             desc=f"{desc} {even_odd}-positioned {signedness} {narrow_width}-bit elements in `a` and {signedness2} elements in `b`, save the {wide_width}-bit result in `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vaddwev(wide, narrow, narrow2=None):
         return vadd_mul_sub_w_ev_od("add", "Add", "even", wide, narrow, narrow2)
 
-    @env.macro
+    @my_macro(env)
     def vmulwev(wide, narrow, narrow2=None):
         return vadd_mul_sub_w_ev_od("mul", "Multiply", "even", wide, narrow, narrow2)
 
-    @env.macro
+    @my_macro(env)
     def vsubwev(wide, narrow):
         return vadd_mul_sub_w_ev_od("sub", "Subtract", "even", wide, narrow)
 
-    @env.macro
+    @my_macro(env)
     def vaddwod(wide, narrow, narrow2=None):
         return vadd_mul_sub_w_ev_od("add", "Add", "odd", wide, narrow, narrow2)
 
-    @env.macro
+    @my_macro(env)
     def vmulwod(wide, narrow, narrow2=None):
         return vadd_mul_sub_w_ev_od("mul", "Multiply", "odd", wide, narrow, narrow2)
 
-    @env.macro
+    @my_macro(env)
     def vsubwod(wide, narrow):
         return vadd_mul_sub_w_ev_od("sub", "Subtract", "odd", wide, narrow)
 
-    @env.macro
+    @my_macro(env)
     def vavg(name):
         width = widths[name]
         signedness = signednesses[name]
@@ -181,7 +203,7 @@ CPU Flags: LSX
             desc=f"Compute the average (rounded towards negative infinity) of {signedness} {width}-bit elements in `a` and `b`, save the result in `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vavgr(name):
         width = widths[name]
         signedness = signednesses[name]
@@ -191,7 +213,7 @@ CPU Flags: LSX
             desc=f"Compute the average (rounded towards positive infinity) of {signedness} {width}-bit elements in `a` and `b`, save the result in `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vbitclr(name):
         width = widths[name]
         return instruction(
@@ -200,7 +222,7 @@ CPU Flags: LSX
             desc=f"Clear the bit specified by elements in `b` from {width}-bit elements in `a`, save the result in `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vbitclri(name):
         width = widths[name]
         imm_upper = width - 1
@@ -210,7 +232,7 @@ CPU Flags: LSX
             desc=f"Clear the bit specified by `imm` from {width}-bit elements in `a`, save the result in `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vbitset(name):
         width = widths[name]
         return instruction(
@@ -219,7 +241,7 @@ CPU Flags: LSX
             desc=f"Set the bit specified by elements in `b` from {width}-bit elements in `a`, save the result in `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vbitseti(name):
         width = widths[name]
         imm_upper = width - 1
@@ -229,7 +251,7 @@ CPU Flags: LSX
             desc=f"Set the bit specified by `imm` from {width}-bit elements in `a`, save the result in `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vbitrev(name):
         width = widths[name]
         return instruction(
@@ -238,7 +260,7 @@ CPU Flags: LSX
             desc=f"Toggle the bit specified by elements in `b` from {width}-bit elements in `a`, save the result in `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vbitrevi(name):
         width = widths[name]
         imm_upper = width - 1
@@ -248,7 +270,7 @@ CPU Flags: LSX
             desc=f"Toggle the bit specified by `imm` from {width}-bit elements in `a`, save the result in `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vclo(name):
         width = widths[name]
         return instruction(
@@ -257,7 +279,7 @@ CPU Flags: LSX
             desc=f"Count leading ones of {width}-bit elements in `a`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vclz(name):
         width = widths[name]
         return instruction(
@@ -266,7 +288,7 @@ CPU Flags: LSX
             desc=f"Count leading zeros of {width}-bit elements in `a`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vdiv(name):
         width = widths[name]
         signedness = signednesses[name]
@@ -276,7 +298,7 @@ CPU Flags: LSX
             desc=f"Divide {signedness} {width}-bit elements in `a` by elements in `b`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vmod(name):
         width = widths[name]
         signedness = signednesses[name]
@@ -286,7 +308,7 @@ CPU Flags: LSX
             desc=f"Modulo residual {signedness} {width}-bit elements in `a` by elements in `b`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vexth(name, name2):
         width = widths[name[0]]
         width2 = widths[name2[0]]
@@ -297,7 +319,7 @@ CPU Flags: LSX
             desc=f"Extend {signedness} {width2}-bit elements in the higher half of `a` to {width}-bit.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vextl(name, name2):
         width = widths[name[0]]
         width2 = widths[name2[0]]
@@ -308,7 +330,7 @@ CPU Flags: LSX
             desc=f"Extend {signedness} {width2}-bit elements in the lower half of `a` to {width}-bit.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vextrins(name):
         width = widths[name[0]]
         return instruction(
@@ -317,7 +339,7 @@ CPU Flags: LSX
             desc=f"Extract one {width}-bit element in `b` and insert it to `a` according to `imm`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vfcmp(cond):
         if cond[0] == "c":
             trap = "Do not trap for QNaN."
@@ -350,7 +372,7 @@ CPU Flags: LSX
             )
         )
 
-    @env.macro
+    @my_macro(env)
     def vfmul(name):
         precision = precisions[name]
         fp_type = fp_types[name]
@@ -360,7 +382,7 @@ CPU Flags: LSX
             desc=f"Multiply {precision} precision floating point elements in `a` and elements in `b`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vfdiv(name):
         precision = precisions[name]
         fp_type = fp_types[name]
@@ -370,7 +392,7 @@ CPU Flags: LSX
             desc=f"Divide {precision} precision floating point elements in `a` by elements in `b`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vfadd(name):
         precision = precisions[name]
         fp_type = fp_types[name]
@@ -380,7 +402,7 @@ CPU Flags: LSX
             desc=f"Add {precision} precision floating point elements in `a` to elements in `b`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vfsub(name):
         precision = precisions[name]
         fp_type = fp_types[name]
@@ -390,7 +412,7 @@ CPU Flags: LSX
             desc=f"Subtract {precision} precision floating point elements in `a` by elements in `b`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vfmax(name):
         precision = precisions[name]
         fp_type = fp_types[name]
@@ -400,7 +422,7 @@ CPU Flags: LSX
             desc=f"Compute maximum of {precision} precision floating point elements in `a` and `b`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vfmaxa(name):
         precision = precisions[name]
         fp_type = fp_types[name]
@@ -410,7 +432,7 @@ CPU Flags: LSX
             desc=f"Compute maximum of {precision} precision floating point elements in `a` and `b` by magnitude.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vfmin(name):
         precision = precisions[name]
         fp_type = fp_types[name]
@@ -420,7 +442,7 @@ CPU Flags: LSX
             desc=f"Compute minimum of {precision} precision floating point elements in `a` and `b`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vfmina(name):
         precision = precisions[name]
         fp_type = fp_types[name]
@@ -430,7 +452,7 @@ CPU Flags: LSX
             desc=f"Compute minimum of {precision} precision floating point elements in `a` and `b` by magnitude.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vhaddw(name, name2):
         width = widths[name[0]]
         width2 = widths[name2[0]]
@@ -441,7 +463,7 @@ CPU Flags: LSX
             desc=f"Add odd-positioned {signedness} {width2}-bit elements in `a` to even-positioned {signedness} {width2}-bit elements in 'b' to get {width}-bit result.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vhsubw(name, name2):
         width = widths[name[0]]
         width2 = widths[name2[0]]
@@ -452,7 +474,7 @@ CPU Flags: LSX
             desc=f"Subtract odd-positioned {signedness} {width2}-bit elements in `a` by even-positioned {signedness} {width2}-bit elements in 'b' to get {width}-bit result.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vilvh(name):
         width = widths[name]
         return instruction(
@@ -461,7 +483,7 @@ CPU Flags: LSX
             desc=f"Interleave {width}-bit elements in higher half of `a` and `b`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vilvl(name):
         width = widths[name]
         return instruction(
@@ -470,7 +492,7 @@ CPU Flags: LSX
             desc=f"Interleave {width}-bit elements in lower half of `a` and `b`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vinsgr2vr(name):
         width = widths[name]
         imm_upper = 128 // width - 1
@@ -484,7 +506,7 @@ CPU Flags: LSX
             desc=f"Insert {width}-bit element into lane indexed `imm`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vminmax(min_max, name):
         width = widths[name]
         signedness = signednesses[name]
@@ -494,15 +516,15 @@ CPU Flags: LSX
             desc=f"Compute elementwise {min_max}imum for {signedness} {width}-bit elements in `a` and `b`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vmin(name):
         return vminmax("min", name)
 
-    @env.macro
+    @my_macro(env)
     def vmax(name):
         return vminmax("max", name)
 
-    @env.macro
+    @my_macro(env)
     def vminmaxi(min_max, name):
         width = widths[name]
         signedness = signednesses[name]
@@ -516,15 +538,15 @@ CPU Flags: LSX
             desc=f"Compute elementwise {min_max}imum for {signedness} {width}-bit elements in `a` and `imm`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vmini(name):
         return vminmaxi("min", name)
 
-    @env.macro
+    @my_macro(env)
     def vmaxi(name):
         return vminmaxi("max", name)
 
-    @env.macro
+    @my_macro(env)
     def vshuf_b():
         name = "b"
         width = widths[name]
@@ -538,7 +560,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
 """,
         )
 
-    @env.macro
+    @my_macro(env)
     def vshuf_hwd(name):
         width = widths[name]
         return instruction(
@@ -547,7 +569,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Shuffle {width}-bit elements in `b` and `c` with indices from `a`, save the result to `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vldrepl(name):
         width = widths[name]
         imm_range = 2048 // (width // 8)
@@ -558,7 +580,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Read {width}-bit data from memory address `addr + (offset << {shift})`, replicate the data to all vector lanes and save into `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vsub(name):
         width = widths[name]
         return instruction(
@@ -567,7 +589,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Subtract {width}-bit elements in `a` and `b`, save the result in `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vlogical(op):
         return instruction(
             intrinsic=f"__m128i __lsx_v{op}_v (__m128i a, __m128i b)",
@@ -575,7 +597,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Compute bitwise {op.upper()} between elements in `a` and `b`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vlogicali(op):
         return instruction(
             intrinsic=f"__m128i __lsx_v{op}i_b (__m128i a, imm0_255 imm)",
@@ -583,7 +605,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Compute bitwise {op.upper()} between elements in `a` and `imm`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vmadd(name):
         width = widths[name]
         return instruction(
@@ -592,7 +614,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Multiply {width}-bit elements in `b` and `c`, add to elements in `a`, save the result in `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vmaddw_ev_od(name, even_odd, wide, narrow, narrow2=None):
         wide_width = widths[wide]
         if narrow2 is None:
@@ -611,15 +633,15 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Multiply {even_odd}-positioned {signedness} {narrow_width}-bit elements in `b` and {signedness2} elements in `c`, add to {wide_width}-bit elements in `a`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vmaddwev(wide, narrow, narrow2=None):
         return vmaddw_ev_od("ev", "even", wide, narrow, narrow2)
 
-    @env.macro
+    @my_macro(env)
     def vmaddwod(wide, narrow, narrow2=None):
         return vmaddw_ev_od("od", "odd", wide, narrow, narrow2)
 
-    @env.macro
+    @my_macro(env)
     def vmul(name):
         width = widths[name]
         return instruction(
@@ -628,7 +650,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Multiply {width}-bit elements in `a` and `b`, save the result in `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vmuh(name):
         width = widths[name]
         signedness = signednesses[name]
@@ -638,7 +660,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Multiply {signedness} {width}-bit elements in `a` and `b`, save the high {width}-bit result in `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vmsub(name):
         width = widths[name]
         return instruction(
@@ -647,7 +669,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Multiply {width}-bit elements in `b` and `c`, negate and add elements in `a`, save the result in `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vpcnt(name):
         width = widths[name]
         return instruction(
@@ -656,7 +678,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Count the number of ones (population, popcount) in {width}-bit elements in `a`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vstelm(name):
         width = widths[name]
         imm_upper = 128 // width - 1
@@ -666,7 +688,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Store the {width}-bit element in `data` specified by `lane` to memory address `addr + offset`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vseq(name):
         width = widths[name]
         return instruction(
@@ -675,7 +697,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Compare the {width}-bit elements in `a` and `b`, store all-ones to `dst` if equal, zero otherwise.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vseqi(name):
         width = widths[name]
         return instruction(
@@ -684,7 +706,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Compare the {width}-bit elements in `a` and `imm`, store all-ones to `dst` if equal, zero otherwise.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vslt(name):
         width = widths[name]
         signedness = signednesses[name]
@@ -694,7 +716,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Compare the {signedness} {width}-bit elements in `a` and `b`, store all-ones to `dst` if corresponding element in `a` is less than `b`, zero otherwise.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vslti(name):
         width = widths[name]
         signedness = signednesses[name]
@@ -708,7 +730,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Compare the {signedness} {width}-bit elements in `a` and `imm`, store all-ones to `dst` if corresponding element in `a` is less than `b`, zero otherwise.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vsle(name):
         width = widths[name]
         signedness = signednesses[name]
@@ -718,7 +740,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Compare the {signedness} {width}-bit elements in `a` and `b`, store all-ones to `dst` if corresponding element in `a` is less than or equal `b`, zero otherwise.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vslei(name):
         width = widths[name]
         signedness = signednesses[name]
@@ -732,7 +754,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Compare the {signedness} {width}-bit elements in `a` and `b`, store all-ones to `dst` if corresponding element in `a` is less than or equal `b`, zero otherwise.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vsadd(name):
         width = widths[name]
         signedness = signednesses[name]
@@ -742,7 +764,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Saturing add the {signedness} {width}-bit elements in `a` and `b`, store the result to `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vssub(name):
         width = widths[name]
         signedness = signednesses[name]
@@ -752,7 +774,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Saturing subtract the {signedness} {width}-bit elements in `a` and `b`, store the result to `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vsll(name):
         width = widths[name]
         signedness = signednesses[name]
@@ -762,7 +784,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Logical left shift the unsigned {width}-bit elements in `a` by elements in `b`, store the result to `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vslli(name):
         width = widths[name]
         signedness = signednesses[name]
@@ -772,7 +794,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Logical left shift the unsigned {width}-bit elements in `a` by `imm`, store the result to `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vsrl(name):
         width = widths[name]
         signedness = signednesses[name]
@@ -782,7 +804,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Logical right shift the unsigned {width}-bit elements in `a` by elements in `b`, store the result to `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vsrli(name):
         width = widths[name]
         signedness = signednesses[name]
@@ -792,7 +814,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Logical right shift the unsigned {width}-bit elements in `a` by `imm`, store the result to `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vsra(name):
         width = widths[name]
         signedness = signednesses[name]
@@ -802,7 +824,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Arithmetic right shift the signed {width}-bit elements in `a` by elements in `b`, store the result to `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vsrai(name):
         width = widths[name]
         signedness = signednesses[name]
@@ -812,7 +834,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Arithmetic right shift the signed {width}-bit elements in `a` by `imm`, store the result to `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vrotr(name):
         width = widths[name]
         signedness = signednesses[name]
@@ -822,7 +844,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Rotate right the unsigned {width}-bit elements in `a` by elements in `b`, store the result to `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vrotri(name):
         width = widths[name]
         signedness = signednesses[name]
@@ -832,7 +854,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Rotate right the unsigned {width}-bit elements in `a` by `imm`, store the result to `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vsrlr(name):
         width = widths[name]
         signedness = signednesses[name]
@@ -842,7 +864,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Logical right shift (with rounding) the unsigned {width}-bit elements in `a` by elements in `b`, store the result to `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vsrlri(name):
         width = widths[name]
         signedness = signednesses[name]
@@ -852,7 +874,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Logical right shift (with rounding) the unsigned {width}-bit elements in `a` by `imm`, store the result to `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vsrar(name):
         width = widths[name]
         signedness = signednesses[name]
@@ -862,7 +884,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Arithmetic right shift (with rounding) the signed {width}-bit elements in `a` by elements in `b`, store the result to `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vsrari(name):
         width = widths[name]
         signedness = signednesses[name]
@@ -872,7 +894,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Arithmetic right shift (with rounding) the signed {width}-bit elements in `a` by `imm`, store the result to `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vpackev(name):
         width = widths[name]
         return instruction(
@@ -881,7 +903,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Collect and pack even-positioned {width}-bit elements in `a` and `b` and store `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vpackod(name):
         width = widths[name]
         return instruction(
@@ -890,7 +912,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Collect and pack odd-positioned {width}-bit elements in `a` and `b` and store `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vpickev(name):
         width = widths[name]
         return instruction(
@@ -899,7 +921,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Pick even-positioned {width}-bit elements in `b` first, then pick even-positioned {width}-bit elements in `a`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vpickod(name):
         width = widths[name]
         return instruction(
@@ -908,7 +930,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Pick odd-positioned {width}-bit elements in `b` first, then pick odd-positioned {width}-bit elements in `a`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vreplve(name):
         width = widths[name]
         return instruction(
@@ -917,7 +939,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Repeat the element in lane `idx` of `a` to fill whole vector.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vreplvei(name):
         width = widths[name]
         imm_upper = 128 // width - 1
@@ -927,7 +949,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Repeat the element in lane `idx` of `a` to fill whole vector.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vrepli(name):
         width = widths[name]
         return instruction(
@@ -936,7 +958,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Repeat `imm` to fill whole vector.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vreplgr2vr(name):
         width = widths[name]
         if name == "d":
@@ -949,7 +971,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Repeat `val` to whole vector.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vsigncov(name):
         width = widths[name]
         return instruction(
@@ -958,7 +980,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"If the {width}-bit element in `a` equals to zero, set the result to zero. If the signed {width}-bit element in `a` is posiive, copy element in `b` to result. Otherwise, copy negated element in `b` to result.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vneg(name):
         width = widths[name]
         return instruction(
@@ -967,7 +989,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Negate {width}-bit elements in `a` and save the result in `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vmskltz(name):
         width = widths[name]
         return instruction(
@@ -976,7 +998,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"For each {width}-bit element in `a`, if the element is less than zero, set one bit in `dst`, otherwise clear it.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vmskgez(name):
         width = widths[name]
         return instruction(
@@ -985,7 +1007,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"For each {width}-bit element in `a`, if the element is greater than or equal to zero, set one bit in `dst`, otherwise clear it.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vmsknz(name):
         width = widths[name]
         return instruction(
@@ -994,7 +1016,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"For each {width}-bit element in `a`, if the element is non-zero, set one bit in `dst`, otherwise clear it.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vpickve2gr(name):
         width = widths[name]
         return_type = {
@@ -1013,7 +1035,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Pick the `lane` specified by `idx` from `a` and store into `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vshuf4i(name):
         width = widths[name]
         if name == "d":
@@ -1028,7 +1050,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Shuffle every four {width}-bit elements in `a`{b_desc} with indices packed in `imm`, save the result to `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def bz_v():
         return instruction(
             intrinsic=f"int __lsx_bz_v (__m128i a)",
@@ -1036,7 +1058,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Expected to be used in branches: branch if the 128-bit vector `a` equals to zero.",
         )
 
-    @env.macro
+    @my_macro(env)
     def bnz_v():
         return instruction(
             intrinsic=f"int __lsx_bnz_v (__m128i a)",
@@ -1044,7 +1066,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Expected to be used in branches: branch if the 128-bit vector `a` is non-zero.",
         )
 
-    @env.macro
+    @my_macro(env)
     def bz(name):
         width = widths[name]
         return instruction(
@@ -1053,7 +1075,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Expected to be used in branches: branch if any {width}-bit element in `a` equals to zero.",
         )
 
-    @env.macro
+    @my_macro(env)
     def bnz(name):
         width = widths[name]
         return instruction(
@@ -1062,7 +1084,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Expected to be used in branches: branch if all {width}-bit elements in `a` are non-zero.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vsllwil(name, name2):
         width = widths[name[0]]
         width2 = widths[name2[0]]
@@ -1073,7 +1095,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Extend and shift {signedness} {width2}-bit elements in `a` by `imm` to {signedness} {width}-bit result.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vsrln(name, name2):
         width = widths[name[0]]
         width2 = widths[name2[0]]
@@ -1083,7 +1105,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Logical right shift the unsigned {width2}-bit elements in `a` by elements in `b`, truncate to {width}-bit and store the result to `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vsran(name, name2):
         width = widths[name[0]]
         width2 = widths[name2[0]]
@@ -1093,7 +1115,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Arithmetic right shift the signed {width2}-bit elements in `a` by elements in `b`, truncate to {width}-bit and store the result to `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vsrlni(name, name2):
         width = widths[name[0]]
         width2 = widths[name2[0]]
@@ -1103,7 +1125,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Logical right shift the unsigned {width2}-bit elements in `a` and `b` by `imm`, truncate to {width}-bit and store the result to `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vsrani(name, name2):
         width = widths[name[0]]
         width2 = widths[name2[0]]
@@ -1113,7 +1135,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Arithemtic right shift the signed {width2}-bit elements in `a` and `b` by `imm`, truncate to {width}-bit and store the result to `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vsrlrn(name, name2):
         width = widths[name[0]]
         width2 = widths[name2[0]]
@@ -1123,7 +1145,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Logical right shift (with rounding) the unsigned {width2}-bit elements in `a` by elements in `b`, truncate to {width}-bit and store the result to `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vsrarn(name, name2):
         width = widths[name[0]]
         width2 = widths[name2[0]]
@@ -1133,7 +1155,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Arithmetic right shift (with rounding) the signed {width2}-bit elements in `a` by elements in `b`, truncate to {width}-bit and store the result to `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vsrlrni(name, name2):
         width = widths[name[0]]
         width2 = widths[name2[0]]
@@ -1143,7 +1165,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Logical right shift (with rounding) the unsigned {width2}-bit elements in `a` and `b` by `imm`, truncate to {width}-bit and store the result to `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vsrarni(name, name2):
         width = widths[name[0]]
         width2 = widths[name2[0]]
@@ -1153,7 +1175,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Arithemtic right shift (with rounding) the signed {width2}-bit elements in `a` and `b` by `imm`, truncate to {width}-bit and store the result to `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vssrln(name, name2):
         width = widths[name[0]]
         signedness = signednesses[name]
@@ -1164,7 +1186,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Logical right shift the unsigned {width2}-bit elements in `a` by elements in `b`, clamp to fit in {signedness} {width}-bit integer and store the result to `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vssran(name, name2):
         width = widths[name[0]]
         signedness = signednesses[name]
@@ -1175,7 +1197,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Arithemtic right shift the signed {width2}-bit elements in `a` by elements in `b`, clamp to fit in {signedness} {width}-bit integer and store the result to `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vssrlni(name, name2):
         width = widths[name[0]]
         signedness = signednesses[name]
@@ -1186,7 +1208,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Logical right shift the unsigned {width2}-bit elements in `a` and `b` by `imm`, clamp to fit in {signedness} {width}-bit integer and store the result to `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vssrani(name, name2):
         width = widths[name[0]]
         signedness = signednesses[name]
@@ -1197,7 +1219,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Arithemtic right shift the signed {width2}-bit elements in `a` and `b` by `imm`, clamp to fit in {signedness} {width}-bit integer and store the result to `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vssrlrn(name, name2):
         width = widths[name[0]]
         signedness = signednesses[name]
@@ -1208,7 +1230,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Logical right shift (with rounding) the unsigned {width2}-bit elements in `a` by elements in `b`, clamp to fit in {signedness} {width}-bit integer and store the result to `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vssrarn(name, name2):
         width = widths[name[0]]
         signedness = signednesses[name]
@@ -1219,7 +1241,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Arithemtic right shift (with rounding) the signed {width2}-bit elements in `a` by elements in `b`, clamp to fit in {signedness} {width}-bit integer and store the result to `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vssrlrni(name, name2):
         width = widths[name[0]]
         signedness = signednesses[name]
@@ -1230,7 +1252,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Logical right shift (with rounding) the unsigned {width2}-bit elements in `a` and `b` by `imm`, clamp to fit in {signedness} {width}-bit integer and store the result to `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vssrarni(name, name2):
         width = widths[name[0]]
         signedness = signednesses[name]
@@ -1241,7 +1263,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Arithemtic right shift (with rounding) the signed {width2}-bit elements in `a` and `b` by `imm`, clamp to fit in {signedness} {width}-bit integer and store the result to `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vsat(name):
         width = widths[name]
         signedness = signednesses[name]
@@ -1266,7 +1288,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             assert False
         return rounding_mode
 
-    @env.macro
+    @my_macro(env)
     def vftint_l_s(rounding, low_high):
         if low_high == "l":
             half = "lower"
@@ -1279,7 +1301,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Convert single-precision floating point elements in {half} part of `a` to 64-bit integer, {rounding_mode}.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vftint_w_d(rounding):
         rounding_mode = get_rounding_mode(rounding)
         return instruction(
@@ -1288,7 +1310,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Convert double-precision floating point elements in `a` and `b` to 32-bit integer, {rounding_mode}.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vftint(rounding, name, name2):
         if name2 == "d":
             arg_type = "__m128d"
@@ -1309,7 +1331,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Convert {precision}-precision floating point elements in `a` to {signedness} {int_width}-bit integer, {rounding_mode}.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vfop(desc, name, ty):
         if ty == "s":
             precision = "single"
@@ -1323,7 +1345,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Compute {desc} of {precision} precision floating point elements in `a`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vfrint(rounding, name):
         if name == "s":
             precision = "single"
@@ -1338,7 +1360,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Round single-precision floating point elements in `a` to integers, {rounding_mode}, and store as floating point numbers.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vffint_d_w(low_high):
         if low_high == "l":
             half = "lower"
@@ -1350,7 +1372,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Convert 32-bit integer elements in {half} part of `a` to double precision floating point numbers.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vffint(name, name2):
         if name == "d":
             arg_type = "__m128d"
@@ -1370,7 +1392,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Convert {signedness} {int_width}-bit integer elements in `a` to {precision}-precision floating point numbers.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vffint_s_l():
         return instruction(
             intrinsic=f"__m128 __lsx_vffint_s_l (__m128i a, __m128i b)",
@@ -1378,7 +1400,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Convert 64-bit integer elements in `a` and `b` to double-precision floating point numbers.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vfrstp(name):
         width = widths[name]
         return instruction(
@@ -1387,7 +1409,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Find the first negative {width}-bit element in `b`, set the index of the element to the lane of `a` specified by `c`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vfrstpi(name):
         width = widths[name]
         return instruction(
@@ -1396,7 +1418,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Find the first negative {width}-bit element in `b`, set the index of the element to the lane of `a` specified by `imm`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vbsll_srl(name, dir):
         return instruction(
             intrinsic=f"__m128i __lsx_vb{name}_v (__m128i a, imm0_31 imm)",
@@ -1404,7 +1426,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Compute 128-bit `a` shifted {dir} by `imm * 8` bits.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vpermi_w():
         return instruction(
             intrinsic=f"__m128i __lsx_vpermi_w (__m128i a, __m128i b, imm0_255 imm)",
@@ -1412,7 +1434,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Permute words from `a` and `b` with indices recorded in `imm` and store into `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vld():
         return instruction(
             intrinsic=f"__m128i __lsx_vld (void * addr, imm_n2048_2047 offset)",
@@ -1420,7 +1442,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Read 128-bit data from memory address `addr + offset`, save the data into `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vldx():
         return instruction(
             intrinsic=f"__m128i __lsx_vldx (void * addr, long int offset)",
@@ -1428,7 +1450,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Read 128-bit data from memory address `addr + offset`, save the data into `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vst():
         return instruction(
             intrinsic=f"void __lsx_vst (__m128i data, void * addr, imm_n2048_2047 offset)",
@@ -1436,7 +1458,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Write 128-bit data in `data` to memory address `addr + offset`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vstx():
         return instruction(
             intrinsic=f"void __lsx_vstx (__m128i data, void * addr, long int offset)",
@@ -1444,7 +1466,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Write 128-bit data in `data` to memory address `addr + offset`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vbitsel_v():
         return instruction(
             intrinsic=f"__m128i __lsx_vbitsel_v (__m128i a, __m128i b, __m128i c)",
@@ -1452,7 +1474,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Compute bitwise selection: for each bit position, if the bit in `c` equals to one, copy the bit from `b` to `dst`, otherwise copy from `a`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vbitseli_b():
         return instruction(
             intrinsic=f"__m128i __lsx_vbitseli_b (__m128i a, __m128i b, imm0_255 imm)",
@@ -1460,7 +1482,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Compute bitwise selection: for each bit position, if the bit in `a` equals to one, copy the bit from `imm` to `dst`, otherwise copy from `b`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vfcvth_d_s():
         return instruction(
             intrinsic=f"__m128d __lsx_vfcvth_d_s (__m128 a)",
@@ -1468,7 +1490,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Convert single precision floating point elements in higher half of `a` to double precision.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vfcvtl_d_s():
         return instruction(
             intrinsic=f"__m128d __lsx_vfcvtl_d_s (__m128 a)",
@@ -1476,7 +1498,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Convert single precision floating point elements in lower half of `a` to double precision.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vfcvt_s_d():
         return instruction(
             intrinsic=f"__m128 __lsx_vfcvt_s_d (__m128d a, __m128d b)",
@@ -1484,7 +1506,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Convert double precision floating point elements in `a` and `b` to double precision.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vfcvth_s_h():
         return instruction(
             intrinsic=f"__m128 __lsx_vfcvth_s_h (__m128i a)",
@@ -1492,7 +1514,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Convert half precision floating point elements in higher half of `a` to single precision.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vfcvtl_s_h():
         return instruction(
             intrinsic=f"__m128 __lsx_vfcvtl_s_h (__m128i a)",
@@ -1500,7 +1522,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Convert half precision floating point elements in lower half of `a` to single precision.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vfcvt_h_s():
         return instruction(
             intrinsic=f"__m128i __lsx_vfcvt_h_s (__m128 a, __m128 b)",
@@ -1508,7 +1530,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Convert single precision floating point elements in `a` and `b` to half precision.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vfclass_d():
         return instruction(
             intrinsic=f"__m128i __lsx_vfclass_d (__m128d a)",
@@ -1516,7 +1538,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Classifiy each double precision floating point elements in `a`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vfclass_s():
         return instruction(
             intrinsic=f"__m128i __lsx_vfclass_s (__m128 a)",
@@ -1524,7 +1546,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Classifiy each single precision floating point elements in `a`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vfmadd_s():
         return instruction(
             intrinsic=f"__m128 __lsx_vfmadd_s (__m128 a, __m128 b, __m128 c)",
@@ -1532,7 +1554,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Compute packed single precision floating point FMA(Fused Multiply-Add): multiply elements in `a` and `b`, accumulate to elements in `c` and store the result in `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vfmadd_d():
         return instruction(
             intrinsic=f"__m128d __lsx_vfmadd_d (__m128d a, __m128d b, __m128d c)",
@@ -1540,7 +1562,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Compute packed double precision floating point FMA(Fused Multiply-Add): multiply elements in `a` and `b`, accumulate to elements in `c` and store the result in `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vfmsub_s():
         return instruction(
             intrinsic=f"__m128 __lsx_vfmsub_s (__m128 a, __m128 b, __m128 c)",
@@ -1548,7 +1570,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Compute packed single precision floating point FMA(Fused Multiply-Add): multiply elements in `a` and `b`, subtract elements in `c` and store the result in `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vfmsub_d():
         return instruction(
             intrinsic=f"__m128d __lsx_vfmsub_d (__m128d a, __m128d b, __m128d c)",
@@ -1556,7 +1578,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Compute packed double precision floating point FMA(Fused Multiply-Add): multiply elements in `a` and `b`, subtract elements in `c` and store the result in `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vfnmadd_s():
         return instruction(
             intrinsic=f"__m128 __lsx_vfnmadd_s (__m128 a, __m128 b, __m128 c)",
@@ -1564,7 +1586,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Compute packed single precision floating point FMA(Fused Multiply-Add): multiply elements in `a` and `b`, accumulate to elements in `c` and store the negated result in `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vfnmadd_d():
         return instruction(
             intrinsic=f"__m128d __lsx_vfnmadd_d (__m128d a, __m128d b, __m128d c)",
@@ -1572,7 +1594,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Compute packed double precision floating point FMA(Fused Multiply-Add): multiply elements in `a` and `b`, accumulate to elements in `c` and store the negated result in `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vfnmsub_s():
         return instruction(
             intrinsic=f"__m128 __lsx_vfnmsub_s (__m128 a, __m128 b, __m128 c)",
@@ -1580,7 +1602,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Compute packed single precision floating point FMA(Fused Multiply-Add): multiply elements in `a` and `b`, subtract elements in `c` and store the negated result in `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vfnmsub_d():
         return instruction(
             intrinsic=f"__m128d __lsx_vfnmsub_d (__m128d a, __m128d b, __m128d c)",
@@ -1588,7 +1610,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Compute packed double precision floating point FMA(Fused Multiply-Add): multiply elements in `a` and `b`, subtract elements in `c` and store the negated result in `dst`.",
         )
 
-    @env.macro
+    @my_macro(env)
     def vldi():
         return instruction(
             intrinsic=f"__m128i __lsx_vldi (imm_n1024_1023 imm)",
@@ -1619,7 +1641,7 @@ Initialize `dst` using predefined patterns:
     @env.macro
     def all_intrinsics():
         result = []
-        for file in glob.glob("docs/lsx/*.md"):
+        for file in glob.glob("docs/*/*.md"):
             for line in open(file, "r"):
                 if line.startswith("#"):
                     title = line[1:].strip()
@@ -1653,7 +1675,7 @@ Initialize `dst` using predefined patterns:
     @env.macro
     def all_groups():
         result = []
-        for file in glob.glob("docs/lsx/*.md"):
+        for file in glob.glob("docs/*/*.md"):
             for line in open(file, "r"):
                 if line.startswith("#"):
                     title = line[1:].strip()
