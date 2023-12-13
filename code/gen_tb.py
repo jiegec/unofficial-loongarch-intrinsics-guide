@@ -157,6 +157,9 @@ for name in tb:
             # skip xvinsgr2vr_b/h
             if inst_name in ["xvinsgr2vr_b", "xvinsgr2vr_h"]:
                 continue
+            # skip xvreplvei
+            if inst_name.startswith("xvreplvei"):
+                continue
 
             fuzz_args = 0
             for arg in args.split(", "):

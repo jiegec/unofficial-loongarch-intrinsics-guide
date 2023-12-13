@@ -618,12 +618,27 @@ for vlen, prefix in [(128, "v"), (256, "xv")]:
                 )
                 print(f"}}", file=f)
         with open(f"{prefix}ilvl_{width}.h", "w") as f:
-            print(f"for (int i = 0;i < {vlen // w};i++) {{", file=f)
-            print(
-                f"  dst.{m}[i] = (i % 2 == 1) ? a.{m}[i / 2] : b.{m}[i / 2];",
-                file=f,
-            )
-            print(f"}}", file=f)
+            if prefix == "v":
+                print(f"for (int i = 0;i < {vlen // w};i++) {{", file=f)
+                print(
+                    f"  dst.{m}[i] = (i % 2 == 1) ? a.{m}[i / 2] : b.{m}[i / 2];",
+                    file=f,
+                )
+                print(f"}}", file=f)
+            else:
+                print(f"int i;", file=f)
+                print(f"for (i = 0;i < {vlen // 2 // w};i++) {{", file=f)
+                print(
+                    f"  dst.{m}[i] = (i % 2 == 1) ? a.{m}[i / 2] : b.{m}[i / 2];",
+                    file=f,
+                )
+                print(f"}}", file=f)
+                print(f"for (;i < {vlen // w};i++) {{", file=f)
+                print(
+                    f"  dst.{m}[i] = (i % 2 == 1) ? a.{m}[i / 2 + {vlen // 4 // w}] : b.{m}[i / 2 + {vlen // 4 // w}];",
+                    file=f,
+                )
+                print(f"}}", file=f)
         if prefix != "xv" or (width != "h" and width != "b"):
             # no __lasx_xvinsgr2vr_h or __lasx_xvinsgr2vr_b
             with open(f"{prefix}insgr2vr_{width}.h", "w") as f:
@@ -794,13 +809,14 @@ for vlen, prefix in [(128, "v"), (256, "xv")]:
                 file=f,
             )
             print(f"}}", file=f)
-        with open(f"{prefix}replvei_{width}.h", "w") as f:
-            print(f"for (int i = 0;i < {vlen // w};i++) {{", file=f)
-            print(
-                f"  dst.{m}[i] = a.{m}[idx];",
-                file=f,
-            )
-            print(f"}}", file=f)
+        if prefix == "v":
+            with open(f"{prefix}replvei_{width}.h", "w") as f:
+                print(f"for (int i = 0;i < {vlen // w};i++) {{", file=f)
+                print(
+                    f"  dst.{m}[i] = a.{m}[idx];",
+                    file=f,
+                )
+                print(f"}}", file=f)
         with open(f"{prefix}replgr2vr_{width}.h", "w") as f:
             print(f"for (int i = 0;i < {vlen // w};i++) {{", file=f)
             print(
