@@ -763,12 +763,13 @@ for width in ["b", "h", "w", "d"]:
 
 for width in ["s", "d"]:
     m = members_fp[width]
-    with open(f"vfdiv_{width}.h", "w") as f:
-        print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
-        print(
-            f"  dst.{m}[i] = a.{m}[i] / b.{m}[i];",
-            file=f,
-        )
-        print(f"}}", file=f)
+    for name, op in [("div", "/"), ("mul", "*"), ("sub", "-"), ("add", "+")]:
+        with open(f"vf{name}_{width}.h", "w") as f:
+            print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+            print(
+                f"  dst.{m}[i] = a.{m}[i] {op} b.{m}[i];",
+                file=f,
+            )
+            print(f"}}", file=f)
 
 os.system("clang-format -i *.cpp *.h")

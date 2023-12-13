@@ -359,13 +359,43 @@ for (int i = 0;i < 2;i++) {{
         )
 
     @env.macro
+    def vfmul(name):
+        precision = precisions[name]
+        fp_type = fp_types[name]
+        return instruction(
+            intrinsic=f"{fp_type} __lsx_vfmul_{name} ({fp_type} a, {fp_type} b)",
+            instr=f"vfmul.{name} vr, vr, vr",
+            desc=f"Multiply {precision} precision floating point elements in `a` and elements in `b`.",
+        )
+
+    @env.macro
     def vfdiv(name):
         precision = precisions[name]
         fp_type = fp_types[name]
         return instruction(
             intrinsic=f"{fp_type} __lsx_vfdiv_{name} ({fp_type} a, {fp_type} b)",
             instr=f"vfdiv.{name} vr, vr, vr",
-            desc=f"Divide {fp_type} precision floating point elements in `a` by elements in `b`.",
+            desc=f"Divide {precision} precision floating point elements in `a` by elements in `b`.",
+        )
+
+    @env.macro
+    def vfadd(name):
+        precision = precisions[name]
+        fp_type = fp_types[name]
+        return instruction(
+            intrinsic=f"{fp_type} __lsx_vfadd_{name} ({fp_type} a, {fp_type} b)",
+            instr=f"vfadd.{name} vr, vr, vr",
+            desc=f"Add {precision} precision floating point elements in `a` to elements in `b`.",
+        )
+
+    @env.macro
+    def vfsub(name):
+        precision = precisions[name]
+        fp_type = fp_types[name]
+        return instruction(
+            intrinsic=f"{fp_type} __lsx_vfsub_{name} ({fp_type} a, {fp_type} b)",
+            instr=f"vfsub.{name} vr, vr, vr",
+            desc=f"Subtract {precision} precision floating point elements in `a` by elements in `b`.",
         )
 
     @env.macro
