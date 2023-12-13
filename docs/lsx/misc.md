@@ -15,6 +15,12 @@
 {{ vinsgr2vr('w') }}
 {{ vinsgr2vr('d') }}
 
+{{ vfrstp('b') }}
+{{ vfrstp('h') }}
+
+{{ vfrstpi('b') }}
+{{ vfrstpi('h') }}
+
 {{ vmskgez('b') }}
 
 {{ vmskltz('b') }}

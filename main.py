@@ -1383,3 +1383,21 @@ memory_store({width}, data.{member}[lane], addr + offset);
             instr=f"vffint.s.l vr, vr, vr",
             desc=f"Convert 64-bit integer elements in `a` and `b` to double-precision floating point numbers.",
         )
+
+    @env.macro
+    def vfrstp(name):
+        width = widths[name]
+        return instruction(
+            intrinsic=f"__m128i __lsx_vfrstp_{name} (__m128i a, __m128i b, __m128i c)",
+            instr=f"vfrstp.{name} vr, vr, vr",
+            desc=f"Find the first negative {width}-bit element in `b`, set the index of the element to the lane of `a` specified by `c`.",
+        )
+
+    @env.macro
+    def vfrstpi(name):
+        width = widths[name]
+        return instruction(
+            intrinsic=f"__m128i __lsx_vfrstpi_{name} (__m128i a, __m128i b, imm0_31 imm)",
+            instr=f"vfrstpi.{name} vr, vr, vr",
+            desc=f"Find the first negative {width}-bit element in `b`, set the index of the element to the lane of `a` specified by `imm`.",
+        )

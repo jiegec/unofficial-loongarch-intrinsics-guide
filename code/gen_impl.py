@@ -768,6 +768,41 @@ for width in ["b", "h", "w", "d"]:
                 file=f,
             )
             print(f"}}", file=f)
+    if width == "b" or width == "h":
+        with open(f"vfrstp_{width}.h", "w") as f:
+            print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+            print(
+                f"  dst.{m}[i] = a.{m}[i];",
+                file=f,
+            )
+            print(f"}}", file=f)
+            print(f"int i;", file=f)
+            print(f"for (i = 0;i < {128 // w};i++) {{", file=f)
+            print(
+                f"  if ((s{w})b.{m}[i] < 0) {{",
+                file=f,
+            )
+            print(f"break;", file=f)
+            print(f"}}", file=f)
+            print(f"}}", file=f)
+            print(f"  dst.{m}[c.{m}[0] % {128 // w}] = i;", file=f)
+        with open(f"vfrstpi_{width}.h", "w") as f:
+            print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+            print(
+                f"  dst.{m}[i] = a.{m}[i];",
+                file=f,
+            )
+            print(f"}}", file=f)
+            print(f"int i;", file=f)
+            print(f"for (i = 0;i < {128 // w};i++) {{", file=f)
+            print(
+                f"  if ((s{w})b.{m}[i] < 0) {{",
+                file=f,
+            )
+            print(f"break;", file=f)
+            print(f"}}", file=f)
+            print(f"}}", file=f)
+            print(f"  dst.{m}[imm % {128 // w}] = i;", file=f)
 
 for width in ["s", "d"]:
     m = members_fp[width]

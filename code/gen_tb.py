@@ -10,6 +10,7 @@ widths_vsrln = ["b_h", "h_w", "w_d"]
 widths_vssrln = ["b_h", "bu_h", "h_w", "hu_w", "w_d", "wu_d"]
 widths_vsrlni = ["b_h", "h_w", "w_d", "d_q"]
 widths_vssrlni = ["b_h", "bu_h", "h_w", "hu_w", "w_d", "wu_d", "d_q", "du_q"]
+widths_vfrstp = ["b", "h"]
 widths_vaddw = [
     "h_b",
     "h_bu",
@@ -59,6 +60,8 @@ tb = {
         "v128 a, v128 b, int imm",
         [0, 3, 7, 15, 16, 32, 64, 128, 255],
     ),
+    "vfrstp": (widths_vfrstp, "v128 a, v128 b, v128 c"),
+    "vfrstpi": (widths_vfrstp, "v128 a, v128 b, int imm", [0, 4, 31]),
     "vhaddw": (widths_vexth, "v128 a, v128 b"),
     "vhsubw": (widths_vexth, "v128 a, v128 b"),
     "vilvh": (widths_signed, "v128 a, v128 b"),
