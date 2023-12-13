@@ -1650,4 +1650,4 @@ memory_store({width}, data.{member}[lane], addr + offset);
                     title = line[1:].strip()
                     result.append(title)
                     break
-        return json.dumps(result)
+        return json.dumps(sorted(result))
