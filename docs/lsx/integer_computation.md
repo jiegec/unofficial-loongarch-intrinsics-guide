@@ -223,14 +223,22 @@
 {{ vneg('d') }}
 
 {{ vsadd('b') }}
+{{ vsadd('bu') }}
 {{ vsadd('h') }}
+{{ vsadd('hu') }}
 {{ vsadd('w') }}
+{{ vsadd('wu') }}
 {{ vsadd('d') }}
+{{ vsadd('du') }}
 
 {{ vssub('b') }}
+{{ vssub('bu') }}
 {{ vssub('h') }}
+{{ vssub('hu') }}
 {{ vssub('w') }}
+{{ vssub('wu') }}
 {{ vssub('d') }}
+{{ vssub('du') }}
 
 {{ vsub('b') }}
 {{ vsub('h') }}

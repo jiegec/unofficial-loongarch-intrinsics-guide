@@ -732,7 +732,7 @@ memory_store({width}, data.{member}[lane], addr + offset);
         if signedness == "signed":
             imm_range = "imm_n16_15"
         else:
-            imm_range = "imm_0_31"
+            imm_range = "imm0_31"
         return instruction(
             intrinsic=f"__m128i __lsx_vslei_{name} (__m128i a, {imm_range} imm)",
             instr=f"vslei.{name} vr, vr, imm",
