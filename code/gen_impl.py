@@ -53,6 +53,11 @@ members_fp = {
     "d": "fp64",
 }
 
+widths_fp = {
+    "s": 32,
+    "d": 64,
+}
+
 for width in ["b", "bu", "h", "hu", "w", "wu", "d", "du"]:
     w = widths[width]
     m = members[width]
@@ -763,6 +768,7 @@ for width in ["b", "h", "w", "d"]:
 
 for width in ["s", "d"]:
     m = members_fp[width]
+    w = widths_fp[width]
     for name, op in [("div", "/"), ("mul", "*"), ("sub", "-"), ("add", "+")]:
         with open(f"vf{name}_{width}.h", "w") as f:
             print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
