@@ -773,6 +773,12 @@ for width in ["s", "d"]:
     m = members_fp[width]
     int_m = members[width]
     w = widths_fp[width]
+    if width == "s":
+        int_width = "w"
+        int_w = 32
+    else:
+        int_width = "l"
+        int_w = 64
     for name, op in [("div", "/"), ("mul", "*"), ("sub", "-"), ("add", "+")]:
         with open(f"vf{name}_{width}.h", "w") as f:
             print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
@@ -786,26 +792,30 @@ for width in ["s", "d"]:
             with open(f"vftint{rounding}l_l_{width}.h", "w") as f:
                 print(f"for (int i = 0;i < {64 // w};i++) {{", file=f)
                 print(
-                    f"  dst.dword[i] = a.{m}[i]; // rounding mode is not expressed in C",
+                    f"  dst.dword[i] = (s{int_w})a.{m}[i]; // rounding mode is not expressed in C",
                     file=f,
                 )
                 print(f"}}", file=f)
             with open(f"vftint{rounding}h_l_{width}.h", "w") as f:
                 print(f"for (int i = 0;i < {64 // w};i++) {{", file=f)
                 print(
-                    f"  dst.dword[i] = a.{m}[i + {64 // w}]; // rounding mode is not expressed in C",
+                    f"  dst.dword[i] = (s{int_w})a.{m}[i + {64 // w}]; // rounding mode is not expressed in C",
                     file=f,
                 )
                 print(f"}}", file=f)
     for rounding in ["", "rm", "rp", "rz", "rne"]:
-        if width == "s":
-            int_width = "w"
-        else:
-            int_width = "l"
         with open(f"vftint{rounding}_{int_width}_{width}.h", "w") as f:
             print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
             print(
-                f"  dst.{int_m}[i] = a.{m}[i]; // rounding mode is not expressed in C",
+                f"  dst.{int_m}[i] = (s{int_w})a.{m}[i]; // rounding mode is not expressed in C",
+                file=f,
+            )
+            print(f"}}", file=f)
+    for rounding in ["", "rz"]:
+        with open(f"vftint{rounding}_{int_width}u_{width}.h", "w") as f:
+            print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+            print(
+                f"  dst.{int_m}[i] = (u{int_w})a.{m}[i]; // rounding mode is not expressed in C",
                 file=f,
             )
             print(f"}}", file=f)

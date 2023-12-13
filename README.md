@@ -55,7 +55,3 @@ TODO List:
 ### vffintl.d.w
 
 ### vffinth.d.w
-
-### vftint.wu.s/lu.d
-
-### vftintrz.wu.s/lu.d

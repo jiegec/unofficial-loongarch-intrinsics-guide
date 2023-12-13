@@ -1296,8 +1296,12 @@ memory_store({width}, data.{member}[lane], addr + offset);
             precision = "single"
             int_width = 32
         rounding_mode = get_rounding_mode(rounding)
+        if len(name) == 1:
+            signedness = "signed"
+        else:
+            signedness = "unsigned"
         return instruction(
             intrinsic=f"__m128i __lsx_vftint{rounding}_{name}_{name2} ({arg_type} a)",
             instr=f"vftint{rounding}.{name}.{name2} vr, vr",
-            desc=f"Convert {precision}-precision floating point elements in `a` to {int_width}-bit integer, {rounding_mode}.",
+            desc=f"Convert {precision}-precision floating point elements in `a` to {signedness} {int_width}-bit integer, {rounding_mode}.",
         )

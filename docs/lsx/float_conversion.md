@@ -85,3 +85,8 @@ Convert double precision floating point elements in `a` and `b` to double precis
 {{ vftint('rz', 'w', 's') }}
 {{ vftint('rne', 'l', 'd') }}
 {{ vftint('rne', 'w', 's') }}
+
+{{ vftint('', 'lu', 'd') }}
+{{ vftint('', 'wu', 's') }}
+{{ vftint('rz', 'lu', 'd') }}
+{{ vftint('rz', 'wu', 's') }}
