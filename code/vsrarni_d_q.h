@@ -10,7 +10,7 @@ for (int i = 0; i < 2; i++) {
     if (imm == 0) {
       dst.dword[i] = (s64)(s128)a.qword[i - 1];
     } else {
-      dst.dword[i] = (u64)(((s128)a.qword[i - 1] >> imm) +
+      dst.dword[i] = (s64)(((s128)a.qword[i - 1] >> imm) +
                            (((s128)a.qword[i - 1] >> (imm - 1)) & 0x1));
     }
   }

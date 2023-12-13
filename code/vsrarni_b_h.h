@@ -10,7 +10,7 @@ for (int i = 0; i < 16; i++) {
     if (imm == 0) {
       dst.byte[i] = (s8)(s16)a.half[i - 8];
     } else {
-      dst.byte[i] = (u8)(((s16)a.half[i - 8] >> imm) +
+      dst.byte[i] = (s8)(((s16)a.half[i - 8] >> imm) +
                          (((s16)a.half[i - 8] >> (imm - 1)) & 0x1));
     }
   }

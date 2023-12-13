@@ -10,7 +10,7 @@ for (int i = 0; i < 4; i++) {
     if (imm == 0) {
       dst.word[i] = (s32)(s64)a.dword[i - 2];
     } else {
-      dst.word[i] = (u32)(((s64)a.dword[i - 2] >> imm) +
+      dst.word[i] = (s32)(((s64)a.dword[i - 2] >> imm) +
                           (((s64)a.dword[i - 2] >> (imm - 1)) & 0x1));
     }
   }

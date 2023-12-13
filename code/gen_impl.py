@@ -60,38 +60,26 @@ for width in ["b", "bu", "h", "hu", "w", "wu", "d", "du"]:
         sign = "u"
     else:
         sign = "s"
-    with open(f"vavg_{width}.h", "w") as f:
-        print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
-        print(
-            f"  dst.{m}[i] = (({sign}{w})a.{m}[i] >> 1) + (({sign}{w})b.{m}[i] >> 1) + (a.{m}[i] & b.{m}[i] & 1);",
-            file=f,
-        )
-        print(f"}}", file=f)
-    with open(f"vavgr_{width}.h", "w") as f:
-        print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
-        print(
-            f"  dst.{m}[i] = (({sign}{w})a.{m}[i] >> 1) + (({sign}{w})b.{m}[i] >> 1) + ((a.{m}[i] | b.{m}[i]) & 1);",
-            file=f,
-        )
-        print(f"}}", file=f)
-    with open(f"vdiv_{width}.h", "w") as f:
-        print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
-        print(
-            f"  dst.{m}[i] = (b.{m}[i] == 0) ? 0 : (({sign}{w})a.{m}[i] / ({sign}{w})b.{m}[i]);",
-            file=f,
-        )
-        print(f"}}", file=f)
-    with open(f"vmod_{width}.h", "w") as f:
-        print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
-        print(
-            f"  dst.{m}[i] = (b.{m}[i] == 0) ? 0 : (({sign}{w})a.{m}[i] % ({sign}{w})b.{m}[i]);",
-            file=f,
-        )
-        print(f"}}", file=f)
-
     double_width = double_widths_same_signedness[width]
     double_w = widths[double_width]
     double_m = members[double_width]
+
+    for name, op in [("avg", "&"), ("avgr", "|")]:
+        with open(f"v{name}_{width}.h", "w") as f:
+            print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+            print(
+                f"  dst.{m}[i] = (({sign}{w})a.{m}[i] >> 1) + (({sign}{w})b.{m}[i] >> 1) + ((a.{m}[i] {op} b.{m}[i]) & 1);",
+                file=f,
+            )
+            print(f"}}", file=f)
+    for name, op in [("div", "/"), ("mod", "%")]:
+        with open(f"v{name}_{width}.h", "w") as f:
+            print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+            print(
+                f"  dst.{m}[i] = (b.{m}[i] == 0) ? 0 : (({sign}{w})a.{m}[i] {op} ({sign}{w})b.{m}[i]);",
+                file=f,
+            )
+            print(f"}}", file=f)
     with open(f"vexth_{double_width}_{width}.h", "w") as f:
         print(f"for (int i = 0;i < {128 // double_w};i++) {{", file=f)
         print(
@@ -99,20 +87,15 @@ for width in ["b", "bu", "h", "hu", "w", "wu", "d", "du"]:
             file=f,
         )
         print(f"}}", file=f)
-    with open(f"vhaddw_{double_width}_{width}.h", "w") as f:
-        print(f"for (int i = 0;i < {128 // double_w};i++) {{", file=f)
-        print(
-            f"  dst.{double_m}[i] = ({sign}{double_w})({sign}{w})a.{m}[2 * i + 1] + ({sign}{double_w})({sign}{w})b.{m}[2 * i];",
-            file=f,
-        )
-        print(f"}}", file=f)
-    with open(f"vhsubw_{double_width}_{width}.h", "w") as f:
-        print(f"for (int i = 0;i < {128 // double_w};i++) {{", file=f)
-        print(
-            f"  dst.{double_m}[i] = ({sign}{double_w})({sign}{w})a.{m}[2 * i + 1] - ({sign}{double_w})({sign}{w})b.{m}[2 * i];",
-            file=f,
-        )
-        print(f"}}", file=f)
+    for name, op in [("add", "+"), ("sub", "-")]:
+        with open(f"vh{name}w_{double_width}_{width}.h", "w") as f:
+            print(f"for (int i = 0;i < {128 // double_w};i++) {{", file=f)
+            print(
+                f"  dst.{double_m}[i] = ({sign}{double_w})({sign}{w})a.{m}[2 * i + 1] {op} ({sign}{double_w})({sign}{w})b.{m}[2 * i];",
+                file=f,
+            )
+            print(f"}}", file=f)
+
     if width != "d":
         with open(f"vsllwil_{double_width}_{width}.h", "w") as f:
             print(f"for (int i = 0;i < {128 // double_w};i++) {{", file=f)
@@ -122,129 +105,71 @@ for width in ["b", "bu", "h", "hu", "w", "wu", "d", "du"]:
             )
             print(f"}}", file=f)
         if sign == "s":
-            with open(f"vsrln_{width}_{double_width}.h", "w") as f:
-                print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
-                print(
-                    f"  dst.{m}[i] = (i < {64 // w}) ? (u{w})((u{double_w})a.{double_m}[i] >> (b.{double_m}[i] & {double_w-1})) : 0;",
-                    file=f,
-                )
-                print(f"}}", file=f)
-            with open(f"vsrlrn_{width}_{double_width}.h", "w") as f:
-                print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
-                print(f"if (i < {64 // w}) {{", file=f)
-                print(f"u8 shift = (b.{double_m}[i] & {double_w-1});", file=f)
-                print(f"if (shift == 0) {{", file=f)
-                print(
-                    f"  dst.{m}[i] = (u{w})(u{double_w})a.{double_m}[i];",
-                    file=f,
-                )
-                print(f"}} else {{", file=f)
-                print(
-                    f"  dst.{m}[i] = (u{w})(((u{double_w})a.{double_m}[i] >> shift) + (((u{double_w})a.{double_m}[i] >> (shift - 1)) & 0x1));",
-                    file=f,
-                )
-                print(f"}}", file=f)
-                print(f"}} else {{", file=f)
-                print(f"  dst.{m}[i] = 0;", file=f)
-                print(f"}}", file=f)
-                print(f"}}", file=f)
-            with open(f"vsran_{width}_{double_width}.h", "w") as f:
-                print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
-                print(
-                    f"  dst.{m}[i] = (i < {64 // w}) ? (s{w})((s{double_w})a.{double_m}[i] >> (b.{double_m}[i] & {double_w-1})) : 0;",
-                    file=f,
-                )
-                print(f"}}", file=f)
-            with open(f"vsrarn_{width}_{double_width}.h", "w") as f:
-                print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
-                print(f"if (i < {64 // w}) {{", file=f)
-                print(f"u8 shift = (b.{double_m}[i] & {double_w-1});", file=f)
-                print(f"if (shift == 0) {{", file=f)
-                print(
-                    f"  dst.{m}[i] = (s{w})(s{double_w})a.{double_m}[i];",
-                    file=f,
-                )
-                print(f"}} else {{", file=f)
-                print(
-                    f"  dst.{m}[i] = (s{w})(((s{double_w})a.{double_m}[i] >> shift) + (((s{double_w})a.{double_m}[i] >> (shift - 1)) & 0x1));",
-                    file=f,
-                )
-                print(f"}}", file=f)
-                print(f"}} else {{", file=f)
-                print(f"  dst.{m}[i] = 0;", file=f)
-                print(f"}}", file=f)
-                print(f"}}", file=f)
+            for name, sign in [("srl", "u"), ("sra", "s")]:
+                with open(f"v{name}n_{width}_{double_width}.h", "w") as f:
+                    print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+                    print(
+                        f"  dst.{m}[i] = (i < {64 // w}) ? ({sign}{w})(({sign}{double_w})a.{double_m}[i] >> (b.{double_m}[i] & {double_w-1})) : 0;",
+                        file=f,
+                    )
+                    print(f"}}", file=f)
+                with open(f"v{name}rn_{width}_{double_width}.h", "w") as f:
+                    print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+                    print(f"if (i < {64 // w}) {{", file=f)
+                    print(f"u8 shift = (b.{double_m}[i] & {double_w-1});", file=f)
+                    print(f"if (shift == 0) {{", file=f)
+                    print(
+                        f"  dst.{m}[i] = ({sign}{w})({sign}{double_w})a.{double_m}[i];",
+                        file=f,
+                    )
+                    print(f"}} else {{", file=f)
+                    print(
+                        f"  dst.{m}[i] = ({sign}{w})((({sign}{double_w})a.{double_m}[i] >> shift) + ((({sign}{double_w})a.{double_m}[i] >> (shift - 1)) & 0x1));",
+                        file=f,
+                    )
+                    print(f"}}", file=f)
+                    print(f"}} else {{", file=f)
+                    print(f"  dst.{m}[i] = 0;", file=f)
+                    print(f"}}", file=f)
+                    print(f"}}", file=f)
+
     if sign == "s":
-        with open(f"vsrlni_{width}_{double_width}.h", "w") as f:
-            print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
-            print(
-                f"  dst.{m}[i] = (i < {64 // w}) ? (u{w})((u{double_w})b.{double_m}[i] >> imm) : (u{w})((u{double_w})a.{double_m}[i - {64 // w}] >> imm);",
-                file=f,
-            )
-            print(f"}}", file=f)
-        with open(f"vsrani_{width}_{double_width}.h", "w") as f:
-            print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
-            print(
-                f"  dst.{m}[i] = (i < {64 // w}) ? (s{w})((s{double_w})b.{double_m}[i] >> imm) : (s{w})((s{double_w})a.{double_m}[i - {64 // w}] >> imm);",
-                file=f,
-            )
-            print(f"}}", file=f)
-        with open(f"vsrlrni_{width}_{double_width}.h", "w") as f:
-            print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
-            print(f"if (i < {64 // w}) {{", file=f)
-            print(f"if (imm == 0) {{", file=f)
-            print(
-                f"  dst.{m}[i] = (u{w})(u{double_w})b.{double_m}[i];",
-                file=f,
-            )
-            print(f"}} else {{", file=f)
-            print(
-                f"  dst.{m}[i] = (u{w})(((u{double_w})b.{double_m}[i] >> imm) + (((u{double_w})b.{double_m}[i] >> (imm - 1)) & 0x1));",
-                file=f,
-            )
-            print(f"}}", file=f)
-            print(f"}} else {{", file=f)
-            print(f"if (imm == 0) {{", file=f)
-            print(
-                f"  dst.{m}[i] = (u{w})(u{double_w})a.{double_m}[i - {64 // w}];",
-                file=f,
-            )
-            print(f"}} else {{", file=f)
-            print(
-                f"  dst.{m}[i] = (u{w})(((u{double_w})a.{double_m}[i - {64 // w}] >> imm) + (((u{double_w})a.{double_m}[i - {64 // w}] >> (imm - 1)) & 0x1));",
-                file=f,
-            )
-            print(f"}}", file=f)
-            print(f"}}", file=f)
-            print(f"}}", file=f)
-        with open(f"vsrarni_{width}_{double_width}.h", "w") as f:
-            print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
-            print(f"if (i < {64 // w}) {{", file=f)
-            print(f"if (imm == 0) {{", file=f)
-            print(
-                f"  dst.{m}[i] = (s{w})(s{double_w})b.{double_m}[i];",
-                file=f,
-            )
-            print(f"}} else {{", file=f)
-            print(
-                f"  dst.{m}[i] = (s{w})(((s{double_w})b.{double_m}[i] >> imm) + (((s{double_w})b.{double_m}[i] >> (imm - 1)) & 0x1));",
-                file=f,
-            )
-            print(f"}}", file=f)
-            print(f"}} else {{", file=f)
-            print(f"if (imm == 0) {{", file=f)
-            print(
-                f"  dst.{m}[i] = (s{w})(s{double_w})a.{double_m}[i - {64 // w}];",
-                file=f,
-            )
-            print(f"}} else {{", file=f)
-            print(
-                f"  dst.{m}[i] = (u{w})(((s{double_w})a.{double_m}[i - {64 // w}] >> imm) + (((s{double_w})a.{double_m}[i - {64 // w}] >> (imm - 1)) & 0x1));",
-                file=f,
-            )
-            print(f"}}", file=f)
-            print(f"}}", file=f)
-            print(f"}}", file=f)
+        for name, sign in [("srl", "u"), ("sra", "s")]:
+            with open(f"v{name}ni_{width}_{double_width}.h", "w") as f:
+                print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+                print(
+                    f"  dst.{m}[i] = (i < {64 // w}) ? ({sign}{w})(({sign}{double_w})b.{double_m}[i] >> imm) : ({sign}{w})(({sign}{double_w})a.{double_m}[i - {64 // w}] >> imm);",
+                    file=f,
+                )
+                print(f"}}", file=f)
+            with open(f"v{name}rni_{width}_{double_width}.h", "w") as f:
+                print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+                print(f"if (i < {64 // w}) {{", file=f)
+                print(f"if (imm == 0) {{", file=f)
+                print(
+                    f"  dst.{m}[i] = ({sign}{w})({sign}{double_w})b.{double_m}[i];",
+                    file=f,
+                )
+                print(f"}} else {{", file=f)
+                print(
+                    f"  dst.{m}[i] = ({sign}{w})((({sign}{double_w})b.{double_m}[i] >> imm) + ((({sign}{double_w})b.{double_m}[i] >> (imm - 1)) & 0x1));",
+                    file=f,
+                )
+                print(f"}}", file=f)
+                print(f"}} else {{", file=f)
+                print(f"if (imm == 0) {{", file=f)
+                print(
+                    f"  dst.{m}[i] = ({sign}{w})({sign}{double_w})a.{double_m}[i - {64 // w}];",
+                    file=f,
+                )
+                print(f"}} else {{", file=f)
+                print(
+                    f"  dst.{m}[i] = ({sign}{w})((({sign}{double_w})a.{double_m}[i - {64 // w}] >> imm) + ((({sign}{double_w})a.{double_m}[i - {64 // w}] >> (imm - 1)) & 0x1));",
+                    file=f,
+                )
+                print(f"}}", file=f)
+                print(f"}}", file=f)
+                print(f"}}", file=f)
 
 
     if width == "d" or width == "du":
@@ -255,34 +180,23 @@ for width in ["b", "bu", "h", "hu", "w", "wu", "d", "du"]:
                 file=f,
             )
             print(f"}}", file=f)
-    with open(f"vmax_{width}.h", "w") as f:
-        print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
-        print(
-            f"  dst.{m}[i] = max(({sign}{w})a.{m}[i], ({sign}{w})b.{m}[i]);",
-            file=f,
-        )
-        print(f"}}", file=f)
-    with open(f"vmaxi_{width}.h", "w") as f:
-        print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
-        print(
-            f"  dst.{m}[i] = max(({sign}{w})a.{m}[i], ({sign}{w})imm);",
-            file=f,
-        )
-        print(f"}}", file=f)
-    with open(f"vmin_{width}.h", "w") as f:
-        print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
-        print(
-            f"  dst.{m}[i] = min(({sign}{w})a.{m}[i], ({sign}{w})b.{m}[i]);",
-            file=f,
-        )
-        print(f"}}", file=f)
-    with open(f"vmini_{width}.h", "w") as f:
-        print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
-        print(
-            f"  dst.{m}[i] = min(({sign}{w})a.{m}[i], ({sign}{w})imm);",
-            file=f,
-        )
-        print(f"}}", file=f)
+
+    for op in ["max", "min"]:
+        with open(f"v{op}_{width}.h", "w") as f:
+            print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+            print(
+                f"  dst.{m}[i] = {op}(({sign}{w})a.{m}[i], ({sign}{w})b.{m}[i]);",
+                file=f,
+            )
+            print(f"}}", file=f)
+        with open(f"v{op}i_{width}.h", "w") as f:
+            print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+            print(
+                f"  dst.{m}[i] = {op}(({sign}{w})a.{m}[i], ({sign}{w})imm);",
+                file=f,
+            )
+            print(f"}}", file=f)
+
     for name, op in [("lt", "<"), ("le", "<=")]:
         with open(f"vs{name}_{width}.h", "w") as f:
             print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
