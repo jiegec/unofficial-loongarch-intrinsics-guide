@@ -645,7 +645,7 @@ for (int i = 0;i < 2;i++) {{
     def vpcnt(name):
         width = widths[name]
         return instruction(
-            intrinsic=f"__m128i __lsx_pcnt_{name} (__m128i a)",
+            intrinsic=f"__m128i __lsx_vpcnt_{name} (__m128i a)",
             instr=f"vpcnt.{name} vr, vr",
             desc=f"Count the number of ones in {width}-bit elements in `a`.",
         )
