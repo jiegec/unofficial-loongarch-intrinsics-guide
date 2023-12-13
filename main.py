@@ -36,13 +36,17 @@ def define_env(env):
 
     fp_types = {"s": "__m128", "d": "__m128d"}
 
-    def include(file):
-        return open(f"code/{file}").read().strip()
-
     def instruction(intrinsic, instr, desc, code=None):
-        file_name = instr.split(" ")[0].replace(".", "_")
+        # try to be smart
+        file_name = None
+        for part in intrinsic.split(" "):
+            if part.startswith("__lsx_"):
+                file_name = part[6:]
+        if not os.path.exists(f"code/{file_name}.h"):
+            file_name = instr.split(" ")[0].replace(".", "_")
+
         if code is None:
-            code = include(f"{file_name}.h")
+            code = open(f"code/{file_name}.h").read().strip()
         code = code.strip()
         if os.path.exists(f"code/{file_name}.cpp"):
             tested = "Tested on real machine."
@@ -930,7 +934,6 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             intrinsic=f"__m128i __lsx_vrepli_{name} (imm_n512_511 imm)",
             instr=f"vldi.{name} vr, imm",
             desc=f"Repeat `imm` to fill whole vector.",
-            code=include(f"vrepli_{name}.h"),
         )
 
     @env.macro
