@@ -46,6 +46,9 @@ members = {
     "du": "dword",
     "q": "qword",
     "qu": "qword",
+
+    # fp to int
+    "s": "word",
 }
 
 members_fp = {
@@ -768,6 +771,7 @@ for width in ["b", "h", "w", "d"]:
 
 for width in ["s", "d"]:
     m = members_fp[width]
+    int_m = members[width]
     w = widths_fp[width]
     for name, op in [("div", "/"), ("mul", "*"), ("sub", "-"), ("add", "+")]:
         with open(f"vf{name}_{width}.h", "w") as f:
@@ -777,6 +781,22 @@ for width in ["s", "d"]:
                 file=f,
             )
             print(f"}}", file=f)
+    if width == "s":
+        for rounding in ["", "rm", "rp", "rz", "rne"]:
+            with open(f"vftint{rounding}l_l_{width}.h", "w") as f:
+                print(f"for (int i = 0;i < {64 // w};i++) {{", file=f)
+                print(
+                    f"  dst.dword[i] = a.{m}[i]; // rounding mode is not expressed in C",
+                    file=f,
+                )
+                print(f"}}", file=f)
+            with open(f"vftint{rounding}h_l_{width}.h", "w") as f:
+                print(f"for (int i = 0;i < {64 // w};i++) {{", file=f)
+                print(
+                    f"  dst.dword[i] = a.{m}[i + {64 // w}]; // rounding mode is not expressed in C",
+                    file=f,
+                )
+                print(f"}}", file=f)
 
     for name in ["max", "min"]:
         with open(f"vf{name}_{width}.h", "w") as f:

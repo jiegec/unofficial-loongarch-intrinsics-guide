@@ -67,23 +67,3 @@ TODO List:
 ### vftint.wu.s/lu.d
 
 ### vftintrz.wu.s/lu.d
-
-### vftintl.l.s
-
-### vftinth.l.s
-
-### vftintrml.l.s
-
-### vftintrmh.l.s
-
-### vftintrpl.l.s
-
-### vftintrph.l.s
-
-### vftintrzl.l.s
-
-### vftintrzh.l.s
-
-### vftintrnel.l.s
-
-### vftintrneh.l.s

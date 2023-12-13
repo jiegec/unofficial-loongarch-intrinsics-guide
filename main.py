@@ -1256,3 +1256,27 @@ memory_store({width}, data.{member}[lane], addr + offset);
             instr=f"vsat.{name} vr, vr, imm",
             desc=f"Clamp {signedness} {width}-bit elements in `a` to range specified by `imm`.",
         )
+
+    @env.macro
+    def vftint_l_s(rounding, low_high):
+        if low_high == "l":
+            half = "lower"
+        else:
+            half = "higher"
+        if rounding == "":
+            rounding_mode = "using current rounding mode specified in `fscr`"
+        elif rounding == "rm":
+            rounding_mode = "rounding towards negative infinity"
+        elif rounding == "rp":
+            rounding_mode = "rounding towards positive infinity"
+        elif rounding == "rz":
+            rounding_mode = "rounding towards zero"
+        elif rounding == "rne":
+            rounding_mode = "rounding towards nearest even"
+        else:
+            assert False
+        return instruction(
+            intrinsic=f"__m128i __lsx_vftint{rounding}{low_high}_l_s (__m128i a)",
+            instr=f"vftint{rounding}{low_high}.l.s vr, vr",
+            desc=f"Convert single-precision floating point elements in {half} part of `a` to 64-bit integer, {rounding_mode}.",
+        )

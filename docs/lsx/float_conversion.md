@@ -63,3 +63,14 @@ Convert double precision floating point elements in `a` and `b` to double precis
 ```c++
 {% include('vfcvt_s_d.h') %}
 ```
+
+{{ vftint_l_s('', 'l') }}
+{{ vftint_l_s('', 'h') }}
+{{ vftint_l_s('rm', 'l') }}
+{{ vftint_l_s('rm', 'h') }}
+{{ vftint_l_s('rp', 'l') }}
+{{ vftint_l_s('rp', 'h') }}
+{{ vftint_l_s('rz', 'l') }}
+{{ vftint_l_s('rz', 'h') }}
+{{ vftint_l_s('rne', 'l') }}
+{{ vftint_l_s('rne', 'h') }}
