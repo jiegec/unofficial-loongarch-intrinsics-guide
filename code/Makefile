@@ -15,6 +15,6 @@ clean:
 	rm -rf $(EXES)
 
 %: %.cpp %.h common.h
-	$(CXX) $< -mlsx -mlasx -o $@
+	$(CXX) $(CFLAGS) $< -mlsx -mlasx -o $@
 
 .SUFFIXES:

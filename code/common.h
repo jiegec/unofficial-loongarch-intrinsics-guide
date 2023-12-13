@@ -132,9 +132,9 @@ union v128 {
 };
 
 union v256 {
-  __m256i m128i;
-  __m256 m128;
-  __m256d m128d;
+  __m256i m256i;
+  __m256 m256;
+  __m256d m256d;
   v4i64 __v4i64;
   v4u64 __v4u64;
   v8i32 __v8i32;
@@ -162,9 +162,9 @@ union v256 {
     }
   }
 
-  operator __m256i() { return m128i; }
-  operator __m256() { return m128; }
-  operator __m256d() { return m128d; }
+  operator __m256i() { return m256i; }
+  operator __m256() { return m256; }
+  operator __m256d() { return m256d; }
   // duplicate with __m256i
   // operator v4i64() { return __v4i64; }
   operator v4u64() { return __v4u64; }
