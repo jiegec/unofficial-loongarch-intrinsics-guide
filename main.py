@@ -535,6 +535,20 @@ for (int i = 0;i < 2;i++) {{
         return vminmaxi("max", name)
 
     @env.macro
+    def vshuf_b():
+        name = 'b'
+        width = widths[name]
+        return instruction(
+            intrinsic=f"__m128i __lsx_vshuf_b (__m128i a, __m128i b, __m128i c)",
+            instr=f"vshuf.{name} vr, vr, vr, vr",
+            desc=f"""
+Shuffle bytes from `a` and `b` with indices from `c`.
+
+Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they are placed in `a`.
+""",
+        )
+
+    @env.macro
     def vshuf_hwd(name):
         width = widths[name]
         return instruction(
@@ -1395,4 +1409,52 @@ memory_store({width}, data.{member}[lane], addr + offset);
             intrinsic=f"__m128i __lsx_vfrstpi_{name} (__m128i a, __m128i b, imm0_31 imm)",
             instr=f"vfrstpi.{name} vr, vr, vr",
             desc=f"Find the first negative {width}-bit element in `b`, set the index of the element to the lane of `a` specified by `imm`.",
+        )
+
+    @env.macro
+    def vbsll_srl(name, dir):
+        return instruction(
+            intrinsic=f"__m128i __lsx_vb{name}_v (__m128i a, imm0_31 imm)",
+            instr=f"vb{name}.v vr, vr, imm",
+            desc=f"Compute 128-bit `a` shifted {dir} by `imm * 8` bits.",
+        )
+
+    @env.macro
+    def vpermi_w():
+        return instruction(
+            intrinsic=f"__m128i __lsx_vpermi_w (__m128i a, __m128i b, imm0_255 imm)",
+            instr=f"vpermi.w vr, vr, imm",
+            desc=f"Permute words from `a` and `b` with indices recorded in `imm` and store into `dst`.",
+        )
+
+    @env.macro
+    def vld():
+        return instruction(
+            intrinsic=f"__m128i __lsx_vld (void * addr, imm_n2048_2047 offset)",
+            instr=f"vld vr, r, imm",
+            desc=f"Read 128-bit data from memory address `addr + offset`, save the data into `dst`.",
+        )
+
+    @env.macro
+    def vldx():
+        return instruction(
+            intrinsic=f"__m128i __lsx_vldx (void * addr, long int offset)",
+            instr=f"vldx vr, r, r",
+            desc=f"Read 128-bit data from memory address `addr + offset`, save the data into `dst`.",
+        )
+
+    @env.macro
+    def vst():
+        return instruction(
+            intrinsic=f"void __lsx_vst (__m128i data, void * addr, imm_n2048_2047 offset)",
+            instr=f"vst vr, r, imm",
+            desc=f"Write 128-bit data in `data` to memory address `addr + offset`.",
+        )
+
+    @env.macro
+    def vstx():
+        return instruction(
+            intrinsic=f"void __lsx_vstx (__m128i data, void * addr, long int offset)",
+            instr=f"vstx vr, r, r",
+            desc=f"Write 128-bit data in `data` to memory address `addr + offset`.",
         )

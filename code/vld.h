@@ -1,0 +1,1 @@
+dst = memory_load(128, addr + offset);
