@@ -1,0 +1,24 @@
+u64 m = 0x8000800080008000;
+u64 c = m & a.dword[0];
+c |= c << 15;
+c |= c << 30;
+c >>= 60;
+dst.dword[0] = c;
+c = m & a.dword[1];
+c |= c << 15;
+c |= c << 30;
+c >>= 60;
+dst.dword[0] |= c << 4;
+dst.dword[1] = 0;
+
+c = m & a.dword[2];
+c |= c << 15;
+c |= c << 30;
+c >>= 60;
+dst.dword[2] = c;
+c = m & a.dword[3];
+c |= c << 15;
+c |= c << 30;
+c >>= 60;
+dst.dword[2] |= c << 4;
+dst.dword[3] = 0;
