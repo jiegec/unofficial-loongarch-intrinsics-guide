@@ -1319,3 +1319,18 @@ memory_store({width}, data.{member}[lane], addr + offset);
             instr=f"vf{name}.{ty} vr, vr",
             desc=f"Compute {desc} of {precision} precision floating point elements in `a`.",
         )
+
+    @env.macro
+    def vfrint(rounding, name):
+        if name == "s":
+            precision = "single"
+            arg_type = "__m128"
+        else:
+            precision = "double"
+            arg_type = "__m128d"
+        rounding_mode = get_rounding_mode(rounding)
+        return instruction(
+            intrinsic=f"{arg_type} __lsx_vfrint{rounding}_{name} ({arg_type} a)",
+            instr=f"vfrint{rounding}.{name} vr, vr",
+            desc=f"Round single-precision floating point elements in `a` to integers, {rounding_mode}, and store as floating point numbers.",
+        )

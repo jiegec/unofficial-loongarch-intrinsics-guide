@@ -884,5 +884,13 @@ for width in ["s", "d"]:
             file=f,
         )
         print(f"}}", file=f)
+    for rounding in ["", "rm", "rp", "rz", "rne"]:
+        with open(f"vfrint{rounding}_{width}.h", "w") as f:
+            print(f"for (int i = 0;i < {128 // w};i++) {{", file=f)
+            print(
+                f"  dst.{m}[i] = ({m})(s{int_w})a.{m}[i]; // rounding mode is not expressed in C",
+                file=f,
+            )
+            print(f"}}", file=f)
 
 os.system("clang-format -i *.cpp *.h")

@@ -24,16 +24,6 @@ TODO List:
 
 ### vfrstpi.b/h
 
-### vfrint.s/d
-
-### vfrintrm.s/d
-
-### vfrintrp.s/d
-
-### vfrintrz.s/d
-
-### vfrintrne.s/d
-
 ### vfcvtl.s.h
 
 ### vfcvth.s.h

@@ -45,3 +45,15 @@ for (int i = 0;i < 4;i++) {
     dst.word[i] = fp_classify(a.fp32[i]);
 }
 ```
+
+
+{{ vfrint('', 's') }}
+{{ vfrint('', 'd') }}
+{{ vfrint('rp', 's') }}
+{{ vfrint('rp', 'd') }}
+{{ vfrint('rm', 's') }}
+{{ vfrint('rm', 'd') }}
+{{ vfrint('rz', 's') }}
+{{ vfrint('rz', 'd') }}
+{{ vfrint('rne', 's') }}
+{{ vfrint('rne', 'd') }}
