@@ -1,16 +1,31 @@
 {% raw %}
 <div id="app">
 
-<input v-model="search">
+<b style="padding-top: 10px">Categories:</b>
+<p></p>
 
 <div v-for="group in allGroups">
   <input type="checkbox" :id="group" :value="group" v-model="groups" />
-  <label :for="group">{{ group }}</label>
+  <label :for="group" style="display: inline">{{ group }}</label>
 </div>
 
-<details v-for="intrinsic in intrinsics">
+<p></p>
+<b>Filter by content:</b>
+<p></p>
+
+<input v-model="search" placeholder="Search intrinsics" style="width: 100%">
+
+<p></p>
+<p></p>
+
+Found {{intrinsics.length}} intrinsics.
+
+<p></p>
+<p></p>
+<p></p>
+<details v-for="intrinsic in intrinsics" style="margin-top: 5px;padding-left: 5px;border-top: 1px solid black;border-left: 5px solid black">
   <summary>{{ intrinsic.name }}</summary>
-  <div v-html="intrinsic.content"></div>
+  <div v-html="intrinsic.content" style="padding: 10px"></div>
 </details>
 </div>
 

@@ -3,6 +3,7 @@ import glob
 import os
 import json
 import markdown
+import re
 
 
 def define_env(env):
@@ -1618,18 +1619,22 @@ memory_store({width}, data.{member}[lane], addr + offset);
                     code = line.split("{{")[1].split("}}")[0]
                     # Dangerous! But we trust ourselves.
                     content = eval(code, env.macros)
-                    lines = content.split('\n')
-                    for i in range(len(lines)):
-                        line = lines[i]
-                        if line.startswith('##'):
-                            body = '\n'.join(lines[i+1:])
-                            intrinsic = line[2:].strip()
-                            result.append({
-                                'name': intrinsic,
-                                'content': markdown.markdown(body, extensions=['fenced_code', 'codehilite']),
-                                'group': title
-                            })
-                            break
+                    # handle cases for multiple instructions in one call
+                    for part in re.split(r'^## ', content, flags=re.MULTILINE):
+                        if len(part.strip()) == 0:
+                            continue
+                        lines = ('## ' + part).split('\n')
+                        for i in range(len(lines)):
+                            line = lines[i]
+                            if line.startswith('##'):
+                                body = '\n'.join(lines[i+1:])
+                                intrinsic = line[2:].strip()
+                                result.append({
+                                    'name': intrinsic,
+                                    'content': markdown.markdown(body, extensions=['fenced_code', 'codehilite']),
+                                    'group': title
+                                })
+                                break
         return json.dumps(result)
 
     @env.macro
