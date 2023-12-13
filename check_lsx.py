@@ -43,3 +43,5 @@ for entry in undocumented:
     for e in documented_intrinsics:
         if e[1] == entry[1]:
             print("Matching:", " ".join(e))
+            print(repr(e))
+            print(repr(entry))

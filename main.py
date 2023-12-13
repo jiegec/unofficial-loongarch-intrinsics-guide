@@ -523,7 +523,7 @@ for (int i = 0;i < 2;i++) {{
         else:
             imm_range = "n16_15"
         return instruction(
-            intrinsic=f"__m128i __lsx_v{min_max}i_{name} (__m128i a, imm_{imm_range} imm)",
+            intrinsic=f"__m128i __lsx_v{min_max}i_{name} (__m128i a, imm{imm_range} imm)",
             instr=f"v{min_max}i.{name} vr, vr, imm",
             desc=f"Compute elementwise {min_max}imum for {signedness} {width}-bit elements in `a` and `imm`.",
         )
@@ -754,9 +754,9 @@ memory_store({width}, data.{member}[lane], addr + offset);
         width = widths[name]
         signedness = signednesses[name]
         return instruction(
-            intrinsic=f"__m128i __lsx_vsadd_{name} (__m128i a, __m128i b)",
-            instr=f"vsadd.{name} vr, vr, vr",
-            desc=f"Saturing add the {signedness} {width}-bit elements in `a` and `b`, store the result to `dst`.",
+            intrinsic=f"__m128i __lsx_vssub_{name} (__m128i a, __m128i b)",
+            instr=f"vssub.{name} vr, vr, vr",
+            desc=f"Saturing subtract the {signedness} {width}-bit elements in `a` and `b`, store the result to `dst`.",
         )
 
     @env.macro
