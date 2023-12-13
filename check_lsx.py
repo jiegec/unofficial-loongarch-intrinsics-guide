@@ -4,6 +4,7 @@ import glob
 # Update gh-pages before running:
 # git fetch origin
 # git worktree add -f ../gh-pages gh-pages
+# git -C ../gh-pages reset origin/gh-pages --hard
 
 # gcc intrinsics
 gcc_intrinsics = set()

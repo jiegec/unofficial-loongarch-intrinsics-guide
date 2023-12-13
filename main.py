@@ -704,7 +704,7 @@ memory_store({width}, data.{member}[lane], addr + offset);
         if signedness == "signed":
             imm_range = "imm_n16_15"
         else:
-            imm_range = "imm_0_31"
+            imm_range = "imm0_31"
         return instruction(
             intrinsic=f"__m128i __lsx_vslti_{name} (__m128i a, {imm_range} imm)",
             instr=f"vslti.{name} vr, vr, imm",
@@ -1289,7 +1289,7 @@ memory_store({width}, data.{member}[lane], addr + offset);
     def vftint_w_d(rounding):
         rounding_mode = get_rounding_mode(rounding)
         return instruction(
-            intrinsic=f"__m128i __lsx_vftint{rounding}_w_d (__m128 a, __m128 b)",
+            intrinsic=f"__m128i __lsx_vftint{rounding}_w_d (__m128d a, __m128d b)",
             instr=f"vftint{rounding}.w.d vr, vr",
             desc=f"Convert double-precision floating point elements in `a` and `b` to 32-bit integer, {rounding_mode}.",
         )
