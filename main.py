@@ -1154,3 +1154,25 @@ memory_store({width}, data.{member}[lane], addr + offset);
             instr=f"vssrarn.{name}.{name2} vr, vr, vr",
             desc=f"Arithemtic right shift (with rounding) the signed {width2}-bit elements in `a` by elements in `b`, clamp to fit in {signedness} {width}-bit integer and store the result to `dst`.",
         )
+
+    @env.macro
+    def vssrlrni(name, name2):
+        width = widths[name[0]]
+        signedness = signednesses[name]
+        width2 = widths[name2[0]]
+        return instruction(
+            intrinsic=f"__m128i __lsx_vssrlrni_{name}_{name2} (__m128i a, __m128i b, imm0_{width2-1} imm)",
+            instr=f"vssrlrni.{name}.{name2} vr, vr, imm",
+            desc=f"Logical right shift (with rounding) the unsigned {width2}-bit elements in `a` and `b` by `imm`, clamp to fit in {signedness} {width}-bit integer and store the result to `dst`.",
+        )
+
+    @env.macro
+    def vssrarni(name, name2):
+        width = widths[name[0]]
+        signedness = signednesses[name]
+        width2 = widths[name2[0]]
+        return instruction(
+            intrinsic=f"__m128i __lsx_vssrarni_{name}_{name2} (__m128i a, __m128i b, imm0_{width2-1} imm)",
+            instr=f"vssrarni.{name}.{name2} vr, vr, imm",
+            desc=f"Arithemtic right shift (with rounding) the signed {width2}-bit elements in `a` and `b` by `imm`, clamp to fit in {signedness} {width}-bit integer and store the result to `dst`.",
+        )

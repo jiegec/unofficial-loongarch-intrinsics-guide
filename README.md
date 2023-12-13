@@ -101,9 +101,3 @@ TODO List:
 ### vftintrneh.l.s
 
 ### vsat.b/h/w/d/bu/hu/wu/du
-
-### vssrlrni.b.h/h.w/w.d/d.q/bu.h/hu.w/wu.d/du.q
-
-### vssrarni.b.h/h.w/w.d/d.q
-
-### vssrarni.bu.h/hu.w/wu.d/du.q

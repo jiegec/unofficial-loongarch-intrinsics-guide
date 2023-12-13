@@ -158,6 +158,15 @@ Compute 128-bit `a` shifted right by `imm * 8` bits.
 {{ vssrarn('w', 'd') }}
 {{ vssrarn('wu', 'd') }}
 
+{{ vssrarni('b', 'h') }}
+{{ vssrarni('bu', 'h') }}
+{{ vssrarni('h', 'w') }}
+{{ vssrarni('hu', 'w') }}
+{{ vssrarni('w', 'd') }}
+{{ vssrarni('wu', 'd') }}
+{{ vssrarni('d', 'q') }}
+{{ vssrarni('du', 'q') }}
+
 {{ vssrln('b', 'h') }}
 {{ vssrln('bu', 'h') }}
 {{ vssrln('h', 'w') }}
@@ -180,6 +189,15 @@ Compute 128-bit `a` shifted right by `imm * 8` bits.
 {{ vssrlrn('hu', 'w') }}
 {{ vssrlrn('w', 'd') }}
 {{ vssrlrn('wu', 'd') }}
+
+{{ vssrlrni('b', 'h') }}
+{{ vssrlrni('bu', 'h') }}
+{{ vssrlrni('h', 'w') }}
+{{ vssrlrni('hu', 'w') }}
+{{ vssrlrni('w', 'd') }}
+{{ vssrlrni('wu', 'd') }}
+{{ vssrlrni('d', 'q') }}
+{{ vssrlrni('du', 'q') }}
 
 {{ vrotr('b') }}
 {{ vrotr('h') }}
