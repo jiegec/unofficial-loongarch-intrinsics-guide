@@ -789,26 +789,69 @@ for vlen, prefix in [(128, "v"), (256, "xv")]:
             )
             print(f"}}", file=f)
         with open(f"{prefix}pickev_{width}.h", "w") as f:
-            print(f"for (int i = 0;i < {vlen // w};i++) {{", file=f)
-            print(
-                f"  dst.{m}[i] = (i < {vlen // 2 // w}) ? b.{m}[i * 2] : a.{m}[(i - {vlen // 2 // w}) * 2];",
-                file=f,
-            )
-            print(f"}}", file=f)
+            if prefix == "v":
+                print(f"for (int i = 0;i < {vlen // w};i++) {{", file=f)
+                print(
+                    f"  dst.{m}[i] = (i < {vlen // 2 // w}) ? b.{m}[i * 2] : a.{m}[(i - {vlen // 2 // w}) * 2];",
+                    file=f,
+                )
+                print(f"}}", file=f)
+            else:
+                print(f"for (int i = 0;i < {vlen // 2 // w};i++) {{", file=f)
+                print(
+                    f"  dst.{m}[i] = (i < {vlen // 4 // w}) ? b.{m}[i * 2] : a.{m}[(i - {vlen // 4 // w}) * 2];",
+                    file=f,
+                )
+                print(f"}}", file=f)
+                print(f"for (int i = {vlen // 2 // w};i < {vlen // w};i++) {{", file=f)
+                print(
+                    f"  dst.{m}[i] = (i < {3 * vlen // 4 // w}) ? b.{m}[(i - {vlen // 4 // w}) * 2] : a.{m}[(i - {vlen // 2 // w}) * 2];",
+                    file=f,
+                )
+                print(f"}}", file=f)
         with open(f"{prefix}pickod_{width}.h", "w") as f:
-            print(f"for (int i = 0;i < {vlen // w};i++) {{", file=f)
-            print(
-                f"  dst.{m}[i] = (i < {vlen // 2 // w}) ? b.{m}[i * 2 + 1] : a.{m}[(i - {vlen // 2 // w}) * 2 + 1];",
-                file=f,
-            )
-            print(f"}}", file=f)
+            if prefix == "v":
+                print(f"for (int i = 0;i < {vlen // w};i++) {{", file=f)
+                print(
+                    f"  dst.{m}[i] = (i < {vlen // 2 // w}) ? b.{m}[i * 2 + 1] : a.{m}[(i - {vlen // 2 // w}) * 2 + 1];",
+                    file=f,
+                )
+                print(f"}}", file=f)
+            else:
+                print(f"for (int i = 0;i < {vlen // 2 // w};i++) {{", file=f)
+                print(
+                    f"  dst.{m}[i] = (i < {vlen // 4 // w}) ? b.{m}[i * 2 + 1] : a.{m}[(i - {vlen // 4 // w}) * 2 + 1];",
+                    file=f,
+                )
+                print(f"}}", file=f)
+                print(f"for (int i = {vlen // 2 // w};i < {vlen // w};i++) {{", file=f)
+                print(
+                    f"  dst.{m}[i] = (i < {3 * vlen // 4 // w}) ? b.{m}[(i - {vlen // 4 // w}) * 2 + 1] : a.{m}[(i - {vlen // 2 // w}) * 2 + 1];",
+                    file=f,
+                )
+                print(f"}}", file=f)
         with open(f"{prefix}replve_{width}.h", "w") as f:
-            print(f"for (int i = 0;i < {vlen // w};i++) {{", file=f)
-            print(
-                f"  dst.{m}[i] = a.{m}[idx % {vlen // w}];",
-                file=f,
-            )
-            print(f"}}", file=f)
+            mask = 128 // w # not vlen
+            if prefix == "v":
+                print(f"for (int i = 0;i < {vlen // w};i++) {{", file=f)
+                print(
+                    f"  dst.{m}[i] = a.{m}[idx % {mask}];",
+                    file=f,
+                )
+                print(f"}}", file=f)
+            else:
+                print(f"for (int i = 0;i < {vlen // 2 // w};i++) {{", file=f)
+                print(
+                    f"  dst.{m}[i] = a.{m}[idx % {mask}];",
+                    file=f,
+                )
+                print(f"}}", file=f)
+                print(f"for (int i = {vlen // 2 // w};i < {vlen // w};i++) {{", file=f)
+                print(
+                    f"  dst.{m}[i] = a.{m}[(idx % {mask}) + {vlen // 2 // w}];",
+                    file=f,
+                )
+                print(f"}}", file=f)
         if prefix == "v":
             with open(f"{prefix}replvei_{width}.h", "w") as f:
                 print(f"for (int i = 0;i < {vlen // w};i++) {{", file=f)
