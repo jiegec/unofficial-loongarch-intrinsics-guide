@@ -540,7 +540,7 @@ for (int i = 0;i < 2;i++) {{
 
     @env.macro
     def vshuf_b():
-        name = 'b'
+        name = "b"
         width = widths[name]
         return instruction(
             intrinsic=f"__m128i __lsx_vshuf_b (__m128i a, __m128i b, __m128i c)",
@@ -1519,7 +1519,6 @@ memory_store({width}, data.{member}[lane], addr + offset);
             desc=f"Convert half precision floating point elements in lower half of `a` to single precision.",
         )
 
-
     @env.macro
     def vfcvt_h_s():
         return instruction(
@@ -1612,37 +1611,42 @@ memory_store({width}, data.{member}[lane], addr + offset);
     def all_intrinsics():
         result = []
         for file in glob.glob("docs/lsx/*.md"):
-            for line in open(file, 'r'):
-                if line.startswith('#'):
+            for line in open(file, "r"):
+                if line.startswith("#"):
                     title = line[1:].strip()
-                if '{{' in line and '}}' in line:
+                if "{{" in line and "}}" in line:
                     code = line.split("{{")[1].split("}}")[0]
                     # Dangerous! But we trust ourselves.
                     content = eval(code, env.macros)
                     # handle cases for multiple instructions in one call
-                    for part in re.split(r'^## ', content, flags=re.MULTILINE):
+                    for part in re.split(r"^## ", content, flags=re.MULTILINE):
                         if len(part.strip()) == 0:
                             continue
-                        lines = ('## ' + part).split('\n')
+                        lines = ("## " + part).split("\n")
                         for i in range(len(lines)):
                             line = lines[i]
-                            if line.startswith('##'):
-                                body = '\n'.join(lines[i+1:])
+                            if line.startswith("##"):
+                                body = "\n".join(lines[i + 1 :])
                                 intrinsic = line[2:].strip()
-                                result.append({
-                                    'name': intrinsic,
-                                    'content': markdown.markdown(body, extensions=['fenced_code', 'codehilite']),
-                                    'group': title
-                                })
+                                result.append(
+                                    {
+                                        "name": intrinsic,
+                                        "content": markdown.markdown(
+                                            body,
+                                            extensions=["fenced_code", "codehilite"],
+                                        ),
+                                        "group": title,
+                                    }
+                                )
                                 break
-        return json.dumps(result)
+        return json.dumps(sorted(result, key=lambda e: e["name"]))
 
     @env.macro
     def all_groups():
         result = []
         for file in glob.glob("docs/lsx/*.md"):
-            for line in open(file, 'r'):
-                if line.startswith('#'):
+            for line in open(file, "r"):
+                if line.startswith("#"):
                     title = line[1:].strip()
                     result.append(title)
                     break
