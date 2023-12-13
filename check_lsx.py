@@ -1,10 +1,10 @@
 import os
 import glob
 
-# Update gh-pages before running:
-# git fetch origin
+# Initial worktree:
 # git worktree add -f ../gh-pages gh-pages
-# git -C ../gh-pages reset origin/gh-pages --hard
+# Update gh-pages before running:
+# git fetch origin gh-pages && git -C ../gh-pages reset origin/gh-pages --hard
 
 # gcc intrinsics
 gcc_intrinsics = set()

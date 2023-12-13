@@ -134,8 +134,12 @@ CPU Flags: LSX
         narrow_width = widths[narrow]
         signedness = signednesses[narrow]
         signedness2 = signednesses[narrow2]
+        if even_odd == "even":
+            suffix = "ev"
+        else:
+            suffix = "od"
         return instruction(
-            intrinsic=f"__m128i __lsx_v{op}wev_{wide}_{narrow}{intrinsic_suffix} (__m128i a, __m128i b)",
+            intrinsic=f"__m128i __lsx_v{op}w{suffix}_{wide}_{narrow}{intrinsic_suffix} (__m128i a, __m128i b)",
             instr=f"v{op}wev.{wide}.{narrow}{inst_suffix} vr, vr, vr",
             desc=f"{desc} {even_odd}-positioned {signedness} {narrow_width}-bit elements in `a` and {signedness2} elements in `b`, save the {wide_width}-bit result in `dst`.",
         )
