@@ -42,7 +42,7 @@ Found {{intrinsics.length}} intrinsics.
 </div>
 
 <script type="module">
-  import { createApp, ref, computed } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
+  import { createApp, ref, computed, nextTick } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
 
   const allIntrinsics = {% endraw %} {{ all_intrinsics() }} {% raw %};
 
@@ -63,6 +63,8 @@ Found {{intrinsics.length}} intrinsics.
             result.push(val);
           }
         }
+
+        nextTick(hljs.highlightAll);
         return result;
       });
 
