@@ -7,9 +7,6 @@ v128 vxori_b(v128 a, int imm) {
 }
 
 void test() {
-  FUZZ1(vxori_b, 0x00);
-  FUZZ1(vxori_b, 0x04);
-  FUZZ1(vxori_b, 0x08);
-  FUZZ1(vxori_b, 0x10);
-  FUZZ1(vxori_b, 0xFF);
+  FUZZ1(vxori_b, 0);
+  FUZZ1(vxori_b, 31);
 }

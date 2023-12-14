@@ -38,8 +38,13 @@ widths_vsubw = [
 
 tb = {
     # widths, args, extra args for imm
-    "vadd": (widths_signed, "v128 a, v128 b"),
+    "vadd": (widths_signed + ["q"], "v128 a, v128 b"),
+    "vadda": (widths_signed, "v128 a, v128 b"),
     "vaddi": (widths_unsigned, "v128 a, int imm", [0, 31]),
+    "vand": (["v"], "v128 a, v128 b"),
+    "vandn": (["v"], "v128 a, v128 b"),
+    "vandi": (["b"], "v128 a, int imm", [0, 31]),
+    "vabsd": (widths_all, "v128 a, v128 b"),
     "vavg": (widths_all, "v128 a, v128 b"),
     "vavgr": (widths_all, "v128 a, v128 b"),
     "vaddwev": (widths_vaddw, "v128 a, v128 b"),
@@ -50,6 +55,8 @@ tb = {
     "vbitseti": (widths_signed, "v128 a, int imm", [0, 3, 7]),
     "vbitrev": (widths_signed, "v128 a, v128 b"),
     "vbitrevi": (widths_signed, "v128 a, int imm", [0, 3, 7]),
+    "vbsll": (["v"], "v128 a, int imm", [0, 3]),
+    "vbsrl": (["v"], "v128 a, int imm", [0, 3]),
     "vclo": (widths_signed, "v128 a"),
     "vclz": (widths_signed, "v128 a"),
     "vdiv": (widths_all, "v128 a, v128 b"),
@@ -88,6 +95,11 @@ tb = {
     "vmulwev": (widths_vaddw, "v128 a, v128 b"),
     "vmulwod": (widths_vaddw, "v128 a, v128 b"),
     "vneg": (widths_signed, "v128 a"),
+    "vnor": (["v"], "v128 a, v128 b"),
+    "vnori": (["b"], "v128 a, int imm", [0, 31]),
+    "vor": (["v"], "v128 a, v128 b"),
+    "vorn": (["v"], "v128 a, v128 b"),
+    "vori": (["b"], "v128 a, int imm", [0, 31]),
     "vpackev": (widths_signed, "v128 a, v128 b"),
     "vpackod": (widths_signed, "v128 a, v128 b"),
     "vpcnt": (widths_signed, "v128 a"),
@@ -107,7 +119,7 @@ tb = {
     "vsigncov": (widths_signed, "v128 a, v128 b"),
     "vsllwil": (widths_vsllwil, "v128 a, int imm", [0, 7]),
     "vssub": (widths_all, "v128 a, v128 b"),
-    "vsub": (widths_signed, "v128 a, v128 b"),
+    "vsub": (widths_signed + ["q"], "v128 a, v128 b"),
     "vsubi": (widths_unsigned, "v128 a, int imm", [0, 31]),
     "vsll": (widths_signed, "v128 a, v128 b"),
     "vslli": (widths_signed, "v128 a, int imm", [0, 7]),
@@ -142,6 +154,8 @@ tb = {
     "vsub": (widths_signed, "v128 a, v128 b"),
     "vsubwev": (widths_vsubw, "v128 a, v128 b"),
     "vsubwod": (widths_vsubw, "v128 a, v128 b"),
+    "vxor": (["v"], "v128 a, v128 b"),
+    "vxori": (["b"], "v128 a, int imm", [0, 31]),
 }
 
 for name in tb:
