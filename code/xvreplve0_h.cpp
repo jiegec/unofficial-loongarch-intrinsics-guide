@@ -6,6 +6,4 @@ v256 xvreplve0_h(v256 a) {
   return dst;
 }
 
-void test() {
-  XFUZZ1(xvreplve0_h);
-}
+void test() { XFUZZ1(xvreplve0_h); }

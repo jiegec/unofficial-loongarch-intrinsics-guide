@@ -11,6 +11,8 @@ void test() {
   XFUZZ2(xvpermi_q, 1);
   XFUZZ2(xvpermi_q, 2);
   XFUZZ2(xvpermi_q, 0x10);
+  XFUZZ2(xvpermi_q, 0x80);
+  XFUZZ2(xvpermi_q, 0xC0);
   XFUZZ2(xvpermi_q, 0xF0);
   XFUZZ2(xvpermi_q, 0xFF);
 }
