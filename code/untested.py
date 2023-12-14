@@ -3,6 +3,10 @@ import os
 
 for f in sorted(glob.glob("*.h")):
     src = f.replace(".h", ".cpp")
+    if os.path.exists(src):
+        # make sure we are testing the expected instruction
+        if src.split(".")[0] not in open(src, 'r').read():
+            print("Bad test:", src)
     if not os.path.exists(src):
         if (
             src.startswith("xvf")
