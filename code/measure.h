@@ -694,35 +694,67 @@ INSTR_TEST(vmuh_du_tp, "vmuh.du $vr0, $vr1, $vr2\n")
 INSTR_TEST(vmadd_b_0, "vmadd.b $vr0, $vr1, $vr2\n")
 INSTR_TEST(vmadd_b_1, "vmadd.b $vr0, $vr0, $vr2\n")
 INSTR_TEST(vmadd_b_2, "vmadd.b $vr0, $vr1, $vr0\n")
-INSTR_TEST8(vmadd_b_tp, "vmadd.b $vr0, $vr1, $vr2\nvmadd.b $vr4, $vr5, $vr6\nvmadd.b $vr8, $vr9, $vr10\nvmadd.b $vr12, $vr13, $vr14\nvmadd.b $vr16, $vr17, $vr18\nvmadd.b $vr20, $vr21, $vr22\nvmadd.b $vr24, $vr25, $vr26\nvmadd.b $vr28, $vr29, $vr30\n")
+INSTR_TEST8(vmadd_b_tp,
+            "vmadd.b $vr0, $vr1, $vr2\nvmadd.b $vr4, $vr5, $vr6\nvmadd.b $vr8, "
+            "$vr9, $vr10\nvmadd.b $vr12, $vr13, $vr14\nvmadd.b $vr16, $vr17, "
+            "$vr18\nvmadd.b $vr20, $vr21, $vr22\nvmadd.b $vr24, $vr25, "
+            "$vr26\nvmadd.b $vr28, $vr29, $vr30\n")
 INSTR_TEST(vmadd_h_0, "vmadd.h $vr0, $vr1, $vr2\n")
 INSTR_TEST(vmadd_h_1, "vmadd.h $vr0, $vr0, $vr2\n")
 INSTR_TEST(vmadd_h_2, "vmadd.h $vr0, $vr1, $vr0\n")
-INSTR_TEST8(vmadd_h_tp, "vmadd.h $vr0, $vr1, $vr2\nvmadd.h $vr4, $vr5, $vr6\nvmadd.h $vr8, $vr9, $vr10\nvmadd.h $vr12, $vr13, $vr14\nvmadd.h $vr16, $vr17, $vr18\nvmadd.h $vr20, $vr21, $vr22\nvmadd.h $vr24, $vr25, $vr26\nvmadd.h $vr28, $vr29, $vr30\n")
+INSTR_TEST8(vmadd_h_tp,
+            "vmadd.h $vr0, $vr1, $vr2\nvmadd.h $vr4, $vr5, $vr6\nvmadd.h $vr8, "
+            "$vr9, $vr10\nvmadd.h $vr12, $vr13, $vr14\nvmadd.h $vr16, $vr17, "
+            "$vr18\nvmadd.h $vr20, $vr21, $vr22\nvmadd.h $vr24, $vr25, "
+            "$vr26\nvmadd.h $vr28, $vr29, $vr30\n")
 INSTR_TEST(vmadd_w_0, "vmadd.w $vr0, $vr1, $vr2\n")
 INSTR_TEST(vmadd_w_1, "vmadd.w $vr0, $vr0, $vr2\n")
 INSTR_TEST(vmadd_w_2, "vmadd.w $vr0, $vr1, $vr0\n")
-INSTR_TEST8(vmadd_w_tp, "vmadd.w $vr0, $vr1, $vr2\nvmadd.w $vr4, $vr5, $vr6\nvmadd.w $vr8, $vr9, $vr10\nvmadd.w $vr12, $vr13, $vr14\nvmadd.w $vr16, $vr17, $vr18\nvmadd.w $vr20, $vr21, $vr22\nvmadd.w $vr24, $vr25, $vr26\nvmadd.w $vr28, $vr29, $vr30\n")
+INSTR_TEST8(vmadd_w_tp,
+            "vmadd.w $vr0, $vr1, $vr2\nvmadd.w $vr4, $vr5, $vr6\nvmadd.w $vr8, "
+            "$vr9, $vr10\nvmadd.w $vr12, $vr13, $vr14\nvmadd.w $vr16, $vr17, "
+            "$vr18\nvmadd.w $vr20, $vr21, $vr22\nvmadd.w $vr24, $vr25, "
+            "$vr26\nvmadd.w $vr28, $vr29, $vr30\n")
 INSTR_TEST(vmadd_d_0, "vmadd.d $vr0, $vr1, $vr2\n")
 INSTR_TEST(vmadd_d_1, "vmadd.d $vr0, $vr0, $vr2\n")
 INSTR_TEST(vmadd_d_2, "vmadd.d $vr0, $vr1, $vr0\n")
-INSTR_TEST8(vmadd_d_tp, "vmadd.d $vr0, $vr1, $vr2\nvmadd.d $vr4, $vr5, $vr6\nvmadd.d $vr8, $vr9, $vr10\nvmadd.d $vr12, $vr13, $vr14\nvmadd.d $vr16, $vr17, $vr18\nvmadd.d $vr20, $vr21, $vr22\nvmadd.d $vr24, $vr25, $vr26\nvmadd.d $vr28, $vr29, $vr30\n")
+INSTR_TEST8(vmadd_d_tp,
+            "vmadd.d $vr0, $vr1, $vr2\nvmadd.d $vr4, $vr5, $vr6\nvmadd.d $vr8, "
+            "$vr9, $vr10\nvmadd.d $vr12, $vr13, $vr14\nvmadd.d $vr16, $vr17, "
+            "$vr18\nvmadd.d $vr20, $vr21, $vr22\nvmadd.d $vr24, $vr25, "
+            "$vr26\nvmadd.d $vr28, $vr29, $vr30\n")
 INSTR_TEST(vmsub_b_0, "vmsub.b $vr0, $vr1, $vr2\n")
 INSTR_TEST(vmsub_b_1, "vmsub.b $vr0, $vr0, $vr2\n")
 INSTR_TEST(vmsub_b_2, "vmsub.b $vr0, $vr1, $vr0\n")
-INSTR_TEST8(vmsub_b_tp, "vmsub.b $vr0, $vr1, $vr2\nvmsub.b $vr4, $vr5, $vr6\nvmsub.b $vr8, $vr9, $vr10\nvmsub.b $vr12, $vr13, $vr14\nvmsub.b $vr16, $vr17, $vr18\nvmsub.b $vr20, $vr21, $vr22\nvmsub.b $vr24, $vr25, $vr26\nvmsub.b $vr28, $vr29, $vr30\n")
+INSTR_TEST8(vmsub_b_tp,
+            "vmsub.b $vr0, $vr1, $vr2\nvmsub.b $vr4, $vr5, $vr6\nvmsub.b $vr8, "
+            "$vr9, $vr10\nvmsub.b $vr12, $vr13, $vr14\nvmsub.b $vr16, $vr17, "
+            "$vr18\nvmsub.b $vr20, $vr21, $vr22\nvmsub.b $vr24, $vr25, "
+            "$vr26\nvmsub.b $vr28, $vr29, $vr30\n")
 INSTR_TEST(vmsub_h_0, "vmsub.h $vr0, $vr1, $vr2\n")
 INSTR_TEST(vmsub_h_1, "vmsub.h $vr0, $vr0, $vr2\n")
 INSTR_TEST(vmsub_h_2, "vmsub.h $vr0, $vr1, $vr0\n")
-INSTR_TEST8(vmsub_h_tp, "vmsub.h $vr0, $vr1, $vr2\nvmsub.h $vr4, $vr5, $vr6\nvmsub.h $vr8, $vr9, $vr10\nvmsub.h $vr12, $vr13, $vr14\nvmsub.h $vr16, $vr17, $vr18\nvmsub.h $vr20, $vr21, $vr22\nvmsub.h $vr24, $vr25, $vr26\nvmsub.h $vr28, $vr29, $vr30\n")
+INSTR_TEST8(vmsub_h_tp,
+            "vmsub.h $vr0, $vr1, $vr2\nvmsub.h $vr4, $vr5, $vr6\nvmsub.h $vr8, "
+            "$vr9, $vr10\nvmsub.h $vr12, $vr13, $vr14\nvmsub.h $vr16, $vr17, "
+            "$vr18\nvmsub.h $vr20, $vr21, $vr22\nvmsub.h $vr24, $vr25, "
+            "$vr26\nvmsub.h $vr28, $vr29, $vr30\n")
 INSTR_TEST(vmsub_w_0, "vmsub.w $vr0, $vr1, $vr2\n")
 INSTR_TEST(vmsub_w_1, "vmsub.w $vr0, $vr0, $vr2\n")
 INSTR_TEST(vmsub_w_2, "vmsub.w $vr0, $vr1, $vr0\n")
-INSTR_TEST8(vmsub_w_tp, "vmsub.w $vr0, $vr1, $vr2\nvmsub.w $vr4, $vr5, $vr6\nvmsub.w $vr8, $vr9, $vr10\nvmsub.w $vr12, $vr13, $vr14\nvmsub.w $vr16, $vr17, $vr18\nvmsub.w $vr20, $vr21, $vr22\nvmsub.w $vr24, $vr25, $vr26\nvmsub.w $vr28, $vr29, $vr30\n")
+INSTR_TEST8(vmsub_w_tp,
+            "vmsub.w $vr0, $vr1, $vr2\nvmsub.w $vr4, $vr5, $vr6\nvmsub.w $vr8, "
+            "$vr9, $vr10\nvmsub.w $vr12, $vr13, $vr14\nvmsub.w $vr16, $vr17, "
+            "$vr18\nvmsub.w $vr20, $vr21, $vr22\nvmsub.w $vr24, $vr25, "
+            "$vr26\nvmsub.w $vr28, $vr29, $vr30\n")
 INSTR_TEST(vmsub_d_0, "vmsub.d $vr0, $vr1, $vr2\n")
 INSTR_TEST(vmsub_d_1, "vmsub.d $vr0, $vr0, $vr2\n")
 INSTR_TEST(vmsub_d_2, "vmsub.d $vr0, $vr1, $vr0\n")
-INSTR_TEST8(vmsub_d_tp, "vmsub.d $vr0, $vr1, $vr2\nvmsub.d $vr4, $vr5, $vr6\nvmsub.d $vr8, $vr9, $vr10\nvmsub.d $vr12, $vr13, $vr14\nvmsub.d $vr16, $vr17, $vr18\nvmsub.d $vr20, $vr21, $vr22\nvmsub.d $vr24, $vr25, $vr26\nvmsub.d $vr28, $vr29, $vr30\n")
+INSTR_TEST8(vmsub_d_tp,
+            "vmsub.d $vr0, $vr1, $vr2\nvmsub.d $vr4, $vr5, $vr6\nvmsub.d $vr8, "
+            "$vr9, $vr10\nvmsub.d $vr12, $vr13, $vr14\nvmsub.d $vr16, $vr17, "
+            "$vr18\nvmsub.d $vr20, $vr21, $vr22\nvmsub.d $vr24, $vr25, "
+            "$vr26\nvmsub.d $vr28, $vr29, $vr30\n")
 INSTR_TEST(vdiv_b_1, "vdiv.b $vr0, $vr0, $vr2\n")
 INSTR_TEST(vdiv_b_2, "vdiv.b $vr0, $vr1, $vr0\n")
 INSTR_TEST(vdiv_b_tp, "vdiv.b $vr0, $vr1, $vr2\n")
@@ -1088,11 +1120,19 @@ INSTR_TEST(vorn_v_tp, "vorn.v $vr0, $vr1, $vr2\n")
 INSTR_TEST(vfrstp_b_0, "vfrstp.b $vr0, $vr1, $vr2\n")
 INSTR_TEST(vfrstp_b_1, "vfrstp.b $vr0, $vr0, $vr2\n")
 INSTR_TEST(vfrstp_b_2, "vfrstp.b $vr0, $vr1, $vr0\n")
-INSTR_TEST8(vfrstp_b_tp, "vfrstp.b $vr0, $vr1, $vr2\nvfrstp.b $vr4, $vr5, $vr6\nvfrstp.b $vr8, $vr9, $vr10\nvfrstp.b $vr12, $vr13, $vr14\nvfrstp.b $vr16, $vr17, $vr18\nvfrstp.b $vr20, $vr21, $vr22\nvfrstp.b $vr24, $vr25, $vr26\nvfrstp.b $vr28, $vr29, $vr30\n")
+INSTR_TEST8(vfrstp_b_tp,
+            "vfrstp.b $vr0, $vr1, $vr2\nvfrstp.b $vr4, $vr5, $vr6\nvfrstp.b "
+            "$vr8, $vr9, $vr10\nvfrstp.b $vr12, $vr13, $vr14\nvfrstp.b $vr16, "
+            "$vr17, $vr18\nvfrstp.b $vr20, $vr21, $vr22\nvfrstp.b $vr24, "
+            "$vr25, $vr26\nvfrstp.b $vr28, $vr29, $vr30\n")
 INSTR_TEST(vfrstp_h_0, "vfrstp.h $vr0, $vr1, $vr2\n")
 INSTR_TEST(vfrstp_h_1, "vfrstp.h $vr0, $vr0, $vr2\n")
 INSTR_TEST(vfrstp_h_2, "vfrstp.h $vr0, $vr1, $vr0\n")
-INSTR_TEST8(vfrstp_h_tp, "vfrstp.h $vr0, $vr1, $vr2\nvfrstp.h $vr4, $vr5, $vr6\nvfrstp.h $vr8, $vr9, $vr10\nvfrstp.h $vr12, $vr13, $vr14\nvfrstp.h $vr16, $vr17, $vr18\nvfrstp.h $vr20, $vr21, $vr22\nvfrstp.h $vr24, $vr25, $vr26\nvfrstp.h $vr28, $vr29, $vr30\n")
+INSTR_TEST8(vfrstp_h_tp,
+            "vfrstp.h $vr0, $vr1, $vr2\nvfrstp.h $vr4, $vr5, $vr6\nvfrstp.h "
+            "$vr8, $vr9, $vr10\nvfrstp.h $vr12, $vr13, $vr14\nvfrstp.h $vr16, "
+            "$vr17, $vr18\nvfrstp.h $vr20, $vr21, $vr22\nvfrstp.h $vr24, "
+            "$vr25, $vr26\nvfrstp.h $vr28, $vr29, $vr30\n")
 INSTR_TEST(vadd_q_1, "vadd.q $vr0, $vr0, $vr2\n")
 INSTR_TEST(vadd_q_2, "vadd.q $vr0, $vr1, $vr0\n")
 INSTR_TEST(vadd_q_tp, "vadd.q $vr0, $vr1, $vr2\n")
@@ -1186,15 +1226,27 @@ INSTR_TEST(vftintrne_w_d_tp, "vftintrne.w.d $vr0, $vr1, $vr2\n")
 INSTR_TEST(vshuf_h_0, "vshuf.h $vr0, $vr1, $vr2\n")
 INSTR_TEST(vshuf_h_1, "vshuf.h $vr0, $vr0, $vr2\n")
 INSTR_TEST(vshuf_h_2, "vshuf.h $vr0, $vr1, $vr0\n")
-INSTR_TEST8(vshuf_h_tp, "vshuf.h $vr0, $vr1, $vr2\nvshuf.h $vr4, $vr5, $vr6\nvshuf.h $vr8, $vr9, $vr10\nvshuf.h $vr12, $vr13, $vr14\nvshuf.h $vr16, $vr17, $vr18\nvshuf.h $vr20, $vr21, $vr22\nvshuf.h $vr24, $vr25, $vr26\nvshuf.h $vr28, $vr29, $vr30\n")
+INSTR_TEST8(vshuf_h_tp,
+            "vshuf.h $vr0, $vr1, $vr2\nvshuf.h $vr4, $vr5, $vr6\nvshuf.h $vr8, "
+            "$vr9, $vr10\nvshuf.h $vr12, $vr13, $vr14\nvshuf.h $vr16, $vr17, "
+            "$vr18\nvshuf.h $vr20, $vr21, $vr22\nvshuf.h $vr24, $vr25, "
+            "$vr26\nvshuf.h $vr28, $vr29, $vr30\n")
 INSTR_TEST(vshuf_w_0, "vshuf.w $vr0, $vr1, $vr2\n")
 INSTR_TEST(vshuf_w_1, "vshuf.w $vr0, $vr0, $vr2\n")
 INSTR_TEST(vshuf_w_2, "vshuf.w $vr0, $vr1, $vr0\n")
-INSTR_TEST8(vshuf_w_tp, "vshuf.w $vr0, $vr1, $vr2\nvshuf.w $vr4, $vr5, $vr6\nvshuf.w $vr8, $vr9, $vr10\nvshuf.w $vr12, $vr13, $vr14\nvshuf.w $vr16, $vr17, $vr18\nvshuf.w $vr20, $vr21, $vr22\nvshuf.w $vr24, $vr25, $vr26\nvshuf.w $vr28, $vr29, $vr30\n")
+INSTR_TEST8(vshuf_w_tp,
+            "vshuf.w $vr0, $vr1, $vr2\nvshuf.w $vr4, $vr5, $vr6\nvshuf.w $vr8, "
+            "$vr9, $vr10\nvshuf.w $vr12, $vr13, $vr14\nvshuf.w $vr16, $vr17, "
+            "$vr18\nvshuf.w $vr20, $vr21, $vr22\nvshuf.w $vr24, $vr25, "
+            "$vr26\nvshuf.w $vr28, $vr29, $vr30\n")
 INSTR_TEST(vshuf_d_0, "vshuf.d $vr0, $vr1, $vr2\n")
 INSTR_TEST(vshuf_d_1, "vshuf.d $vr0, $vr0, $vr2\n")
 INSTR_TEST(vshuf_d_2, "vshuf.d $vr0, $vr1, $vr0\n")
-INSTR_TEST8(vshuf_d_tp, "vshuf.d $vr0, $vr1, $vr2\nvshuf.d $vr4, $vr5, $vr6\nvshuf.d $vr8, $vr9, $vr10\nvshuf.d $vr12, $vr13, $vr14\nvshuf.d $vr16, $vr17, $vr18\nvshuf.d $vr20, $vr21, $vr22\nvshuf.d $vr24, $vr25, $vr26\nvshuf.d $vr28, $vr29, $vr30\n")
+INSTR_TEST8(vshuf_d_tp,
+            "vshuf.d $vr0, $vr1, $vr2\nvshuf.d $vr4, $vr5, $vr6\nvshuf.d $vr8, "
+            "$vr9, $vr10\nvshuf.d $vr12, $vr13, $vr14\nvshuf.d $vr16, $vr17, "
+            "$vr18\nvshuf.d $vr20, $vr21, $vr22\nvshuf.d $vr24, $vr25, "
+            "$vr26\nvshuf.d $vr28, $vr29, $vr30\n")
 INSTR_TEST(vseqi_b_1, "vseqi.b $vr0, $vr0, 0\n")
 INSTR_TEST(vseqi_b_tp, "vseqi.b $vr0, $vr1, 0\n")
 INSTR_TEST(vseqi_h_1, "vseqi.h $vr0, $vr0, 0\n")
@@ -1289,10 +1341,18 @@ INSTR_TEST(vmini_du_1, "vmini.du $vr0, $vr0, 0\n")
 INSTR_TEST(vmini_du_tp, "vmini.du $vr0, $vr1, 0\n")
 INSTR_TEST(vfrstpi_b_0, "vfrstpi.b $vr0, $vr1, 0\n")
 INSTR_TEST(vfrstpi_b_1, "vfrstpi.b $vr0, $vr0, 0\n")
-INSTR_TEST8(vfrstpi_b_tp, "vfrstpi.b $vr0, $vr1, 0\nvfrstpi.b $vr4, $vr5, 0\nvfrstpi.b $vr8, $vr9, 0\nvfrstpi.b $vr12, $vr13, 0\nvfrstpi.b $vr16, $vr17, 0\nvfrstpi.b $vr20, $vr21, 0\nvfrstpi.b $vr24, $vr25, 0\nvfrstpi.b $vr28, $vr29, 0\n")
+INSTR_TEST8(
+    vfrstpi_b_tp,
+    "vfrstpi.b $vr0, $vr1, 0\nvfrstpi.b $vr4, $vr5, 0\nvfrstpi.b $vr8, $vr9, "
+    "0\nvfrstpi.b $vr12, $vr13, 0\nvfrstpi.b $vr16, $vr17, 0\nvfrstpi.b $vr20, "
+    "$vr21, 0\nvfrstpi.b $vr24, $vr25, 0\nvfrstpi.b $vr28, $vr29, 0\n")
 INSTR_TEST(vfrstpi_h_0, "vfrstpi.h $vr0, $vr1, 0\n")
 INSTR_TEST(vfrstpi_h_1, "vfrstpi.h $vr0, $vr0, 0\n")
-INSTR_TEST8(vfrstpi_h_tp, "vfrstpi.h $vr0, $vr1, 0\nvfrstpi.h $vr4, $vr5, 0\nvfrstpi.h $vr8, $vr9, 0\nvfrstpi.h $vr12, $vr13, 0\nvfrstpi.h $vr16, $vr17, 0\nvfrstpi.h $vr20, $vr21, 0\nvfrstpi.h $vr24, $vr25, 0\nvfrstpi.h $vr28, $vr29, 0\n")
+INSTR_TEST8(
+    vfrstpi_h_tp,
+    "vfrstpi.h $vr0, $vr1, 0\nvfrstpi.h $vr4, $vr5, 0\nvfrstpi.h $vr8, $vr9, "
+    "0\nvfrstpi.h $vr12, $vr13, 0\nvfrstpi.h $vr16, $vr17, 0\nvfrstpi.h $vr20, "
+    "$vr21, 0\nvfrstpi.h $vr24, $vr25, 0\nvfrstpi.h $vr28, $vr29, 0\n")
 INSTR_TEST(vclo_b_1, "vclo.b $vr0, $vr0\n")
 INSTR_TEST(vclo_b_tp, "vclo.b $vr0, $vr1\n")
 INSTR_TEST(vclo_h_1, "vclo.h $vr0, $vr0\n")
@@ -1510,13 +1570,29 @@ INSTR_TEST(vsrari_w_tp, "vsrari.w $vr0, $vr1, 0\n")
 INSTR_TEST(vsrari_d_1, "vsrari.d $vr0, $vr0, 0\n")
 INSTR_TEST(vsrari_d_tp, "vsrari.d $vr0, $vr1, 0\n")
 INSTR_TEST(vinsgr2vr_b_0, "vinsgr2vr.b $vr0, $r0, 0\n")
-INSTR_TEST8(vinsgr2vr_b_tp, "vinsgr2vr.b $vr0, $r0, 0\nvinsgr2vr.b $vr4, $r0, 0\nvinsgr2vr.b $vr8, $r0, 0\nvinsgr2vr.b $vr12, $r0, 0\nvinsgr2vr.b $vr16, $r0, 0\nvinsgr2vr.b $vr20, $r0, 0\nvinsgr2vr.b $vr24, $r0, 0\nvinsgr2vr.b $vr28, $r0, 0\n")
+INSTR_TEST8(
+    vinsgr2vr_b_tp,
+    "vinsgr2vr.b $vr0, $r0, 0\nvinsgr2vr.b $vr4, $r0, 0\nvinsgr2vr.b $vr8, "
+    "$r0, 0\nvinsgr2vr.b $vr12, $r0, 0\nvinsgr2vr.b $vr16, $r0, 0\nvinsgr2vr.b "
+    "$vr20, $r0, 0\nvinsgr2vr.b $vr24, $r0, 0\nvinsgr2vr.b $vr28, $r0, 0\n")
 INSTR_TEST(vinsgr2vr_h_0, "vinsgr2vr.h $vr0, $r0, 0\n")
-INSTR_TEST8(vinsgr2vr_h_tp, "vinsgr2vr.h $vr0, $r0, 0\nvinsgr2vr.h $vr4, $r0, 0\nvinsgr2vr.h $vr8, $r0, 0\nvinsgr2vr.h $vr12, $r0, 0\nvinsgr2vr.h $vr16, $r0, 0\nvinsgr2vr.h $vr20, $r0, 0\nvinsgr2vr.h $vr24, $r0, 0\nvinsgr2vr.h $vr28, $r0, 0\n")
+INSTR_TEST8(
+    vinsgr2vr_h_tp,
+    "vinsgr2vr.h $vr0, $r0, 0\nvinsgr2vr.h $vr4, $r0, 0\nvinsgr2vr.h $vr8, "
+    "$r0, 0\nvinsgr2vr.h $vr12, $r0, 0\nvinsgr2vr.h $vr16, $r0, 0\nvinsgr2vr.h "
+    "$vr20, $r0, 0\nvinsgr2vr.h $vr24, $r0, 0\nvinsgr2vr.h $vr28, $r0, 0\n")
 INSTR_TEST(vinsgr2vr_w_0, "vinsgr2vr.w $vr0, $r0, 0\n")
-INSTR_TEST8(vinsgr2vr_w_tp, "vinsgr2vr.w $vr0, $r0, 0\nvinsgr2vr.w $vr4, $r0, 0\nvinsgr2vr.w $vr8, $r0, 0\nvinsgr2vr.w $vr12, $r0, 0\nvinsgr2vr.w $vr16, $r0, 0\nvinsgr2vr.w $vr20, $r0, 0\nvinsgr2vr.w $vr24, $r0, 0\nvinsgr2vr.w $vr28, $r0, 0\n")
+INSTR_TEST8(
+    vinsgr2vr_w_tp,
+    "vinsgr2vr.w $vr0, $r0, 0\nvinsgr2vr.w $vr4, $r0, 0\nvinsgr2vr.w $vr8, "
+    "$r0, 0\nvinsgr2vr.w $vr12, $r0, 0\nvinsgr2vr.w $vr16, $r0, 0\nvinsgr2vr.w "
+    "$vr20, $r0, 0\nvinsgr2vr.w $vr24, $r0, 0\nvinsgr2vr.w $vr28, $r0, 0\n")
 INSTR_TEST(vinsgr2vr_d_0, "vinsgr2vr.d $vr0, $r0, 0\n")
-INSTR_TEST8(vinsgr2vr_d_tp, "vinsgr2vr.d $vr0, $r0, 0\nvinsgr2vr.d $vr4, $r0, 0\nvinsgr2vr.d $vr8, $r0, 0\nvinsgr2vr.d $vr12, $r0, 0\nvinsgr2vr.d $vr16, $r0, 0\nvinsgr2vr.d $vr20, $r0, 0\nvinsgr2vr.d $vr24, $r0, 0\nvinsgr2vr.d $vr28, $r0, 0\n")
+INSTR_TEST8(
+    vinsgr2vr_d_tp,
+    "vinsgr2vr.d $vr0, $r0, 0\nvinsgr2vr.d $vr4, $r0, 0\nvinsgr2vr.d $vr8, "
+    "$r0, 0\nvinsgr2vr.d $vr12, $r0, 0\nvinsgr2vr.d $vr16, $r0, 0\nvinsgr2vr.d "
+    "$vr20, $r0, 0\nvinsgr2vr.d $vr24, $r0, 0\nvinsgr2vr.d $vr28, $r0, 0\n")
 INSTR_TEST(vpickve2gr_b_1, "vpickve2gr.b $r0, $vr0, 0\n")
 INSTR_TEST(vpickve2gr_b_tp, "vpickve2gr.b $r0, $vr1, 0\n")
 INSTR_TEST(vpickve2gr_h_1, "vpickve2gr.h $r0, $vr0, 0\n")
@@ -1623,160 +1699,368 @@ INSTR_TEST(vsrai_d_1, "vsrai.d $vr0, $vr0, 0\n")
 INSTR_TEST(vsrai_d_tp, "vsrai.d $vr0, $vr1, 0\n")
 INSTR_TEST(vsrlni_b_h_0, "vsrlni.b.h $vr0, $vr1, 0\n")
 INSTR_TEST(vsrlni_b_h_1, "vsrlni.b.h $vr0, $vr0, 0\n")
-INSTR_TEST8(vsrlni_b_h_tp, "vsrlni.b.h $vr0, $vr1, 0\nvsrlni.b.h $vr4, $vr5, 0\nvsrlni.b.h $vr8, $vr9, 0\nvsrlni.b.h $vr12, $vr13, 0\nvsrlni.b.h $vr16, $vr17, 0\nvsrlni.b.h $vr20, $vr21, 0\nvsrlni.b.h $vr24, $vr25, 0\nvsrlni.b.h $vr28, $vr29, 0\n")
+INSTR_TEST8(vsrlni_b_h_tp,
+            "vsrlni.b.h $vr0, $vr1, 0\nvsrlni.b.h $vr4, $vr5, 0\nvsrlni.b.h "
+            "$vr8, $vr9, 0\nvsrlni.b.h $vr12, $vr13, 0\nvsrlni.b.h $vr16, "
+            "$vr17, 0\nvsrlni.b.h $vr20, $vr21, 0\nvsrlni.b.h $vr24, $vr25, "
+            "0\nvsrlni.b.h $vr28, $vr29, 0\n")
 INSTR_TEST(vsrlni_h_w_0, "vsrlni.h.w $vr0, $vr1, 0\n")
 INSTR_TEST(vsrlni_h_w_1, "vsrlni.h.w $vr0, $vr0, 0\n")
-INSTR_TEST8(vsrlni_h_w_tp, "vsrlni.h.w $vr0, $vr1, 0\nvsrlni.h.w $vr4, $vr5, 0\nvsrlni.h.w $vr8, $vr9, 0\nvsrlni.h.w $vr12, $vr13, 0\nvsrlni.h.w $vr16, $vr17, 0\nvsrlni.h.w $vr20, $vr21, 0\nvsrlni.h.w $vr24, $vr25, 0\nvsrlni.h.w $vr28, $vr29, 0\n")
+INSTR_TEST8(vsrlni_h_w_tp,
+            "vsrlni.h.w $vr0, $vr1, 0\nvsrlni.h.w $vr4, $vr5, 0\nvsrlni.h.w "
+            "$vr8, $vr9, 0\nvsrlni.h.w $vr12, $vr13, 0\nvsrlni.h.w $vr16, "
+            "$vr17, 0\nvsrlni.h.w $vr20, $vr21, 0\nvsrlni.h.w $vr24, $vr25, "
+            "0\nvsrlni.h.w $vr28, $vr29, 0\n")
 INSTR_TEST(vsrlni_w_d_0, "vsrlni.w.d $vr0, $vr1, 0\n")
 INSTR_TEST(vsrlni_w_d_1, "vsrlni.w.d $vr0, $vr0, 0\n")
-INSTR_TEST8(vsrlni_w_d_tp, "vsrlni.w.d $vr0, $vr1, 0\nvsrlni.w.d $vr4, $vr5, 0\nvsrlni.w.d $vr8, $vr9, 0\nvsrlni.w.d $vr12, $vr13, 0\nvsrlni.w.d $vr16, $vr17, 0\nvsrlni.w.d $vr20, $vr21, 0\nvsrlni.w.d $vr24, $vr25, 0\nvsrlni.w.d $vr28, $vr29, 0\n")
+INSTR_TEST8(vsrlni_w_d_tp,
+            "vsrlni.w.d $vr0, $vr1, 0\nvsrlni.w.d $vr4, $vr5, 0\nvsrlni.w.d "
+            "$vr8, $vr9, 0\nvsrlni.w.d $vr12, $vr13, 0\nvsrlni.w.d $vr16, "
+            "$vr17, 0\nvsrlni.w.d $vr20, $vr21, 0\nvsrlni.w.d $vr24, $vr25, "
+            "0\nvsrlni.w.d $vr28, $vr29, 0\n")
 INSTR_TEST(vsrlni_d_q_0, "vsrlni.d.q $vr0, $vr1, 0\n")
 INSTR_TEST(vsrlni_d_q_1, "vsrlni.d.q $vr0, $vr0, 0\n")
-INSTR_TEST8(vsrlni_d_q_tp, "vsrlni.d.q $vr0, $vr1, 0\nvsrlni.d.q $vr4, $vr5, 0\nvsrlni.d.q $vr8, $vr9, 0\nvsrlni.d.q $vr12, $vr13, 0\nvsrlni.d.q $vr16, $vr17, 0\nvsrlni.d.q $vr20, $vr21, 0\nvsrlni.d.q $vr24, $vr25, 0\nvsrlni.d.q $vr28, $vr29, 0\n")
+INSTR_TEST8(vsrlni_d_q_tp,
+            "vsrlni.d.q $vr0, $vr1, 0\nvsrlni.d.q $vr4, $vr5, 0\nvsrlni.d.q "
+            "$vr8, $vr9, 0\nvsrlni.d.q $vr12, $vr13, 0\nvsrlni.d.q $vr16, "
+            "$vr17, 0\nvsrlni.d.q $vr20, $vr21, 0\nvsrlni.d.q $vr24, $vr25, "
+            "0\nvsrlni.d.q $vr28, $vr29, 0\n")
 INSTR_TEST(vssrlni_b_h_0, "vssrlni.b.h $vr0, $vr1, 0\n")
 INSTR_TEST(vssrlni_b_h_1, "vssrlni.b.h $vr0, $vr0, 0\n")
-INSTR_TEST8(vssrlni_b_h_tp, "vssrlni.b.h $vr0, $vr1, 0\nvssrlni.b.h $vr4, $vr5, 0\nvssrlni.b.h $vr8, $vr9, 0\nvssrlni.b.h $vr12, $vr13, 0\nvssrlni.b.h $vr16, $vr17, 0\nvssrlni.b.h $vr20, $vr21, 0\nvssrlni.b.h $vr24, $vr25, 0\nvssrlni.b.h $vr28, $vr29, 0\n")
+INSTR_TEST8(vssrlni_b_h_tp,
+            "vssrlni.b.h $vr0, $vr1, 0\nvssrlni.b.h $vr4, $vr5, 0\nvssrlni.b.h "
+            "$vr8, $vr9, 0\nvssrlni.b.h $vr12, $vr13, 0\nvssrlni.b.h $vr16, "
+            "$vr17, 0\nvssrlni.b.h $vr20, $vr21, 0\nvssrlni.b.h $vr24, $vr25, "
+            "0\nvssrlni.b.h $vr28, $vr29, 0\n")
 INSTR_TEST(vssrlni_h_w_0, "vssrlni.h.w $vr0, $vr1, 0\n")
 INSTR_TEST(vssrlni_h_w_1, "vssrlni.h.w $vr0, $vr0, 0\n")
-INSTR_TEST8(vssrlni_h_w_tp, "vssrlni.h.w $vr0, $vr1, 0\nvssrlni.h.w $vr4, $vr5, 0\nvssrlni.h.w $vr8, $vr9, 0\nvssrlni.h.w $vr12, $vr13, 0\nvssrlni.h.w $vr16, $vr17, 0\nvssrlni.h.w $vr20, $vr21, 0\nvssrlni.h.w $vr24, $vr25, 0\nvssrlni.h.w $vr28, $vr29, 0\n")
+INSTR_TEST8(vssrlni_h_w_tp,
+            "vssrlni.h.w $vr0, $vr1, 0\nvssrlni.h.w $vr4, $vr5, 0\nvssrlni.h.w "
+            "$vr8, $vr9, 0\nvssrlni.h.w $vr12, $vr13, 0\nvssrlni.h.w $vr16, "
+            "$vr17, 0\nvssrlni.h.w $vr20, $vr21, 0\nvssrlni.h.w $vr24, $vr25, "
+            "0\nvssrlni.h.w $vr28, $vr29, 0\n")
 INSTR_TEST(vssrlni_w_d_0, "vssrlni.w.d $vr0, $vr1, 0\n")
 INSTR_TEST(vssrlni_w_d_1, "vssrlni.w.d $vr0, $vr0, 0\n")
-INSTR_TEST8(vssrlni_w_d_tp, "vssrlni.w.d $vr0, $vr1, 0\nvssrlni.w.d $vr4, $vr5, 0\nvssrlni.w.d $vr8, $vr9, 0\nvssrlni.w.d $vr12, $vr13, 0\nvssrlni.w.d $vr16, $vr17, 0\nvssrlni.w.d $vr20, $vr21, 0\nvssrlni.w.d $vr24, $vr25, 0\nvssrlni.w.d $vr28, $vr29, 0\n")
+INSTR_TEST8(vssrlni_w_d_tp,
+            "vssrlni.w.d $vr0, $vr1, 0\nvssrlni.w.d $vr4, $vr5, 0\nvssrlni.w.d "
+            "$vr8, $vr9, 0\nvssrlni.w.d $vr12, $vr13, 0\nvssrlni.w.d $vr16, "
+            "$vr17, 0\nvssrlni.w.d $vr20, $vr21, 0\nvssrlni.w.d $vr24, $vr25, "
+            "0\nvssrlni.w.d $vr28, $vr29, 0\n")
 INSTR_TEST(vssrlni_d_q_0, "vssrlni.d.q $vr0, $vr1, 0\n")
 INSTR_TEST(vssrlni_d_q_1, "vssrlni.d.q $vr0, $vr0, 0\n")
-INSTR_TEST8(vssrlni_d_q_tp, "vssrlni.d.q $vr0, $vr1, 0\nvssrlni.d.q $vr4, $vr5, 0\nvssrlni.d.q $vr8, $vr9, 0\nvssrlni.d.q $vr12, $vr13, 0\nvssrlni.d.q $vr16, $vr17, 0\nvssrlni.d.q $vr20, $vr21, 0\nvssrlni.d.q $vr24, $vr25, 0\nvssrlni.d.q $vr28, $vr29, 0\n")
+INSTR_TEST8(vssrlni_d_q_tp,
+            "vssrlni.d.q $vr0, $vr1, 0\nvssrlni.d.q $vr4, $vr5, 0\nvssrlni.d.q "
+            "$vr8, $vr9, 0\nvssrlni.d.q $vr12, $vr13, 0\nvssrlni.d.q $vr16, "
+            "$vr17, 0\nvssrlni.d.q $vr20, $vr21, 0\nvssrlni.d.q $vr24, $vr25, "
+            "0\nvssrlni.d.q $vr28, $vr29, 0\n")
 INSTR_TEST(vsrlrni_b_h_0, "vsrlrni.b.h $vr0, $vr1, 0\n")
 INSTR_TEST(vsrlrni_b_h_1, "vsrlrni.b.h $vr0, $vr0, 0\n")
-INSTR_TEST8(vsrlrni_b_h_tp, "vsrlrni.b.h $vr0, $vr1, 0\nvsrlrni.b.h $vr4, $vr5, 0\nvsrlrni.b.h $vr8, $vr9, 0\nvsrlrni.b.h $vr12, $vr13, 0\nvsrlrni.b.h $vr16, $vr17, 0\nvsrlrni.b.h $vr20, $vr21, 0\nvsrlrni.b.h $vr24, $vr25, 0\nvsrlrni.b.h $vr28, $vr29, 0\n")
+INSTR_TEST8(vsrlrni_b_h_tp,
+            "vsrlrni.b.h $vr0, $vr1, 0\nvsrlrni.b.h $vr4, $vr5, 0\nvsrlrni.b.h "
+            "$vr8, $vr9, 0\nvsrlrni.b.h $vr12, $vr13, 0\nvsrlrni.b.h $vr16, "
+            "$vr17, 0\nvsrlrni.b.h $vr20, $vr21, 0\nvsrlrni.b.h $vr24, $vr25, "
+            "0\nvsrlrni.b.h $vr28, $vr29, 0\n")
 INSTR_TEST(vsrlrni_h_w_0, "vsrlrni.h.w $vr0, $vr1, 0\n")
 INSTR_TEST(vsrlrni_h_w_1, "vsrlrni.h.w $vr0, $vr0, 0\n")
-INSTR_TEST8(vsrlrni_h_w_tp, "vsrlrni.h.w $vr0, $vr1, 0\nvsrlrni.h.w $vr4, $vr5, 0\nvsrlrni.h.w $vr8, $vr9, 0\nvsrlrni.h.w $vr12, $vr13, 0\nvsrlrni.h.w $vr16, $vr17, 0\nvsrlrni.h.w $vr20, $vr21, 0\nvsrlrni.h.w $vr24, $vr25, 0\nvsrlrni.h.w $vr28, $vr29, 0\n")
+INSTR_TEST8(vsrlrni_h_w_tp,
+            "vsrlrni.h.w $vr0, $vr1, 0\nvsrlrni.h.w $vr4, $vr5, 0\nvsrlrni.h.w "
+            "$vr8, $vr9, 0\nvsrlrni.h.w $vr12, $vr13, 0\nvsrlrni.h.w $vr16, "
+            "$vr17, 0\nvsrlrni.h.w $vr20, $vr21, 0\nvsrlrni.h.w $vr24, $vr25, "
+            "0\nvsrlrni.h.w $vr28, $vr29, 0\n")
 INSTR_TEST(vsrlrni_w_d_0, "vsrlrni.w.d $vr0, $vr1, 0\n")
 INSTR_TEST(vsrlrni_w_d_1, "vsrlrni.w.d $vr0, $vr0, 0\n")
-INSTR_TEST8(vsrlrni_w_d_tp, "vsrlrni.w.d $vr0, $vr1, 0\nvsrlrni.w.d $vr4, $vr5, 0\nvsrlrni.w.d $vr8, $vr9, 0\nvsrlrni.w.d $vr12, $vr13, 0\nvsrlrni.w.d $vr16, $vr17, 0\nvsrlrni.w.d $vr20, $vr21, 0\nvsrlrni.w.d $vr24, $vr25, 0\nvsrlrni.w.d $vr28, $vr29, 0\n")
+INSTR_TEST8(vsrlrni_w_d_tp,
+            "vsrlrni.w.d $vr0, $vr1, 0\nvsrlrni.w.d $vr4, $vr5, 0\nvsrlrni.w.d "
+            "$vr8, $vr9, 0\nvsrlrni.w.d $vr12, $vr13, 0\nvsrlrni.w.d $vr16, "
+            "$vr17, 0\nvsrlrni.w.d $vr20, $vr21, 0\nvsrlrni.w.d $vr24, $vr25, "
+            "0\nvsrlrni.w.d $vr28, $vr29, 0\n")
 INSTR_TEST(vsrlrni_d_q_0, "vsrlrni.d.q $vr0, $vr1, 0\n")
 INSTR_TEST(vsrlrni_d_q_1, "vsrlrni.d.q $vr0, $vr0, 0\n")
-INSTR_TEST8(vsrlrni_d_q_tp, "vsrlrni.d.q $vr0, $vr1, 0\nvsrlrni.d.q $vr4, $vr5, 0\nvsrlrni.d.q $vr8, $vr9, 0\nvsrlrni.d.q $vr12, $vr13, 0\nvsrlrni.d.q $vr16, $vr17, 0\nvsrlrni.d.q $vr20, $vr21, 0\nvsrlrni.d.q $vr24, $vr25, 0\nvsrlrni.d.q $vr28, $vr29, 0\n")
+INSTR_TEST8(vsrlrni_d_q_tp,
+            "vsrlrni.d.q $vr0, $vr1, 0\nvsrlrni.d.q $vr4, $vr5, 0\nvsrlrni.d.q "
+            "$vr8, $vr9, 0\nvsrlrni.d.q $vr12, $vr13, 0\nvsrlrni.d.q $vr16, "
+            "$vr17, 0\nvsrlrni.d.q $vr20, $vr21, 0\nvsrlrni.d.q $vr24, $vr25, "
+            "0\nvsrlrni.d.q $vr28, $vr29, 0\n")
 INSTR_TEST(vssrlni_bu_h_0, "vssrlni.bu.h $vr0, $vr1, 0\n")
 INSTR_TEST(vssrlni_bu_h_1, "vssrlni.bu.h $vr0, $vr0, 0\n")
-INSTR_TEST8(vssrlni_bu_h_tp, "vssrlni.bu.h $vr0, $vr1, 0\nvssrlni.bu.h $vr4, $vr5, 0\nvssrlni.bu.h $vr8, $vr9, 0\nvssrlni.bu.h $vr12, $vr13, 0\nvssrlni.bu.h $vr16, $vr17, 0\nvssrlni.bu.h $vr20, $vr21, 0\nvssrlni.bu.h $vr24, $vr25, 0\nvssrlni.bu.h $vr28, $vr29, 0\n")
+INSTR_TEST8(vssrlni_bu_h_tp,
+            "vssrlni.bu.h $vr0, $vr1, 0\nvssrlni.bu.h $vr4, $vr5, "
+            "0\nvssrlni.bu.h $vr8, $vr9, 0\nvssrlni.bu.h $vr12, $vr13, "
+            "0\nvssrlni.bu.h $vr16, $vr17, 0\nvssrlni.bu.h $vr20, $vr21, "
+            "0\nvssrlni.bu.h $vr24, $vr25, 0\nvssrlni.bu.h $vr28, $vr29, 0\n")
 INSTR_TEST(vssrlni_hu_w_0, "vssrlni.hu.w $vr0, $vr1, 0\n")
 INSTR_TEST(vssrlni_hu_w_1, "vssrlni.hu.w $vr0, $vr0, 0\n")
-INSTR_TEST8(vssrlni_hu_w_tp, "vssrlni.hu.w $vr0, $vr1, 0\nvssrlni.hu.w $vr4, $vr5, 0\nvssrlni.hu.w $vr8, $vr9, 0\nvssrlni.hu.w $vr12, $vr13, 0\nvssrlni.hu.w $vr16, $vr17, 0\nvssrlni.hu.w $vr20, $vr21, 0\nvssrlni.hu.w $vr24, $vr25, 0\nvssrlni.hu.w $vr28, $vr29, 0\n")
+INSTR_TEST8(vssrlni_hu_w_tp,
+            "vssrlni.hu.w $vr0, $vr1, 0\nvssrlni.hu.w $vr4, $vr5, "
+            "0\nvssrlni.hu.w $vr8, $vr9, 0\nvssrlni.hu.w $vr12, $vr13, "
+            "0\nvssrlni.hu.w $vr16, $vr17, 0\nvssrlni.hu.w $vr20, $vr21, "
+            "0\nvssrlni.hu.w $vr24, $vr25, 0\nvssrlni.hu.w $vr28, $vr29, 0\n")
 INSTR_TEST(vssrlni_wu_d_0, "vssrlni.wu.d $vr0, $vr1, 0\n")
 INSTR_TEST(vssrlni_wu_d_1, "vssrlni.wu.d $vr0, $vr0, 0\n")
-INSTR_TEST8(vssrlni_wu_d_tp, "vssrlni.wu.d $vr0, $vr1, 0\nvssrlni.wu.d $vr4, $vr5, 0\nvssrlni.wu.d $vr8, $vr9, 0\nvssrlni.wu.d $vr12, $vr13, 0\nvssrlni.wu.d $vr16, $vr17, 0\nvssrlni.wu.d $vr20, $vr21, 0\nvssrlni.wu.d $vr24, $vr25, 0\nvssrlni.wu.d $vr28, $vr29, 0\n")
+INSTR_TEST8(vssrlni_wu_d_tp,
+            "vssrlni.wu.d $vr0, $vr1, 0\nvssrlni.wu.d $vr4, $vr5, "
+            "0\nvssrlni.wu.d $vr8, $vr9, 0\nvssrlni.wu.d $vr12, $vr13, "
+            "0\nvssrlni.wu.d $vr16, $vr17, 0\nvssrlni.wu.d $vr20, $vr21, "
+            "0\nvssrlni.wu.d $vr24, $vr25, 0\nvssrlni.wu.d $vr28, $vr29, 0\n")
 INSTR_TEST(vssrlni_du_q_0, "vssrlni.du.q $vr0, $vr1, 0\n")
 INSTR_TEST(vssrlni_du_q_1, "vssrlni.du.q $vr0, $vr0, 0\n")
-INSTR_TEST8(vssrlni_du_q_tp, "vssrlni.du.q $vr0, $vr1, 0\nvssrlni.du.q $vr4, $vr5, 0\nvssrlni.du.q $vr8, $vr9, 0\nvssrlni.du.q $vr12, $vr13, 0\nvssrlni.du.q $vr16, $vr17, 0\nvssrlni.du.q $vr20, $vr21, 0\nvssrlni.du.q $vr24, $vr25, 0\nvssrlni.du.q $vr28, $vr29, 0\n")
+INSTR_TEST8(vssrlni_du_q_tp,
+            "vssrlni.du.q $vr0, $vr1, 0\nvssrlni.du.q $vr4, $vr5, "
+            "0\nvssrlni.du.q $vr8, $vr9, 0\nvssrlni.du.q $vr12, $vr13, "
+            "0\nvssrlni.du.q $vr16, $vr17, 0\nvssrlni.du.q $vr20, $vr21, "
+            "0\nvssrlni.du.q $vr24, $vr25, 0\nvssrlni.du.q $vr28, $vr29, 0\n")
 INSTR_TEST(vssrlrni_b_h_0, "vssrlrni.b.h $vr0, $vr1, 0\n")
 INSTR_TEST(vssrlrni_b_h_1, "vssrlrni.b.h $vr0, $vr0, 0\n")
-INSTR_TEST8(vssrlrni_b_h_tp, "vssrlrni.b.h $vr0, $vr1, 0\nvssrlrni.b.h $vr4, $vr5, 0\nvssrlrni.b.h $vr8, $vr9, 0\nvssrlrni.b.h $vr12, $vr13, 0\nvssrlrni.b.h $vr16, $vr17, 0\nvssrlrni.b.h $vr20, $vr21, 0\nvssrlrni.b.h $vr24, $vr25, 0\nvssrlrni.b.h $vr28, $vr29, 0\n")
+INSTR_TEST8(vssrlrni_b_h_tp,
+            "vssrlrni.b.h $vr0, $vr1, 0\nvssrlrni.b.h $vr4, $vr5, "
+            "0\nvssrlrni.b.h $vr8, $vr9, 0\nvssrlrni.b.h $vr12, $vr13, "
+            "0\nvssrlrni.b.h $vr16, $vr17, 0\nvssrlrni.b.h $vr20, $vr21, "
+            "0\nvssrlrni.b.h $vr24, $vr25, 0\nvssrlrni.b.h $vr28, $vr29, 0\n")
 INSTR_TEST(vssrlrni_h_w_0, "vssrlrni.h.w $vr0, $vr1, 0\n")
 INSTR_TEST(vssrlrni_h_w_1, "vssrlrni.h.w $vr0, $vr0, 0\n")
-INSTR_TEST8(vssrlrni_h_w_tp, "vssrlrni.h.w $vr0, $vr1, 0\nvssrlrni.h.w $vr4, $vr5, 0\nvssrlrni.h.w $vr8, $vr9, 0\nvssrlrni.h.w $vr12, $vr13, 0\nvssrlrni.h.w $vr16, $vr17, 0\nvssrlrni.h.w $vr20, $vr21, 0\nvssrlrni.h.w $vr24, $vr25, 0\nvssrlrni.h.w $vr28, $vr29, 0\n")
+INSTR_TEST8(vssrlrni_h_w_tp,
+            "vssrlrni.h.w $vr0, $vr1, 0\nvssrlrni.h.w $vr4, $vr5, "
+            "0\nvssrlrni.h.w $vr8, $vr9, 0\nvssrlrni.h.w $vr12, $vr13, "
+            "0\nvssrlrni.h.w $vr16, $vr17, 0\nvssrlrni.h.w $vr20, $vr21, "
+            "0\nvssrlrni.h.w $vr24, $vr25, 0\nvssrlrni.h.w $vr28, $vr29, 0\n")
 INSTR_TEST(vssrlrni_w_d_0, "vssrlrni.w.d $vr0, $vr1, 0\n")
 INSTR_TEST(vssrlrni_w_d_1, "vssrlrni.w.d $vr0, $vr0, 0\n")
-INSTR_TEST8(vssrlrni_w_d_tp, "vssrlrni.w.d $vr0, $vr1, 0\nvssrlrni.w.d $vr4, $vr5, 0\nvssrlrni.w.d $vr8, $vr9, 0\nvssrlrni.w.d $vr12, $vr13, 0\nvssrlrni.w.d $vr16, $vr17, 0\nvssrlrni.w.d $vr20, $vr21, 0\nvssrlrni.w.d $vr24, $vr25, 0\nvssrlrni.w.d $vr28, $vr29, 0\n")
+INSTR_TEST8(vssrlrni_w_d_tp,
+            "vssrlrni.w.d $vr0, $vr1, 0\nvssrlrni.w.d $vr4, $vr5, "
+            "0\nvssrlrni.w.d $vr8, $vr9, 0\nvssrlrni.w.d $vr12, $vr13, "
+            "0\nvssrlrni.w.d $vr16, $vr17, 0\nvssrlrni.w.d $vr20, $vr21, "
+            "0\nvssrlrni.w.d $vr24, $vr25, 0\nvssrlrni.w.d $vr28, $vr29, 0\n")
 INSTR_TEST(vssrlrni_d_q_0, "vssrlrni.d.q $vr0, $vr1, 0\n")
 INSTR_TEST(vssrlrni_d_q_1, "vssrlrni.d.q $vr0, $vr0, 0\n")
-INSTR_TEST8(vssrlrni_d_q_tp, "vssrlrni.d.q $vr0, $vr1, 0\nvssrlrni.d.q $vr4, $vr5, 0\nvssrlrni.d.q $vr8, $vr9, 0\nvssrlrni.d.q $vr12, $vr13, 0\nvssrlrni.d.q $vr16, $vr17, 0\nvssrlrni.d.q $vr20, $vr21, 0\nvssrlrni.d.q $vr24, $vr25, 0\nvssrlrni.d.q $vr28, $vr29, 0\n")
+INSTR_TEST8(vssrlrni_d_q_tp,
+            "vssrlrni.d.q $vr0, $vr1, 0\nvssrlrni.d.q $vr4, $vr5, "
+            "0\nvssrlrni.d.q $vr8, $vr9, 0\nvssrlrni.d.q $vr12, $vr13, "
+            "0\nvssrlrni.d.q $vr16, $vr17, 0\nvssrlrni.d.q $vr20, $vr21, "
+            "0\nvssrlrni.d.q $vr24, $vr25, 0\nvssrlrni.d.q $vr28, $vr29, 0\n")
 INSTR_TEST(vssrlrni_bu_h_0, "vssrlrni.bu.h $vr0, $vr1, 0\n")
 INSTR_TEST(vssrlrni_bu_h_1, "vssrlrni.bu.h $vr0, $vr0, 0\n")
-INSTR_TEST8(vssrlrni_bu_h_tp, "vssrlrni.bu.h $vr0, $vr1, 0\nvssrlrni.bu.h $vr4, $vr5, 0\nvssrlrni.bu.h $vr8, $vr9, 0\nvssrlrni.bu.h $vr12, $vr13, 0\nvssrlrni.bu.h $vr16, $vr17, 0\nvssrlrni.bu.h $vr20, $vr21, 0\nvssrlrni.bu.h $vr24, $vr25, 0\nvssrlrni.bu.h $vr28, $vr29, 0\n")
+INSTR_TEST8(vssrlrni_bu_h_tp,
+            "vssrlrni.bu.h $vr0, $vr1, 0\nvssrlrni.bu.h $vr4, $vr5, "
+            "0\nvssrlrni.bu.h $vr8, $vr9, 0\nvssrlrni.bu.h $vr12, $vr13, "
+            "0\nvssrlrni.bu.h $vr16, $vr17, 0\nvssrlrni.bu.h $vr20, $vr21, "
+            "0\nvssrlrni.bu.h $vr24, $vr25, 0\nvssrlrni.bu.h $vr28, $vr29, 0\n")
 INSTR_TEST(vssrlrni_hu_w_0, "vssrlrni.hu.w $vr0, $vr1, 0\n")
 INSTR_TEST(vssrlrni_hu_w_1, "vssrlrni.hu.w $vr0, $vr0, 0\n")
-INSTR_TEST8(vssrlrni_hu_w_tp, "vssrlrni.hu.w $vr0, $vr1, 0\nvssrlrni.hu.w $vr4, $vr5, 0\nvssrlrni.hu.w $vr8, $vr9, 0\nvssrlrni.hu.w $vr12, $vr13, 0\nvssrlrni.hu.w $vr16, $vr17, 0\nvssrlrni.hu.w $vr20, $vr21, 0\nvssrlrni.hu.w $vr24, $vr25, 0\nvssrlrni.hu.w $vr28, $vr29, 0\n")
+INSTR_TEST8(vssrlrni_hu_w_tp,
+            "vssrlrni.hu.w $vr0, $vr1, 0\nvssrlrni.hu.w $vr4, $vr5, "
+            "0\nvssrlrni.hu.w $vr8, $vr9, 0\nvssrlrni.hu.w $vr12, $vr13, "
+            "0\nvssrlrni.hu.w $vr16, $vr17, 0\nvssrlrni.hu.w $vr20, $vr21, "
+            "0\nvssrlrni.hu.w $vr24, $vr25, 0\nvssrlrni.hu.w $vr28, $vr29, 0\n")
 INSTR_TEST(vssrlrni_wu_d_0, "vssrlrni.wu.d $vr0, $vr1, 0\n")
 INSTR_TEST(vssrlrni_wu_d_1, "vssrlrni.wu.d $vr0, $vr0, 0\n")
-INSTR_TEST8(vssrlrni_wu_d_tp, "vssrlrni.wu.d $vr0, $vr1, 0\nvssrlrni.wu.d $vr4, $vr5, 0\nvssrlrni.wu.d $vr8, $vr9, 0\nvssrlrni.wu.d $vr12, $vr13, 0\nvssrlrni.wu.d $vr16, $vr17, 0\nvssrlrni.wu.d $vr20, $vr21, 0\nvssrlrni.wu.d $vr24, $vr25, 0\nvssrlrni.wu.d $vr28, $vr29, 0\n")
+INSTR_TEST8(vssrlrni_wu_d_tp,
+            "vssrlrni.wu.d $vr0, $vr1, 0\nvssrlrni.wu.d $vr4, $vr5, "
+            "0\nvssrlrni.wu.d $vr8, $vr9, 0\nvssrlrni.wu.d $vr12, $vr13, "
+            "0\nvssrlrni.wu.d $vr16, $vr17, 0\nvssrlrni.wu.d $vr20, $vr21, "
+            "0\nvssrlrni.wu.d $vr24, $vr25, 0\nvssrlrni.wu.d $vr28, $vr29, 0\n")
 INSTR_TEST(vssrlrni_du_q_0, "vssrlrni.du.q $vr0, $vr1, 0\n")
 INSTR_TEST(vssrlrni_du_q_1, "vssrlrni.du.q $vr0, $vr0, 0\n")
-INSTR_TEST8(vssrlrni_du_q_tp, "vssrlrni.du.q $vr0, $vr1, 0\nvssrlrni.du.q $vr4, $vr5, 0\nvssrlrni.du.q $vr8, $vr9, 0\nvssrlrni.du.q $vr12, $vr13, 0\nvssrlrni.du.q $vr16, $vr17, 0\nvssrlrni.du.q $vr20, $vr21, 0\nvssrlrni.du.q $vr24, $vr25, 0\nvssrlrni.du.q $vr28, $vr29, 0\n")
+INSTR_TEST8(vssrlrni_du_q_tp,
+            "vssrlrni.du.q $vr0, $vr1, 0\nvssrlrni.du.q $vr4, $vr5, "
+            "0\nvssrlrni.du.q $vr8, $vr9, 0\nvssrlrni.du.q $vr12, $vr13, "
+            "0\nvssrlrni.du.q $vr16, $vr17, 0\nvssrlrni.du.q $vr20, $vr21, "
+            "0\nvssrlrni.du.q $vr24, $vr25, 0\nvssrlrni.du.q $vr28, $vr29, 0\n")
 INSTR_TEST(vsrani_b_h_0, "vsrani.b.h $vr0, $vr1, 0\n")
 INSTR_TEST(vsrani_b_h_1, "vsrani.b.h $vr0, $vr0, 0\n")
-INSTR_TEST8(vsrani_b_h_tp, "vsrani.b.h $vr0, $vr1, 0\nvsrani.b.h $vr4, $vr5, 0\nvsrani.b.h $vr8, $vr9, 0\nvsrani.b.h $vr12, $vr13, 0\nvsrani.b.h $vr16, $vr17, 0\nvsrani.b.h $vr20, $vr21, 0\nvsrani.b.h $vr24, $vr25, 0\nvsrani.b.h $vr28, $vr29, 0\n")
+INSTR_TEST8(vsrani_b_h_tp,
+            "vsrani.b.h $vr0, $vr1, 0\nvsrani.b.h $vr4, $vr5, 0\nvsrani.b.h "
+            "$vr8, $vr9, 0\nvsrani.b.h $vr12, $vr13, 0\nvsrani.b.h $vr16, "
+            "$vr17, 0\nvsrani.b.h $vr20, $vr21, 0\nvsrani.b.h $vr24, $vr25, "
+            "0\nvsrani.b.h $vr28, $vr29, 0\n")
 INSTR_TEST(vsrani_h_w_0, "vsrani.h.w $vr0, $vr1, 0\n")
 INSTR_TEST(vsrani_h_w_1, "vsrani.h.w $vr0, $vr0, 0\n")
-INSTR_TEST8(vsrani_h_w_tp, "vsrani.h.w $vr0, $vr1, 0\nvsrani.h.w $vr4, $vr5, 0\nvsrani.h.w $vr8, $vr9, 0\nvsrani.h.w $vr12, $vr13, 0\nvsrani.h.w $vr16, $vr17, 0\nvsrani.h.w $vr20, $vr21, 0\nvsrani.h.w $vr24, $vr25, 0\nvsrani.h.w $vr28, $vr29, 0\n")
+INSTR_TEST8(vsrani_h_w_tp,
+            "vsrani.h.w $vr0, $vr1, 0\nvsrani.h.w $vr4, $vr5, 0\nvsrani.h.w "
+            "$vr8, $vr9, 0\nvsrani.h.w $vr12, $vr13, 0\nvsrani.h.w $vr16, "
+            "$vr17, 0\nvsrani.h.w $vr20, $vr21, 0\nvsrani.h.w $vr24, $vr25, "
+            "0\nvsrani.h.w $vr28, $vr29, 0\n")
 INSTR_TEST(vsrani_w_d_0, "vsrani.w.d $vr0, $vr1, 0\n")
 INSTR_TEST(vsrani_w_d_1, "vsrani.w.d $vr0, $vr0, 0\n")
-INSTR_TEST8(vsrani_w_d_tp, "vsrani.w.d $vr0, $vr1, 0\nvsrani.w.d $vr4, $vr5, 0\nvsrani.w.d $vr8, $vr9, 0\nvsrani.w.d $vr12, $vr13, 0\nvsrani.w.d $vr16, $vr17, 0\nvsrani.w.d $vr20, $vr21, 0\nvsrani.w.d $vr24, $vr25, 0\nvsrani.w.d $vr28, $vr29, 0\n")
+INSTR_TEST8(vsrani_w_d_tp,
+            "vsrani.w.d $vr0, $vr1, 0\nvsrani.w.d $vr4, $vr5, 0\nvsrani.w.d "
+            "$vr8, $vr9, 0\nvsrani.w.d $vr12, $vr13, 0\nvsrani.w.d $vr16, "
+            "$vr17, 0\nvsrani.w.d $vr20, $vr21, 0\nvsrani.w.d $vr24, $vr25, "
+            "0\nvsrani.w.d $vr28, $vr29, 0\n")
 INSTR_TEST(vsrani_d_q_0, "vsrani.d.q $vr0, $vr1, 0\n")
 INSTR_TEST(vsrani_d_q_1, "vsrani.d.q $vr0, $vr0, 0\n")
-INSTR_TEST8(vsrani_d_q_tp, "vsrani.d.q $vr0, $vr1, 0\nvsrani.d.q $vr4, $vr5, 0\nvsrani.d.q $vr8, $vr9, 0\nvsrani.d.q $vr12, $vr13, 0\nvsrani.d.q $vr16, $vr17, 0\nvsrani.d.q $vr20, $vr21, 0\nvsrani.d.q $vr24, $vr25, 0\nvsrani.d.q $vr28, $vr29, 0\n")
+INSTR_TEST8(vsrani_d_q_tp,
+            "vsrani.d.q $vr0, $vr1, 0\nvsrani.d.q $vr4, $vr5, 0\nvsrani.d.q "
+            "$vr8, $vr9, 0\nvsrani.d.q $vr12, $vr13, 0\nvsrani.d.q $vr16, "
+            "$vr17, 0\nvsrani.d.q $vr20, $vr21, 0\nvsrani.d.q $vr24, $vr25, "
+            "0\nvsrani.d.q $vr28, $vr29, 0\n")
 INSTR_TEST(vsrarni_b_h_0, "vsrarni.b.h $vr0, $vr1, 0\n")
 INSTR_TEST(vsrarni_b_h_1, "vsrarni.b.h $vr0, $vr0, 0\n")
-INSTR_TEST8(vsrarni_b_h_tp, "vsrarni.b.h $vr0, $vr1, 0\nvsrarni.b.h $vr4, $vr5, 0\nvsrarni.b.h $vr8, $vr9, 0\nvsrarni.b.h $vr12, $vr13, 0\nvsrarni.b.h $vr16, $vr17, 0\nvsrarni.b.h $vr20, $vr21, 0\nvsrarni.b.h $vr24, $vr25, 0\nvsrarni.b.h $vr28, $vr29, 0\n")
+INSTR_TEST8(vsrarni_b_h_tp,
+            "vsrarni.b.h $vr0, $vr1, 0\nvsrarni.b.h $vr4, $vr5, 0\nvsrarni.b.h "
+            "$vr8, $vr9, 0\nvsrarni.b.h $vr12, $vr13, 0\nvsrarni.b.h $vr16, "
+            "$vr17, 0\nvsrarni.b.h $vr20, $vr21, 0\nvsrarni.b.h $vr24, $vr25, "
+            "0\nvsrarni.b.h $vr28, $vr29, 0\n")
 INSTR_TEST(vsrarni_h_w_0, "vsrarni.h.w $vr0, $vr1, 0\n")
 INSTR_TEST(vsrarni_h_w_1, "vsrarni.h.w $vr0, $vr0, 0\n")
-INSTR_TEST8(vsrarni_h_w_tp, "vsrarni.h.w $vr0, $vr1, 0\nvsrarni.h.w $vr4, $vr5, 0\nvsrarni.h.w $vr8, $vr9, 0\nvsrarni.h.w $vr12, $vr13, 0\nvsrarni.h.w $vr16, $vr17, 0\nvsrarni.h.w $vr20, $vr21, 0\nvsrarni.h.w $vr24, $vr25, 0\nvsrarni.h.w $vr28, $vr29, 0\n")
+INSTR_TEST8(vsrarni_h_w_tp,
+            "vsrarni.h.w $vr0, $vr1, 0\nvsrarni.h.w $vr4, $vr5, 0\nvsrarni.h.w "
+            "$vr8, $vr9, 0\nvsrarni.h.w $vr12, $vr13, 0\nvsrarni.h.w $vr16, "
+            "$vr17, 0\nvsrarni.h.w $vr20, $vr21, 0\nvsrarni.h.w $vr24, $vr25, "
+            "0\nvsrarni.h.w $vr28, $vr29, 0\n")
 INSTR_TEST(vsrarni_w_d_0, "vsrarni.w.d $vr0, $vr1, 0\n")
 INSTR_TEST(vsrarni_w_d_1, "vsrarni.w.d $vr0, $vr0, 0\n")
-INSTR_TEST8(vsrarni_w_d_tp, "vsrarni.w.d $vr0, $vr1, 0\nvsrarni.w.d $vr4, $vr5, 0\nvsrarni.w.d $vr8, $vr9, 0\nvsrarni.w.d $vr12, $vr13, 0\nvsrarni.w.d $vr16, $vr17, 0\nvsrarni.w.d $vr20, $vr21, 0\nvsrarni.w.d $vr24, $vr25, 0\nvsrarni.w.d $vr28, $vr29, 0\n")
+INSTR_TEST8(vsrarni_w_d_tp,
+            "vsrarni.w.d $vr0, $vr1, 0\nvsrarni.w.d $vr4, $vr5, 0\nvsrarni.w.d "
+            "$vr8, $vr9, 0\nvsrarni.w.d $vr12, $vr13, 0\nvsrarni.w.d $vr16, "
+            "$vr17, 0\nvsrarni.w.d $vr20, $vr21, 0\nvsrarni.w.d $vr24, $vr25, "
+            "0\nvsrarni.w.d $vr28, $vr29, 0\n")
 INSTR_TEST(vsrarni_d_q_0, "vsrarni.d.q $vr0, $vr1, 0\n")
 INSTR_TEST(vsrarni_d_q_1, "vsrarni.d.q $vr0, $vr0, 0\n")
-INSTR_TEST8(vsrarni_d_q_tp, "vsrarni.d.q $vr0, $vr1, 0\nvsrarni.d.q $vr4, $vr5, 0\nvsrarni.d.q $vr8, $vr9, 0\nvsrarni.d.q $vr12, $vr13, 0\nvsrarni.d.q $vr16, $vr17, 0\nvsrarni.d.q $vr20, $vr21, 0\nvsrarni.d.q $vr24, $vr25, 0\nvsrarni.d.q $vr28, $vr29, 0\n")
+INSTR_TEST8(vsrarni_d_q_tp,
+            "vsrarni.d.q $vr0, $vr1, 0\nvsrarni.d.q $vr4, $vr5, 0\nvsrarni.d.q "
+            "$vr8, $vr9, 0\nvsrarni.d.q $vr12, $vr13, 0\nvsrarni.d.q $vr16, "
+            "$vr17, 0\nvsrarni.d.q $vr20, $vr21, 0\nvsrarni.d.q $vr24, $vr25, "
+            "0\nvsrarni.d.q $vr28, $vr29, 0\n")
 INSTR_TEST(vssrani_b_h_0, "vssrani.b.h $vr0, $vr1, 0\n")
 INSTR_TEST(vssrani_b_h_1, "vssrani.b.h $vr0, $vr0, 0\n")
-INSTR_TEST8(vssrani_b_h_tp, "vssrani.b.h $vr0, $vr1, 0\nvssrani.b.h $vr4, $vr5, 0\nvssrani.b.h $vr8, $vr9, 0\nvssrani.b.h $vr12, $vr13, 0\nvssrani.b.h $vr16, $vr17, 0\nvssrani.b.h $vr20, $vr21, 0\nvssrani.b.h $vr24, $vr25, 0\nvssrani.b.h $vr28, $vr29, 0\n")
+INSTR_TEST8(vssrani_b_h_tp,
+            "vssrani.b.h $vr0, $vr1, 0\nvssrani.b.h $vr4, $vr5, 0\nvssrani.b.h "
+            "$vr8, $vr9, 0\nvssrani.b.h $vr12, $vr13, 0\nvssrani.b.h $vr16, "
+            "$vr17, 0\nvssrani.b.h $vr20, $vr21, 0\nvssrani.b.h $vr24, $vr25, "
+            "0\nvssrani.b.h $vr28, $vr29, 0\n")
 INSTR_TEST(vssrani_h_w_0, "vssrani.h.w $vr0, $vr1, 0\n")
 INSTR_TEST(vssrani_h_w_1, "vssrani.h.w $vr0, $vr0, 0\n")
-INSTR_TEST8(vssrani_h_w_tp, "vssrani.h.w $vr0, $vr1, 0\nvssrani.h.w $vr4, $vr5, 0\nvssrani.h.w $vr8, $vr9, 0\nvssrani.h.w $vr12, $vr13, 0\nvssrani.h.w $vr16, $vr17, 0\nvssrani.h.w $vr20, $vr21, 0\nvssrani.h.w $vr24, $vr25, 0\nvssrani.h.w $vr28, $vr29, 0\n")
+INSTR_TEST8(vssrani_h_w_tp,
+            "vssrani.h.w $vr0, $vr1, 0\nvssrani.h.w $vr4, $vr5, 0\nvssrani.h.w "
+            "$vr8, $vr9, 0\nvssrani.h.w $vr12, $vr13, 0\nvssrani.h.w $vr16, "
+            "$vr17, 0\nvssrani.h.w $vr20, $vr21, 0\nvssrani.h.w $vr24, $vr25, "
+            "0\nvssrani.h.w $vr28, $vr29, 0\n")
 INSTR_TEST(vssrani_w_d_0, "vssrani.w.d $vr0, $vr1, 0\n")
 INSTR_TEST(vssrani_w_d_1, "vssrani.w.d $vr0, $vr0, 0\n")
-INSTR_TEST8(vssrani_w_d_tp, "vssrani.w.d $vr0, $vr1, 0\nvssrani.w.d $vr4, $vr5, 0\nvssrani.w.d $vr8, $vr9, 0\nvssrani.w.d $vr12, $vr13, 0\nvssrani.w.d $vr16, $vr17, 0\nvssrani.w.d $vr20, $vr21, 0\nvssrani.w.d $vr24, $vr25, 0\nvssrani.w.d $vr28, $vr29, 0\n")
+INSTR_TEST8(vssrani_w_d_tp,
+            "vssrani.w.d $vr0, $vr1, 0\nvssrani.w.d $vr4, $vr5, 0\nvssrani.w.d "
+            "$vr8, $vr9, 0\nvssrani.w.d $vr12, $vr13, 0\nvssrani.w.d $vr16, "
+            "$vr17, 0\nvssrani.w.d $vr20, $vr21, 0\nvssrani.w.d $vr24, $vr25, "
+            "0\nvssrani.w.d $vr28, $vr29, 0\n")
 INSTR_TEST(vssrani_d_q_0, "vssrani.d.q $vr0, $vr1, 0\n")
 INSTR_TEST(vssrani_d_q_1, "vssrani.d.q $vr0, $vr0, 0\n")
-INSTR_TEST8(vssrani_d_q_tp, "vssrani.d.q $vr0, $vr1, 0\nvssrani.d.q $vr4, $vr5, 0\nvssrani.d.q $vr8, $vr9, 0\nvssrani.d.q $vr12, $vr13, 0\nvssrani.d.q $vr16, $vr17, 0\nvssrani.d.q $vr20, $vr21, 0\nvssrani.d.q $vr24, $vr25, 0\nvssrani.d.q $vr28, $vr29, 0\n")
+INSTR_TEST8(vssrani_d_q_tp,
+            "vssrani.d.q $vr0, $vr1, 0\nvssrani.d.q $vr4, $vr5, 0\nvssrani.d.q "
+            "$vr8, $vr9, 0\nvssrani.d.q $vr12, $vr13, 0\nvssrani.d.q $vr16, "
+            "$vr17, 0\nvssrani.d.q $vr20, $vr21, 0\nvssrani.d.q $vr24, $vr25, "
+            "0\nvssrani.d.q $vr28, $vr29, 0\n")
 INSTR_TEST(vssrani_bu_h_0, "vssrani.bu.h $vr0, $vr1, 0\n")
 INSTR_TEST(vssrani_bu_h_1, "vssrani.bu.h $vr0, $vr0, 0\n")
-INSTR_TEST8(vssrani_bu_h_tp, "vssrani.bu.h $vr0, $vr1, 0\nvssrani.bu.h $vr4, $vr5, 0\nvssrani.bu.h $vr8, $vr9, 0\nvssrani.bu.h $vr12, $vr13, 0\nvssrani.bu.h $vr16, $vr17, 0\nvssrani.bu.h $vr20, $vr21, 0\nvssrani.bu.h $vr24, $vr25, 0\nvssrani.bu.h $vr28, $vr29, 0\n")
+INSTR_TEST8(vssrani_bu_h_tp,
+            "vssrani.bu.h $vr0, $vr1, 0\nvssrani.bu.h $vr4, $vr5, "
+            "0\nvssrani.bu.h $vr8, $vr9, 0\nvssrani.bu.h $vr12, $vr13, "
+            "0\nvssrani.bu.h $vr16, $vr17, 0\nvssrani.bu.h $vr20, $vr21, "
+            "0\nvssrani.bu.h $vr24, $vr25, 0\nvssrani.bu.h $vr28, $vr29, 0\n")
 INSTR_TEST(vssrani_hu_w_0, "vssrani.hu.w $vr0, $vr1, 0\n")
 INSTR_TEST(vssrani_hu_w_1, "vssrani.hu.w $vr0, $vr0, 0\n")
-INSTR_TEST8(vssrani_hu_w_tp, "vssrani.hu.w $vr0, $vr1, 0\nvssrani.hu.w $vr4, $vr5, 0\nvssrani.hu.w $vr8, $vr9, 0\nvssrani.hu.w $vr12, $vr13, 0\nvssrani.hu.w $vr16, $vr17, 0\nvssrani.hu.w $vr20, $vr21, 0\nvssrani.hu.w $vr24, $vr25, 0\nvssrani.hu.w $vr28, $vr29, 0\n")
+INSTR_TEST8(vssrani_hu_w_tp,
+            "vssrani.hu.w $vr0, $vr1, 0\nvssrani.hu.w $vr4, $vr5, "
+            "0\nvssrani.hu.w $vr8, $vr9, 0\nvssrani.hu.w $vr12, $vr13, "
+            "0\nvssrani.hu.w $vr16, $vr17, 0\nvssrani.hu.w $vr20, $vr21, "
+            "0\nvssrani.hu.w $vr24, $vr25, 0\nvssrani.hu.w $vr28, $vr29, 0\n")
 INSTR_TEST(vssrani_wu_d_0, "vssrani.wu.d $vr0, $vr1, 0\n")
 INSTR_TEST(vssrani_wu_d_1, "vssrani.wu.d $vr0, $vr0, 0\n")
-INSTR_TEST8(vssrani_wu_d_tp, "vssrani.wu.d $vr0, $vr1, 0\nvssrani.wu.d $vr4, $vr5, 0\nvssrani.wu.d $vr8, $vr9, 0\nvssrani.wu.d $vr12, $vr13, 0\nvssrani.wu.d $vr16, $vr17, 0\nvssrani.wu.d $vr20, $vr21, 0\nvssrani.wu.d $vr24, $vr25, 0\nvssrani.wu.d $vr28, $vr29, 0\n")
+INSTR_TEST8(vssrani_wu_d_tp,
+            "vssrani.wu.d $vr0, $vr1, 0\nvssrani.wu.d $vr4, $vr5, "
+            "0\nvssrani.wu.d $vr8, $vr9, 0\nvssrani.wu.d $vr12, $vr13, "
+            "0\nvssrani.wu.d $vr16, $vr17, 0\nvssrani.wu.d $vr20, $vr21, "
+            "0\nvssrani.wu.d $vr24, $vr25, 0\nvssrani.wu.d $vr28, $vr29, 0\n")
 INSTR_TEST(vssrani_du_q_0, "vssrani.du.q $vr0, $vr1, 0\n")
 INSTR_TEST(vssrani_du_q_1, "vssrani.du.q $vr0, $vr0, 0\n")
-INSTR_TEST8(vssrani_du_q_tp, "vssrani.du.q $vr0, $vr1, 0\nvssrani.du.q $vr4, $vr5, 0\nvssrani.du.q $vr8, $vr9, 0\nvssrani.du.q $vr12, $vr13, 0\nvssrani.du.q $vr16, $vr17, 0\nvssrani.du.q $vr20, $vr21, 0\nvssrani.du.q $vr24, $vr25, 0\nvssrani.du.q $vr28, $vr29, 0\n")
+INSTR_TEST8(vssrani_du_q_tp,
+            "vssrani.du.q $vr0, $vr1, 0\nvssrani.du.q $vr4, $vr5, "
+            "0\nvssrani.du.q $vr8, $vr9, 0\nvssrani.du.q $vr12, $vr13, "
+            "0\nvssrani.du.q $vr16, $vr17, 0\nvssrani.du.q $vr20, $vr21, "
+            "0\nvssrani.du.q $vr24, $vr25, 0\nvssrani.du.q $vr28, $vr29, 0\n")
 INSTR_TEST(vssrarni_b_h_0, "vssrarni.b.h $vr0, $vr1, 0\n")
 INSTR_TEST(vssrarni_b_h_1, "vssrarni.b.h $vr0, $vr0, 0\n")
-INSTR_TEST8(vssrarni_b_h_tp, "vssrarni.b.h $vr0, $vr1, 0\nvssrarni.b.h $vr4, $vr5, 0\nvssrarni.b.h $vr8, $vr9, 0\nvssrarni.b.h $vr12, $vr13, 0\nvssrarni.b.h $vr16, $vr17, 0\nvssrarni.b.h $vr20, $vr21, 0\nvssrarni.b.h $vr24, $vr25, 0\nvssrarni.b.h $vr28, $vr29, 0\n")
+INSTR_TEST8(vssrarni_b_h_tp,
+            "vssrarni.b.h $vr0, $vr1, 0\nvssrarni.b.h $vr4, $vr5, "
+            "0\nvssrarni.b.h $vr8, $vr9, 0\nvssrarni.b.h $vr12, $vr13, "
+            "0\nvssrarni.b.h $vr16, $vr17, 0\nvssrarni.b.h $vr20, $vr21, "
+            "0\nvssrarni.b.h $vr24, $vr25, 0\nvssrarni.b.h $vr28, $vr29, 0\n")
 INSTR_TEST(vssrarni_h_w_0, "vssrarni.h.w $vr0, $vr1, 0\n")
 INSTR_TEST(vssrarni_h_w_1, "vssrarni.h.w $vr0, $vr0, 0\n")
-INSTR_TEST8(vssrarni_h_w_tp, "vssrarni.h.w $vr0, $vr1, 0\nvssrarni.h.w $vr4, $vr5, 0\nvssrarni.h.w $vr8, $vr9, 0\nvssrarni.h.w $vr12, $vr13, 0\nvssrarni.h.w $vr16, $vr17, 0\nvssrarni.h.w $vr20, $vr21, 0\nvssrarni.h.w $vr24, $vr25, 0\nvssrarni.h.w $vr28, $vr29, 0\n")
+INSTR_TEST8(vssrarni_h_w_tp,
+            "vssrarni.h.w $vr0, $vr1, 0\nvssrarni.h.w $vr4, $vr5, "
+            "0\nvssrarni.h.w $vr8, $vr9, 0\nvssrarni.h.w $vr12, $vr13, "
+            "0\nvssrarni.h.w $vr16, $vr17, 0\nvssrarni.h.w $vr20, $vr21, "
+            "0\nvssrarni.h.w $vr24, $vr25, 0\nvssrarni.h.w $vr28, $vr29, 0\n")
 INSTR_TEST(vssrarni_w_d_0, "vssrarni.w.d $vr0, $vr1, 0\n")
 INSTR_TEST(vssrarni_w_d_1, "vssrarni.w.d $vr0, $vr0, 0\n")
-INSTR_TEST8(vssrarni_w_d_tp, "vssrarni.w.d $vr0, $vr1, 0\nvssrarni.w.d $vr4, $vr5, 0\nvssrarni.w.d $vr8, $vr9, 0\nvssrarni.w.d $vr12, $vr13, 0\nvssrarni.w.d $vr16, $vr17, 0\nvssrarni.w.d $vr20, $vr21, 0\nvssrarni.w.d $vr24, $vr25, 0\nvssrarni.w.d $vr28, $vr29, 0\n")
+INSTR_TEST8(vssrarni_w_d_tp,
+            "vssrarni.w.d $vr0, $vr1, 0\nvssrarni.w.d $vr4, $vr5, "
+            "0\nvssrarni.w.d $vr8, $vr9, 0\nvssrarni.w.d $vr12, $vr13, "
+            "0\nvssrarni.w.d $vr16, $vr17, 0\nvssrarni.w.d $vr20, $vr21, "
+            "0\nvssrarni.w.d $vr24, $vr25, 0\nvssrarni.w.d $vr28, $vr29, 0\n")
 INSTR_TEST(vssrarni_d_q_0, "vssrarni.d.q $vr0, $vr1, 0\n")
 INSTR_TEST(vssrarni_d_q_1, "vssrarni.d.q $vr0, $vr0, 0\n")
-INSTR_TEST8(vssrarni_d_q_tp, "vssrarni.d.q $vr0, $vr1, 0\nvssrarni.d.q $vr4, $vr5, 0\nvssrarni.d.q $vr8, $vr9, 0\nvssrarni.d.q $vr12, $vr13, 0\nvssrarni.d.q $vr16, $vr17, 0\nvssrarni.d.q $vr20, $vr21, 0\nvssrarni.d.q $vr24, $vr25, 0\nvssrarni.d.q $vr28, $vr29, 0\n")
+INSTR_TEST8(vssrarni_d_q_tp,
+            "vssrarni.d.q $vr0, $vr1, 0\nvssrarni.d.q $vr4, $vr5, "
+            "0\nvssrarni.d.q $vr8, $vr9, 0\nvssrarni.d.q $vr12, $vr13, "
+            "0\nvssrarni.d.q $vr16, $vr17, 0\nvssrarni.d.q $vr20, $vr21, "
+            "0\nvssrarni.d.q $vr24, $vr25, 0\nvssrarni.d.q $vr28, $vr29, 0\n")
 INSTR_TEST(vssrarni_bu_h_0, "vssrarni.bu.h $vr0, $vr1, 0\n")
 INSTR_TEST(vssrarni_bu_h_1, "vssrarni.bu.h $vr0, $vr0, 0\n")
-INSTR_TEST8(vssrarni_bu_h_tp, "vssrarni.bu.h $vr0, $vr1, 0\nvssrarni.bu.h $vr4, $vr5, 0\nvssrarni.bu.h $vr8, $vr9, 0\nvssrarni.bu.h $vr12, $vr13, 0\nvssrarni.bu.h $vr16, $vr17, 0\nvssrarni.bu.h $vr20, $vr21, 0\nvssrarni.bu.h $vr24, $vr25, 0\nvssrarni.bu.h $vr28, $vr29, 0\n")
+INSTR_TEST8(vssrarni_bu_h_tp,
+            "vssrarni.bu.h $vr0, $vr1, 0\nvssrarni.bu.h $vr4, $vr5, "
+            "0\nvssrarni.bu.h $vr8, $vr9, 0\nvssrarni.bu.h $vr12, $vr13, "
+            "0\nvssrarni.bu.h $vr16, $vr17, 0\nvssrarni.bu.h $vr20, $vr21, "
+            "0\nvssrarni.bu.h $vr24, $vr25, 0\nvssrarni.bu.h $vr28, $vr29, 0\n")
 INSTR_TEST(vssrarni_hu_w_0, "vssrarni.hu.w $vr0, $vr1, 0\n")
 INSTR_TEST(vssrarni_hu_w_1, "vssrarni.hu.w $vr0, $vr0, 0\n")
-INSTR_TEST8(vssrarni_hu_w_tp, "vssrarni.hu.w $vr0, $vr1, 0\nvssrarni.hu.w $vr4, $vr5, 0\nvssrarni.hu.w $vr8, $vr9, 0\nvssrarni.hu.w $vr12, $vr13, 0\nvssrarni.hu.w $vr16, $vr17, 0\nvssrarni.hu.w $vr20, $vr21, 0\nvssrarni.hu.w $vr24, $vr25, 0\nvssrarni.hu.w $vr28, $vr29, 0\n")
+INSTR_TEST8(vssrarni_hu_w_tp,
+            "vssrarni.hu.w $vr0, $vr1, 0\nvssrarni.hu.w $vr4, $vr5, "
+            "0\nvssrarni.hu.w $vr8, $vr9, 0\nvssrarni.hu.w $vr12, $vr13, "
+            "0\nvssrarni.hu.w $vr16, $vr17, 0\nvssrarni.hu.w $vr20, $vr21, "
+            "0\nvssrarni.hu.w $vr24, $vr25, 0\nvssrarni.hu.w $vr28, $vr29, 0\n")
 INSTR_TEST(vssrarni_wu_d_0, "vssrarni.wu.d $vr0, $vr1, 0\n")
 INSTR_TEST(vssrarni_wu_d_1, "vssrarni.wu.d $vr0, $vr0, 0\n")
-INSTR_TEST8(vssrarni_wu_d_tp, "vssrarni.wu.d $vr0, $vr1, 0\nvssrarni.wu.d $vr4, $vr5, 0\nvssrarni.wu.d $vr8, $vr9, 0\nvssrarni.wu.d $vr12, $vr13, 0\nvssrarni.wu.d $vr16, $vr17, 0\nvssrarni.wu.d $vr20, $vr21, 0\nvssrarni.wu.d $vr24, $vr25, 0\nvssrarni.wu.d $vr28, $vr29, 0\n")
+INSTR_TEST8(vssrarni_wu_d_tp,
+            "vssrarni.wu.d $vr0, $vr1, 0\nvssrarni.wu.d $vr4, $vr5, "
+            "0\nvssrarni.wu.d $vr8, $vr9, 0\nvssrarni.wu.d $vr12, $vr13, "
+            "0\nvssrarni.wu.d $vr16, $vr17, 0\nvssrarni.wu.d $vr20, $vr21, "
+            "0\nvssrarni.wu.d $vr24, $vr25, 0\nvssrarni.wu.d $vr28, $vr29, 0\n")
 INSTR_TEST(vssrarni_du_q_0, "vssrarni.du.q $vr0, $vr1, 0\n")
 INSTR_TEST(vssrarni_du_q_1, "vssrarni.du.q $vr0, $vr0, 0\n")
-INSTR_TEST8(vssrarni_du_q_tp, "vssrarni.du.q $vr0, $vr1, 0\nvssrarni.du.q $vr4, $vr5, 0\nvssrarni.du.q $vr8, $vr9, 0\nvssrarni.du.q $vr12, $vr13, 0\nvssrarni.du.q $vr16, $vr17, 0\nvssrarni.du.q $vr20, $vr21, 0\nvssrarni.du.q $vr24, $vr25, 0\nvssrarni.du.q $vr28, $vr29, 0\n")
+INSTR_TEST8(vssrarni_du_q_tp,
+            "vssrarni.du.q $vr0, $vr1, 0\nvssrarni.du.q $vr4, $vr5, "
+            "0\nvssrarni.du.q $vr8, $vr9, 0\nvssrarni.du.q $vr12, $vr13, "
+            "0\nvssrarni.du.q $vr16, $vr17, 0\nvssrarni.du.q $vr20, $vr21, "
+            "0\nvssrarni.du.q $vr24, $vr25, 0\nvssrarni.du.q $vr28, $vr29, 0\n")
 INSTR_TEST(vextrins_d_0, "vextrins.d $vr0, $vr1, 0\n")
 INSTR_TEST(vextrins_d_1, "vextrins.d $vr0, $vr0, 0\n")
-INSTR_TEST8(vextrins_d_tp, "vextrins.d $vr0, $vr1, 0\nvextrins.d $vr4, $vr5, 0\nvextrins.d $vr8, $vr9, 0\nvextrins.d $vr12, $vr13, 0\nvextrins.d $vr16, $vr17, 0\nvextrins.d $vr20, $vr21, 0\nvextrins.d $vr24, $vr25, 0\nvextrins.d $vr28, $vr29, 0\n")
+INSTR_TEST8(vextrins_d_tp,
+            "vextrins.d $vr0, $vr1, 0\nvextrins.d $vr4, $vr5, 0\nvextrins.d "
+            "$vr8, $vr9, 0\nvextrins.d $vr12, $vr13, 0\nvextrins.d $vr16, "
+            "$vr17, 0\nvextrins.d $vr20, $vr21, 0\nvextrins.d $vr24, $vr25, "
+            "0\nvextrins.d $vr28, $vr29, 0\n")
 INSTR_TEST(vextrins_w_0, "vextrins.w $vr0, $vr1, 0\n")
 INSTR_TEST(vextrins_w_1, "vextrins.w $vr0, $vr0, 0\n")
-INSTR_TEST8(vextrins_w_tp, "vextrins.w $vr0, $vr1, 0\nvextrins.w $vr4, $vr5, 0\nvextrins.w $vr8, $vr9, 0\nvextrins.w $vr12, $vr13, 0\nvextrins.w $vr16, $vr17, 0\nvextrins.w $vr20, $vr21, 0\nvextrins.w $vr24, $vr25, 0\nvextrins.w $vr28, $vr29, 0\n")
+INSTR_TEST8(vextrins_w_tp,
+            "vextrins.w $vr0, $vr1, 0\nvextrins.w $vr4, $vr5, 0\nvextrins.w "
+            "$vr8, $vr9, 0\nvextrins.w $vr12, $vr13, 0\nvextrins.w $vr16, "
+            "$vr17, 0\nvextrins.w $vr20, $vr21, 0\nvextrins.w $vr24, $vr25, "
+            "0\nvextrins.w $vr28, $vr29, 0\n")
 INSTR_TEST(vextrins_h_0, "vextrins.h $vr0, $vr1, 0\n")
 INSTR_TEST(vextrins_h_1, "vextrins.h $vr0, $vr0, 0\n")
-INSTR_TEST8(vextrins_h_tp, "vextrins.h $vr0, $vr1, 0\nvextrins.h $vr4, $vr5, 0\nvextrins.h $vr8, $vr9, 0\nvextrins.h $vr12, $vr13, 0\nvextrins.h $vr16, $vr17, 0\nvextrins.h $vr20, $vr21, 0\nvextrins.h $vr24, $vr25, 0\nvextrins.h $vr28, $vr29, 0\n")
+INSTR_TEST8(vextrins_h_tp,
+            "vextrins.h $vr0, $vr1, 0\nvextrins.h $vr4, $vr5, 0\nvextrins.h "
+            "$vr8, $vr9, 0\nvextrins.h $vr12, $vr13, 0\nvextrins.h $vr16, "
+            "$vr17, 0\nvextrins.h $vr20, $vr21, 0\nvextrins.h $vr24, $vr25, "
+            "0\nvextrins.h $vr28, $vr29, 0\n")
 INSTR_TEST(vextrins_b_0, "vextrins.b $vr0, $vr1, 0\n")
 INSTR_TEST(vextrins_b_1, "vextrins.b $vr0, $vr0, 0\n")
-INSTR_TEST8(vextrins_b_tp, "vextrins.b $vr0, $vr1, 0\nvextrins.b $vr4, $vr5, 0\nvextrins.b $vr8, $vr9, 0\nvextrins.b $vr12, $vr13, 0\nvextrins.b $vr16, $vr17, 0\nvextrins.b $vr20, $vr21, 0\nvextrins.b $vr24, $vr25, 0\nvextrins.b $vr28, $vr29, 0\n")
+INSTR_TEST8(vextrins_b_tp,
+            "vextrins.b $vr0, $vr1, 0\nvextrins.b $vr4, $vr5, 0\nvextrins.b "
+            "$vr8, $vr9, 0\nvextrins.b $vr12, $vr13, 0\nvextrins.b $vr16, "
+            "$vr17, 0\nvextrins.b $vr20, $vr21, 0\nvextrins.b $vr24, $vr25, "
+            "0\nvextrins.b $vr28, $vr29, 0\n")
 INSTR_TEST(vshuf4i_b_1, "vshuf4i.b $vr0, $vr0, 0\n")
 INSTR_TEST(vshuf4i_b_tp, "vshuf4i.b $vr0, $vr1, 0\n")
 INSTR_TEST(vshuf4i_h_1, "vshuf4i.h $vr0, $vr0, 0\n")
@@ -1785,10 +2069,18 @@ INSTR_TEST(vshuf4i_w_1, "vshuf4i.w $vr0, $vr0, 0\n")
 INSTR_TEST(vshuf4i_w_tp, "vshuf4i.w $vr0, $vr1, 0\n")
 INSTR_TEST(vshuf4i_d_0, "vshuf4i.d $vr0, $vr1, 0\n")
 INSTR_TEST(vshuf4i_d_1, "vshuf4i.d $vr0, $vr0, 0\n")
-INSTR_TEST8(vshuf4i_d_tp, "vshuf4i.d $vr0, $vr1, 0\nvshuf4i.d $vr4, $vr5, 0\nvshuf4i.d $vr8, $vr9, 0\nvshuf4i.d $vr12, $vr13, 0\nvshuf4i.d $vr16, $vr17, 0\nvshuf4i.d $vr20, $vr21, 0\nvshuf4i.d $vr24, $vr25, 0\nvshuf4i.d $vr28, $vr29, 0\n")
+INSTR_TEST8(
+    vshuf4i_d_tp,
+    "vshuf4i.d $vr0, $vr1, 0\nvshuf4i.d $vr4, $vr5, 0\nvshuf4i.d $vr8, $vr9, "
+    "0\nvshuf4i.d $vr12, $vr13, 0\nvshuf4i.d $vr16, $vr17, 0\nvshuf4i.d $vr20, "
+    "$vr21, 0\nvshuf4i.d $vr24, $vr25, 0\nvshuf4i.d $vr28, $vr29, 0\n")
 INSTR_TEST(vbitseli_b_0, "vbitseli.b $vr0, $vr1, 0\n")
 INSTR_TEST(vbitseli_b_1, "vbitseli.b $vr0, $vr0, 0\n")
-INSTR_TEST8(vbitseli_b_tp, "vbitseli.b $vr0, $vr1, 0\nvbitseli.b $vr4, $vr5, 0\nvbitseli.b $vr8, $vr9, 0\nvbitseli.b $vr12, $vr13, 0\nvbitseli.b $vr16, $vr17, 0\nvbitseli.b $vr20, $vr21, 0\nvbitseli.b $vr24, $vr25, 0\nvbitseli.b $vr28, $vr29, 0\n")
+INSTR_TEST8(vbitseli_b_tp,
+            "vbitseli.b $vr0, $vr1, 0\nvbitseli.b $vr4, $vr5, 0\nvbitseli.b "
+            "$vr8, $vr9, 0\nvbitseli.b $vr12, $vr13, 0\nvbitseli.b $vr16, "
+            "$vr17, 0\nvbitseli.b $vr20, $vr21, 0\nvbitseli.b $vr24, $vr25, "
+            "0\nvbitseli.b $vr28, $vr29, 0\n")
 INSTR_TEST(vandi_b_1, "vandi.b $vr0, $vr0, 0\n")
 INSTR_TEST(vandi_b_tp, "vandi.b $vr0, $vr1, 0\n")
 INSTR_TEST(vori_b_1, "vori.b $vr0, $vr0, 0\n")
@@ -1873,99 +2165,219 @@ INSTR_TEST(vaddwod_q_du_d_tp, "vaddwod.q.du.d $vr0, $vr1, $vr2\n")
 INSTR_TEST(vmaddwev_h_b_0, "vmaddwev.h.b $vr0, $vr1, $vr2\n")
 INSTR_TEST(vmaddwev_h_b_1, "vmaddwev.h.b $vr0, $vr0, $vr2\n")
 INSTR_TEST(vmaddwev_h_b_2, "vmaddwev.h.b $vr0, $vr1, $vr0\n")
-INSTR_TEST8(vmaddwev_h_b_tp, "vmaddwev.h.b $vr0, $vr1, $vr2\nvmaddwev.h.b $vr4, $vr5, $vr6\nvmaddwev.h.b $vr8, $vr9, $vr10\nvmaddwev.h.b $vr12, $vr13, $vr14\nvmaddwev.h.b $vr16, $vr17, $vr18\nvmaddwev.h.b $vr20, $vr21, $vr22\nvmaddwev.h.b $vr24, $vr25, $vr26\nvmaddwev.h.b $vr28, $vr29, $vr30\n")
+INSTR_TEST8(vmaddwev_h_b_tp,
+            "vmaddwev.h.b $vr0, $vr1, $vr2\nvmaddwev.h.b $vr4, $vr5, "
+            "$vr6\nvmaddwev.h.b $vr8, $vr9, $vr10\nvmaddwev.h.b $vr12, $vr13, "
+            "$vr14\nvmaddwev.h.b $vr16, $vr17, $vr18\nvmaddwev.h.b $vr20, "
+            "$vr21, $vr22\nvmaddwev.h.b $vr24, $vr25, $vr26\nvmaddwev.h.b "
+            "$vr28, $vr29, $vr30\n")
 INSTR_TEST(vmaddwev_w_h_0, "vmaddwev.w.h $vr0, $vr1, $vr2\n")
 INSTR_TEST(vmaddwev_w_h_1, "vmaddwev.w.h $vr0, $vr0, $vr2\n")
 INSTR_TEST(vmaddwev_w_h_2, "vmaddwev.w.h $vr0, $vr1, $vr0\n")
-INSTR_TEST8(vmaddwev_w_h_tp, "vmaddwev.w.h $vr0, $vr1, $vr2\nvmaddwev.w.h $vr4, $vr5, $vr6\nvmaddwev.w.h $vr8, $vr9, $vr10\nvmaddwev.w.h $vr12, $vr13, $vr14\nvmaddwev.w.h $vr16, $vr17, $vr18\nvmaddwev.w.h $vr20, $vr21, $vr22\nvmaddwev.w.h $vr24, $vr25, $vr26\nvmaddwev.w.h $vr28, $vr29, $vr30\n")
+INSTR_TEST8(vmaddwev_w_h_tp,
+            "vmaddwev.w.h $vr0, $vr1, $vr2\nvmaddwev.w.h $vr4, $vr5, "
+            "$vr6\nvmaddwev.w.h $vr8, $vr9, $vr10\nvmaddwev.w.h $vr12, $vr13, "
+            "$vr14\nvmaddwev.w.h $vr16, $vr17, $vr18\nvmaddwev.w.h $vr20, "
+            "$vr21, $vr22\nvmaddwev.w.h $vr24, $vr25, $vr26\nvmaddwev.w.h "
+            "$vr28, $vr29, $vr30\n")
 INSTR_TEST(vmaddwev_d_w_0, "vmaddwev.d.w $vr0, $vr1, $vr2\n")
 INSTR_TEST(vmaddwev_d_w_1, "vmaddwev.d.w $vr0, $vr0, $vr2\n")
 INSTR_TEST(vmaddwev_d_w_2, "vmaddwev.d.w $vr0, $vr1, $vr0\n")
-INSTR_TEST8(vmaddwev_d_w_tp, "vmaddwev.d.w $vr0, $vr1, $vr2\nvmaddwev.d.w $vr4, $vr5, $vr6\nvmaddwev.d.w $vr8, $vr9, $vr10\nvmaddwev.d.w $vr12, $vr13, $vr14\nvmaddwev.d.w $vr16, $vr17, $vr18\nvmaddwev.d.w $vr20, $vr21, $vr22\nvmaddwev.d.w $vr24, $vr25, $vr26\nvmaddwev.d.w $vr28, $vr29, $vr30\n")
+INSTR_TEST8(vmaddwev_d_w_tp,
+            "vmaddwev.d.w $vr0, $vr1, $vr2\nvmaddwev.d.w $vr4, $vr5, "
+            "$vr6\nvmaddwev.d.w $vr8, $vr9, $vr10\nvmaddwev.d.w $vr12, $vr13, "
+            "$vr14\nvmaddwev.d.w $vr16, $vr17, $vr18\nvmaddwev.d.w $vr20, "
+            "$vr21, $vr22\nvmaddwev.d.w $vr24, $vr25, $vr26\nvmaddwev.d.w "
+            "$vr28, $vr29, $vr30\n")
 INSTR_TEST(vmaddwev_q_d_0, "vmaddwev.q.d $vr0, $vr1, $vr2\n")
 INSTR_TEST(vmaddwev_q_d_1, "vmaddwev.q.d $vr0, $vr0, $vr2\n")
 INSTR_TEST(vmaddwev_q_d_2, "vmaddwev.q.d $vr0, $vr1, $vr0\n")
-INSTR_TEST8(vmaddwev_q_d_tp, "vmaddwev.q.d $vr0, $vr1, $vr2\nvmaddwev.q.d $vr4, $vr5, $vr6\nvmaddwev.q.d $vr8, $vr9, $vr10\nvmaddwev.q.d $vr12, $vr13, $vr14\nvmaddwev.q.d $vr16, $vr17, $vr18\nvmaddwev.q.d $vr20, $vr21, $vr22\nvmaddwev.q.d $vr24, $vr25, $vr26\nvmaddwev.q.d $vr28, $vr29, $vr30\n")
+INSTR_TEST8(vmaddwev_q_d_tp,
+            "vmaddwev.q.d $vr0, $vr1, $vr2\nvmaddwev.q.d $vr4, $vr5, "
+            "$vr6\nvmaddwev.q.d $vr8, $vr9, $vr10\nvmaddwev.q.d $vr12, $vr13, "
+            "$vr14\nvmaddwev.q.d $vr16, $vr17, $vr18\nvmaddwev.q.d $vr20, "
+            "$vr21, $vr22\nvmaddwev.q.d $vr24, $vr25, $vr26\nvmaddwev.q.d "
+            "$vr28, $vr29, $vr30\n")
 INSTR_TEST(vmaddwev_h_bu_0, "vmaddwev.h.bu $vr0, $vr1, $vr2\n")
 INSTR_TEST(vmaddwev_h_bu_1, "vmaddwev.h.bu $vr0, $vr0, $vr2\n")
 INSTR_TEST(vmaddwev_h_bu_2, "vmaddwev.h.bu $vr0, $vr1, $vr0\n")
-INSTR_TEST8(vmaddwev_h_bu_tp, "vmaddwev.h.bu $vr0, $vr1, $vr2\nvmaddwev.h.bu $vr4, $vr5, $vr6\nvmaddwev.h.bu $vr8, $vr9, $vr10\nvmaddwev.h.bu $vr12, $vr13, $vr14\nvmaddwev.h.bu $vr16, $vr17, $vr18\nvmaddwev.h.bu $vr20, $vr21, $vr22\nvmaddwev.h.bu $vr24, $vr25, $vr26\nvmaddwev.h.bu $vr28, $vr29, $vr30\n")
+INSTR_TEST8(vmaddwev_h_bu_tp,
+            "vmaddwev.h.bu $vr0, $vr1, $vr2\nvmaddwev.h.bu $vr4, $vr5, "
+            "$vr6\nvmaddwev.h.bu $vr8, $vr9, $vr10\nvmaddwev.h.bu $vr12, "
+            "$vr13, $vr14\nvmaddwev.h.bu $vr16, $vr17, $vr18\nvmaddwev.h.bu "
+            "$vr20, $vr21, $vr22\nvmaddwev.h.bu $vr24, $vr25, "
+            "$vr26\nvmaddwev.h.bu $vr28, $vr29, $vr30\n")
 INSTR_TEST(vmaddwev_w_hu_0, "vmaddwev.w.hu $vr0, $vr1, $vr2\n")
 INSTR_TEST(vmaddwev_w_hu_1, "vmaddwev.w.hu $vr0, $vr0, $vr2\n")
 INSTR_TEST(vmaddwev_w_hu_2, "vmaddwev.w.hu $vr0, $vr1, $vr0\n")
-INSTR_TEST8(vmaddwev_w_hu_tp, "vmaddwev.w.hu $vr0, $vr1, $vr2\nvmaddwev.w.hu $vr4, $vr5, $vr6\nvmaddwev.w.hu $vr8, $vr9, $vr10\nvmaddwev.w.hu $vr12, $vr13, $vr14\nvmaddwev.w.hu $vr16, $vr17, $vr18\nvmaddwev.w.hu $vr20, $vr21, $vr22\nvmaddwev.w.hu $vr24, $vr25, $vr26\nvmaddwev.w.hu $vr28, $vr29, $vr30\n")
+INSTR_TEST8(vmaddwev_w_hu_tp,
+            "vmaddwev.w.hu $vr0, $vr1, $vr2\nvmaddwev.w.hu $vr4, $vr5, "
+            "$vr6\nvmaddwev.w.hu $vr8, $vr9, $vr10\nvmaddwev.w.hu $vr12, "
+            "$vr13, $vr14\nvmaddwev.w.hu $vr16, $vr17, $vr18\nvmaddwev.w.hu "
+            "$vr20, $vr21, $vr22\nvmaddwev.w.hu $vr24, $vr25, "
+            "$vr26\nvmaddwev.w.hu $vr28, $vr29, $vr30\n")
 INSTR_TEST(vmaddwev_d_wu_0, "vmaddwev.d.wu $vr0, $vr1, $vr2\n")
 INSTR_TEST(vmaddwev_d_wu_1, "vmaddwev.d.wu $vr0, $vr0, $vr2\n")
 INSTR_TEST(vmaddwev_d_wu_2, "vmaddwev.d.wu $vr0, $vr1, $vr0\n")
-INSTR_TEST8(vmaddwev_d_wu_tp, "vmaddwev.d.wu $vr0, $vr1, $vr2\nvmaddwev.d.wu $vr4, $vr5, $vr6\nvmaddwev.d.wu $vr8, $vr9, $vr10\nvmaddwev.d.wu $vr12, $vr13, $vr14\nvmaddwev.d.wu $vr16, $vr17, $vr18\nvmaddwev.d.wu $vr20, $vr21, $vr22\nvmaddwev.d.wu $vr24, $vr25, $vr26\nvmaddwev.d.wu $vr28, $vr29, $vr30\n")
+INSTR_TEST8(vmaddwev_d_wu_tp,
+            "vmaddwev.d.wu $vr0, $vr1, $vr2\nvmaddwev.d.wu $vr4, $vr5, "
+            "$vr6\nvmaddwev.d.wu $vr8, $vr9, $vr10\nvmaddwev.d.wu $vr12, "
+            "$vr13, $vr14\nvmaddwev.d.wu $vr16, $vr17, $vr18\nvmaddwev.d.wu "
+            "$vr20, $vr21, $vr22\nvmaddwev.d.wu $vr24, $vr25, "
+            "$vr26\nvmaddwev.d.wu $vr28, $vr29, $vr30\n")
 INSTR_TEST(vmaddwev_q_du_0, "vmaddwev.q.du $vr0, $vr1, $vr2\n")
 INSTR_TEST(vmaddwev_q_du_1, "vmaddwev.q.du $vr0, $vr0, $vr2\n")
 INSTR_TEST(vmaddwev_q_du_2, "vmaddwev.q.du $vr0, $vr1, $vr0\n")
-INSTR_TEST8(vmaddwev_q_du_tp, "vmaddwev.q.du $vr0, $vr1, $vr2\nvmaddwev.q.du $vr4, $vr5, $vr6\nvmaddwev.q.du $vr8, $vr9, $vr10\nvmaddwev.q.du $vr12, $vr13, $vr14\nvmaddwev.q.du $vr16, $vr17, $vr18\nvmaddwev.q.du $vr20, $vr21, $vr22\nvmaddwev.q.du $vr24, $vr25, $vr26\nvmaddwev.q.du $vr28, $vr29, $vr30\n")
+INSTR_TEST8(vmaddwev_q_du_tp,
+            "vmaddwev.q.du $vr0, $vr1, $vr2\nvmaddwev.q.du $vr4, $vr5, "
+            "$vr6\nvmaddwev.q.du $vr8, $vr9, $vr10\nvmaddwev.q.du $vr12, "
+            "$vr13, $vr14\nvmaddwev.q.du $vr16, $vr17, $vr18\nvmaddwev.q.du "
+            "$vr20, $vr21, $vr22\nvmaddwev.q.du $vr24, $vr25, "
+            "$vr26\nvmaddwev.q.du $vr28, $vr29, $vr30\n")
 INSTR_TEST(vmaddwev_h_bu_b_0, "vmaddwev.h.bu.b $vr0, $vr1, $vr2\n")
 INSTR_TEST(vmaddwev_h_bu_b_1, "vmaddwev.h.bu.b $vr0, $vr0, $vr2\n")
 INSTR_TEST(vmaddwev_h_bu_b_2, "vmaddwev.h.bu.b $vr0, $vr1, $vr0\n")
-INSTR_TEST8(vmaddwev_h_bu_b_tp, "vmaddwev.h.bu.b $vr0, $vr1, $vr2\nvmaddwev.h.bu.b $vr4, $vr5, $vr6\nvmaddwev.h.bu.b $vr8, $vr9, $vr10\nvmaddwev.h.bu.b $vr12, $vr13, $vr14\nvmaddwev.h.bu.b $vr16, $vr17, $vr18\nvmaddwev.h.bu.b $vr20, $vr21, $vr22\nvmaddwev.h.bu.b $vr24, $vr25, $vr26\nvmaddwev.h.bu.b $vr28, $vr29, $vr30\n")
+INSTR_TEST8(vmaddwev_h_bu_b_tp,
+            "vmaddwev.h.bu.b $vr0, $vr1, $vr2\nvmaddwev.h.bu.b $vr4, $vr5, "
+            "$vr6\nvmaddwev.h.bu.b $vr8, $vr9, $vr10\nvmaddwev.h.bu.b $vr12, "
+            "$vr13, $vr14\nvmaddwev.h.bu.b $vr16, $vr17, "
+            "$vr18\nvmaddwev.h.bu.b $vr20, $vr21, $vr22\nvmaddwev.h.bu.b "
+            "$vr24, $vr25, $vr26\nvmaddwev.h.bu.b $vr28, $vr29, $vr30\n")
 INSTR_TEST(vmaddwev_w_hu_h_0, "vmaddwev.w.hu.h $vr0, $vr1, $vr2\n")
 INSTR_TEST(vmaddwev_w_hu_h_1, "vmaddwev.w.hu.h $vr0, $vr0, $vr2\n")
 INSTR_TEST(vmaddwev_w_hu_h_2, "vmaddwev.w.hu.h $vr0, $vr1, $vr0\n")
-INSTR_TEST8(vmaddwev_w_hu_h_tp, "vmaddwev.w.hu.h $vr0, $vr1, $vr2\nvmaddwev.w.hu.h $vr4, $vr5, $vr6\nvmaddwev.w.hu.h $vr8, $vr9, $vr10\nvmaddwev.w.hu.h $vr12, $vr13, $vr14\nvmaddwev.w.hu.h $vr16, $vr17, $vr18\nvmaddwev.w.hu.h $vr20, $vr21, $vr22\nvmaddwev.w.hu.h $vr24, $vr25, $vr26\nvmaddwev.w.hu.h $vr28, $vr29, $vr30\n")
+INSTR_TEST8(vmaddwev_w_hu_h_tp,
+            "vmaddwev.w.hu.h $vr0, $vr1, $vr2\nvmaddwev.w.hu.h $vr4, $vr5, "
+            "$vr6\nvmaddwev.w.hu.h $vr8, $vr9, $vr10\nvmaddwev.w.hu.h $vr12, "
+            "$vr13, $vr14\nvmaddwev.w.hu.h $vr16, $vr17, "
+            "$vr18\nvmaddwev.w.hu.h $vr20, $vr21, $vr22\nvmaddwev.w.hu.h "
+            "$vr24, $vr25, $vr26\nvmaddwev.w.hu.h $vr28, $vr29, $vr30\n")
 INSTR_TEST(vmaddwev_d_wu_w_0, "vmaddwev.d.wu.w $vr0, $vr1, $vr2\n")
 INSTR_TEST(vmaddwev_d_wu_w_1, "vmaddwev.d.wu.w $vr0, $vr0, $vr2\n")
 INSTR_TEST(vmaddwev_d_wu_w_2, "vmaddwev.d.wu.w $vr0, $vr1, $vr0\n")
-INSTR_TEST8(vmaddwev_d_wu_w_tp, "vmaddwev.d.wu.w $vr0, $vr1, $vr2\nvmaddwev.d.wu.w $vr4, $vr5, $vr6\nvmaddwev.d.wu.w $vr8, $vr9, $vr10\nvmaddwev.d.wu.w $vr12, $vr13, $vr14\nvmaddwev.d.wu.w $vr16, $vr17, $vr18\nvmaddwev.d.wu.w $vr20, $vr21, $vr22\nvmaddwev.d.wu.w $vr24, $vr25, $vr26\nvmaddwev.d.wu.w $vr28, $vr29, $vr30\n")
+INSTR_TEST8(vmaddwev_d_wu_w_tp,
+            "vmaddwev.d.wu.w $vr0, $vr1, $vr2\nvmaddwev.d.wu.w $vr4, $vr5, "
+            "$vr6\nvmaddwev.d.wu.w $vr8, $vr9, $vr10\nvmaddwev.d.wu.w $vr12, "
+            "$vr13, $vr14\nvmaddwev.d.wu.w $vr16, $vr17, "
+            "$vr18\nvmaddwev.d.wu.w $vr20, $vr21, $vr22\nvmaddwev.d.wu.w "
+            "$vr24, $vr25, $vr26\nvmaddwev.d.wu.w $vr28, $vr29, $vr30\n")
 INSTR_TEST(vmaddwev_q_du_d_0, "vmaddwev.q.du.d $vr0, $vr1, $vr2\n")
 INSTR_TEST(vmaddwev_q_du_d_1, "vmaddwev.q.du.d $vr0, $vr0, $vr2\n")
 INSTR_TEST(vmaddwev_q_du_d_2, "vmaddwev.q.du.d $vr0, $vr1, $vr0\n")
-INSTR_TEST8(vmaddwev_q_du_d_tp, "vmaddwev.q.du.d $vr0, $vr1, $vr2\nvmaddwev.q.du.d $vr4, $vr5, $vr6\nvmaddwev.q.du.d $vr8, $vr9, $vr10\nvmaddwev.q.du.d $vr12, $vr13, $vr14\nvmaddwev.q.du.d $vr16, $vr17, $vr18\nvmaddwev.q.du.d $vr20, $vr21, $vr22\nvmaddwev.q.du.d $vr24, $vr25, $vr26\nvmaddwev.q.du.d $vr28, $vr29, $vr30\n")
+INSTR_TEST8(vmaddwev_q_du_d_tp,
+            "vmaddwev.q.du.d $vr0, $vr1, $vr2\nvmaddwev.q.du.d $vr4, $vr5, "
+            "$vr6\nvmaddwev.q.du.d $vr8, $vr9, $vr10\nvmaddwev.q.du.d $vr12, "
+            "$vr13, $vr14\nvmaddwev.q.du.d $vr16, $vr17, "
+            "$vr18\nvmaddwev.q.du.d $vr20, $vr21, $vr22\nvmaddwev.q.du.d "
+            "$vr24, $vr25, $vr26\nvmaddwev.q.du.d $vr28, $vr29, $vr30\n")
 INSTR_TEST(vmaddwod_h_b_0, "vmaddwod.h.b $vr0, $vr1, $vr2\n")
 INSTR_TEST(vmaddwod_h_b_1, "vmaddwod.h.b $vr0, $vr0, $vr2\n")
 INSTR_TEST(vmaddwod_h_b_2, "vmaddwod.h.b $vr0, $vr1, $vr0\n")
-INSTR_TEST8(vmaddwod_h_b_tp, "vmaddwod.h.b $vr0, $vr1, $vr2\nvmaddwod.h.b $vr4, $vr5, $vr6\nvmaddwod.h.b $vr8, $vr9, $vr10\nvmaddwod.h.b $vr12, $vr13, $vr14\nvmaddwod.h.b $vr16, $vr17, $vr18\nvmaddwod.h.b $vr20, $vr21, $vr22\nvmaddwod.h.b $vr24, $vr25, $vr26\nvmaddwod.h.b $vr28, $vr29, $vr30\n")
+INSTR_TEST8(vmaddwod_h_b_tp,
+            "vmaddwod.h.b $vr0, $vr1, $vr2\nvmaddwod.h.b $vr4, $vr5, "
+            "$vr6\nvmaddwod.h.b $vr8, $vr9, $vr10\nvmaddwod.h.b $vr12, $vr13, "
+            "$vr14\nvmaddwod.h.b $vr16, $vr17, $vr18\nvmaddwod.h.b $vr20, "
+            "$vr21, $vr22\nvmaddwod.h.b $vr24, $vr25, $vr26\nvmaddwod.h.b "
+            "$vr28, $vr29, $vr30\n")
 INSTR_TEST(vmaddwod_w_h_0, "vmaddwod.w.h $vr0, $vr1, $vr2\n")
 INSTR_TEST(vmaddwod_w_h_1, "vmaddwod.w.h $vr0, $vr0, $vr2\n")
 INSTR_TEST(vmaddwod_w_h_2, "vmaddwod.w.h $vr0, $vr1, $vr0\n")
-INSTR_TEST8(vmaddwod_w_h_tp, "vmaddwod.w.h $vr0, $vr1, $vr2\nvmaddwod.w.h $vr4, $vr5, $vr6\nvmaddwod.w.h $vr8, $vr9, $vr10\nvmaddwod.w.h $vr12, $vr13, $vr14\nvmaddwod.w.h $vr16, $vr17, $vr18\nvmaddwod.w.h $vr20, $vr21, $vr22\nvmaddwod.w.h $vr24, $vr25, $vr26\nvmaddwod.w.h $vr28, $vr29, $vr30\n")
+INSTR_TEST8(vmaddwod_w_h_tp,
+            "vmaddwod.w.h $vr0, $vr1, $vr2\nvmaddwod.w.h $vr4, $vr5, "
+            "$vr6\nvmaddwod.w.h $vr8, $vr9, $vr10\nvmaddwod.w.h $vr12, $vr13, "
+            "$vr14\nvmaddwod.w.h $vr16, $vr17, $vr18\nvmaddwod.w.h $vr20, "
+            "$vr21, $vr22\nvmaddwod.w.h $vr24, $vr25, $vr26\nvmaddwod.w.h "
+            "$vr28, $vr29, $vr30\n")
 INSTR_TEST(vmaddwod_d_w_0, "vmaddwod.d.w $vr0, $vr1, $vr2\n")
 INSTR_TEST(vmaddwod_d_w_1, "vmaddwod.d.w $vr0, $vr0, $vr2\n")
 INSTR_TEST(vmaddwod_d_w_2, "vmaddwod.d.w $vr0, $vr1, $vr0\n")
-INSTR_TEST8(vmaddwod_d_w_tp, "vmaddwod.d.w $vr0, $vr1, $vr2\nvmaddwod.d.w $vr4, $vr5, $vr6\nvmaddwod.d.w $vr8, $vr9, $vr10\nvmaddwod.d.w $vr12, $vr13, $vr14\nvmaddwod.d.w $vr16, $vr17, $vr18\nvmaddwod.d.w $vr20, $vr21, $vr22\nvmaddwod.d.w $vr24, $vr25, $vr26\nvmaddwod.d.w $vr28, $vr29, $vr30\n")
+INSTR_TEST8(vmaddwod_d_w_tp,
+            "vmaddwod.d.w $vr0, $vr1, $vr2\nvmaddwod.d.w $vr4, $vr5, "
+            "$vr6\nvmaddwod.d.w $vr8, $vr9, $vr10\nvmaddwod.d.w $vr12, $vr13, "
+            "$vr14\nvmaddwod.d.w $vr16, $vr17, $vr18\nvmaddwod.d.w $vr20, "
+            "$vr21, $vr22\nvmaddwod.d.w $vr24, $vr25, $vr26\nvmaddwod.d.w "
+            "$vr28, $vr29, $vr30\n")
 INSTR_TEST(vmaddwod_q_d_0, "vmaddwod.q.d $vr0, $vr1, $vr2\n")
 INSTR_TEST(vmaddwod_q_d_1, "vmaddwod.q.d $vr0, $vr0, $vr2\n")
 INSTR_TEST(vmaddwod_q_d_2, "vmaddwod.q.d $vr0, $vr1, $vr0\n")
-INSTR_TEST8(vmaddwod_q_d_tp, "vmaddwod.q.d $vr0, $vr1, $vr2\nvmaddwod.q.d $vr4, $vr5, $vr6\nvmaddwod.q.d $vr8, $vr9, $vr10\nvmaddwod.q.d $vr12, $vr13, $vr14\nvmaddwod.q.d $vr16, $vr17, $vr18\nvmaddwod.q.d $vr20, $vr21, $vr22\nvmaddwod.q.d $vr24, $vr25, $vr26\nvmaddwod.q.d $vr28, $vr29, $vr30\n")
+INSTR_TEST8(vmaddwod_q_d_tp,
+            "vmaddwod.q.d $vr0, $vr1, $vr2\nvmaddwod.q.d $vr4, $vr5, "
+            "$vr6\nvmaddwod.q.d $vr8, $vr9, $vr10\nvmaddwod.q.d $vr12, $vr13, "
+            "$vr14\nvmaddwod.q.d $vr16, $vr17, $vr18\nvmaddwod.q.d $vr20, "
+            "$vr21, $vr22\nvmaddwod.q.d $vr24, $vr25, $vr26\nvmaddwod.q.d "
+            "$vr28, $vr29, $vr30\n")
 INSTR_TEST(vmaddwod_h_bu_0, "vmaddwod.h.bu $vr0, $vr1, $vr2\n")
 INSTR_TEST(vmaddwod_h_bu_1, "vmaddwod.h.bu $vr0, $vr0, $vr2\n")
 INSTR_TEST(vmaddwod_h_bu_2, "vmaddwod.h.bu $vr0, $vr1, $vr0\n")
-INSTR_TEST8(vmaddwod_h_bu_tp, "vmaddwod.h.bu $vr0, $vr1, $vr2\nvmaddwod.h.bu $vr4, $vr5, $vr6\nvmaddwod.h.bu $vr8, $vr9, $vr10\nvmaddwod.h.bu $vr12, $vr13, $vr14\nvmaddwod.h.bu $vr16, $vr17, $vr18\nvmaddwod.h.bu $vr20, $vr21, $vr22\nvmaddwod.h.bu $vr24, $vr25, $vr26\nvmaddwod.h.bu $vr28, $vr29, $vr30\n")
+INSTR_TEST8(vmaddwod_h_bu_tp,
+            "vmaddwod.h.bu $vr0, $vr1, $vr2\nvmaddwod.h.bu $vr4, $vr5, "
+            "$vr6\nvmaddwod.h.bu $vr8, $vr9, $vr10\nvmaddwod.h.bu $vr12, "
+            "$vr13, $vr14\nvmaddwod.h.bu $vr16, $vr17, $vr18\nvmaddwod.h.bu "
+            "$vr20, $vr21, $vr22\nvmaddwod.h.bu $vr24, $vr25, "
+            "$vr26\nvmaddwod.h.bu $vr28, $vr29, $vr30\n")
 INSTR_TEST(vmaddwod_w_hu_0, "vmaddwod.w.hu $vr0, $vr1, $vr2\n")
 INSTR_TEST(vmaddwod_w_hu_1, "vmaddwod.w.hu $vr0, $vr0, $vr2\n")
 INSTR_TEST(vmaddwod_w_hu_2, "vmaddwod.w.hu $vr0, $vr1, $vr0\n")
-INSTR_TEST8(vmaddwod_w_hu_tp, "vmaddwod.w.hu $vr0, $vr1, $vr2\nvmaddwod.w.hu $vr4, $vr5, $vr6\nvmaddwod.w.hu $vr8, $vr9, $vr10\nvmaddwod.w.hu $vr12, $vr13, $vr14\nvmaddwod.w.hu $vr16, $vr17, $vr18\nvmaddwod.w.hu $vr20, $vr21, $vr22\nvmaddwod.w.hu $vr24, $vr25, $vr26\nvmaddwod.w.hu $vr28, $vr29, $vr30\n")
+INSTR_TEST8(vmaddwod_w_hu_tp,
+            "vmaddwod.w.hu $vr0, $vr1, $vr2\nvmaddwod.w.hu $vr4, $vr5, "
+            "$vr6\nvmaddwod.w.hu $vr8, $vr9, $vr10\nvmaddwod.w.hu $vr12, "
+            "$vr13, $vr14\nvmaddwod.w.hu $vr16, $vr17, $vr18\nvmaddwod.w.hu "
+            "$vr20, $vr21, $vr22\nvmaddwod.w.hu $vr24, $vr25, "
+            "$vr26\nvmaddwod.w.hu $vr28, $vr29, $vr30\n")
 INSTR_TEST(vmaddwod_d_wu_0, "vmaddwod.d.wu $vr0, $vr1, $vr2\n")
 INSTR_TEST(vmaddwod_d_wu_1, "vmaddwod.d.wu $vr0, $vr0, $vr2\n")
 INSTR_TEST(vmaddwod_d_wu_2, "vmaddwod.d.wu $vr0, $vr1, $vr0\n")
-INSTR_TEST8(vmaddwod_d_wu_tp, "vmaddwod.d.wu $vr0, $vr1, $vr2\nvmaddwod.d.wu $vr4, $vr5, $vr6\nvmaddwod.d.wu $vr8, $vr9, $vr10\nvmaddwod.d.wu $vr12, $vr13, $vr14\nvmaddwod.d.wu $vr16, $vr17, $vr18\nvmaddwod.d.wu $vr20, $vr21, $vr22\nvmaddwod.d.wu $vr24, $vr25, $vr26\nvmaddwod.d.wu $vr28, $vr29, $vr30\n")
+INSTR_TEST8(vmaddwod_d_wu_tp,
+            "vmaddwod.d.wu $vr0, $vr1, $vr2\nvmaddwod.d.wu $vr4, $vr5, "
+            "$vr6\nvmaddwod.d.wu $vr8, $vr9, $vr10\nvmaddwod.d.wu $vr12, "
+            "$vr13, $vr14\nvmaddwod.d.wu $vr16, $vr17, $vr18\nvmaddwod.d.wu "
+            "$vr20, $vr21, $vr22\nvmaddwod.d.wu $vr24, $vr25, "
+            "$vr26\nvmaddwod.d.wu $vr28, $vr29, $vr30\n")
 INSTR_TEST(vmaddwod_q_du_0, "vmaddwod.q.du $vr0, $vr1, $vr2\n")
 INSTR_TEST(vmaddwod_q_du_1, "vmaddwod.q.du $vr0, $vr0, $vr2\n")
 INSTR_TEST(vmaddwod_q_du_2, "vmaddwod.q.du $vr0, $vr1, $vr0\n")
-INSTR_TEST8(vmaddwod_q_du_tp, "vmaddwod.q.du $vr0, $vr1, $vr2\nvmaddwod.q.du $vr4, $vr5, $vr6\nvmaddwod.q.du $vr8, $vr9, $vr10\nvmaddwod.q.du $vr12, $vr13, $vr14\nvmaddwod.q.du $vr16, $vr17, $vr18\nvmaddwod.q.du $vr20, $vr21, $vr22\nvmaddwod.q.du $vr24, $vr25, $vr26\nvmaddwod.q.du $vr28, $vr29, $vr30\n")
+INSTR_TEST8(vmaddwod_q_du_tp,
+            "vmaddwod.q.du $vr0, $vr1, $vr2\nvmaddwod.q.du $vr4, $vr5, "
+            "$vr6\nvmaddwod.q.du $vr8, $vr9, $vr10\nvmaddwod.q.du $vr12, "
+            "$vr13, $vr14\nvmaddwod.q.du $vr16, $vr17, $vr18\nvmaddwod.q.du "
+            "$vr20, $vr21, $vr22\nvmaddwod.q.du $vr24, $vr25, "
+            "$vr26\nvmaddwod.q.du $vr28, $vr29, $vr30\n")
 INSTR_TEST(vmaddwod_h_bu_b_0, "vmaddwod.h.bu.b $vr0, $vr1, $vr2\n")
 INSTR_TEST(vmaddwod_h_bu_b_1, "vmaddwod.h.bu.b $vr0, $vr0, $vr2\n")
 INSTR_TEST(vmaddwod_h_bu_b_2, "vmaddwod.h.bu.b $vr0, $vr1, $vr0\n")
-INSTR_TEST8(vmaddwod_h_bu_b_tp, "vmaddwod.h.bu.b $vr0, $vr1, $vr2\nvmaddwod.h.bu.b $vr4, $vr5, $vr6\nvmaddwod.h.bu.b $vr8, $vr9, $vr10\nvmaddwod.h.bu.b $vr12, $vr13, $vr14\nvmaddwod.h.bu.b $vr16, $vr17, $vr18\nvmaddwod.h.bu.b $vr20, $vr21, $vr22\nvmaddwod.h.bu.b $vr24, $vr25, $vr26\nvmaddwod.h.bu.b $vr28, $vr29, $vr30\n")
+INSTR_TEST8(vmaddwod_h_bu_b_tp,
+            "vmaddwod.h.bu.b $vr0, $vr1, $vr2\nvmaddwod.h.bu.b $vr4, $vr5, "
+            "$vr6\nvmaddwod.h.bu.b $vr8, $vr9, $vr10\nvmaddwod.h.bu.b $vr12, "
+            "$vr13, $vr14\nvmaddwod.h.bu.b $vr16, $vr17, "
+            "$vr18\nvmaddwod.h.bu.b $vr20, $vr21, $vr22\nvmaddwod.h.bu.b "
+            "$vr24, $vr25, $vr26\nvmaddwod.h.bu.b $vr28, $vr29, $vr30\n")
 INSTR_TEST(vmaddwod_w_hu_h_0, "vmaddwod.w.hu.h $vr0, $vr1, $vr2\n")
 INSTR_TEST(vmaddwod_w_hu_h_1, "vmaddwod.w.hu.h $vr0, $vr0, $vr2\n")
 INSTR_TEST(vmaddwod_w_hu_h_2, "vmaddwod.w.hu.h $vr0, $vr1, $vr0\n")
-INSTR_TEST8(vmaddwod_w_hu_h_tp, "vmaddwod.w.hu.h $vr0, $vr1, $vr2\nvmaddwod.w.hu.h $vr4, $vr5, $vr6\nvmaddwod.w.hu.h $vr8, $vr9, $vr10\nvmaddwod.w.hu.h $vr12, $vr13, $vr14\nvmaddwod.w.hu.h $vr16, $vr17, $vr18\nvmaddwod.w.hu.h $vr20, $vr21, $vr22\nvmaddwod.w.hu.h $vr24, $vr25, $vr26\nvmaddwod.w.hu.h $vr28, $vr29, $vr30\n")
+INSTR_TEST8(vmaddwod_w_hu_h_tp,
+            "vmaddwod.w.hu.h $vr0, $vr1, $vr2\nvmaddwod.w.hu.h $vr4, $vr5, "
+            "$vr6\nvmaddwod.w.hu.h $vr8, $vr9, $vr10\nvmaddwod.w.hu.h $vr12, "
+            "$vr13, $vr14\nvmaddwod.w.hu.h $vr16, $vr17, "
+            "$vr18\nvmaddwod.w.hu.h $vr20, $vr21, $vr22\nvmaddwod.w.hu.h "
+            "$vr24, $vr25, $vr26\nvmaddwod.w.hu.h $vr28, $vr29, $vr30\n")
 INSTR_TEST(vmaddwod_d_wu_w_0, "vmaddwod.d.wu.w $vr0, $vr1, $vr2\n")
 INSTR_TEST(vmaddwod_d_wu_w_1, "vmaddwod.d.wu.w $vr0, $vr0, $vr2\n")
 INSTR_TEST(vmaddwod_d_wu_w_2, "vmaddwod.d.wu.w $vr0, $vr1, $vr0\n")
-INSTR_TEST8(vmaddwod_d_wu_w_tp, "vmaddwod.d.wu.w $vr0, $vr1, $vr2\nvmaddwod.d.wu.w $vr4, $vr5, $vr6\nvmaddwod.d.wu.w $vr8, $vr9, $vr10\nvmaddwod.d.wu.w $vr12, $vr13, $vr14\nvmaddwod.d.wu.w $vr16, $vr17, $vr18\nvmaddwod.d.wu.w $vr20, $vr21, $vr22\nvmaddwod.d.wu.w $vr24, $vr25, $vr26\nvmaddwod.d.wu.w $vr28, $vr29, $vr30\n")
+INSTR_TEST8(vmaddwod_d_wu_w_tp,
+            "vmaddwod.d.wu.w $vr0, $vr1, $vr2\nvmaddwod.d.wu.w $vr4, $vr5, "
+            "$vr6\nvmaddwod.d.wu.w $vr8, $vr9, $vr10\nvmaddwod.d.wu.w $vr12, "
+            "$vr13, $vr14\nvmaddwod.d.wu.w $vr16, $vr17, "
+            "$vr18\nvmaddwod.d.wu.w $vr20, $vr21, $vr22\nvmaddwod.d.wu.w "
+            "$vr24, $vr25, $vr26\nvmaddwod.d.wu.w $vr28, $vr29, $vr30\n")
 INSTR_TEST(vmaddwod_q_du_d_0, "vmaddwod.q.du.d $vr0, $vr1, $vr2\n")
 INSTR_TEST(vmaddwod_q_du_d_1, "vmaddwod.q.du.d $vr0, $vr0, $vr2\n")
 INSTR_TEST(vmaddwod_q_du_d_2, "vmaddwod.q.du.d $vr0, $vr1, $vr0\n")
-INSTR_TEST8(vmaddwod_q_du_d_tp, "vmaddwod.q.du.d $vr0, $vr1, $vr2\nvmaddwod.q.du.d $vr4, $vr5, $vr6\nvmaddwod.q.du.d $vr8, $vr9, $vr10\nvmaddwod.q.du.d $vr12, $vr13, $vr14\nvmaddwod.q.du.d $vr16, $vr17, $vr18\nvmaddwod.q.du.d $vr20, $vr21, $vr22\nvmaddwod.q.du.d $vr24, $vr25, $vr26\nvmaddwod.q.du.d $vr28, $vr29, $vr30\n")
+INSTR_TEST8(vmaddwod_q_du_d_tp,
+            "vmaddwod.q.du.d $vr0, $vr1, $vr2\nvmaddwod.q.du.d $vr4, $vr5, "
+            "$vr6\nvmaddwod.q.du.d $vr8, $vr9, $vr10\nvmaddwod.q.du.d $vr12, "
+            "$vr13, $vr14\nvmaddwod.q.du.d $vr16, $vr17, "
+            "$vr18\nvmaddwod.q.du.d $vr20, $vr21, $vr22\nvmaddwod.q.du.d "
+            "$vr24, $vr25, $vr26\nvmaddwod.q.du.d $vr28, $vr29, $vr30\n")
 INSTR_TEST(vmulwev_h_b_1, "vmulwev.h.b $vr0, $vr0, $vr2\n")
 INSTR_TEST(vmulwev_h_b_2, "vmulwev.h.b $vr0, $vr1, $vr0\n")
 INSTR_TEST(vmulwev_h_b_tp, "vmulwev.h.b $vr0, $vr1, $vr2\n")
@@ -2091,7 +2503,11 @@ INSTR_TEST(vrepli_h_tp, "vrepli.h $vr0, 0\n")
 INSTR_TEST(vrepli_w_tp, "vrepli.w $vr0, 0\n")
 INSTR_TEST(vpermi_w_0, "vpermi.w $vr0, $vr1, 0\n")
 INSTR_TEST(vpermi_w_1, "vpermi.w $vr0, $vr0, 0\n")
-INSTR_TEST8(vpermi_w_tp, "vpermi.w $vr0, $vr1, 0\nvpermi.w $vr4, $vr5, 0\nvpermi.w $vr8, $vr9, 0\nvpermi.w $vr12, $vr13, 0\nvpermi.w $vr16, $vr17, 0\nvpermi.w $vr20, $vr21, 0\nvpermi.w $vr24, $vr25, 0\nvpermi.w $vr28, $vr29, 0\n")
+INSTR_TEST8(
+    vpermi_w_tp,
+    "vpermi.w $vr0, $vr1, 0\nvpermi.w $vr4, $vr5, 0\nvpermi.w $vr8, $vr9, "
+    "0\nvpermi.w $vr12, $vr13, 0\nvpermi.w $vr16, $vr17, 0\nvpermi.w $vr20, "
+    "$vr21, 0\nvpermi.w $vr24, $vr25, 0\nvpermi.w $vr28, $vr29, 0\n")
 INSTR_TEST(xvseq_b_1, "xvseq.b $xr0, $xr0, $xr2\n")
 INSTR_TEST(xvseq_b_2, "xvseq.b $xr0, $xr1, $xr0\n")
 INSTR_TEST(xvseq_b_tp, "xvseq.b $xr0, $xr1, $xr2\n")
@@ -2347,99 +2763,219 @@ INSTR_TEST(xvaddwod_q_du_d_tp, "xvaddwod.q.du.d $xr0, $xr1, $xr2\n")
 INSTR_TEST(xvmaddwev_h_b_0, "xvmaddwev.h.b $xr0, $xr1, $xr2\n")
 INSTR_TEST(xvmaddwev_h_b_1, "xvmaddwev.h.b $xr0, $xr0, $xr2\n")
 INSTR_TEST(xvmaddwev_h_b_2, "xvmaddwev.h.b $xr0, $xr1, $xr0\n")
-INSTR_TEST8(xvmaddwev_h_b_tp, "xvmaddwev.h.b $xr0, $xr1, $xr2\nxvmaddwev.h.b $xr4, $xr5, $xr6\nxvmaddwev.h.b $xr8, $xr9, $xr10\nxvmaddwev.h.b $xr12, $xr13, $xr14\nxvmaddwev.h.b $xr16, $xr17, $xr18\nxvmaddwev.h.b $xr20, $xr21, $xr22\nxvmaddwev.h.b $xr24, $xr25, $xr26\nxvmaddwev.h.b $xr28, $xr29, $xr30\n")
+INSTR_TEST8(xvmaddwev_h_b_tp,
+            "xvmaddwev.h.b $xr0, $xr1, $xr2\nxvmaddwev.h.b $xr4, $xr5, "
+            "$xr6\nxvmaddwev.h.b $xr8, $xr9, $xr10\nxvmaddwev.h.b $xr12, "
+            "$xr13, $xr14\nxvmaddwev.h.b $xr16, $xr17, $xr18\nxvmaddwev.h.b "
+            "$xr20, $xr21, $xr22\nxvmaddwev.h.b $xr24, $xr25, "
+            "$xr26\nxvmaddwev.h.b $xr28, $xr29, $xr30\n")
 INSTR_TEST(xvmaddwev_w_h_0, "xvmaddwev.w.h $xr0, $xr1, $xr2\n")
 INSTR_TEST(xvmaddwev_w_h_1, "xvmaddwev.w.h $xr0, $xr0, $xr2\n")
 INSTR_TEST(xvmaddwev_w_h_2, "xvmaddwev.w.h $xr0, $xr1, $xr0\n")
-INSTR_TEST8(xvmaddwev_w_h_tp, "xvmaddwev.w.h $xr0, $xr1, $xr2\nxvmaddwev.w.h $xr4, $xr5, $xr6\nxvmaddwev.w.h $xr8, $xr9, $xr10\nxvmaddwev.w.h $xr12, $xr13, $xr14\nxvmaddwev.w.h $xr16, $xr17, $xr18\nxvmaddwev.w.h $xr20, $xr21, $xr22\nxvmaddwev.w.h $xr24, $xr25, $xr26\nxvmaddwev.w.h $xr28, $xr29, $xr30\n")
+INSTR_TEST8(xvmaddwev_w_h_tp,
+            "xvmaddwev.w.h $xr0, $xr1, $xr2\nxvmaddwev.w.h $xr4, $xr5, "
+            "$xr6\nxvmaddwev.w.h $xr8, $xr9, $xr10\nxvmaddwev.w.h $xr12, "
+            "$xr13, $xr14\nxvmaddwev.w.h $xr16, $xr17, $xr18\nxvmaddwev.w.h "
+            "$xr20, $xr21, $xr22\nxvmaddwev.w.h $xr24, $xr25, "
+            "$xr26\nxvmaddwev.w.h $xr28, $xr29, $xr30\n")
 INSTR_TEST(xvmaddwev_d_w_0, "xvmaddwev.d.w $xr0, $xr1, $xr2\n")
 INSTR_TEST(xvmaddwev_d_w_1, "xvmaddwev.d.w $xr0, $xr0, $xr2\n")
 INSTR_TEST(xvmaddwev_d_w_2, "xvmaddwev.d.w $xr0, $xr1, $xr0\n")
-INSTR_TEST8(xvmaddwev_d_w_tp, "xvmaddwev.d.w $xr0, $xr1, $xr2\nxvmaddwev.d.w $xr4, $xr5, $xr6\nxvmaddwev.d.w $xr8, $xr9, $xr10\nxvmaddwev.d.w $xr12, $xr13, $xr14\nxvmaddwev.d.w $xr16, $xr17, $xr18\nxvmaddwev.d.w $xr20, $xr21, $xr22\nxvmaddwev.d.w $xr24, $xr25, $xr26\nxvmaddwev.d.w $xr28, $xr29, $xr30\n")
+INSTR_TEST8(xvmaddwev_d_w_tp,
+            "xvmaddwev.d.w $xr0, $xr1, $xr2\nxvmaddwev.d.w $xr4, $xr5, "
+            "$xr6\nxvmaddwev.d.w $xr8, $xr9, $xr10\nxvmaddwev.d.w $xr12, "
+            "$xr13, $xr14\nxvmaddwev.d.w $xr16, $xr17, $xr18\nxvmaddwev.d.w "
+            "$xr20, $xr21, $xr22\nxvmaddwev.d.w $xr24, $xr25, "
+            "$xr26\nxvmaddwev.d.w $xr28, $xr29, $xr30\n")
 INSTR_TEST(xvmaddwev_q_d_0, "xvmaddwev.q.d $xr0, $xr1, $xr2\n")
 INSTR_TEST(xvmaddwev_q_d_1, "xvmaddwev.q.d $xr0, $xr0, $xr2\n")
 INSTR_TEST(xvmaddwev_q_d_2, "xvmaddwev.q.d $xr0, $xr1, $xr0\n")
-INSTR_TEST8(xvmaddwev_q_d_tp, "xvmaddwev.q.d $xr0, $xr1, $xr2\nxvmaddwev.q.d $xr4, $xr5, $xr6\nxvmaddwev.q.d $xr8, $xr9, $xr10\nxvmaddwev.q.d $xr12, $xr13, $xr14\nxvmaddwev.q.d $xr16, $xr17, $xr18\nxvmaddwev.q.d $xr20, $xr21, $xr22\nxvmaddwev.q.d $xr24, $xr25, $xr26\nxvmaddwev.q.d $xr28, $xr29, $xr30\n")
+INSTR_TEST8(xvmaddwev_q_d_tp,
+            "xvmaddwev.q.d $xr0, $xr1, $xr2\nxvmaddwev.q.d $xr4, $xr5, "
+            "$xr6\nxvmaddwev.q.d $xr8, $xr9, $xr10\nxvmaddwev.q.d $xr12, "
+            "$xr13, $xr14\nxvmaddwev.q.d $xr16, $xr17, $xr18\nxvmaddwev.q.d "
+            "$xr20, $xr21, $xr22\nxvmaddwev.q.d $xr24, $xr25, "
+            "$xr26\nxvmaddwev.q.d $xr28, $xr29, $xr30\n")
 INSTR_TEST(xvmaddwev_h_bu_b_0, "xvmaddwev.h.bu.b $xr0, $xr1, $xr2\n")
 INSTR_TEST(xvmaddwev_h_bu_b_1, "xvmaddwev.h.bu.b $xr0, $xr0, $xr2\n")
 INSTR_TEST(xvmaddwev_h_bu_b_2, "xvmaddwev.h.bu.b $xr0, $xr1, $xr0\n")
-INSTR_TEST8(xvmaddwev_h_bu_b_tp, "xvmaddwev.h.bu.b $xr0, $xr1, $xr2\nxvmaddwev.h.bu.b $xr4, $xr5, $xr6\nxvmaddwev.h.bu.b $xr8, $xr9, $xr10\nxvmaddwev.h.bu.b $xr12, $xr13, $xr14\nxvmaddwev.h.bu.b $xr16, $xr17, $xr18\nxvmaddwev.h.bu.b $xr20, $xr21, $xr22\nxvmaddwev.h.bu.b $xr24, $xr25, $xr26\nxvmaddwev.h.bu.b $xr28, $xr29, $xr30\n")
+INSTR_TEST8(xvmaddwev_h_bu_b_tp,
+            "xvmaddwev.h.bu.b $xr0, $xr1, $xr2\nxvmaddwev.h.bu.b $xr4, $xr5, "
+            "$xr6\nxvmaddwev.h.bu.b $xr8, $xr9, $xr10\nxvmaddwev.h.bu.b $xr12, "
+            "$xr13, $xr14\nxvmaddwev.h.bu.b $xr16, $xr17, "
+            "$xr18\nxvmaddwev.h.bu.b $xr20, $xr21, $xr22\nxvmaddwev.h.bu.b "
+            "$xr24, $xr25, $xr26\nxvmaddwev.h.bu.b $xr28, $xr29, $xr30\n")
 INSTR_TEST(xvmaddwev_w_hu_h_0, "xvmaddwev.w.hu.h $xr0, $xr1, $xr2\n")
 INSTR_TEST(xvmaddwev_w_hu_h_1, "xvmaddwev.w.hu.h $xr0, $xr0, $xr2\n")
 INSTR_TEST(xvmaddwev_w_hu_h_2, "xvmaddwev.w.hu.h $xr0, $xr1, $xr0\n")
-INSTR_TEST8(xvmaddwev_w_hu_h_tp, "xvmaddwev.w.hu.h $xr0, $xr1, $xr2\nxvmaddwev.w.hu.h $xr4, $xr5, $xr6\nxvmaddwev.w.hu.h $xr8, $xr9, $xr10\nxvmaddwev.w.hu.h $xr12, $xr13, $xr14\nxvmaddwev.w.hu.h $xr16, $xr17, $xr18\nxvmaddwev.w.hu.h $xr20, $xr21, $xr22\nxvmaddwev.w.hu.h $xr24, $xr25, $xr26\nxvmaddwev.w.hu.h $xr28, $xr29, $xr30\n")
+INSTR_TEST8(xvmaddwev_w_hu_h_tp,
+            "xvmaddwev.w.hu.h $xr0, $xr1, $xr2\nxvmaddwev.w.hu.h $xr4, $xr5, "
+            "$xr6\nxvmaddwev.w.hu.h $xr8, $xr9, $xr10\nxvmaddwev.w.hu.h $xr12, "
+            "$xr13, $xr14\nxvmaddwev.w.hu.h $xr16, $xr17, "
+            "$xr18\nxvmaddwev.w.hu.h $xr20, $xr21, $xr22\nxvmaddwev.w.hu.h "
+            "$xr24, $xr25, $xr26\nxvmaddwev.w.hu.h $xr28, $xr29, $xr30\n")
 INSTR_TEST(xvmaddwev_d_wu_w_0, "xvmaddwev.d.wu.w $xr0, $xr1, $xr2\n")
 INSTR_TEST(xvmaddwev_d_wu_w_1, "xvmaddwev.d.wu.w $xr0, $xr0, $xr2\n")
 INSTR_TEST(xvmaddwev_d_wu_w_2, "xvmaddwev.d.wu.w $xr0, $xr1, $xr0\n")
-INSTR_TEST8(xvmaddwev_d_wu_w_tp, "xvmaddwev.d.wu.w $xr0, $xr1, $xr2\nxvmaddwev.d.wu.w $xr4, $xr5, $xr6\nxvmaddwev.d.wu.w $xr8, $xr9, $xr10\nxvmaddwev.d.wu.w $xr12, $xr13, $xr14\nxvmaddwev.d.wu.w $xr16, $xr17, $xr18\nxvmaddwev.d.wu.w $xr20, $xr21, $xr22\nxvmaddwev.d.wu.w $xr24, $xr25, $xr26\nxvmaddwev.d.wu.w $xr28, $xr29, $xr30\n")
+INSTR_TEST8(xvmaddwev_d_wu_w_tp,
+            "xvmaddwev.d.wu.w $xr0, $xr1, $xr2\nxvmaddwev.d.wu.w $xr4, $xr5, "
+            "$xr6\nxvmaddwev.d.wu.w $xr8, $xr9, $xr10\nxvmaddwev.d.wu.w $xr12, "
+            "$xr13, $xr14\nxvmaddwev.d.wu.w $xr16, $xr17, "
+            "$xr18\nxvmaddwev.d.wu.w $xr20, $xr21, $xr22\nxvmaddwev.d.wu.w "
+            "$xr24, $xr25, $xr26\nxvmaddwev.d.wu.w $xr28, $xr29, $xr30\n")
 INSTR_TEST(xvmaddwev_q_du_d_0, "xvmaddwev.q.du.d $xr0, $xr1, $xr2\n")
 INSTR_TEST(xvmaddwev_q_du_d_1, "xvmaddwev.q.du.d $xr0, $xr0, $xr2\n")
 INSTR_TEST(xvmaddwev_q_du_d_2, "xvmaddwev.q.du.d $xr0, $xr1, $xr0\n")
-INSTR_TEST8(xvmaddwev_q_du_d_tp, "xvmaddwev.q.du.d $xr0, $xr1, $xr2\nxvmaddwev.q.du.d $xr4, $xr5, $xr6\nxvmaddwev.q.du.d $xr8, $xr9, $xr10\nxvmaddwev.q.du.d $xr12, $xr13, $xr14\nxvmaddwev.q.du.d $xr16, $xr17, $xr18\nxvmaddwev.q.du.d $xr20, $xr21, $xr22\nxvmaddwev.q.du.d $xr24, $xr25, $xr26\nxvmaddwev.q.du.d $xr28, $xr29, $xr30\n")
+INSTR_TEST8(xvmaddwev_q_du_d_tp,
+            "xvmaddwev.q.du.d $xr0, $xr1, $xr2\nxvmaddwev.q.du.d $xr4, $xr5, "
+            "$xr6\nxvmaddwev.q.du.d $xr8, $xr9, $xr10\nxvmaddwev.q.du.d $xr12, "
+            "$xr13, $xr14\nxvmaddwev.q.du.d $xr16, $xr17, "
+            "$xr18\nxvmaddwev.q.du.d $xr20, $xr21, $xr22\nxvmaddwev.q.du.d "
+            "$xr24, $xr25, $xr26\nxvmaddwev.q.du.d $xr28, $xr29, $xr30\n")
 INSTR_TEST(xvmaddwev_h_bu_0, "xvmaddwev.h.bu $xr0, $xr1, $xr2\n")
 INSTR_TEST(xvmaddwev_h_bu_1, "xvmaddwev.h.bu $xr0, $xr0, $xr2\n")
 INSTR_TEST(xvmaddwev_h_bu_2, "xvmaddwev.h.bu $xr0, $xr1, $xr0\n")
-INSTR_TEST8(xvmaddwev_h_bu_tp, "xvmaddwev.h.bu $xr0, $xr1, $xr2\nxvmaddwev.h.bu $xr4, $xr5, $xr6\nxvmaddwev.h.bu $xr8, $xr9, $xr10\nxvmaddwev.h.bu $xr12, $xr13, $xr14\nxvmaddwev.h.bu $xr16, $xr17, $xr18\nxvmaddwev.h.bu $xr20, $xr21, $xr22\nxvmaddwev.h.bu $xr24, $xr25, $xr26\nxvmaddwev.h.bu $xr28, $xr29, $xr30\n")
+INSTR_TEST8(xvmaddwev_h_bu_tp,
+            "xvmaddwev.h.bu $xr0, $xr1, $xr2\nxvmaddwev.h.bu $xr4, $xr5, "
+            "$xr6\nxvmaddwev.h.bu $xr8, $xr9, $xr10\nxvmaddwev.h.bu $xr12, "
+            "$xr13, $xr14\nxvmaddwev.h.bu $xr16, $xr17, $xr18\nxvmaddwev.h.bu "
+            "$xr20, $xr21, $xr22\nxvmaddwev.h.bu $xr24, $xr25, "
+            "$xr26\nxvmaddwev.h.bu $xr28, $xr29, $xr30\n")
 INSTR_TEST(xvmaddwev_w_hu_0, "xvmaddwev.w.hu $xr0, $xr1, $xr2\n")
 INSTR_TEST(xvmaddwev_w_hu_1, "xvmaddwev.w.hu $xr0, $xr0, $xr2\n")
 INSTR_TEST(xvmaddwev_w_hu_2, "xvmaddwev.w.hu $xr0, $xr1, $xr0\n")
-INSTR_TEST8(xvmaddwev_w_hu_tp, "xvmaddwev.w.hu $xr0, $xr1, $xr2\nxvmaddwev.w.hu $xr4, $xr5, $xr6\nxvmaddwev.w.hu $xr8, $xr9, $xr10\nxvmaddwev.w.hu $xr12, $xr13, $xr14\nxvmaddwev.w.hu $xr16, $xr17, $xr18\nxvmaddwev.w.hu $xr20, $xr21, $xr22\nxvmaddwev.w.hu $xr24, $xr25, $xr26\nxvmaddwev.w.hu $xr28, $xr29, $xr30\n")
+INSTR_TEST8(xvmaddwev_w_hu_tp,
+            "xvmaddwev.w.hu $xr0, $xr1, $xr2\nxvmaddwev.w.hu $xr4, $xr5, "
+            "$xr6\nxvmaddwev.w.hu $xr8, $xr9, $xr10\nxvmaddwev.w.hu $xr12, "
+            "$xr13, $xr14\nxvmaddwev.w.hu $xr16, $xr17, $xr18\nxvmaddwev.w.hu "
+            "$xr20, $xr21, $xr22\nxvmaddwev.w.hu $xr24, $xr25, "
+            "$xr26\nxvmaddwev.w.hu $xr28, $xr29, $xr30\n")
 INSTR_TEST(xvmaddwev_d_wu_0, "xvmaddwev.d.wu $xr0, $xr1, $xr2\n")
 INSTR_TEST(xvmaddwev_d_wu_1, "xvmaddwev.d.wu $xr0, $xr0, $xr2\n")
 INSTR_TEST(xvmaddwev_d_wu_2, "xvmaddwev.d.wu $xr0, $xr1, $xr0\n")
-INSTR_TEST8(xvmaddwev_d_wu_tp, "xvmaddwev.d.wu $xr0, $xr1, $xr2\nxvmaddwev.d.wu $xr4, $xr5, $xr6\nxvmaddwev.d.wu $xr8, $xr9, $xr10\nxvmaddwev.d.wu $xr12, $xr13, $xr14\nxvmaddwev.d.wu $xr16, $xr17, $xr18\nxvmaddwev.d.wu $xr20, $xr21, $xr22\nxvmaddwev.d.wu $xr24, $xr25, $xr26\nxvmaddwev.d.wu $xr28, $xr29, $xr30\n")
+INSTR_TEST8(xvmaddwev_d_wu_tp,
+            "xvmaddwev.d.wu $xr0, $xr1, $xr2\nxvmaddwev.d.wu $xr4, $xr5, "
+            "$xr6\nxvmaddwev.d.wu $xr8, $xr9, $xr10\nxvmaddwev.d.wu $xr12, "
+            "$xr13, $xr14\nxvmaddwev.d.wu $xr16, $xr17, $xr18\nxvmaddwev.d.wu "
+            "$xr20, $xr21, $xr22\nxvmaddwev.d.wu $xr24, $xr25, "
+            "$xr26\nxvmaddwev.d.wu $xr28, $xr29, $xr30\n")
 INSTR_TEST(xvmaddwev_q_du_0, "xvmaddwev.q.du $xr0, $xr1, $xr2\n")
 INSTR_TEST(xvmaddwev_q_du_1, "xvmaddwev.q.du $xr0, $xr0, $xr2\n")
 INSTR_TEST(xvmaddwev_q_du_2, "xvmaddwev.q.du $xr0, $xr1, $xr0\n")
-INSTR_TEST8(xvmaddwev_q_du_tp, "xvmaddwev.q.du $xr0, $xr1, $xr2\nxvmaddwev.q.du $xr4, $xr5, $xr6\nxvmaddwev.q.du $xr8, $xr9, $xr10\nxvmaddwev.q.du $xr12, $xr13, $xr14\nxvmaddwev.q.du $xr16, $xr17, $xr18\nxvmaddwev.q.du $xr20, $xr21, $xr22\nxvmaddwev.q.du $xr24, $xr25, $xr26\nxvmaddwev.q.du $xr28, $xr29, $xr30\n")
+INSTR_TEST8(xvmaddwev_q_du_tp,
+            "xvmaddwev.q.du $xr0, $xr1, $xr2\nxvmaddwev.q.du $xr4, $xr5, "
+            "$xr6\nxvmaddwev.q.du $xr8, $xr9, $xr10\nxvmaddwev.q.du $xr12, "
+            "$xr13, $xr14\nxvmaddwev.q.du $xr16, $xr17, $xr18\nxvmaddwev.q.du "
+            "$xr20, $xr21, $xr22\nxvmaddwev.q.du $xr24, $xr25, "
+            "$xr26\nxvmaddwev.q.du $xr28, $xr29, $xr30\n")
 INSTR_TEST(xvmaddwod_h_b_0, "xvmaddwod.h.b $xr0, $xr1, $xr2\n")
 INSTR_TEST(xvmaddwod_h_b_1, "xvmaddwod.h.b $xr0, $xr0, $xr2\n")
 INSTR_TEST(xvmaddwod_h_b_2, "xvmaddwod.h.b $xr0, $xr1, $xr0\n")
-INSTR_TEST8(xvmaddwod_h_b_tp, "xvmaddwod.h.b $xr0, $xr1, $xr2\nxvmaddwod.h.b $xr4, $xr5, $xr6\nxvmaddwod.h.b $xr8, $xr9, $xr10\nxvmaddwod.h.b $xr12, $xr13, $xr14\nxvmaddwod.h.b $xr16, $xr17, $xr18\nxvmaddwod.h.b $xr20, $xr21, $xr22\nxvmaddwod.h.b $xr24, $xr25, $xr26\nxvmaddwod.h.b $xr28, $xr29, $xr30\n")
+INSTR_TEST8(xvmaddwod_h_b_tp,
+            "xvmaddwod.h.b $xr0, $xr1, $xr2\nxvmaddwod.h.b $xr4, $xr5, "
+            "$xr6\nxvmaddwod.h.b $xr8, $xr9, $xr10\nxvmaddwod.h.b $xr12, "
+            "$xr13, $xr14\nxvmaddwod.h.b $xr16, $xr17, $xr18\nxvmaddwod.h.b "
+            "$xr20, $xr21, $xr22\nxvmaddwod.h.b $xr24, $xr25, "
+            "$xr26\nxvmaddwod.h.b $xr28, $xr29, $xr30\n")
 INSTR_TEST(xvmaddwod_w_h_0, "xvmaddwod.w.h $xr0, $xr1, $xr2\n")
 INSTR_TEST(xvmaddwod_w_h_1, "xvmaddwod.w.h $xr0, $xr0, $xr2\n")
 INSTR_TEST(xvmaddwod_w_h_2, "xvmaddwod.w.h $xr0, $xr1, $xr0\n")
-INSTR_TEST8(xvmaddwod_w_h_tp, "xvmaddwod.w.h $xr0, $xr1, $xr2\nxvmaddwod.w.h $xr4, $xr5, $xr6\nxvmaddwod.w.h $xr8, $xr9, $xr10\nxvmaddwod.w.h $xr12, $xr13, $xr14\nxvmaddwod.w.h $xr16, $xr17, $xr18\nxvmaddwod.w.h $xr20, $xr21, $xr22\nxvmaddwod.w.h $xr24, $xr25, $xr26\nxvmaddwod.w.h $xr28, $xr29, $xr30\n")
+INSTR_TEST8(xvmaddwod_w_h_tp,
+            "xvmaddwod.w.h $xr0, $xr1, $xr2\nxvmaddwod.w.h $xr4, $xr5, "
+            "$xr6\nxvmaddwod.w.h $xr8, $xr9, $xr10\nxvmaddwod.w.h $xr12, "
+            "$xr13, $xr14\nxvmaddwod.w.h $xr16, $xr17, $xr18\nxvmaddwod.w.h "
+            "$xr20, $xr21, $xr22\nxvmaddwod.w.h $xr24, $xr25, "
+            "$xr26\nxvmaddwod.w.h $xr28, $xr29, $xr30\n")
 INSTR_TEST(xvmaddwod_d_w_0, "xvmaddwod.d.w $xr0, $xr1, $xr2\n")
 INSTR_TEST(xvmaddwod_d_w_1, "xvmaddwod.d.w $xr0, $xr0, $xr2\n")
 INSTR_TEST(xvmaddwod_d_w_2, "xvmaddwod.d.w $xr0, $xr1, $xr0\n")
-INSTR_TEST8(xvmaddwod_d_w_tp, "xvmaddwod.d.w $xr0, $xr1, $xr2\nxvmaddwod.d.w $xr4, $xr5, $xr6\nxvmaddwod.d.w $xr8, $xr9, $xr10\nxvmaddwod.d.w $xr12, $xr13, $xr14\nxvmaddwod.d.w $xr16, $xr17, $xr18\nxvmaddwod.d.w $xr20, $xr21, $xr22\nxvmaddwod.d.w $xr24, $xr25, $xr26\nxvmaddwod.d.w $xr28, $xr29, $xr30\n")
+INSTR_TEST8(xvmaddwod_d_w_tp,
+            "xvmaddwod.d.w $xr0, $xr1, $xr2\nxvmaddwod.d.w $xr4, $xr5, "
+            "$xr6\nxvmaddwod.d.w $xr8, $xr9, $xr10\nxvmaddwod.d.w $xr12, "
+            "$xr13, $xr14\nxvmaddwod.d.w $xr16, $xr17, $xr18\nxvmaddwod.d.w "
+            "$xr20, $xr21, $xr22\nxvmaddwod.d.w $xr24, $xr25, "
+            "$xr26\nxvmaddwod.d.w $xr28, $xr29, $xr30\n")
 INSTR_TEST(xvmaddwod_q_d_0, "xvmaddwod.q.d $xr0, $xr1, $xr2\n")
 INSTR_TEST(xvmaddwod_q_d_1, "xvmaddwod.q.d $xr0, $xr0, $xr2\n")
 INSTR_TEST(xvmaddwod_q_d_2, "xvmaddwod.q.d $xr0, $xr1, $xr0\n")
-INSTR_TEST8(xvmaddwod_q_d_tp, "xvmaddwod.q.d $xr0, $xr1, $xr2\nxvmaddwod.q.d $xr4, $xr5, $xr6\nxvmaddwod.q.d $xr8, $xr9, $xr10\nxvmaddwod.q.d $xr12, $xr13, $xr14\nxvmaddwod.q.d $xr16, $xr17, $xr18\nxvmaddwod.q.d $xr20, $xr21, $xr22\nxvmaddwod.q.d $xr24, $xr25, $xr26\nxvmaddwod.q.d $xr28, $xr29, $xr30\n")
+INSTR_TEST8(xvmaddwod_q_d_tp,
+            "xvmaddwod.q.d $xr0, $xr1, $xr2\nxvmaddwod.q.d $xr4, $xr5, "
+            "$xr6\nxvmaddwod.q.d $xr8, $xr9, $xr10\nxvmaddwod.q.d $xr12, "
+            "$xr13, $xr14\nxvmaddwod.q.d $xr16, $xr17, $xr18\nxvmaddwod.q.d "
+            "$xr20, $xr21, $xr22\nxvmaddwod.q.d $xr24, $xr25, "
+            "$xr26\nxvmaddwod.q.d $xr28, $xr29, $xr30\n")
 INSTR_TEST(xvmaddwod_h_bu_0, "xvmaddwod.h.bu $xr0, $xr1, $xr2\n")
 INSTR_TEST(xvmaddwod_h_bu_1, "xvmaddwod.h.bu $xr0, $xr0, $xr2\n")
 INSTR_TEST(xvmaddwod_h_bu_2, "xvmaddwod.h.bu $xr0, $xr1, $xr0\n")
-INSTR_TEST8(xvmaddwod_h_bu_tp, "xvmaddwod.h.bu $xr0, $xr1, $xr2\nxvmaddwod.h.bu $xr4, $xr5, $xr6\nxvmaddwod.h.bu $xr8, $xr9, $xr10\nxvmaddwod.h.bu $xr12, $xr13, $xr14\nxvmaddwod.h.bu $xr16, $xr17, $xr18\nxvmaddwod.h.bu $xr20, $xr21, $xr22\nxvmaddwod.h.bu $xr24, $xr25, $xr26\nxvmaddwod.h.bu $xr28, $xr29, $xr30\n")
+INSTR_TEST8(xvmaddwod_h_bu_tp,
+            "xvmaddwod.h.bu $xr0, $xr1, $xr2\nxvmaddwod.h.bu $xr4, $xr5, "
+            "$xr6\nxvmaddwod.h.bu $xr8, $xr9, $xr10\nxvmaddwod.h.bu $xr12, "
+            "$xr13, $xr14\nxvmaddwod.h.bu $xr16, $xr17, $xr18\nxvmaddwod.h.bu "
+            "$xr20, $xr21, $xr22\nxvmaddwod.h.bu $xr24, $xr25, "
+            "$xr26\nxvmaddwod.h.bu $xr28, $xr29, $xr30\n")
 INSTR_TEST(xvmaddwod_w_hu_0, "xvmaddwod.w.hu $xr0, $xr1, $xr2\n")
 INSTR_TEST(xvmaddwod_w_hu_1, "xvmaddwod.w.hu $xr0, $xr0, $xr2\n")
 INSTR_TEST(xvmaddwod_w_hu_2, "xvmaddwod.w.hu $xr0, $xr1, $xr0\n")
-INSTR_TEST8(xvmaddwod_w_hu_tp, "xvmaddwod.w.hu $xr0, $xr1, $xr2\nxvmaddwod.w.hu $xr4, $xr5, $xr6\nxvmaddwod.w.hu $xr8, $xr9, $xr10\nxvmaddwod.w.hu $xr12, $xr13, $xr14\nxvmaddwod.w.hu $xr16, $xr17, $xr18\nxvmaddwod.w.hu $xr20, $xr21, $xr22\nxvmaddwod.w.hu $xr24, $xr25, $xr26\nxvmaddwod.w.hu $xr28, $xr29, $xr30\n")
+INSTR_TEST8(xvmaddwod_w_hu_tp,
+            "xvmaddwod.w.hu $xr0, $xr1, $xr2\nxvmaddwod.w.hu $xr4, $xr5, "
+            "$xr6\nxvmaddwod.w.hu $xr8, $xr9, $xr10\nxvmaddwod.w.hu $xr12, "
+            "$xr13, $xr14\nxvmaddwod.w.hu $xr16, $xr17, $xr18\nxvmaddwod.w.hu "
+            "$xr20, $xr21, $xr22\nxvmaddwod.w.hu $xr24, $xr25, "
+            "$xr26\nxvmaddwod.w.hu $xr28, $xr29, $xr30\n")
 INSTR_TEST(xvmaddwod_d_wu_0, "xvmaddwod.d.wu $xr0, $xr1, $xr2\n")
 INSTR_TEST(xvmaddwod_d_wu_1, "xvmaddwod.d.wu $xr0, $xr0, $xr2\n")
 INSTR_TEST(xvmaddwod_d_wu_2, "xvmaddwod.d.wu $xr0, $xr1, $xr0\n")
-INSTR_TEST8(xvmaddwod_d_wu_tp, "xvmaddwod.d.wu $xr0, $xr1, $xr2\nxvmaddwod.d.wu $xr4, $xr5, $xr6\nxvmaddwod.d.wu $xr8, $xr9, $xr10\nxvmaddwod.d.wu $xr12, $xr13, $xr14\nxvmaddwod.d.wu $xr16, $xr17, $xr18\nxvmaddwod.d.wu $xr20, $xr21, $xr22\nxvmaddwod.d.wu $xr24, $xr25, $xr26\nxvmaddwod.d.wu $xr28, $xr29, $xr30\n")
+INSTR_TEST8(xvmaddwod_d_wu_tp,
+            "xvmaddwod.d.wu $xr0, $xr1, $xr2\nxvmaddwod.d.wu $xr4, $xr5, "
+            "$xr6\nxvmaddwod.d.wu $xr8, $xr9, $xr10\nxvmaddwod.d.wu $xr12, "
+            "$xr13, $xr14\nxvmaddwod.d.wu $xr16, $xr17, $xr18\nxvmaddwod.d.wu "
+            "$xr20, $xr21, $xr22\nxvmaddwod.d.wu $xr24, $xr25, "
+            "$xr26\nxvmaddwod.d.wu $xr28, $xr29, $xr30\n")
 INSTR_TEST(xvmaddwod_q_du_0, "xvmaddwod.q.du $xr0, $xr1, $xr2\n")
 INSTR_TEST(xvmaddwod_q_du_1, "xvmaddwod.q.du $xr0, $xr0, $xr2\n")
 INSTR_TEST(xvmaddwod_q_du_2, "xvmaddwod.q.du $xr0, $xr1, $xr0\n")
-INSTR_TEST8(xvmaddwod_q_du_tp, "xvmaddwod.q.du $xr0, $xr1, $xr2\nxvmaddwod.q.du $xr4, $xr5, $xr6\nxvmaddwod.q.du $xr8, $xr9, $xr10\nxvmaddwod.q.du $xr12, $xr13, $xr14\nxvmaddwod.q.du $xr16, $xr17, $xr18\nxvmaddwod.q.du $xr20, $xr21, $xr22\nxvmaddwod.q.du $xr24, $xr25, $xr26\nxvmaddwod.q.du $xr28, $xr29, $xr30\n")
+INSTR_TEST8(xvmaddwod_q_du_tp,
+            "xvmaddwod.q.du $xr0, $xr1, $xr2\nxvmaddwod.q.du $xr4, $xr5, "
+            "$xr6\nxvmaddwod.q.du $xr8, $xr9, $xr10\nxvmaddwod.q.du $xr12, "
+            "$xr13, $xr14\nxvmaddwod.q.du $xr16, $xr17, $xr18\nxvmaddwod.q.du "
+            "$xr20, $xr21, $xr22\nxvmaddwod.q.du $xr24, $xr25, "
+            "$xr26\nxvmaddwod.q.du $xr28, $xr29, $xr30\n")
 INSTR_TEST(xvmaddwod_h_bu_b_0, "xvmaddwod.h.bu.b $xr0, $xr1, $xr2\n")
 INSTR_TEST(xvmaddwod_h_bu_b_1, "xvmaddwod.h.bu.b $xr0, $xr0, $xr2\n")
 INSTR_TEST(xvmaddwod_h_bu_b_2, "xvmaddwod.h.bu.b $xr0, $xr1, $xr0\n")
-INSTR_TEST8(xvmaddwod_h_bu_b_tp, "xvmaddwod.h.bu.b $xr0, $xr1, $xr2\nxvmaddwod.h.bu.b $xr4, $xr5, $xr6\nxvmaddwod.h.bu.b $xr8, $xr9, $xr10\nxvmaddwod.h.bu.b $xr12, $xr13, $xr14\nxvmaddwod.h.bu.b $xr16, $xr17, $xr18\nxvmaddwod.h.bu.b $xr20, $xr21, $xr22\nxvmaddwod.h.bu.b $xr24, $xr25, $xr26\nxvmaddwod.h.bu.b $xr28, $xr29, $xr30\n")
+INSTR_TEST8(xvmaddwod_h_bu_b_tp,
+            "xvmaddwod.h.bu.b $xr0, $xr1, $xr2\nxvmaddwod.h.bu.b $xr4, $xr5, "
+            "$xr6\nxvmaddwod.h.bu.b $xr8, $xr9, $xr10\nxvmaddwod.h.bu.b $xr12, "
+            "$xr13, $xr14\nxvmaddwod.h.bu.b $xr16, $xr17, "
+            "$xr18\nxvmaddwod.h.bu.b $xr20, $xr21, $xr22\nxvmaddwod.h.bu.b "
+            "$xr24, $xr25, $xr26\nxvmaddwod.h.bu.b $xr28, $xr29, $xr30\n")
 INSTR_TEST(xvmaddwod_w_hu_h_0, "xvmaddwod.w.hu.h $xr0, $xr1, $xr2\n")
 INSTR_TEST(xvmaddwod_w_hu_h_1, "xvmaddwod.w.hu.h $xr0, $xr0, $xr2\n")
 INSTR_TEST(xvmaddwod_w_hu_h_2, "xvmaddwod.w.hu.h $xr0, $xr1, $xr0\n")
-INSTR_TEST8(xvmaddwod_w_hu_h_tp, "xvmaddwod.w.hu.h $xr0, $xr1, $xr2\nxvmaddwod.w.hu.h $xr4, $xr5, $xr6\nxvmaddwod.w.hu.h $xr8, $xr9, $xr10\nxvmaddwod.w.hu.h $xr12, $xr13, $xr14\nxvmaddwod.w.hu.h $xr16, $xr17, $xr18\nxvmaddwod.w.hu.h $xr20, $xr21, $xr22\nxvmaddwod.w.hu.h $xr24, $xr25, $xr26\nxvmaddwod.w.hu.h $xr28, $xr29, $xr30\n")
+INSTR_TEST8(xvmaddwod_w_hu_h_tp,
+            "xvmaddwod.w.hu.h $xr0, $xr1, $xr2\nxvmaddwod.w.hu.h $xr4, $xr5, "
+            "$xr6\nxvmaddwod.w.hu.h $xr8, $xr9, $xr10\nxvmaddwod.w.hu.h $xr12, "
+            "$xr13, $xr14\nxvmaddwod.w.hu.h $xr16, $xr17, "
+            "$xr18\nxvmaddwod.w.hu.h $xr20, $xr21, $xr22\nxvmaddwod.w.hu.h "
+            "$xr24, $xr25, $xr26\nxvmaddwod.w.hu.h $xr28, $xr29, $xr30\n")
 INSTR_TEST(xvmaddwod_d_wu_w_0, "xvmaddwod.d.wu.w $xr0, $xr1, $xr2\n")
 INSTR_TEST(xvmaddwod_d_wu_w_1, "xvmaddwod.d.wu.w $xr0, $xr0, $xr2\n")
 INSTR_TEST(xvmaddwod_d_wu_w_2, "xvmaddwod.d.wu.w $xr0, $xr1, $xr0\n")
-INSTR_TEST8(xvmaddwod_d_wu_w_tp, "xvmaddwod.d.wu.w $xr0, $xr1, $xr2\nxvmaddwod.d.wu.w $xr4, $xr5, $xr6\nxvmaddwod.d.wu.w $xr8, $xr9, $xr10\nxvmaddwod.d.wu.w $xr12, $xr13, $xr14\nxvmaddwod.d.wu.w $xr16, $xr17, $xr18\nxvmaddwod.d.wu.w $xr20, $xr21, $xr22\nxvmaddwod.d.wu.w $xr24, $xr25, $xr26\nxvmaddwod.d.wu.w $xr28, $xr29, $xr30\n")
+INSTR_TEST8(xvmaddwod_d_wu_w_tp,
+            "xvmaddwod.d.wu.w $xr0, $xr1, $xr2\nxvmaddwod.d.wu.w $xr4, $xr5, "
+            "$xr6\nxvmaddwod.d.wu.w $xr8, $xr9, $xr10\nxvmaddwod.d.wu.w $xr12, "
+            "$xr13, $xr14\nxvmaddwod.d.wu.w $xr16, $xr17, "
+            "$xr18\nxvmaddwod.d.wu.w $xr20, $xr21, $xr22\nxvmaddwod.d.wu.w "
+            "$xr24, $xr25, $xr26\nxvmaddwod.d.wu.w $xr28, $xr29, $xr30\n")
 INSTR_TEST(xvmaddwod_q_du_d_0, "xvmaddwod.q.du.d $xr0, $xr1, $xr2\n")
 INSTR_TEST(xvmaddwod_q_du_d_1, "xvmaddwod.q.du.d $xr0, $xr0, $xr2\n")
 INSTR_TEST(xvmaddwod_q_du_d_2, "xvmaddwod.q.du.d $xr0, $xr1, $xr0\n")
-INSTR_TEST8(xvmaddwod_q_du_d_tp, "xvmaddwod.q.du.d $xr0, $xr1, $xr2\nxvmaddwod.q.du.d $xr4, $xr5, $xr6\nxvmaddwod.q.du.d $xr8, $xr9, $xr10\nxvmaddwod.q.du.d $xr12, $xr13, $xr14\nxvmaddwod.q.du.d $xr16, $xr17, $xr18\nxvmaddwod.q.du.d $xr20, $xr21, $xr22\nxvmaddwod.q.du.d $xr24, $xr25, $xr26\nxvmaddwod.q.du.d $xr28, $xr29, $xr30\n")
+INSTR_TEST8(xvmaddwod_q_du_d_tp,
+            "xvmaddwod.q.du.d $xr0, $xr1, $xr2\nxvmaddwod.q.du.d $xr4, $xr5, "
+            "$xr6\nxvmaddwod.q.du.d $xr8, $xr9, $xr10\nxvmaddwod.q.du.d $xr12, "
+            "$xr13, $xr14\nxvmaddwod.q.du.d $xr16, $xr17, "
+            "$xr18\nxvmaddwod.q.du.d $xr20, $xr21, $xr22\nxvmaddwod.q.du.d "
+            "$xr24, $xr25, $xr26\nxvmaddwod.q.du.d $xr28, $xr29, $xr30\n")
 INSTR_TEST(xvmulwev_h_b_1, "xvmulwev.h.b $xr0, $xr0, $xr2\n")
 INSTR_TEST(xvmulwev_h_b_2, "xvmulwev.h.b $xr0, $xr1, $xr0\n")
 INSTR_TEST(xvmulwev_h_b_tp, "xvmulwev.h.b $xr0, $xr1, $xr2\n")
@@ -2731,35 +3267,67 @@ INSTR_TEST(xvmuh_du_tp, "xvmuh.du $xr0, $xr1, $xr2\n")
 INSTR_TEST(xvmadd_b_0, "xvmadd.b $xr0, $xr1, $xr2\n")
 INSTR_TEST(xvmadd_b_1, "xvmadd.b $xr0, $xr0, $xr2\n")
 INSTR_TEST(xvmadd_b_2, "xvmadd.b $xr0, $xr1, $xr0\n")
-INSTR_TEST8(xvmadd_b_tp, "xvmadd.b $xr0, $xr1, $xr2\nxvmadd.b $xr4, $xr5, $xr6\nxvmadd.b $xr8, $xr9, $xr10\nxvmadd.b $xr12, $xr13, $xr14\nxvmadd.b $xr16, $xr17, $xr18\nxvmadd.b $xr20, $xr21, $xr22\nxvmadd.b $xr24, $xr25, $xr26\nxvmadd.b $xr28, $xr29, $xr30\n")
+INSTR_TEST8(xvmadd_b_tp,
+            "xvmadd.b $xr0, $xr1, $xr2\nxvmadd.b $xr4, $xr5, $xr6\nxvmadd.b "
+            "$xr8, $xr9, $xr10\nxvmadd.b $xr12, $xr13, $xr14\nxvmadd.b $xr16, "
+            "$xr17, $xr18\nxvmadd.b $xr20, $xr21, $xr22\nxvmadd.b $xr24, "
+            "$xr25, $xr26\nxvmadd.b $xr28, $xr29, $xr30\n")
 INSTR_TEST(xvmadd_h_0, "xvmadd.h $xr0, $xr1, $xr2\n")
 INSTR_TEST(xvmadd_h_1, "xvmadd.h $xr0, $xr0, $xr2\n")
 INSTR_TEST(xvmadd_h_2, "xvmadd.h $xr0, $xr1, $xr0\n")
-INSTR_TEST8(xvmadd_h_tp, "xvmadd.h $xr0, $xr1, $xr2\nxvmadd.h $xr4, $xr5, $xr6\nxvmadd.h $xr8, $xr9, $xr10\nxvmadd.h $xr12, $xr13, $xr14\nxvmadd.h $xr16, $xr17, $xr18\nxvmadd.h $xr20, $xr21, $xr22\nxvmadd.h $xr24, $xr25, $xr26\nxvmadd.h $xr28, $xr29, $xr30\n")
+INSTR_TEST8(xvmadd_h_tp,
+            "xvmadd.h $xr0, $xr1, $xr2\nxvmadd.h $xr4, $xr5, $xr6\nxvmadd.h "
+            "$xr8, $xr9, $xr10\nxvmadd.h $xr12, $xr13, $xr14\nxvmadd.h $xr16, "
+            "$xr17, $xr18\nxvmadd.h $xr20, $xr21, $xr22\nxvmadd.h $xr24, "
+            "$xr25, $xr26\nxvmadd.h $xr28, $xr29, $xr30\n")
 INSTR_TEST(xvmadd_w_0, "xvmadd.w $xr0, $xr1, $xr2\n")
 INSTR_TEST(xvmadd_w_1, "xvmadd.w $xr0, $xr0, $xr2\n")
 INSTR_TEST(xvmadd_w_2, "xvmadd.w $xr0, $xr1, $xr0\n")
-INSTR_TEST8(xvmadd_w_tp, "xvmadd.w $xr0, $xr1, $xr2\nxvmadd.w $xr4, $xr5, $xr6\nxvmadd.w $xr8, $xr9, $xr10\nxvmadd.w $xr12, $xr13, $xr14\nxvmadd.w $xr16, $xr17, $xr18\nxvmadd.w $xr20, $xr21, $xr22\nxvmadd.w $xr24, $xr25, $xr26\nxvmadd.w $xr28, $xr29, $xr30\n")
+INSTR_TEST8(xvmadd_w_tp,
+            "xvmadd.w $xr0, $xr1, $xr2\nxvmadd.w $xr4, $xr5, $xr6\nxvmadd.w "
+            "$xr8, $xr9, $xr10\nxvmadd.w $xr12, $xr13, $xr14\nxvmadd.w $xr16, "
+            "$xr17, $xr18\nxvmadd.w $xr20, $xr21, $xr22\nxvmadd.w $xr24, "
+            "$xr25, $xr26\nxvmadd.w $xr28, $xr29, $xr30\n")
 INSTR_TEST(xvmadd_d_0, "xvmadd.d $xr0, $xr1, $xr2\n")
 INSTR_TEST(xvmadd_d_1, "xvmadd.d $xr0, $xr0, $xr2\n")
 INSTR_TEST(xvmadd_d_2, "xvmadd.d $xr0, $xr1, $xr0\n")
-INSTR_TEST8(xvmadd_d_tp, "xvmadd.d $xr0, $xr1, $xr2\nxvmadd.d $xr4, $xr5, $xr6\nxvmadd.d $xr8, $xr9, $xr10\nxvmadd.d $xr12, $xr13, $xr14\nxvmadd.d $xr16, $xr17, $xr18\nxvmadd.d $xr20, $xr21, $xr22\nxvmadd.d $xr24, $xr25, $xr26\nxvmadd.d $xr28, $xr29, $xr30\n")
+INSTR_TEST8(xvmadd_d_tp,
+            "xvmadd.d $xr0, $xr1, $xr2\nxvmadd.d $xr4, $xr5, $xr6\nxvmadd.d "
+            "$xr8, $xr9, $xr10\nxvmadd.d $xr12, $xr13, $xr14\nxvmadd.d $xr16, "
+            "$xr17, $xr18\nxvmadd.d $xr20, $xr21, $xr22\nxvmadd.d $xr24, "
+            "$xr25, $xr26\nxvmadd.d $xr28, $xr29, $xr30\n")
 INSTR_TEST(xvmsub_b_0, "xvmsub.b $xr0, $xr1, $xr2\n")
 INSTR_TEST(xvmsub_b_1, "xvmsub.b $xr0, $xr0, $xr2\n")
 INSTR_TEST(xvmsub_b_2, "xvmsub.b $xr0, $xr1, $xr0\n")
-INSTR_TEST8(xvmsub_b_tp, "xvmsub.b $xr0, $xr1, $xr2\nxvmsub.b $xr4, $xr5, $xr6\nxvmsub.b $xr8, $xr9, $xr10\nxvmsub.b $xr12, $xr13, $xr14\nxvmsub.b $xr16, $xr17, $xr18\nxvmsub.b $xr20, $xr21, $xr22\nxvmsub.b $xr24, $xr25, $xr26\nxvmsub.b $xr28, $xr29, $xr30\n")
+INSTR_TEST8(xvmsub_b_tp,
+            "xvmsub.b $xr0, $xr1, $xr2\nxvmsub.b $xr4, $xr5, $xr6\nxvmsub.b "
+            "$xr8, $xr9, $xr10\nxvmsub.b $xr12, $xr13, $xr14\nxvmsub.b $xr16, "
+            "$xr17, $xr18\nxvmsub.b $xr20, $xr21, $xr22\nxvmsub.b $xr24, "
+            "$xr25, $xr26\nxvmsub.b $xr28, $xr29, $xr30\n")
 INSTR_TEST(xvmsub_h_0, "xvmsub.h $xr0, $xr1, $xr2\n")
 INSTR_TEST(xvmsub_h_1, "xvmsub.h $xr0, $xr0, $xr2\n")
 INSTR_TEST(xvmsub_h_2, "xvmsub.h $xr0, $xr1, $xr0\n")
-INSTR_TEST8(xvmsub_h_tp, "xvmsub.h $xr0, $xr1, $xr2\nxvmsub.h $xr4, $xr5, $xr6\nxvmsub.h $xr8, $xr9, $xr10\nxvmsub.h $xr12, $xr13, $xr14\nxvmsub.h $xr16, $xr17, $xr18\nxvmsub.h $xr20, $xr21, $xr22\nxvmsub.h $xr24, $xr25, $xr26\nxvmsub.h $xr28, $xr29, $xr30\n")
+INSTR_TEST8(xvmsub_h_tp,
+            "xvmsub.h $xr0, $xr1, $xr2\nxvmsub.h $xr4, $xr5, $xr6\nxvmsub.h "
+            "$xr8, $xr9, $xr10\nxvmsub.h $xr12, $xr13, $xr14\nxvmsub.h $xr16, "
+            "$xr17, $xr18\nxvmsub.h $xr20, $xr21, $xr22\nxvmsub.h $xr24, "
+            "$xr25, $xr26\nxvmsub.h $xr28, $xr29, $xr30\n")
 INSTR_TEST(xvmsub_w_0, "xvmsub.w $xr0, $xr1, $xr2\n")
 INSTR_TEST(xvmsub_w_1, "xvmsub.w $xr0, $xr0, $xr2\n")
 INSTR_TEST(xvmsub_w_2, "xvmsub.w $xr0, $xr1, $xr0\n")
-INSTR_TEST8(xvmsub_w_tp, "xvmsub.w $xr0, $xr1, $xr2\nxvmsub.w $xr4, $xr5, $xr6\nxvmsub.w $xr8, $xr9, $xr10\nxvmsub.w $xr12, $xr13, $xr14\nxvmsub.w $xr16, $xr17, $xr18\nxvmsub.w $xr20, $xr21, $xr22\nxvmsub.w $xr24, $xr25, $xr26\nxvmsub.w $xr28, $xr29, $xr30\n")
+INSTR_TEST8(xvmsub_w_tp,
+            "xvmsub.w $xr0, $xr1, $xr2\nxvmsub.w $xr4, $xr5, $xr6\nxvmsub.w "
+            "$xr8, $xr9, $xr10\nxvmsub.w $xr12, $xr13, $xr14\nxvmsub.w $xr16, "
+            "$xr17, $xr18\nxvmsub.w $xr20, $xr21, $xr22\nxvmsub.w $xr24, "
+            "$xr25, $xr26\nxvmsub.w $xr28, $xr29, $xr30\n")
 INSTR_TEST(xvmsub_d_0, "xvmsub.d $xr0, $xr1, $xr2\n")
 INSTR_TEST(xvmsub_d_1, "xvmsub.d $xr0, $xr0, $xr2\n")
 INSTR_TEST(xvmsub_d_2, "xvmsub.d $xr0, $xr1, $xr0\n")
-INSTR_TEST8(xvmsub_d_tp, "xvmsub.d $xr0, $xr1, $xr2\nxvmsub.d $xr4, $xr5, $xr6\nxvmsub.d $xr8, $xr9, $xr10\nxvmsub.d $xr12, $xr13, $xr14\nxvmsub.d $xr16, $xr17, $xr18\nxvmsub.d $xr20, $xr21, $xr22\nxvmsub.d $xr24, $xr25, $xr26\nxvmsub.d $xr28, $xr29, $xr30\n")
+INSTR_TEST8(xvmsub_d_tp,
+            "xvmsub.d $xr0, $xr1, $xr2\nxvmsub.d $xr4, $xr5, $xr6\nxvmsub.d "
+            "$xr8, $xr9, $xr10\nxvmsub.d $xr12, $xr13, $xr14\nxvmsub.d $xr16, "
+            "$xr17, $xr18\nxvmsub.d $xr20, $xr21, $xr22\nxvmsub.d $xr24, "
+            "$xr25, $xr26\nxvmsub.d $xr28, $xr29, $xr30\n")
 INSTR_TEST(xvdiv_b_1, "xvdiv.b $xr0, $xr0, $xr2\n")
 INSTR_TEST(xvdiv_b_2, "xvdiv.b $xr0, $xr1, $xr0\n")
 INSTR_TEST(xvdiv_b_tp, "xvdiv.b $xr0, $xr1, $xr2\n")
@@ -3125,11 +3693,19 @@ INSTR_TEST(xvorn_v_tp, "xvorn.v $xr0, $xr1, $xr2\n")
 INSTR_TEST(xvfrstp_b_0, "xvfrstp.b $xr0, $xr1, $xr2\n")
 INSTR_TEST(xvfrstp_b_1, "xvfrstp.b $xr0, $xr0, $xr2\n")
 INSTR_TEST(xvfrstp_b_2, "xvfrstp.b $xr0, $xr1, $xr0\n")
-INSTR_TEST8(xvfrstp_b_tp, "xvfrstp.b $xr0, $xr1, $xr2\nxvfrstp.b $xr4, $xr5, $xr6\nxvfrstp.b $xr8, $xr9, $xr10\nxvfrstp.b $xr12, $xr13, $xr14\nxvfrstp.b $xr16, $xr17, $xr18\nxvfrstp.b $xr20, $xr21, $xr22\nxvfrstp.b $xr24, $xr25, $xr26\nxvfrstp.b $xr28, $xr29, $xr30\n")
+INSTR_TEST8(xvfrstp_b_tp,
+            "xvfrstp.b $xr0, $xr1, $xr2\nxvfrstp.b $xr4, $xr5, $xr6\nxvfrstp.b "
+            "$xr8, $xr9, $xr10\nxvfrstp.b $xr12, $xr13, $xr14\nxvfrstp.b "
+            "$xr16, $xr17, $xr18\nxvfrstp.b $xr20, $xr21, $xr22\nxvfrstp.b "
+            "$xr24, $xr25, $xr26\nxvfrstp.b $xr28, $xr29, $xr30\n")
 INSTR_TEST(xvfrstp_h_0, "xvfrstp.h $xr0, $xr1, $xr2\n")
 INSTR_TEST(xvfrstp_h_1, "xvfrstp.h $xr0, $xr0, $xr2\n")
 INSTR_TEST(xvfrstp_h_2, "xvfrstp.h $xr0, $xr1, $xr0\n")
-INSTR_TEST8(xvfrstp_h_tp, "xvfrstp.h $xr0, $xr1, $xr2\nxvfrstp.h $xr4, $xr5, $xr6\nxvfrstp.h $xr8, $xr9, $xr10\nxvfrstp.h $xr12, $xr13, $xr14\nxvfrstp.h $xr16, $xr17, $xr18\nxvfrstp.h $xr20, $xr21, $xr22\nxvfrstp.h $xr24, $xr25, $xr26\nxvfrstp.h $xr28, $xr29, $xr30\n")
+INSTR_TEST8(xvfrstp_h_tp,
+            "xvfrstp.h $xr0, $xr1, $xr2\nxvfrstp.h $xr4, $xr5, $xr6\nxvfrstp.h "
+            "$xr8, $xr9, $xr10\nxvfrstp.h $xr12, $xr13, $xr14\nxvfrstp.h "
+            "$xr16, $xr17, $xr18\nxvfrstp.h $xr20, $xr21, $xr22\nxvfrstp.h "
+            "$xr24, $xr25, $xr26\nxvfrstp.h $xr28, $xr29, $xr30\n")
 INSTR_TEST(xvadd_q_1, "xvadd.q $xr0, $xr0, $xr2\n")
 INSTR_TEST(xvadd_q_2, "xvadd.q $xr0, $xr1, $xr0\n")
 INSTR_TEST(xvadd_q_tp, "xvadd.q $xr0, $xr1, $xr2\n")
@@ -3223,15 +3799,27 @@ INSTR_TEST(xvftintrne_w_d_tp, "xvftintrne.w.d $xr0, $xr1, $xr2\n")
 INSTR_TEST(xvshuf_h_0, "xvshuf.h $xr0, $xr1, $xr2\n")
 INSTR_TEST(xvshuf_h_1, "xvshuf.h $xr0, $xr0, $xr2\n")
 INSTR_TEST(xvshuf_h_2, "xvshuf.h $xr0, $xr1, $xr0\n")
-INSTR_TEST8(xvshuf_h_tp, "xvshuf.h $xr0, $xr1, $xr2\nxvshuf.h $xr4, $xr5, $xr6\nxvshuf.h $xr8, $xr9, $xr10\nxvshuf.h $xr12, $xr13, $xr14\nxvshuf.h $xr16, $xr17, $xr18\nxvshuf.h $xr20, $xr21, $xr22\nxvshuf.h $xr24, $xr25, $xr26\nxvshuf.h $xr28, $xr29, $xr30\n")
+INSTR_TEST8(xvshuf_h_tp,
+            "xvshuf.h $xr0, $xr1, $xr2\nxvshuf.h $xr4, $xr5, $xr6\nxvshuf.h "
+            "$xr8, $xr9, $xr10\nxvshuf.h $xr12, $xr13, $xr14\nxvshuf.h $xr16, "
+            "$xr17, $xr18\nxvshuf.h $xr20, $xr21, $xr22\nxvshuf.h $xr24, "
+            "$xr25, $xr26\nxvshuf.h $xr28, $xr29, $xr30\n")
 INSTR_TEST(xvshuf_w_0, "xvshuf.w $xr0, $xr1, $xr2\n")
 INSTR_TEST(xvshuf_w_1, "xvshuf.w $xr0, $xr0, $xr2\n")
 INSTR_TEST(xvshuf_w_2, "xvshuf.w $xr0, $xr1, $xr0\n")
-INSTR_TEST8(xvshuf_w_tp, "xvshuf.w $xr0, $xr1, $xr2\nxvshuf.w $xr4, $xr5, $xr6\nxvshuf.w $xr8, $xr9, $xr10\nxvshuf.w $xr12, $xr13, $xr14\nxvshuf.w $xr16, $xr17, $xr18\nxvshuf.w $xr20, $xr21, $xr22\nxvshuf.w $xr24, $xr25, $xr26\nxvshuf.w $xr28, $xr29, $xr30\n")
+INSTR_TEST8(xvshuf_w_tp,
+            "xvshuf.w $xr0, $xr1, $xr2\nxvshuf.w $xr4, $xr5, $xr6\nxvshuf.w "
+            "$xr8, $xr9, $xr10\nxvshuf.w $xr12, $xr13, $xr14\nxvshuf.w $xr16, "
+            "$xr17, $xr18\nxvshuf.w $xr20, $xr21, $xr22\nxvshuf.w $xr24, "
+            "$xr25, $xr26\nxvshuf.w $xr28, $xr29, $xr30\n")
 INSTR_TEST(xvshuf_d_0, "xvshuf.d $xr0, $xr1, $xr2\n")
 INSTR_TEST(xvshuf_d_1, "xvshuf.d $xr0, $xr0, $xr2\n")
 INSTR_TEST(xvshuf_d_2, "xvshuf.d $xr0, $xr1, $xr0\n")
-INSTR_TEST8(xvshuf_d_tp, "xvshuf.d $xr0, $xr1, $xr2\nxvshuf.d $xr4, $xr5, $xr6\nxvshuf.d $xr8, $xr9, $xr10\nxvshuf.d $xr12, $xr13, $xr14\nxvshuf.d $xr16, $xr17, $xr18\nxvshuf.d $xr20, $xr21, $xr22\nxvshuf.d $xr24, $xr25, $xr26\nxvshuf.d $xr28, $xr29, $xr30\n")
+INSTR_TEST8(xvshuf_d_tp,
+            "xvshuf.d $xr0, $xr1, $xr2\nxvshuf.d $xr4, $xr5, $xr6\nxvshuf.d "
+            "$xr8, $xr9, $xr10\nxvshuf.d $xr12, $xr13, $xr14\nxvshuf.d $xr16, "
+            "$xr17, $xr18\nxvshuf.d $xr20, $xr21, $xr22\nxvshuf.d $xr24, "
+            "$xr25, $xr26\nxvshuf.d $xr28, $xr29, $xr30\n")
 INSTR_TEST(xvperm_w_1, "xvperm.w $xr0, $xr0, $xr2\n")
 INSTR_TEST(xvperm_w_2, "xvperm.w $xr0, $xr1, $xr0\n")
 INSTR_TEST(xvperm_w_tp, "xvperm.w $xr0, $xr1, $xr2\n")
@@ -3329,10 +3917,18 @@ INSTR_TEST(xvmini_du_1, "xvmini.du $xr0, $xr0, 0\n")
 INSTR_TEST(xvmini_du_tp, "xvmini.du $xr0, $xr1, 0\n")
 INSTR_TEST(xvfrstpi_b_0, "xvfrstpi.b $xr0, $xr1, 0\n")
 INSTR_TEST(xvfrstpi_b_1, "xvfrstpi.b $xr0, $xr0, 0\n")
-INSTR_TEST8(xvfrstpi_b_tp, "xvfrstpi.b $xr0, $xr1, 0\nxvfrstpi.b $xr4, $xr5, 0\nxvfrstpi.b $xr8, $xr9, 0\nxvfrstpi.b $xr12, $xr13, 0\nxvfrstpi.b $xr16, $xr17, 0\nxvfrstpi.b $xr20, $xr21, 0\nxvfrstpi.b $xr24, $xr25, 0\nxvfrstpi.b $xr28, $xr29, 0\n")
+INSTR_TEST8(xvfrstpi_b_tp,
+            "xvfrstpi.b $xr0, $xr1, 0\nxvfrstpi.b $xr4, $xr5, 0\nxvfrstpi.b "
+            "$xr8, $xr9, 0\nxvfrstpi.b $xr12, $xr13, 0\nxvfrstpi.b $xr16, "
+            "$xr17, 0\nxvfrstpi.b $xr20, $xr21, 0\nxvfrstpi.b $xr24, $xr25, "
+            "0\nxvfrstpi.b $xr28, $xr29, 0\n")
 INSTR_TEST(xvfrstpi_h_0, "xvfrstpi.h $xr0, $xr1, 0\n")
 INSTR_TEST(xvfrstpi_h_1, "xvfrstpi.h $xr0, $xr0, 0\n")
-INSTR_TEST8(xvfrstpi_h_tp, "xvfrstpi.h $xr0, $xr1, 0\nxvfrstpi.h $xr4, $xr5, 0\nxvfrstpi.h $xr8, $xr9, 0\nxvfrstpi.h $xr12, $xr13, 0\nxvfrstpi.h $xr16, $xr17, 0\nxvfrstpi.h $xr20, $xr21, 0\nxvfrstpi.h $xr24, $xr25, 0\nxvfrstpi.h $xr28, $xr29, 0\n")
+INSTR_TEST8(xvfrstpi_h_tp,
+            "xvfrstpi.h $xr0, $xr1, 0\nxvfrstpi.h $xr4, $xr5, 0\nxvfrstpi.h "
+            "$xr8, $xr9, 0\nxvfrstpi.h $xr12, $xr13, 0\nxvfrstpi.h $xr16, "
+            "$xr17, 0\nxvfrstpi.h $xr20, $xr21, 0\nxvfrstpi.h $xr24, $xr25, "
+            "0\nxvfrstpi.h $xr28, $xr29, 0\n")
 INSTR_TEST(xvclo_b_1, "xvclo.b $xr0, $xr0\n")
 INSTR_TEST(xvclo_b_tp, "xvclo.b $xr0, $xr1\n")
 INSTR_TEST(xvclo_h_1, "xvclo.h $xr0, $xr0\n")
@@ -3576,9 +4172,17 @@ INSTR_TEST(xvsrari_w_tp, "xvsrari.w $xr0, $xr1, 0\n")
 INSTR_TEST(xvsrari_d_1, "xvsrari.d $xr0, $xr0, 0\n")
 INSTR_TEST(xvsrari_d_tp, "xvsrari.d $xr0, $xr1, 0\n")
 INSTR_TEST(xvinsgr2vr_w_0, "xvinsgr2vr.w $xr0, $r0, 0\n")
-INSTR_TEST8(xvinsgr2vr_w_tp, "xvinsgr2vr.w $xr0, $r0, 0\nxvinsgr2vr.w $xr4, $r0, 0\nxvinsgr2vr.w $xr8, $r0, 0\nxvinsgr2vr.w $xr12, $r0, 0\nxvinsgr2vr.w $xr16, $r0, 0\nxvinsgr2vr.w $xr20, $r0, 0\nxvinsgr2vr.w $xr24, $r0, 0\nxvinsgr2vr.w $xr28, $r0, 0\n")
+INSTR_TEST8(xvinsgr2vr_w_tp,
+            "xvinsgr2vr.w $xr0, $r0, 0\nxvinsgr2vr.w $xr4, $r0, "
+            "0\nxvinsgr2vr.w $xr8, $r0, 0\nxvinsgr2vr.w $xr12, $r0, "
+            "0\nxvinsgr2vr.w $xr16, $r0, 0\nxvinsgr2vr.w $xr20, $r0, "
+            "0\nxvinsgr2vr.w $xr24, $r0, 0\nxvinsgr2vr.w $xr28, $r0, 0\n")
 INSTR_TEST(xvinsgr2vr_d_0, "xvinsgr2vr.d $xr0, $r0, 0\n")
-INSTR_TEST8(xvinsgr2vr_d_tp, "xvinsgr2vr.d $xr0, $r0, 0\nxvinsgr2vr.d $xr4, $r0, 0\nxvinsgr2vr.d $xr8, $r0, 0\nxvinsgr2vr.d $xr12, $r0, 0\nxvinsgr2vr.d $xr16, $r0, 0\nxvinsgr2vr.d $xr20, $r0, 0\nxvinsgr2vr.d $xr24, $r0, 0\nxvinsgr2vr.d $xr28, $r0, 0\n")
+INSTR_TEST8(xvinsgr2vr_d_tp,
+            "xvinsgr2vr.d $xr0, $r0, 0\nxvinsgr2vr.d $xr4, $r0, "
+            "0\nxvinsgr2vr.d $xr8, $r0, 0\nxvinsgr2vr.d $xr12, $r0, "
+            "0\nxvinsgr2vr.d $xr16, $r0, 0\nxvinsgr2vr.d $xr20, $r0, "
+            "0\nxvinsgr2vr.d $xr24, $r0, 0\nxvinsgr2vr.d $xr28, $r0, 0\n")
 INSTR_TEST(xvpickve2gr_w_1, "xvpickve2gr.w $r0, $xr0, 0\n")
 INSTR_TEST(xvpickve2gr_w_tp, "xvpickve2gr.w $r0, $xr1, 0\n")
 INSTR_TEST(xvpickve2gr_d_1, "xvpickve2gr.d $r0, $xr0, 0\n")
@@ -3597,10 +4201,18 @@ INSTR_TEST(xvrepl128vei_d_1, "xvrepl128vei.d $xr0, $xr0, 0\n")
 INSTR_TEST(xvrepl128vei_d_tp, "xvrepl128vei.d $xr0, $xr1, 0\n")
 INSTR_TEST(xvinsve0_w_0, "xvinsve0.w $xr0, $xr1, 0\n")
 INSTR_TEST(xvinsve0_w_1, "xvinsve0.w $xr0, $xr0, 0\n")
-INSTR_TEST8(xvinsve0_w_tp, "xvinsve0.w $xr0, $xr1, 0\nxvinsve0.w $xr4, $xr5, 0\nxvinsve0.w $xr8, $xr9, 0\nxvinsve0.w $xr12, $xr13, 0\nxvinsve0.w $xr16, $xr17, 0\nxvinsve0.w $xr20, $xr21, 0\nxvinsve0.w $xr24, $xr25, 0\nxvinsve0.w $xr28, $xr29, 0\n")
+INSTR_TEST8(xvinsve0_w_tp,
+            "xvinsve0.w $xr0, $xr1, 0\nxvinsve0.w $xr4, $xr5, 0\nxvinsve0.w "
+            "$xr8, $xr9, 0\nxvinsve0.w $xr12, $xr13, 0\nxvinsve0.w $xr16, "
+            "$xr17, 0\nxvinsve0.w $xr20, $xr21, 0\nxvinsve0.w $xr24, $xr25, "
+            "0\nxvinsve0.w $xr28, $xr29, 0\n")
 INSTR_TEST(xvinsve0_d_0, "xvinsve0.d $xr0, $xr1, 0\n")
 INSTR_TEST(xvinsve0_d_1, "xvinsve0.d $xr0, $xr0, 0\n")
-INSTR_TEST8(xvinsve0_d_tp, "xvinsve0.d $xr0, $xr1, 0\nxvinsve0.d $xr4, $xr5, 0\nxvinsve0.d $xr8, $xr9, 0\nxvinsve0.d $xr12, $xr13, 0\nxvinsve0.d $xr16, $xr17, 0\nxvinsve0.d $xr20, $xr21, 0\nxvinsve0.d $xr24, $xr25, 0\nxvinsve0.d $xr28, $xr29, 0\n")
+INSTR_TEST8(xvinsve0_d_tp,
+            "xvinsve0.d $xr0, $xr1, 0\nxvinsve0.d $xr4, $xr5, 0\nxvinsve0.d "
+            "$xr8, $xr9, 0\nxvinsve0.d $xr12, $xr13, 0\nxvinsve0.d $xr16, "
+            "$xr17, 0\nxvinsve0.d $xr20, $xr21, 0\nxvinsve0.d $xr24, $xr25, "
+            "0\nxvinsve0.d $xr28, $xr29, 0\n")
 INSTR_TEST(xvpickve_w_1, "xvpickve.w $xr0, $xr0, 0\n")
 INSTR_TEST(xvpickve_w_tp, "xvpickve.w $xr0, $xr1, 0\n")
 INSTR_TEST(xvpickve_d_1, "xvpickve.d $xr0, $xr0, 0\n")
@@ -3697,160 +4309,376 @@ INSTR_TEST(xvsrai_d_1, "xvsrai.d $xr0, $xr0, 0\n")
 INSTR_TEST(xvsrai_d_tp, "xvsrai.d $xr0, $xr1, 0\n")
 INSTR_TEST(xvsrlni_b_h_0, "xvsrlni.b.h $xr0, $xr1, 0\n")
 INSTR_TEST(xvsrlni_b_h_1, "xvsrlni.b.h $xr0, $xr0, 0\n")
-INSTR_TEST8(xvsrlni_b_h_tp, "xvsrlni.b.h $xr0, $xr1, 0\nxvsrlni.b.h $xr4, $xr5, 0\nxvsrlni.b.h $xr8, $xr9, 0\nxvsrlni.b.h $xr12, $xr13, 0\nxvsrlni.b.h $xr16, $xr17, 0\nxvsrlni.b.h $xr20, $xr21, 0\nxvsrlni.b.h $xr24, $xr25, 0\nxvsrlni.b.h $xr28, $xr29, 0\n")
+INSTR_TEST8(xvsrlni_b_h_tp,
+            "xvsrlni.b.h $xr0, $xr1, 0\nxvsrlni.b.h $xr4, $xr5, 0\nxvsrlni.b.h "
+            "$xr8, $xr9, 0\nxvsrlni.b.h $xr12, $xr13, 0\nxvsrlni.b.h $xr16, "
+            "$xr17, 0\nxvsrlni.b.h $xr20, $xr21, 0\nxvsrlni.b.h $xr24, $xr25, "
+            "0\nxvsrlni.b.h $xr28, $xr29, 0\n")
 INSTR_TEST(xvsrlni_h_w_0, "xvsrlni.h.w $xr0, $xr1, 0\n")
 INSTR_TEST(xvsrlni_h_w_1, "xvsrlni.h.w $xr0, $xr0, 0\n")
-INSTR_TEST8(xvsrlni_h_w_tp, "xvsrlni.h.w $xr0, $xr1, 0\nxvsrlni.h.w $xr4, $xr5, 0\nxvsrlni.h.w $xr8, $xr9, 0\nxvsrlni.h.w $xr12, $xr13, 0\nxvsrlni.h.w $xr16, $xr17, 0\nxvsrlni.h.w $xr20, $xr21, 0\nxvsrlni.h.w $xr24, $xr25, 0\nxvsrlni.h.w $xr28, $xr29, 0\n")
+INSTR_TEST8(xvsrlni_h_w_tp,
+            "xvsrlni.h.w $xr0, $xr1, 0\nxvsrlni.h.w $xr4, $xr5, 0\nxvsrlni.h.w "
+            "$xr8, $xr9, 0\nxvsrlni.h.w $xr12, $xr13, 0\nxvsrlni.h.w $xr16, "
+            "$xr17, 0\nxvsrlni.h.w $xr20, $xr21, 0\nxvsrlni.h.w $xr24, $xr25, "
+            "0\nxvsrlni.h.w $xr28, $xr29, 0\n")
 INSTR_TEST(xvsrlni_w_d_0, "xvsrlni.w.d $xr0, $xr1, 0\n")
 INSTR_TEST(xvsrlni_w_d_1, "xvsrlni.w.d $xr0, $xr0, 0\n")
-INSTR_TEST8(xvsrlni_w_d_tp, "xvsrlni.w.d $xr0, $xr1, 0\nxvsrlni.w.d $xr4, $xr5, 0\nxvsrlni.w.d $xr8, $xr9, 0\nxvsrlni.w.d $xr12, $xr13, 0\nxvsrlni.w.d $xr16, $xr17, 0\nxvsrlni.w.d $xr20, $xr21, 0\nxvsrlni.w.d $xr24, $xr25, 0\nxvsrlni.w.d $xr28, $xr29, 0\n")
+INSTR_TEST8(xvsrlni_w_d_tp,
+            "xvsrlni.w.d $xr0, $xr1, 0\nxvsrlni.w.d $xr4, $xr5, 0\nxvsrlni.w.d "
+            "$xr8, $xr9, 0\nxvsrlni.w.d $xr12, $xr13, 0\nxvsrlni.w.d $xr16, "
+            "$xr17, 0\nxvsrlni.w.d $xr20, $xr21, 0\nxvsrlni.w.d $xr24, $xr25, "
+            "0\nxvsrlni.w.d $xr28, $xr29, 0\n")
 INSTR_TEST(xvsrlni_d_q_0, "xvsrlni.d.q $xr0, $xr1, 0\n")
 INSTR_TEST(xvsrlni_d_q_1, "xvsrlni.d.q $xr0, $xr0, 0\n")
-INSTR_TEST8(xvsrlni_d_q_tp, "xvsrlni.d.q $xr0, $xr1, 0\nxvsrlni.d.q $xr4, $xr5, 0\nxvsrlni.d.q $xr8, $xr9, 0\nxvsrlni.d.q $xr12, $xr13, 0\nxvsrlni.d.q $xr16, $xr17, 0\nxvsrlni.d.q $xr20, $xr21, 0\nxvsrlni.d.q $xr24, $xr25, 0\nxvsrlni.d.q $xr28, $xr29, 0\n")
+INSTR_TEST8(xvsrlni_d_q_tp,
+            "xvsrlni.d.q $xr0, $xr1, 0\nxvsrlni.d.q $xr4, $xr5, 0\nxvsrlni.d.q "
+            "$xr8, $xr9, 0\nxvsrlni.d.q $xr12, $xr13, 0\nxvsrlni.d.q $xr16, "
+            "$xr17, 0\nxvsrlni.d.q $xr20, $xr21, 0\nxvsrlni.d.q $xr24, $xr25, "
+            "0\nxvsrlni.d.q $xr28, $xr29, 0\n")
 INSTR_TEST(xvsrlrni_b_h_0, "xvsrlrni.b.h $xr0, $xr1, 0\n")
 INSTR_TEST(xvsrlrni_b_h_1, "xvsrlrni.b.h $xr0, $xr0, 0\n")
-INSTR_TEST8(xvsrlrni_b_h_tp, "xvsrlrni.b.h $xr0, $xr1, 0\nxvsrlrni.b.h $xr4, $xr5, 0\nxvsrlrni.b.h $xr8, $xr9, 0\nxvsrlrni.b.h $xr12, $xr13, 0\nxvsrlrni.b.h $xr16, $xr17, 0\nxvsrlrni.b.h $xr20, $xr21, 0\nxvsrlrni.b.h $xr24, $xr25, 0\nxvsrlrni.b.h $xr28, $xr29, 0\n")
+INSTR_TEST8(xvsrlrni_b_h_tp,
+            "xvsrlrni.b.h $xr0, $xr1, 0\nxvsrlrni.b.h $xr4, $xr5, "
+            "0\nxvsrlrni.b.h $xr8, $xr9, 0\nxvsrlrni.b.h $xr12, $xr13, "
+            "0\nxvsrlrni.b.h $xr16, $xr17, 0\nxvsrlrni.b.h $xr20, $xr21, "
+            "0\nxvsrlrni.b.h $xr24, $xr25, 0\nxvsrlrni.b.h $xr28, $xr29, 0\n")
 INSTR_TEST(xvsrlrni_h_w_0, "xvsrlrni.h.w $xr0, $xr1, 0\n")
 INSTR_TEST(xvsrlrni_h_w_1, "xvsrlrni.h.w $xr0, $xr0, 0\n")
-INSTR_TEST8(xvsrlrni_h_w_tp, "xvsrlrni.h.w $xr0, $xr1, 0\nxvsrlrni.h.w $xr4, $xr5, 0\nxvsrlrni.h.w $xr8, $xr9, 0\nxvsrlrni.h.w $xr12, $xr13, 0\nxvsrlrni.h.w $xr16, $xr17, 0\nxvsrlrni.h.w $xr20, $xr21, 0\nxvsrlrni.h.w $xr24, $xr25, 0\nxvsrlrni.h.w $xr28, $xr29, 0\n")
+INSTR_TEST8(xvsrlrni_h_w_tp,
+            "xvsrlrni.h.w $xr0, $xr1, 0\nxvsrlrni.h.w $xr4, $xr5, "
+            "0\nxvsrlrni.h.w $xr8, $xr9, 0\nxvsrlrni.h.w $xr12, $xr13, "
+            "0\nxvsrlrni.h.w $xr16, $xr17, 0\nxvsrlrni.h.w $xr20, $xr21, "
+            "0\nxvsrlrni.h.w $xr24, $xr25, 0\nxvsrlrni.h.w $xr28, $xr29, 0\n")
 INSTR_TEST(xvsrlrni_w_d_0, "xvsrlrni.w.d $xr0, $xr1, 0\n")
 INSTR_TEST(xvsrlrni_w_d_1, "xvsrlrni.w.d $xr0, $xr0, 0\n")
-INSTR_TEST8(xvsrlrni_w_d_tp, "xvsrlrni.w.d $xr0, $xr1, 0\nxvsrlrni.w.d $xr4, $xr5, 0\nxvsrlrni.w.d $xr8, $xr9, 0\nxvsrlrni.w.d $xr12, $xr13, 0\nxvsrlrni.w.d $xr16, $xr17, 0\nxvsrlrni.w.d $xr20, $xr21, 0\nxvsrlrni.w.d $xr24, $xr25, 0\nxvsrlrni.w.d $xr28, $xr29, 0\n")
+INSTR_TEST8(xvsrlrni_w_d_tp,
+            "xvsrlrni.w.d $xr0, $xr1, 0\nxvsrlrni.w.d $xr4, $xr5, "
+            "0\nxvsrlrni.w.d $xr8, $xr9, 0\nxvsrlrni.w.d $xr12, $xr13, "
+            "0\nxvsrlrni.w.d $xr16, $xr17, 0\nxvsrlrni.w.d $xr20, $xr21, "
+            "0\nxvsrlrni.w.d $xr24, $xr25, 0\nxvsrlrni.w.d $xr28, $xr29, 0\n")
 INSTR_TEST(xvsrlrni_d_q_0, "xvsrlrni.d.q $xr0, $xr1, 0\n")
 INSTR_TEST(xvsrlrni_d_q_1, "xvsrlrni.d.q $xr0, $xr0, 0\n")
-INSTR_TEST8(xvsrlrni_d_q_tp, "xvsrlrni.d.q $xr0, $xr1, 0\nxvsrlrni.d.q $xr4, $xr5, 0\nxvsrlrni.d.q $xr8, $xr9, 0\nxvsrlrni.d.q $xr12, $xr13, 0\nxvsrlrni.d.q $xr16, $xr17, 0\nxvsrlrni.d.q $xr20, $xr21, 0\nxvsrlrni.d.q $xr24, $xr25, 0\nxvsrlrni.d.q $xr28, $xr29, 0\n")
+INSTR_TEST8(xvsrlrni_d_q_tp,
+            "xvsrlrni.d.q $xr0, $xr1, 0\nxvsrlrni.d.q $xr4, $xr5, "
+            "0\nxvsrlrni.d.q $xr8, $xr9, 0\nxvsrlrni.d.q $xr12, $xr13, "
+            "0\nxvsrlrni.d.q $xr16, $xr17, 0\nxvsrlrni.d.q $xr20, $xr21, "
+            "0\nxvsrlrni.d.q $xr24, $xr25, 0\nxvsrlrni.d.q $xr28, $xr29, 0\n")
 INSTR_TEST(xvssrlni_b_h_0, "xvssrlni.b.h $xr0, $xr1, 0\n")
 INSTR_TEST(xvssrlni_b_h_1, "xvssrlni.b.h $xr0, $xr0, 0\n")
-INSTR_TEST8(xvssrlni_b_h_tp, "xvssrlni.b.h $xr0, $xr1, 0\nxvssrlni.b.h $xr4, $xr5, 0\nxvssrlni.b.h $xr8, $xr9, 0\nxvssrlni.b.h $xr12, $xr13, 0\nxvssrlni.b.h $xr16, $xr17, 0\nxvssrlni.b.h $xr20, $xr21, 0\nxvssrlni.b.h $xr24, $xr25, 0\nxvssrlni.b.h $xr28, $xr29, 0\n")
+INSTR_TEST8(xvssrlni_b_h_tp,
+            "xvssrlni.b.h $xr0, $xr1, 0\nxvssrlni.b.h $xr4, $xr5, "
+            "0\nxvssrlni.b.h $xr8, $xr9, 0\nxvssrlni.b.h $xr12, $xr13, "
+            "0\nxvssrlni.b.h $xr16, $xr17, 0\nxvssrlni.b.h $xr20, $xr21, "
+            "0\nxvssrlni.b.h $xr24, $xr25, 0\nxvssrlni.b.h $xr28, $xr29, 0\n")
 INSTR_TEST(xvssrlni_h_w_0, "xvssrlni.h.w $xr0, $xr1, 0\n")
 INSTR_TEST(xvssrlni_h_w_1, "xvssrlni.h.w $xr0, $xr0, 0\n")
-INSTR_TEST8(xvssrlni_h_w_tp, "xvssrlni.h.w $xr0, $xr1, 0\nxvssrlni.h.w $xr4, $xr5, 0\nxvssrlni.h.w $xr8, $xr9, 0\nxvssrlni.h.w $xr12, $xr13, 0\nxvssrlni.h.w $xr16, $xr17, 0\nxvssrlni.h.w $xr20, $xr21, 0\nxvssrlni.h.w $xr24, $xr25, 0\nxvssrlni.h.w $xr28, $xr29, 0\n")
+INSTR_TEST8(xvssrlni_h_w_tp,
+            "xvssrlni.h.w $xr0, $xr1, 0\nxvssrlni.h.w $xr4, $xr5, "
+            "0\nxvssrlni.h.w $xr8, $xr9, 0\nxvssrlni.h.w $xr12, $xr13, "
+            "0\nxvssrlni.h.w $xr16, $xr17, 0\nxvssrlni.h.w $xr20, $xr21, "
+            "0\nxvssrlni.h.w $xr24, $xr25, 0\nxvssrlni.h.w $xr28, $xr29, 0\n")
 INSTR_TEST(xvssrlni_w_d_0, "xvssrlni.w.d $xr0, $xr1, 0\n")
 INSTR_TEST(xvssrlni_w_d_1, "xvssrlni.w.d $xr0, $xr0, 0\n")
-INSTR_TEST8(xvssrlni_w_d_tp, "xvssrlni.w.d $xr0, $xr1, 0\nxvssrlni.w.d $xr4, $xr5, 0\nxvssrlni.w.d $xr8, $xr9, 0\nxvssrlni.w.d $xr12, $xr13, 0\nxvssrlni.w.d $xr16, $xr17, 0\nxvssrlni.w.d $xr20, $xr21, 0\nxvssrlni.w.d $xr24, $xr25, 0\nxvssrlni.w.d $xr28, $xr29, 0\n")
+INSTR_TEST8(xvssrlni_w_d_tp,
+            "xvssrlni.w.d $xr0, $xr1, 0\nxvssrlni.w.d $xr4, $xr5, "
+            "0\nxvssrlni.w.d $xr8, $xr9, 0\nxvssrlni.w.d $xr12, $xr13, "
+            "0\nxvssrlni.w.d $xr16, $xr17, 0\nxvssrlni.w.d $xr20, $xr21, "
+            "0\nxvssrlni.w.d $xr24, $xr25, 0\nxvssrlni.w.d $xr28, $xr29, 0\n")
 INSTR_TEST(xvssrlni_d_q_0, "xvssrlni.d.q $xr0, $xr1, 0\n")
 INSTR_TEST(xvssrlni_d_q_1, "xvssrlni.d.q $xr0, $xr0, 0\n")
-INSTR_TEST8(xvssrlni_d_q_tp, "xvssrlni.d.q $xr0, $xr1, 0\nxvssrlni.d.q $xr4, $xr5, 0\nxvssrlni.d.q $xr8, $xr9, 0\nxvssrlni.d.q $xr12, $xr13, 0\nxvssrlni.d.q $xr16, $xr17, 0\nxvssrlni.d.q $xr20, $xr21, 0\nxvssrlni.d.q $xr24, $xr25, 0\nxvssrlni.d.q $xr28, $xr29, 0\n")
+INSTR_TEST8(xvssrlni_d_q_tp,
+            "xvssrlni.d.q $xr0, $xr1, 0\nxvssrlni.d.q $xr4, $xr5, "
+            "0\nxvssrlni.d.q $xr8, $xr9, 0\nxvssrlni.d.q $xr12, $xr13, "
+            "0\nxvssrlni.d.q $xr16, $xr17, 0\nxvssrlni.d.q $xr20, $xr21, "
+            "0\nxvssrlni.d.q $xr24, $xr25, 0\nxvssrlni.d.q $xr28, $xr29, 0\n")
 INSTR_TEST(xvssrlni_bu_h_0, "xvssrlni.bu.h $xr0, $xr1, 0\n")
 INSTR_TEST(xvssrlni_bu_h_1, "xvssrlni.bu.h $xr0, $xr0, 0\n")
-INSTR_TEST8(xvssrlni_bu_h_tp, "xvssrlni.bu.h $xr0, $xr1, 0\nxvssrlni.bu.h $xr4, $xr5, 0\nxvssrlni.bu.h $xr8, $xr9, 0\nxvssrlni.bu.h $xr12, $xr13, 0\nxvssrlni.bu.h $xr16, $xr17, 0\nxvssrlni.bu.h $xr20, $xr21, 0\nxvssrlni.bu.h $xr24, $xr25, 0\nxvssrlni.bu.h $xr28, $xr29, 0\n")
+INSTR_TEST8(xvssrlni_bu_h_tp,
+            "xvssrlni.bu.h $xr0, $xr1, 0\nxvssrlni.bu.h $xr4, $xr5, "
+            "0\nxvssrlni.bu.h $xr8, $xr9, 0\nxvssrlni.bu.h $xr12, $xr13, "
+            "0\nxvssrlni.bu.h $xr16, $xr17, 0\nxvssrlni.bu.h $xr20, $xr21, "
+            "0\nxvssrlni.bu.h $xr24, $xr25, 0\nxvssrlni.bu.h $xr28, $xr29, 0\n")
 INSTR_TEST(xvssrlni_hu_w_0, "xvssrlni.hu.w $xr0, $xr1, 0\n")
 INSTR_TEST(xvssrlni_hu_w_1, "xvssrlni.hu.w $xr0, $xr0, 0\n")
-INSTR_TEST8(xvssrlni_hu_w_tp, "xvssrlni.hu.w $xr0, $xr1, 0\nxvssrlni.hu.w $xr4, $xr5, 0\nxvssrlni.hu.w $xr8, $xr9, 0\nxvssrlni.hu.w $xr12, $xr13, 0\nxvssrlni.hu.w $xr16, $xr17, 0\nxvssrlni.hu.w $xr20, $xr21, 0\nxvssrlni.hu.w $xr24, $xr25, 0\nxvssrlni.hu.w $xr28, $xr29, 0\n")
+INSTR_TEST8(xvssrlni_hu_w_tp,
+            "xvssrlni.hu.w $xr0, $xr1, 0\nxvssrlni.hu.w $xr4, $xr5, "
+            "0\nxvssrlni.hu.w $xr8, $xr9, 0\nxvssrlni.hu.w $xr12, $xr13, "
+            "0\nxvssrlni.hu.w $xr16, $xr17, 0\nxvssrlni.hu.w $xr20, $xr21, "
+            "0\nxvssrlni.hu.w $xr24, $xr25, 0\nxvssrlni.hu.w $xr28, $xr29, 0\n")
 INSTR_TEST(xvssrlni_wu_d_0, "xvssrlni.wu.d $xr0, $xr1, 0\n")
 INSTR_TEST(xvssrlni_wu_d_1, "xvssrlni.wu.d $xr0, $xr0, 0\n")
-INSTR_TEST8(xvssrlni_wu_d_tp, "xvssrlni.wu.d $xr0, $xr1, 0\nxvssrlni.wu.d $xr4, $xr5, 0\nxvssrlni.wu.d $xr8, $xr9, 0\nxvssrlni.wu.d $xr12, $xr13, 0\nxvssrlni.wu.d $xr16, $xr17, 0\nxvssrlni.wu.d $xr20, $xr21, 0\nxvssrlni.wu.d $xr24, $xr25, 0\nxvssrlni.wu.d $xr28, $xr29, 0\n")
+INSTR_TEST8(xvssrlni_wu_d_tp,
+            "xvssrlni.wu.d $xr0, $xr1, 0\nxvssrlni.wu.d $xr4, $xr5, "
+            "0\nxvssrlni.wu.d $xr8, $xr9, 0\nxvssrlni.wu.d $xr12, $xr13, "
+            "0\nxvssrlni.wu.d $xr16, $xr17, 0\nxvssrlni.wu.d $xr20, $xr21, "
+            "0\nxvssrlni.wu.d $xr24, $xr25, 0\nxvssrlni.wu.d $xr28, $xr29, 0\n")
 INSTR_TEST(xvssrlni_du_q_0, "xvssrlni.du.q $xr0, $xr1, 0\n")
 INSTR_TEST(xvssrlni_du_q_1, "xvssrlni.du.q $xr0, $xr0, 0\n")
-INSTR_TEST8(xvssrlni_du_q_tp, "xvssrlni.du.q $xr0, $xr1, 0\nxvssrlni.du.q $xr4, $xr5, 0\nxvssrlni.du.q $xr8, $xr9, 0\nxvssrlni.du.q $xr12, $xr13, 0\nxvssrlni.du.q $xr16, $xr17, 0\nxvssrlni.du.q $xr20, $xr21, 0\nxvssrlni.du.q $xr24, $xr25, 0\nxvssrlni.du.q $xr28, $xr29, 0\n")
+INSTR_TEST8(xvssrlni_du_q_tp,
+            "xvssrlni.du.q $xr0, $xr1, 0\nxvssrlni.du.q $xr4, $xr5, "
+            "0\nxvssrlni.du.q $xr8, $xr9, 0\nxvssrlni.du.q $xr12, $xr13, "
+            "0\nxvssrlni.du.q $xr16, $xr17, 0\nxvssrlni.du.q $xr20, $xr21, "
+            "0\nxvssrlni.du.q $xr24, $xr25, 0\nxvssrlni.du.q $xr28, $xr29, 0\n")
 INSTR_TEST(xvssrlrni_b_h_0, "xvssrlrni.b.h $xr0, $xr1, 0\n")
 INSTR_TEST(xvssrlrni_b_h_1, "xvssrlrni.b.h $xr0, $xr0, 0\n")
-INSTR_TEST8(xvssrlrni_b_h_tp, "xvssrlrni.b.h $xr0, $xr1, 0\nxvssrlrni.b.h $xr4, $xr5, 0\nxvssrlrni.b.h $xr8, $xr9, 0\nxvssrlrni.b.h $xr12, $xr13, 0\nxvssrlrni.b.h $xr16, $xr17, 0\nxvssrlrni.b.h $xr20, $xr21, 0\nxvssrlrni.b.h $xr24, $xr25, 0\nxvssrlrni.b.h $xr28, $xr29, 0\n")
+INSTR_TEST8(xvssrlrni_b_h_tp,
+            "xvssrlrni.b.h $xr0, $xr1, 0\nxvssrlrni.b.h $xr4, $xr5, "
+            "0\nxvssrlrni.b.h $xr8, $xr9, 0\nxvssrlrni.b.h $xr12, $xr13, "
+            "0\nxvssrlrni.b.h $xr16, $xr17, 0\nxvssrlrni.b.h $xr20, $xr21, "
+            "0\nxvssrlrni.b.h $xr24, $xr25, 0\nxvssrlrni.b.h $xr28, $xr29, 0\n")
 INSTR_TEST(xvssrlrni_h_w_0, "xvssrlrni.h.w $xr0, $xr1, 0\n")
 INSTR_TEST(xvssrlrni_h_w_1, "xvssrlrni.h.w $xr0, $xr0, 0\n")
-INSTR_TEST8(xvssrlrni_h_w_tp, "xvssrlrni.h.w $xr0, $xr1, 0\nxvssrlrni.h.w $xr4, $xr5, 0\nxvssrlrni.h.w $xr8, $xr9, 0\nxvssrlrni.h.w $xr12, $xr13, 0\nxvssrlrni.h.w $xr16, $xr17, 0\nxvssrlrni.h.w $xr20, $xr21, 0\nxvssrlrni.h.w $xr24, $xr25, 0\nxvssrlrni.h.w $xr28, $xr29, 0\n")
+INSTR_TEST8(xvssrlrni_h_w_tp,
+            "xvssrlrni.h.w $xr0, $xr1, 0\nxvssrlrni.h.w $xr4, $xr5, "
+            "0\nxvssrlrni.h.w $xr8, $xr9, 0\nxvssrlrni.h.w $xr12, $xr13, "
+            "0\nxvssrlrni.h.w $xr16, $xr17, 0\nxvssrlrni.h.w $xr20, $xr21, "
+            "0\nxvssrlrni.h.w $xr24, $xr25, 0\nxvssrlrni.h.w $xr28, $xr29, 0\n")
 INSTR_TEST(xvssrlrni_w_d_0, "xvssrlrni.w.d $xr0, $xr1, 0\n")
 INSTR_TEST(xvssrlrni_w_d_1, "xvssrlrni.w.d $xr0, $xr0, 0\n")
-INSTR_TEST8(xvssrlrni_w_d_tp, "xvssrlrni.w.d $xr0, $xr1, 0\nxvssrlrni.w.d $xr4, $xr5, 0\nxvssrlrni.w.d $xr8, $xr9, 0\nxvssrlrni.w.d $xr12, $xr13, 0\nxvssrlrni.w.d $xr16, $xr17, 0\nxvssrlrni.w.d $xr20, $xr21, 0\nxvssrlrni.w.d $xr24, $xr25, 0\nxvssrlrni.w.d $xr28, $xr29, 0\n")
+INSTR_TEST8(xvssrlrni_w_d_tp,
+            "xvssrlrni.w.d $xr0, $xr1, 0\nxvssrlrni.w.d $xr4, $xr5, "
+            "0\nxvssrlrni.w.d $xr8, $xr9, 0\nxvssrlrni.w.d $xr12, $xr13, "
+            "0\nxvssrlrni.w.d $xr16, $xr17, 0\nxvssrlrni.w.d $xr20, $xr21, "
+            "0\nxvssrlrni.w.d $xr24, $xr25, 0\nxvssrlrni.w.d $xr28, $xr29, 0\n")
 INSTR_TEST(xvssrlrni_d_q_0, "xvssrlrni.d.q $xr0, $xr1, 0\n")
 INSTR_TEST(xvssrlrni_d_q_1, "xvssrlrni.d.q $xr0, $xr0, 0\n")
-INSTR_TEST8(xvssrlrni_d_q_tp, "xvssrlrni.d.q $xr0, $xr1, 0\nxvssrlrni.d.q $xr4, $xr5, 0\nxvssrlrni.d.q $xr8, $xr9, 0\nxvssrlrni.d.q $xr12, $xr13, 0\nxvssrlrni.d.q $xr16, $xr17, 0\nxvssrlrni.d.q $xr20, $xr21, 0\nxvssrlrni.d.q $xr24, $xr25, 0\nxvssrlrni.d.q $xr28, $xr29, 0\n")
+INSTR_TEST8(xvssrlrni_d_q_tp,
+            "xvssrlrni.d.q $xr0, $xr1, 0\nxvssrlrni.d.q $xr4, $xr5, "
+            "0\nxvssrlrni.d.q $xr8, $xr9, 0\nxvssrlrni.d.q $xr12, $xr13, "
+            "0\nxvssrlrni.d.q $xr16, $xr17, 0\nxvssrlrni.d.q $xr20, $xr21, "
+            "0\nxvssrlrni.d.q $xr24, $xr25, 0\nxvssrlrni.d.q $xr28, $xr29, 0\n")
 INSTR_TEST(xvssrlrni_bu_h_0, "xvssrlrni.bu.h $xr0, $xr1, 0\n")
 INSTR_TEST(xvssrlrni_bu_h_1, "xvssrlrni.bu.h $xr0, $xr0, 0\n")
-INSTR_TEST8(xvssrlrni_bu_h_tp, "xvssrlrni.bu.h $xr0, $xr1, 0\nxvssrlrni.bu.h $xr4, $xr5, 0\nxvssrlrni.bu.h $xr8, $xr9, 0\nxvssrlrni.bu.h $xr12, $xr13, 0\nxvssrlrni.bu.h $xr16, $xr17, 0\nxvssrlrni.bu.h $xr20, $xr21, 0\nxvssrlrni.bu.h $xr24, $xr25, 0\nxvssrlrni.bu.h $xr28, $xr29, 0\n")
+INSTR_TEST8(
+    xvssrlrni_bu_h_tp,
+    "xvssrlrni.bu.h $xr0, $xr1, 0\nxvssrlrni.bu.h $xr4, $xr5, "
+    "0\nxvssrlrni.bu.h $xr8, $xr9, 0\nxvssrlrni.bu.h $xr12, $xr13, "
+    "0\nxvssrlrni.bu.h $xr16, $xr17, 0\nxvssrlrni.bu.h $xr20, $xr21, "
+    "0\nxvssrlrni.bu.h $xr24, $xr25, 0\nxvssrlrni.bu.h $xr28, $xr29, 0\n")
 INSTR_TEST(xvssrlrni_hu_w_0, "xvssrlrni.hu.w $xr0, $xr1, 0\n")
 INSTR_TEST(xvssrlrni_hu_w_1, "xvssrlrni.hu.w $xr0, $xr0, 0\n")
-INSTR_TEST8(xvssrlrni_hu_w_tp, "xvssrlrni.hu.w $xr0, $xr1, 0\nxvssrlrni.hu.w $xr4, $xr5, 0\nxvssrlrni.hu.w $xr8, $xr9, 0\nxvssrlrni.hu.w $xr12, $xr13, 0\nxvssrlrni.hu.w $xr16, $xr17, 0\nxvssrlrni.hu.w $xr20, $xr21, 0\nxvssrlrni.hu.w $xr24, $xr25, 0\nxvssrlrni.hu.w $xr28, $xr29, 0\n")
+INSTR_TEST8(
+    xvssrlrni_hu_w_tp,
+    "xvssrlrni.hu.w $xr0, $xr1, 0\nxvssrlrni.hu.w $xr4, $xr5, "
+    "0\nxvssrlrni.hu.w $xr8, $xr9, 0\nxvssrlrni.hu.w $xr12, $xr13, "
+    "0\nxvssrlrni.hu.w $xr16, $xr17, 0\nxvssrlrni.hu.w $xr20, $xr21, "
+    "0\nxvssrlrni.hu.w $xr24, $xr25, 0\nxvssrlrni.hu.w $xr28, $xr29, 0\n")
 INSTR_TEST(xvssrlrni_wu_d_0, "xvssrlrni.wu.d $xr0, $xr1, 0\n")
 INSTR_TEST(xvssrlrni_wu_d_1, "xvssrlrni.wu.d $xr0, $xr0, 0\n")
-INSTR_TEST8(xvssrlrni_wu_d_tp, "xvssrlrni.wu.d $xr0, $xr1, 0\nxvssrlrni.wu.d $xr4, $xr5, 0\nxvssrlrni.wu.d $xr8, $xr9, 0\nxvssrlrni.wu.d $xr12, $xr13, 0\nxvssrlrni.wu.d $xr16, $xr17, 0\nxvssrlrni.wu.d $xr20, $xr21, 0\nxvssrlrni.wu.d $xr24, $xr25, 0\nxvssrlrni.wu.d $xr28, $xr29, 0\n")
+INSTR_TEST8(
+    xvssrlrni_wu_d_tp,
+    "xvssrlrni.wu.d $xr0, $xr1, 0\nxvssrlrni.wu.d $xr4, $xr5, "
+    "0\nxvssrlrni.wu.d $xr8, $xr9, 0\nxvssrlrni.wu.d $xr12, $xr13, "
+    "0\nxvssrlrni.wu.d $xr16, $xr17, 0\nxvssrlrni.wu.d $xr20, $xr21, "
+    "0\nxvssrlrni.wu.d $xr24, $xr25, 0\nxvssrlrni.wu.d $xr28, $xr29, 0\n")
 INSTR_TEST(xvssrlrni_du_q_0, "xvssrlrni.du.q $xr0, $xr1, 0\n")
 INSTR_TEST(xvssrlrni_du_q_1, "xvssrlrni.du.q $xr0, $xr0, 0\n")
-INSTR_TEST8(xvssrlrni_du_q_tp, "xvssrlrni.du.q $xr0, $xr1, 0\nxvssrlrni.du.q $xr4, $xr5, 0\nxvssrlrni.du.q $xr8, $xr9, 0\nxvssrlrni.du.q $xr12, $xr13, 0\nxvssrlrni.du.q $xr16, $xr17, 0\nxvssrlrni.du.q $xr20, $xr21, 0\nxvssrlrni.du.q $xr24, $xr25, 0\nxvssrlrni.du.q $xr28, $xr29, 0\n")
+INSTR_TEST8(
+    xvssrlrni_du_q_tp,
+    "xvssrlrni.du.q $xr0, $xr1, 0\nxvssrlrni.du.q $xr4, $xr5, "
+    "0\nxvssrlrni.du.q $xr8, $xr9, 0\nxvssrlrni.du.q $xr12, $xr13, "
+    "0\nxvssrlrni.du.q $xr16, $xr17, 0\nxvssrlrni.du.q $xr20, $xr21, "
+    "0\nxvssrlrni.du.q $xr24, $xr25, 0\nxvssrlrni.du.q $xr28, $xr29, 0\n")
 INSTR_TEST(xvsrani_b_h_0, "xvsrani.b.h $xr0, $xr1, 0\n")
 INSTR_TEST(xvsrani_b_h_1, "xvsrani.b.h $xr0, $xr0, 0\n")
-INSTR_TEST8(xvsrani_b_h_tp, "xvsrani.b.h $xr0, $xr1, 0\nxvsrani.b.h $xr4, $xr5, 0\nxvsrani.b.h $xr8, $xr9, 0\nxvsrani.b.h $xr12, $xr13, 0\nxvsrani.b.h $xr16, $xr17, 0\nxvsrani.b.h $xr20, $xr21, 0\nxvsrani.b.h $xr24, $xr25, 0\nxvsrani.b.h $xr28, $xr29, 0\n")
+INSTR_TEST8(xvsrani_b_h_tp,
+            "xvsrani.b.h $xr0, $xr1, 0\nxvsrani.b.h $xr4, $xr5, 0\nxvsrani.b.h "
+            "$xr8, $xr9, 0\nxvsrani.b.h $xr12, $xr13, 0\nxvsrani.b.h $xr16, "
+            "$xr17, 0\nxvsrani.b.h $xr20, $xr21, 0\nxvsrani.b.h $xr24, $xr25, "
+            "0\nxvsrani.b.h $xr28, $xr29, 0\n")
 INSTR_TEST(xvsrani_h_w_0, "xvsrani.h.w $xr0, $xr1, 0\n")
 INSTR_TEST(xvsrani_h_w_1, "xvsrani.h.w $xr0, $xr0, 0\n")
-INSTR_TEST8(xvsrani_h_w_tp, "xvsrani.h.w $xr0, $xr1, 0\nxvsrani.h.w $xr4, $xr5, 0\nxvsrani.h.w $xr8, $xr9, 0\nxvsrani.h.w $xr12, $xr13, 0\nxvsrani.h.w $xr16, $xr17, 0\nxvsrani.h.w $xr20, $xr21, 0\nxvsrani.h.w $xr24, $xr25, 0\nxvsrani.h.w $xr28, $xr29, 0\n")
+INSTR_TEST8(xvsrani_h_w_tp,
+            "xvsrani.h.w $xr0, $xr1, 0\nxvsrani.h.w $xr4, $xr5, 0\nxvsrani.h.w "
+            "$xr8, $xr9, 0\nxvsrani.h.w $xr12, $xr13, 0\nxvsrani.h.w $xr16, "
+            "$xr17, 0\nxvsrani.h.w $xr20, $xr21, 0\nxvsrani.h.w $xr24, $xr25, "
+            "0\nxvsrani.h.w $xr28, $xr29, 0\n")
 INSTR_TEST(xvsrani_w_d_0, "xvsrani.w.d $xr0, $xr1, 0\n")
 INSTR_TEST(xvsrani_w_d_1, "xvsrani.w.d $xr0, $xr0, 0\n")
-INSTR_TEST8(xvsrani_w_d_tp, "xvsrani.w.d $xr0, $xr1, 0\nxvsrani.w.d $xr4, $xr5, 0\nxvsrani.w.d $xr8, $xr9, 0\nxvsrani.w.d $xr12, $xr13, 0\nxvsrani.w.d $xr16, $xr17, 0\nxvsrani.w.d $xr20, $xr21, 0\nxvsrani.w.d $xr24, $xr25, 0\nxvsrani.w.d $xr28, $xr29, 0\n")
+INSTR_TEST8(xvsrani_w_d_tp,
+            "xvsrani.w.d $xr0, $xr1, 0\nxvsrani.w.d $xr4, $xr5, 0\nxvsrani.w.d "
+            "$xr8, $xr9, 0\nxvsrani.w.d $xr12, $xr13, 0\nxvsrani.w.d $xr16, "
+            "$xr17, 0\nxvsrani.w.d $xr20, $xr21, 0\nxvsrani.w.d $xr24, $xr25, "
+            "0\nxvsrani.w.d $xr28, $xr29, 0\n")
 INSTR_TEST(xvsrani_d_q_0, "xvsrani.d.q $xr0, $xr1, 0\n")
 INSTR_TEST(xvsrani_d_q_1, "xvsrani.d.q $xr0, $xr0, 0\n")
-INSTR_TEST8(xvsrani_d_q_tp, "xvsrani.d.q $xr0, $xr1, 0\nxvsrani.d.q $xr4, $xr5, 0\nxvsrani.d.q $xr8, $xr9, 0\nxvsrani.d.q $xr12, $xr13, 0\nxvsrani.d.q $xr16, $xr17, 0\nxvsrani.d.q $xr20, $xr21, 0\nxvsrani.d.q $xr24, $xr25, 0\nxvsrani.d.q $xr28, $xr29, 0\n")
+INSTR_TEST8(xvsrani_d_q_tp,
+            "xvsrani.d.q $xr0, $xr1, 0\nxvsrani.d.q $xr4, $xr5, 0\nxvsrani.d.q "
+            "$xr8, $xr9, 0\nxvsrani.d.q $xr12, $xr13, 0\nxvsrani.d.q $xr16, "
+            "$xr17, 0\nxvsrani.d.q $xr20, $xr21, 0\nxvsrani.d.q $xr24, $xr25, "
+            "0\nxvsrani.d.q $xr28, $xr29, 0\n")
 INSTR_TEST(xvsrarni_b_h_0, "xvsrarni.b.h $xr0, $xr1, 0\n")
 INSTR_TEST(xvsrarni_b_h_1, "xvsrarni.b.h $xr0, $xr0, 0\n")
-INSTR_TEST8(xvsrarni_b_h_tp, "xvsrarni.b.h $xr0, $xr1, 0\nxvsrarni.b.h $xr4, $xr5, 0\nxvsrarni.b.h $xr8, $xr9, 0\nxvsrarni.b.h $xr12, $xr13, 0\nxvsrarni.b.h $xr16, $xr17, 0\nxvsrarni.b.h $xr20, $xr21, 0\nxvsrarni.b.h $xr24, $xr25, 0\nxvsrarni.b.h $xr28, $xr29, 0\n")
+INSTR_TEST8(xvsrarni_b_h_tp,
+            "xvsrarni.b.h $xr0, $xr1, 0\nxvsrarni.b.h $xr4, $xr5, "
+            "0\nxvsrarni.b.h $xr8, $xr9, 0\nxvsrarni.b.h $xr12, $xr13, "
+            "0\nxvsrarni.b.h $xr16, $xr17, 0\nxvsrarni.b.h $xr20, $xr21, "
+            "0\nxvsrarni.b.h $xr24, $xr25, 0\nxvsrarni.b.h $xr28, $xr29, 0\n")
 INSTR_TEST(xvsrarni_h_w_0, "xvsrarni.h.w $xr0, $xr1, 0\n")
 INSTR_TEST(xvsrarni_h_w_1, "xvsrarni.h.w $xr0, $xr0, 0\n")
-INSTR_TEST8(xvsrarni_h_w_tp, "xvsrarni.h.w $xr0, $xr1, 0\nxvsrarni.h.w $xr4, $xr5, 0\nxvsrarni.h.w $xr8, $xr9, 0\nxvsrarni.h.w $xr12, $xr13, 0\nxvsrarni.h.w $xr16, $xr17, 0\nxvsrarni.h.w $xr20, $xr21, 0\nxvsrarni.h.w $xr24, $xr25, 0\nxvsrarni.h.w $xr28, $xr29, 0\n")
+INSTR_TEST8(xvsrarni_h_w_tp,
+            "xvsrarni.h.w $xr0, $xr1, 0\nxvsrarni.h.w $xr4, $xr5, "
+            "0\nxvsrarni.h.w $xr8, $xr9, 0\nxvsrarni.h.w $xr12, $xr13, "
+            "0\nxvsrarni.h.w $xr16, $xr17, 0\nxvsrarni.h.w $xr20, $xr21, "
+            "0\nxvsrarni.h.w $xr24, $xr25, 0\nxvsrarni.h.w $xr28, $xr29, 0\n")
 INSTR_TEST(xvsrarni_w_d_0, "xvsrarni.w.d $xr0, $xr1, 0\n")
 INSTR_TEST(xvsrarni_w_d_1, "xvsrarni.w.d $xr0, $xr0, 0\n")
-INSTR_TEST8(xvsrarni_w_d_tp, "xvsrarni.w.d $xr0, $xr1, 0\nxvsrarni.w.d $xr4, $xr5, 0\nxvsrarni.w.d $xr8, $xr9, 0\nxvsrarni.w.d $xr12, $xr13, 0\nxvsrarni.w.d $xr16, $xr17, 0\nxvsrarni.w.d $xr20, $xr21, 0\nxvsrarni.w.d $xr24, $xr25, 0\nxvsrarni.w.d $xr28, $xr29, 0\n")
+INSTR_TEST8(xvsrarni_w_d_tp,
+            "xvsrarni.w.d $xr0, $xr1, 0\nxvsrarni.w.d $xr4, $xr5, "
+            "0\nxvsrarni.w.d $xr8, $xr9, 0\nxvsrarni.w.d $xr12, $xr13, "
+            "0\nxvsrarni.w.d $xr16, $xr17, 0\nxvsrarni.w.d $xr20, $xr21, "
+            "0\nxvsrarni.w.d $xr24, $xr25, 0\nxvsrarni.w.d $xr28, $xr29, 0\n")
 INSTR_TEST(xvsrarni_d_q_0, "xvsrarni.d.q $xr0, $xr1, 0\n")
 INSTR_TEST(xvsrarni_d_q_1, "xvsrarni.d.q $xr0, $xr0, 0\n")
-INSTR_TEST8(xvsrarni_d_q_tp, "xvsrarni.d.q $xr0, $xr1, 0\nxvsrarni.d.q $xr4, $xr5, 0\nxvsrarni.d.q $xr8, $xr9, 0\nxvsrarni.d.q $xr12, $xr13, 0\nxvsrarni.d.q $xr16, $xr17, 0\nxvsrarni.d.q $xr20, $xr21, 0\nxvsrarni.d.q $xr24, $xr25, 0\nxvsrarni.d.q $xr28, $xr29, 0\n")
+INSTR_TEST8(xvsrarni_d_q_tp,
+            "xvsrarni.d.q $xr0, $xr1, 0\nxvsrarni.d.q $xr4, $xr5, "
+            "0\nxvsrarni.d.q $xr8, $xr9, 0\nxvsrarni.d.q $xr12, $xr13, "
+            "0\nxvsrarni.d.q $xr16, $xr17, 0\nxvsrarni.d.q $xr20, $xr21, "
+            "0\nxvsrarni.d.q $xr24, $xr25, 0\nxvsrarni.d.q $xr28, $xr29, 0\n")
 INSTR_TEST(xvssrani_b_h_0, "xvssrani.b.h $xr0, $xr1, 0\n")
 INSTR_TEST(xvssrani_b_h_1, "xvssrani.b.h $xr0, $xr0, 0\n")
-INSTR_TEST8(xvssrani_b_h_tp, "xvssrani.b.h $xr0, $xr1, 0\nxvssrani.b.h $xr4, $xr5, 0\nxvssrani.b.h $xr8, $xr9, 0\nxvssrani.b.h $xr12, $xr13, 0\nxvssrani.b.h $xr16, $xr17, 0\nxvssrani.b.h $xr20, $xr21, 0\nxvssrani.b.h $xr24, $xr25, 0\nxvssrani.b.h $xr28, $xr29, 0\n")
+INSTR_TEST8(xvssrani_b_h_tp,
+            "xvssrani.b.h $xr0, $xr1, 0\nxvssrani.b.h $xr4, $xr5, "
+            "0\nxvssrani.b.h $xr8, $xr9, 0\nxvssrani.b.h $xr12, $xr13, "
+            "0\nxvssrani.b.h $xr16, $xr17, 0\nxvssrani.b.h $xr20, $xr21, "
+            "0\nxvssrani.b.h $xr24, $xr25, 0\nxvssrani.b.h $xr28, $xr29, 0\n")
 INSTR_TEST(xvssrani_h_w_0, "xvssrani.h.w $xr0, $xr1, 0\n")
 INSTR_TEST(xvssrani_h_w_1, "xvssrani.h.w $xr0, $xr0, 0\n")
-INSTR_TEST8(xvssrani_h_w_tp, "xvssrani.h.w $xr0, $xr1, 0\nxvssrani.h.w $xr4, $xr5, 0\nxvssrani.h.w $xr8, $xr9, 0\nxvssrani.h.w $xr12, $xr13, 0\nxvssrani.h.w $xr16, $xr17, 0\nxvssrani.h.w $xr20, $xr21, 0\nxvssrani.h.w $xr24, $xr25, 0\nxvssrani.h.w $xr28, $xr29, 0\n")
+INSTR_TEST8(xvssrani_h_w_tp,
+            "xvssrani.h.w $xr0, $xr1, 0\nxvssrani.h.w $xr4, $xr5, "
+            "0\nxvssrani.h.w $xr8, $xr9, 0\nxvssrani.h.w $xr12, $xr13, "
+            "0\nxvssrani.h.w $xr16, $xr17, 0\nxvssrani.h.w $xr20, $xr21, "
+            "0\nxvssrani.h.w $xr24, $xr25, 0\nxvssrani.h.w $xr28, $xr29, 0\n")
 INSTR_TEST(xvssrani_w_d_0, "xvssrani.w.d $xr0, $xr1, 0\n")
 INSTR_TEST(xvssrani_w_d_1, "xvssrani.w.d $xr0, $xr0, 0\n")
-INSTR_TEST8(xvssrani_w_d_tp, "xvssrani.w.d $xr0, $xr1, 0\nxvssrani.w.d $xr4, $xr5, 0\nxvssrani.w.d $xr8, $xr9, 0\nxvssrani.w.d $xr12, $xr13, 0\nxvssrani.w.d $xr16, $xr17, 0\nxvssrani.w.d $xr20, $xr21, 0\nxvssrani.w.d $xr24, $xr25, 0\nxvssrani.w.d $xr28, $xr29, 0\n")
+INSTR_TEST8(xvssrani_w_d_tp,
+            "xvssrani.w.d $xr0, $xr1, 0\nxvssrani.w.d $xr4, $xr5, "
+            "0\nxvssrani.w.d $xr8, $xr9, 0\nxvssrani.w.d $xr12, $xr13, "
+            "0\nxvssrani.w.d $xr16, $xr17, 0\nxvssrani.w.d $xr20, $xr21, "
+            "0\nxvssrani.w.d $xr24, $xr25, 0\nxvssrani.w.d $xr28, $xr29, 0\n")
 INSTR_TEST(xvssrani_d_q_0, "xvssrani.d.q $xr0, $xr1, 0\n")
 INSTR_TEST(xvssrani_d_q_1, "xvssrani.d.q $xr0, $xr0, 0\n")
-INSTR_TEST8(xvssrani_d_q_tp, "xvssrani.d.q $xr0, $xr1, 0\nxvssrani.d.q $xr4, $xr5, 0\nxvssrani.d.q $xr8, $xr9, 0\nxvssrani.d.q $xr12, $xr13, 0\nxvssrani.d.q $xr16, $xr17, 0\nxvssrani.d.q $xr20, $xr21, 0\nxvssrani.d.q $xr24, $xr25, 0\nxvssrani.d.q $xr28, $xr29, 0\n")
+INSTR_TEST8(xvssrani_d_q_tp,
+            "xvssrani.d.q $xr0, $xr1, 0\nxvssrani.d.q $xr4, $xr5, "
+            "0\nxvssrani.d.q $xr8, $xr9, 0\nxvssrani.d.q $xr12, $xr13, "
+            "0\nxvssrani.d.q $xr16, $xr17, 0\nxvssrani.d.q $xr20, $xr21, "
+            "0\nxvssrani.d.q $xr24, $xr25, 0\nxvssrani.d.q $xr28, $xr29, 0\n")
 INSTR_TEST(xvssrani_bu_h_0, "xvssrani.bu.h $xr0, $xr1, 0\n")
 INSTR_TEST(xvssrani_bu_h_1, "xvssrani.bu.h $xr0, $xr0, 0\n")
-INSTR_TEST8(xvssrani_bu_h_tp, "xvssrani.bu.h $xr0, $xr1, 0\nxvssrani.bu.h $xr4, $xr5, 0\nxvssrani.bu.h $xr8, $xr9, 0\nxvssrani.bu.h $xr12, $xr13, 0\nxvssrani.bu.h $xr16, $xr17, 0\nxvssrani.bu.h $xr20, $xr21, 0\nxvssrani.bu.h $xr24, $xr25, 0\nxvssrani.bu.h $xr28, $xr29, 0\n")
+INSTR_TEST8(xvssrani_bu_h_tp,
+            "xvssrani.bu.h $xr0, $xr1, 0\nxvssrani.bu.h $xr4, $xr5, "
+            "0\nxvssrani.bu.h $xr8, $xr9, 0\nxvssrani.bu.h $xr12, $xr13, "
+            "0\nxvssrani.bu.h $xr16, $xr17, 0\nxvssrani.bu.h $xr20, $xr21, "
+            "0\nxvssrani.bu.h $xr24, $xr25, 0\nxvssrani.bu.h $xr28, $xr29, 0\n")
 INSTR_TEST(xvssrani_hu_w_0, "xvssrani.hu.w $xr0, $xr1, 0\n")
 INSTR_TEST(xvssrani_hu_w_1, "xvssrani.hu.w $xr0, $xr0, 0\n")
-INSTR_TEST8(xvssrani_hu_w_tp, "xvssrani.hu.w $xr0, $xr1, 0\nxvssrani.hu.w $xr4, $xr5, 0\nxvssrani.hu.w $xr8, $xr9, 0\nxvssrani.hu.w $xr12, $xr13, 0\nxvssrani.hu.w $xr16, $xr17, 0\nxvssrani.hu.w $xr20, $xr21, 0\nxvssrani.hu.w $xr24, $xr25, 0\nxvssrani.hu.w $xr28, $xr29, 0\n")
+INSTR_TEST8(xvssrani_hu_w_tp,
+            "xvssrani.hu.w $xr0, $xr1, 0\nxvssrani.hu.w $xr4, $xr5, "
+            "0\nxvssrani.hu.w $xr8, $xr9, 0\nxvssrani.hu.w $xr12, $xr13, "
+            "0\nxvssrani.hu.w $xr16, $xr17, 0\nxvssrani.hu.w $xr20, $xr21, "
+            "0\nxvssrani.hu.w $xr24, $xr25, 0\nxvssrani.hu.w $xr28, $xr29, 0\n")
 INSTR_TEST(xvssrani_wu_d_0, "xvssrani.wu.d $xr0, $xr1, 0\n")
 INSTR_TEST(xvssrani_wu_d_1, "xvssrani.wu.d $xr0, $xr0, 0\n")
-INSTR_TEST8(xvssrani_wu_d_tp, "xvssrani.wu.d $xr0, $xr1, 0\nxvssrani.wu.d $xr4, $xr5, 0\nxvssrani.wu.d $xr8, $xr9, 0\nxvssrani.wu.d $xr12, $xr13, 0\nxvssrani.wu.d $xr16, $xr17, 0\nxvssrani.wu.d $xr20, $xr21, 0\nxvssrani.wu.d $xr24, $xr25, 0\nxvssrani.wu.d $xr28, $xr29, 0\n")
+INSTR_TEST8(xvssrani_wu_d_tp,
+            "xvssrani.wu.d $xr0, $xr1, 0\nxvssrani.wu.d $xr4, $xr5, "
+            "0\nxvssrani.wu.d $xr8, $xr9, 0\nxvssrani.wu.d $xr12, $xr13, "
+            "0\nxvssrani.wu.d $xr16, $xr17, 0\nxvssrani.wu.d $xr20, $xr21, "
+            "0\nxvssrani.wu.d $xr24, $xr25, 0\nxvssrani.wu.d $xr28, $xr29, 0\n")
 INSTR_TEST(xvssrani_du_q_0, "xvssrani.du.q $xr0, $xr1, 0\n")
 INSTR_TEST(xvssrani_du_q_1, "xvssrani.du.q $xr0, $xr0, 0\n")
-INSTR_TEST8(xvssrani_du_q_tp, "xvssrani.du.q $xr0, $xr1, 0\nxvssrani.du.q $xr4, $xr5, 0\nxvssrani.du.q $xr8, $xr9, 0\nxvssrani.du.q $xr12, $xr13, 0\nxvssrani.du.q $xr16, $xr17, 0\nxvssrani.du.q $xr20, $xr21, 0\nxvssrani.du.q $xr24, $xr25, 0\nxvssrani.du.q $xr28, $xr29, 0\n")
+INSTR_TEST8(xvssrani_du_q_tp,
+            "xvssrani.du.q $xr0, $xr1, 0\nxvssrani.du.q $xr4, $xr5, "
+            "0\nxvssrani.du.q $xr8, $xr9, 0\nxvssrani.du.q $xr12, $xr13, "
+            "0\nxvssrani.du.q $xr16, $xr17, 0\nxvssrani.du.q $xr20, $xr21, "
+            "0\nxvssrani.du.q $xr24, $xr25, 0\nxvssrani.du.q $xr28, $xr29, 0\n")
 INSTR_TEST(xvssrarni_b_h_0, "xvssrarni.b.h $xr0, $xr1, 0\n")
 INSTR_TEST(xvssrarni_b_h_1, "xvssrarni.b.h $xr0, $xr0, 0\n")
-INSTR_TEST8(xvssrarni_b_h_tp, "xvssrarni.b.h $xr0, $xr1, 0\nxvssrarni.b.h $xr4, $xr5, 0\nxvssrarni.b.h $xr8, $xr9, 0\nxvssrarni.b.h $xr12, $xr13, 0\nxvssrarni.b.h $xr16, $xr17, 0\nxvssrarni.b.h $xr20, $xr21, 0\nxvssrarni.b.h $xr24, $xr25, 0\nxvssrarni.b.h $xr28, $xr29, 0\n")
+INSTR_TEST8(xvssrarni_b_h_tp,
+            "xvssrarni.b.h $xr0, $xr1, 0\nxvssrarni.b.h $xr4, $xr5, "
+            "0\nxvssrarni.b.h $xr8, $xr9, 0\nxvssrarni.b.h $xr12, $xr13, "
+            "0\nxvssrarni.b.h $xr16, $xr17, 0\nxvssrarni.b.h $xr20, $xr21, "
+            "0\nxvssrarni.b.h $xr24, $xr25, 0\nxvssrarni.b.h $xr28, $xr29, 0\n")
 INSTR_TEST(xvssrarni_h_w_0, "xvssrarni.h.w $xr0, $xr1, 0\n")
 INSTR_TEST(xvssrarni_h_w_1, "xvssrarni.h.w $xr0, $xr0, 0\n")
-INSTR_TEST8(xvssrarni_h_w_tp, "xvssrarni.h.w $xr0, $xr1, 0\nxvssrarni.h.w $xr4, $xr5, 0\nxvssrarni.h.w $xr8, $xr9, 0\nxvssrarni.h.w $xr12, $xr13, 0\nxvssrarni.h.w $xr16, $xr17, 0\nxvssrarni.h.w $xr20, $xr21, 0\nxvssrarni.h.w $xr24, $xr25, 0\nxvssrarni.h.w $xr28, $xr29, 0\n")
+INSTR_TEST8(xvssrarni_h_w_tp,
+            "xvssrarni.h.w $xr0, $xr1, 0\nxvssrarni.h.w $xr4, $xr5, "
+            "0\nxvssrarni.h.w $xr8, $xr9, 0\nxvssrarni.h.w $xr12, $xr13, "
+            "0\nxvssrarni.h.w $xr16, $xr17, 0\nxvssrarni.h.w $xr20, $xr21, "
+            "0\nxvssrarni.h.w $xr24, $xr25, 0\nxvssrarni.h.w $xr28, $xr29, 0\n")
 INSTR_TEST(xvssrarni_w_d_0, "xvssrarni.w.d $xr0, $xr1, 0\n")
 INSTR_TEST(xvssrarni_w_d_1, "xvssrarni.w.d $xr0, $xr0, 0\n")
-INSTR_TEST8(xvssrarni_w_d_tp, "xvssrarni.w.d $xr0, $xr1, 0\nxvssrarni.w.d $xr4, $xr5, 0\nxvssrarni.w.d $xr8, $xr9, 0\nxvssrarni.w.d $xr12, $xr13, 0\nxvssrarni.w.d $xr16, $xr17, 0\nxvssrarni.w.d $xr20, $xr21, 0\nxvssrarni.w.d $xr24, $xr25, 0\nxvssrarni.w.d $xr28, $xr29, 0\n")
+INSTR_TEST8(xvssrarni_w_d_tp,
+            "xvssrarni.w.d $xr0, $xr1, 0\nxvssrarni.w.d $xr4, $xr5, "
+            "0\nxvssrarni.w.d $xr8, $xr9, 0\nxvssrarni.w.d $xr12, $xr13, "
+            "0\nxvssrarni.w.d $xr16, $xr17, 0\nxvssrarni.w.d $xr20, $xr21, "
+            "0\nxvssrarni.w.d $xr24, $xr25, 0\nxvssrarni.w.d $xr28, $xr29, 0\n")
 INSTR_TEST(xvssrarni_d_q_0, "xvssrarni.d.q $xr0, $xr1, 0\n")
 INSTR_TEST(xvssrarni_d_q_1, "xvssrarni.d.q $xr0, $xr0, 0\n")
-INSTR_TEST8(xvssrarni_d_q_tp, "xvssrarni.d.q $xr0, $xr1, 0\nxvssrarni.d.q $xr4, $xr5, 0\nxvssrarni.d.q $xr8, $xr9, 0\nxvssrarni.d.q $xr12, $xr13, 0\nxvssrarni.d.q $xr16, $xr17, 0\nxvssrarni.d.q $xr20, $xr21, 0\nxvssrarni.d.q $xr24, $xr25, 0\nxvssrarni.d.q $xr28, $xr29, 0\n")
+INSTR_TEST8(xvssrarni_d_q_tp,
+            "xvssrarni.d.q $xr0, $xr1, 0\nxvssrarni.d.q $xr4, $xr5, "
+            "0\nxvssrarni.d.q $xr8, $xr9, 0\nxvssrarni.d.q $xr12, $xr13, "
+            "0\nxvssrarni.d.q $xr16, $xr17, 0\nxvssrarni.d.q $xr20, $xr21, "
+            "0\nxvssrarni.d.q $xr24, $xr25, 0\nxvssrarni.d.q $xr28, $xr29, 0\n")
 INSTR_TEST(xvssrarni_bu_h_0, "xvssrarni.bu.h $xr0, $xr1, 0\n")
 INSTR_TEST(xvssrarni_bu_h_1, "xvssrarni.bu.h $xr0, $xr0, 0\n")
-INSTR_TEST8(xvssrarni_bu_h_tp, "xvssrarni.bu.h $xr0, $xr1, 0\nxvssrarni.bu.h $xr4, $xr5, 0\nxvssrarni.bu.h $xr8, $xr9, 0\nxvssrarni.bu.h $xr12, $xr13, 0\nxvssrarni.bu.h $xr16, $xr17, 0\nxvssrarni.bu.h $xr20, $xr21, 0\nxvssrarni.bu.h $xr24, $xr25, 0\nxvssrarni.bu.h $xr28, $xr29, 0\n")
+INSTR_TEST8(
+    xvssrarni_bu_h_tp,
+    "xvssrarni.bu.h $xr0, $xr1, 0\nxvssrarni.bu.h $xr4, $xr5, "
+    "0\nxvssrarni.bu.h $xr8, $xr9, 0\nxvssrarni.bu.h $xr12, $xr13, "
+    "0\nxvssrarni.bu.h $xr16, $xr17, 0\nxvssrarni.bu.h $xr20, $xr21, "
+    "0\nxvssrarni.bu.h $xr24, $xr25, 0\nxvssrarni.bu.h $xr28, $xr29, 0\n")
 INSTR_TEST(xvssrarni_hu_w_0, "xvssrarni.hu.w $xr0, $xr1, 0\n")
 INSTR_TEST(xvssrarni_hu_w_1, "xvssrarni.hu.w $xr0, $xr0, 0\n")
-INSTR_TEST8(xvssrarni_hu_w_tp, "xvssrarni.hu.w $xr0, $xr1, 0\nxvssrarni.hu.w $xr4, $xr5, 0\nxvssrarni.hu.w $xr8, $xr9, 0\nxvssrarni.hu.w $xr12, $xr13, 0\nxvssrarni.hu.w $xr16, $xr17, 0\nxvssrarni.hu.w $xr20, $xr21, 0\nxvssrarni.hu.w $xr24, $xr25, 0\nxvssrarni.hu.w $xr28, $xr29, 0\n")
+INSTR_TEST8(
+    xvssrarni_hu_w_tp,
+    "xvssrarni.hu.w $xr0, $xr1, 0\nxvssrarni.hu.w $xr4, $xr5, "
+    "0\nxvssrarni.hu.w $xr8, $xr9, 0\nxvssrarni.hu.w $xr12, $xr13, "
+    "0\nxvssrarni.hu.w $xr16, $xr17, 0\nxvssrarni.hu.w $xr20, $xr21, "
+    "0\nxvssrarni.hu.w $xr24, $xr25, 0\nxvssrarni.hu.w $xr28, $xr29, 0\n")
 INSTR_TEST(xvssrarni_wu_d_0, "xvssrarni.wu.d $xr0, $xr1, 0\n")
 INSTR_TEST(xvssrarni_wu_d_1, "xvssrarni.wu.d $xr0, $xr0, 0\n")
-INSTR_TEST8(xvssrarni_wu_d_tp, "xvssrarni.wu.d $xr0, $xr1, 0\nxvssrarni.wu.d $xr4, $xr5, 0\nxvssrarni.wu.d $xr8, $xr9, 0\nxvssrarni.wu.d $xr12, $xr13, 0\nxvssrarni.wu.d $xr16, $xr17, 0\nxvssrarni.wu.d $xr20, $xr21, 0\nxvssrarni.wu.d $xr24, $xr25, 0\nxvssrarni.wu.d $xr28, $xr29, 0\n")
+INSTR_TEST8(
+    xvssrarni_wu_d_tp,
+    "xvssrarni.wu.d $xr0, $xr1, 0\nxvssrarni.wu.d $xr4, $xr5, "
+    "0\nxvssrarni.wu.d $xr8, $xr9, 0\nxvssrarni.wu.d $xr12, $xr13, "
+    "0\nxvssrarni.wu.d $xr16, $xr17, 0\nxvssrarni.wu.d $xr20, $xr21, "
+    "0\nxvssrarni.wu.d $xr24, $xr25, 0\nxvssrarni.wu.d $xr28, $xr29, 0\n")
 INSTR_TEST(xvssrarni_du_q_0, "xvssrarni.du.q $xr0, $xr1, 0\n")
 INSTR_TEST(xvssrarni_du_q_1, "xvssrarni.du.q $xr0, $xr0, 0\n")
-INSTR_TEST8(xvssrarni_du_q_tp, "xvssrarni.du.q $xr0, $xr1, 0\nxvssrarni.du.q $xr4, $xr5, 0\nxvssrarni.du.q $xr8, $xr9, 0\nxvssrarni.du.q $xr12, $xr13, 0\nxvssrarni.du.q $xr16, $xr17, 0\nxvssrarni.du.q $xr20, $xr21, 0\nxvssrarni.du.q $xr24, $xr25, 0\nxvssrarni.du.q $xr28, $xr29, 0\n")
+INSTR_TEST8(
+    xvssrarni_du_q_tp,
+    "xvssrarni.du.q $xr0, $xr1, 0\nxvssrarni.du.q $xr4, $xr5, "
+    "0\nxvssrarni.du.q $xr8, $xr9, 0\nxvssrarni.du.q $xr12, $xr13, "
+    "0\nxvssrarni.du.q $xr16, $xr17, 0\nxvssrarni.du.q $xr20, $xr21, "
+    "0\nxvssrarni.du.q $xr24, $xr25, 0\nxvssrarni.du.q $xr28, $xr29, 0\n")
 INSTR_TEST(xvextrins_d_0, "xvextrins.d $xr0, $xr1, 0\n")
 INSTR_TEST(xvextrins_d_1, "xvextrins.d $xr0, $xr0, 0\n")
-INSTR_TEST8(xvextrins_d_tp, "xvextrins.d $xr0, $xr1, 0\nxvextrins.d $xr4, $xr5, 0\nxvextrins.d $xr8, $xr9, 0\nxvextrins.d $xr12, $xr13, 0\nxvextrins.d $xr16, $xr17, 0\nxvextrins.d $xr20, $xr21, 0\nxvextrins.d $xr24, $xr25, 0\nxvextrins.d $xr28, $xr29, 0\n")
+INSTR_TEST8(xvextrins_d_tp,
+            "xvextrins.d $xr0, $xr1, 0\nxvextrins.d $xr4, $xr5, 0\nxvextrins.d "
+            "$xr8, $xr9, 0\nxvextrins.d $xr12, $xr13, 0\nxvextrins.d $xr16, "
+            "$xr17, 0\nxvextrins.d $xr20, $xr21, 0\nxvextrins.d $xr24, $xr25, "
+            "0\nxvextrins.d $xr28, $xr29, 0\n")
 INSTR_TEST(xvextrins_w_0, "xvextrins.w $xr0, $xr1, 0\n")
 INSTR_TEST(xvextrins_w_1, "xvextrins.w $xr0, $xr0, 0\n")
-INSTR_TEST8(xvextrins_w_tp, "xvextrins.w $xr0, $xr1, 0\nxvextrins.w $xr4, $xr5, 0\nxvextrins.w $xr8, $xr9, 0\nxvextrins.w $xr12, $xr13, 0\nxvextrins.w $xr16, $xr17, 0\nxvextrins.w $xr20, $xr21, 0\nxvextrins.w $xr24, $xr25, 0\nxvextrins.w $xr28, $xr29, 0\n")
+INSTR_TEST8(xvextrins_w_tp,
+            "xvextrins.w $xr0, $xr1, 0\nxvextrins.w $xr4, $xr5, 0\nxvextrins.w "
+            "$xr8, $xr9, 0\nxvextrins.w $xr12, $xr13, 0\nxvextrins.w $xr16, "
+            "$xr17, 0\nxvextrins.w $xr20, $xr21, 0\nxvextrins.w $xr24, $xr25, "
+            "0\nxvextrins.w $xr28, $xr29, 0\n")
 INSTR_TEST(xvextrins_h_0, "xvextrins.h $xr0, $xr1, 0\n")
 INSTR_TEST(xvextrins_h_1, "xvextrins.h $xr0, $xr0, 0\n")
-INSTR_TEST8(xvextrins_h_tp, "xvextrins.h $xr0, $xr1, 0\nxvextrins.h $xr4, $xr5, 0\nxvextrins.h $xr8, $xr9, 0\nxvextrins.h $xr12, $xr13, 0\nxvextrins.h $xr16, $xr17, 0\nxvextrins.h $xr20, $xr21, 0\nxvextrins.h $xr24, $xr25, 0\nxvextrins.h $xr28, $xr29, 0\n")
+INSTR_TEST8(xvextrins_h_tp,
+            "xvextrins.h $xr0, $xr1, 0\nxvextrins.h $xr4, $xr5, 0\nxvextrins.h "
+            "$xr8, $xr9, 0\nxvextrins.h $xr12, $xr13, 0\nxvextrins.h $xr16, "
+            "$xr17, 0\nxvextrins.h $xr20, $xr21, 0\nxvextrins.h $xr24, $xr25, "
+            "0\nxvextrins.h $xr28, $xr29, 0\n")
 INSTR_TEST(xvextrins_b_0, "xvextrins.b $xr0, $xr1, 0\n")
 INSTR_TEST(xvextrins_b_1, "xvextrins.b $xr0, $xr0, 0\n")
-INSTR_TEST8(xvextrins_b_tp, "xvextrins.b $xr0, $xr1, 0\nxvextrins.b $xr4, $xr5, 0\nxvextrins.b $xr8, $xr9, 0\nxvextrins.b $xr12, $xr13, 0\nxvextrins.b $xr16, $xr17, 0\nxvextrins.b $xr20, $xr21, 0\nxvextrins.b $xr24, $xr25, 0\nxvextrins.b $xr28, $xr29, 0\n")
+INSTR_TEST8(xvextrins_b_tp,
+            "xvextrins.b $xr0, $xr1, 0\nxvextrins.b $xr4, $xr5, 0\nxvextrins.b "
+            "$xr8, $xr9, 0\nxvextrins.b $xr12, $xr13, 0\nxvextrins.b $xr16, "
+            "$xr17, 0\nxvextrins.b $xr20, $xr21, 0\nxvextrins.b $xr24, $xr25, "
+            "0\nxvextrins.b $xr28, $xr29, 0\n")
 INSTR_TEST(xvshuf4i_b_1, "xvshuf4i.b $xr0, $xr0, 0\n")
 INSTR_TEST(xvshuf4i_b_tp, "xvshuf4i.b $xr0, $xr1, 0\n")
 INSTR_TEST(xvshuf4i_h_1, "xvshuf4i.h $xr0, $xr0, 0\n")
@@ -3859,10 +4687,18 @@ INSTR_TEST(xvshuf4i_w_1, "xvshuf4i.w $xr0, $xr0, 0\n")
 INSTR_TEST(xvshuf4i_w_tp, "xvshuf4i.w $xr0, $xr1, 0\n")
 INSTR_TEST(xvshuf4i_d_0, "xvshuf4i.d $xr0, $xr1, 0\n")
 INSTR_TEST(xvshuf4i_d_1, "xvshuf4i.d $xr0, $xr0, 0\n")
-INSTR_TEST8(xvshuf4i_d_tp, "xvshuf4i.d $xr0, $xr1, 0\nxvshuf4i.d $xr4, $xr5, 0\nxvshuf4i.d $xr8, $xr9, 0\nxvshuf4i.d $xr12, $xr13, 0\nxvshuf4i.d $xr16, $xr17, 0\nxvshuf4i.d $xr20, $xr21, 0\nxvshuf4i.d $xr24, $xr25, 0\nxvshuf4i.d $xr28, $xr29, 0\n")
+INSTR_TEST8(xvshuf4i_d_tp,
+            "xvshuf4i.d $xr0, $xr1, 0\nxvshuf4i.d $xr4, $xr5, 0\nxvshuf4i.d "
+            "$xr8, $xr9, 0\nxvshuf4i.d $xr12, $xr13, 0\nxvshuf4i.d $xr16, "
+            "$xr17, 0\nxvshuf4i.d $xr20, $xr21, 0\nxvshuf4i.d $xr24, $xr25, "
+            "0\nxvshuf4i.d $xr28, $xr29, 0\n")
 INSTR_TEST(xvbitseli_b_0, "xvbitseli.b $xr0, $xr1, 0\n")
 INSTR_TEST(xvbitseli_b_1, "xvbitseli.b $xr0, $xr0, 0\n")
-INSTR_TEST8(xvbitseli_b_tp, "xvbitseli.b $xr0, $xr1, 0\nxvbitseli.b $xr4, $xr5, 0\nxvbitseli.b $xr8, $xr9, 0\nxvbitseli.b $xr12, $xr13, 0\nxvbitseli.b $xr16, $xr17, 0\nxvbitseli.b $xr20, $xr21, 0\nxvbitseli.b $xr24, $xr25, 0\nxvbitseli.b $xr28, $xr29, 0\n")
+INSTR_TEST8(xvbitseli_b_tp,
+            "xvbitseli.b $xr0, $xr1, 0\nxvbitseli.b $xr4, $xr5, 0\nxvbitseli.b "
+            "$xr8, $xr9, 0\nxvbitseli.b $xr12, $xr13, 0\nxvbitseli.b $xr16, "
+            "$xr17, 0\nxvbitseli.b $xr20, $xr21, 0\nxvbitseli.b $xr24, $xr25, "
+            "0\nxvbitseli.b $xr28, $xr29, 0\n")
 INSTR_TEST(xvandi_b_1, "xvandi.b $xr0, $xr0, 0\n")
 INSTR_TEST(xvandi_b_tp, "xvandi.b $xr0, $xr1, 0\n")
 INSTR_TEST(xvori_b_1, "xvori.b $xr0, $xr0, 0\n")
@@ -3877,9 +4713,17 @@ INSTR_TEST(xvrepli_h_tp, "xvrepli.h $xr0, 0\n")
 INSTR_TEST(xvrepli_w_tp, "xvrepli.w $xr0, 0\n")
 INSTR_TEST(xvpermi_w_0, "xvpermi.w $xr0, $xr1, 0\n")
 INSTR_TEST(xvpermi_w_1, "xvpermi.w $xr0, $xr0, 0\n")
-INSTR_TEST8(xvpermi_w_tp, "xvpermi.w $xr0, $xr1, 0\nxvpermi.w $xr4, $xr5, 0\nxvpermi.w $xr8, $xr9, 0\nxvpermi.w $xr12, $xr13, 0\nxvpermi.w $xr16, $xr17, 0\nxvpermi.w $xr20, $xr21, 0\nxvpermi.w $xr24, $xr25, 0\nxvpermi.w $xr28, $xr29, 0\n")
+INSTR_TEST8(
+    xvpermi_w_tp,
+    "xvpermi.w $xr0, $xr1, 0\nxvpermi.w $xr4, $xr5, 0\nxvpermi.w $xr8, $xr9, "
+    "0\nxvpermi.w $xr12, $xr13, 0\nxvpermi.w $xr16, $xr17, 0\nxvpermi.w $xr20, "
+    "$xr21, 0\nxvpermi.w $xr24, $xr25, 0\nxvpermi.w $xr28, $xr29, 0\n")
 INSTR_TEST(xvpermi_d_1, "xvpermi.d $xr0, $xr0, 0\n")
 INSTR_TEST(xvpermi_d_tp, "xvpermi.d $xr0, $xr1, 0\n")
 INSTR_TEST(xvpermi_q_0, "xvpermi.q $xr0, $xr1, 0\n")
 INSTR_TEST(xvpermi_q_1, "xvpermi.q $xr0, $xr0, 0\n")
-INSTR_TEST8(xvpermi_q_tp, "xvpermi.q $xr0, $xr1, 0\nxvpermi.q $xr4, $xr5, 0\nxvpermi.q $xr8, $xr9, 0\nxvpermi.q $xr12, $xr13, 0\nxvpermi.q $xr16, $xr17, 0\nxvpermi.q $xr20, $xr21, 0\nxvpermi.q $xr24, $xr25, 0\nxvpermi.q $xr28, $xr29, 0\n")
+INSTR_TEST8(
+    xvpermi_q_tp,
+    "xvpermi.q $xr0, $xr1, 0\nxvpermi.q $xr4, $xr5, 0\nxvpermi.q $xr8, $xr9, "
+    "0\nxvpermi.q $xr12, $xr13, 0\nxvpermi.q $xr16, $xr17, 0\nxvpermi.q $xr20, "
+    "$xr21, 0\nxvpermi.q $xr24, $xr25, 0\nxvpermi.q $xr28, $xr29, 0\n")

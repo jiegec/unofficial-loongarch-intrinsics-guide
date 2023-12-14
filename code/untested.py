@@ -5,10 +5,9 @@ for f in sorted(glob.glob("*.h")):
     src = f.replace(".h", ".cpp")
     if os.path.exists(src):
         # make sure we are testing the expected instruction
-        if src.split(".")[0] not in open(src, "r").read():
-            # intrinsic's name is different from instruction's name
-            if src.startswith("vset") or src.startswith("vset"):
-                continue
+        content = open(src, "r").read()
+        name = src.split(".")[0]
+        if name not in content or f'#include "{name}.h"' not in content:
             print("Bad test:", src)
     if not os.path.exists(src):
         if (
