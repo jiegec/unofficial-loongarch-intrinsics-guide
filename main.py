@@ -1851,7 +1851,7 @@ Initialize `dst` using predefined patterns:
 
     @env.macro
     def latency_throughput_table():
-        result = "<table><thead><tr><th rowspan=2>Instructino</th>"
+        result = "<table><thead><tr><th rowspan=2>Instruction</th>"
         for cpu in cpus:
             result += f"<th colspan=2>{cpu}</th>"
         result += f"</tr><tr>"
