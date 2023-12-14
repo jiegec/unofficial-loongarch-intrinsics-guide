@@ -12,16 +12,13 @@ cur_vlen = 128
 
 # read latency & throughput
 cpus = ["3A6000", "3C5000"]
-measure = {
-    "3A6000": {},
-    "3C5000": {}
-}
+measure = {"3A6000": {}, "3C5000": {}}
 for cpu in cpus:
-    with open(f'code/measure-{cpu}.csv', newline='') as csvfile:
+    with open(f"code/measure-{cpu}.csv", newline="") as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
             latency = []
-            for part in row['latency'].split('/'):
+            for part in row["latency"].split("/"):
                 if part == "":
                     lat = "N/A"
                 else:
@@ -31,20 +28,21 @@ for cpu in cpus:
                 latency.append(lat)
             latency = sorted(list(set(latency)))
 
-            throughput_cpi = float(row['throughput(cpi)'])
+            throughput_cpi = float(row["throughput(cpi)"])
             if abs(throughput_cpi - round(throughput_cpi)) < 0.03:
                 throughput_cpi = round(throughput_cpi)
 
             # TODO: handle small cpi better by 1/ipc
-            throughput_ipc = float(row['throughput(ipc)'])
+            throughput_ipc = float(row["throughput(ipc)"])
             if abs(throughput_ipc - round(throughput_ipc)) < 0.03:
                 throughput_ipc = round(throughput_ipc)
 
-            measure[cpu][row['name']] = {
-                'latency': ", ".join(map(str, latency)),
-                'throughput(cpi)': throughput_cpi,
-                'throughput(ipc)': throughput_ipc,
+            measure[cpu][row["name"]] = {
+                "latency": ", ".join(map(str, latency)),
+                "throughput(cpi)": throughput_cpi,
+                "throughput(ipc)": throughput_ipc,
             }
+
 
 # depends on implementation of env.macro()
 def my_macro(env):
@@ -54,15 +52,20 @@ def my_macro(env):
             cur_simd = "lsx"
             cur_vlen = 128
             return fn(*args)
+
         env.macros[f"{fn.__name__}"] = vfn
+
         def xvfn(*args):
             global cur_simd, cur_vlen
             cur_simd = "lasx"
             cur_vlen = 256
             return fn(*args)
+
         env.macros[f"x{fn.__name__}"] = xvfn
         return fn
+
     return wrap
+
 
 def define_env(env):
     widths = {
@@ -128,8 +131,8 @@ def define_env(env):
         for cpu in cpus:
             if instr_name in measure[cpu]:
                 show_cpus.append(cpu)
-                latencies.append(measure[cpu][instr_name]['latency'])
-                throughputs.append(measure[cpu][instr_name]['throughput(cpi)'])
+                latencies.append(measure[cpu][instr_name]["latency"])
+                throughputs.append(measure[cpu][instr_name]["throughput(cpi)"])
 
         if len(show_cpus) > 0:
             latency_throughput = f"""
@@ -139,7 +142,9 @@ def define_env(env):
 |-----|---------|------------------|
 """
             for i in range(len(show_cpus)):
-                latency_throughput += f"| {show_cpus[i]} | {latencies[i]} | {throughputs[i]} |\n"
+                latency_throughput += (
+                    f"| {show_cpus[i]} | {latencies[i]} | {throughputs[i]} |\n"
+                )
         else:
             latency_throughput = ""
 
@@ -590,7 +595,7 @@ CPU Flags: {cur_simd.upper()}
     @env.macro
     def vext2xv(name, name2):
         global cur_simd
-        cur_simd = "lsx" # avoid replacing vext2xv to xvext2xv
+        cur_simd = "lsx"  # avoid replacing vext2xv to xvext2xv
         width = widths[name]
         width2 = widths[name2]
         signedness = signednesses[name]
@@ -1800,7 +1805,7 @@ Initialize `dst` using predefined patterns:
         )
 
     @env.macro
-    def all_intrinsics():
+    def all_intrinsics(render=True):
         result = []
         for file in glob.glob("docs/*/*.md"):
             for line in open(file, "r"):
@@ -1824,17 +1829,36 @@ Initialize `dst` using predefined patterns:
                                     extension = "LSX"
                                 else:
                                     extension = "LASX"
-                                result.append(
-                                    {
-                                        "name": intrinsic,
-                                        "content": markdown.markdown(
-                                            body,
-                                            extensions=["fenced_code", "codehilite", "tables"],
-                                        ),
-                                        "group": title,
-                                        "extension": extension
-                                    }
-                                )
+
+                                if render:
+                                    result.append(
+                                        {
+                                            "name": intrinsic,
+                                            "content": markdown.markdown(
+                                                body,
+                                                extensions=[
+                                                    "fenced_code",
+                                                    "codehilite",
+                                                    "tables",
+                                                ],
+                                            ),
+                                            "group": title,
+                                            "extension": extension,
+                                        }
+                                    )
+                                else:
+                                    # do not render
+                                    result.append(
+                                        {
+                                            "name": intrinsic.split("(")[0]
+                                            .strip()
+                                            .split(" ")[-1],
+                                            "full_name": intrinsic,
+                                            "content": body.strip(),
+                                            "group": title,
+                                            "extension": extension,
+                                        }
+                                    )
                                 break
         return json.dumps(sorted(result, key=lambda e: e["name"]))
 
@@ -1877,7 +1901,8 @@ Initialize `dst` using predefined patterns:
         result += "</tbody>"
         return result
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     # Fake an env
     class Env:
         def __init__(self):
@@ -1888,5 +1913,5 @@ if __name__ == '__main__':
 
     env = Env()
     define_env(env)
-    result = env.macros["all_intrinsics"]()
-    json.dump(json.loads(result), open("intrinsics.json", 'w'), indent=True)
+    result = env.macros["all_intrinsics"](render=False)
+    json.dump(json.loads(result), open("intrinsics.json", "w"), indent=True)

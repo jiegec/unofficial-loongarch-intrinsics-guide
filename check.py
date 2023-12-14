@@ -3,6 +3,7 @@ import glob
 # Update site directory before running: `poetry run mkdocs build`
 
 for ext in ["lsx", "lasx"]:
+
     def parse_fn(line, skip_last):
         before_paren = line.split("(")[0].split(" ")
         between_parens = line.split("(")[1].split(")")[0]
@@ -18,7 +19,6 @@ for ext in ["lsx", "lasx"]:
         result.append(")")
 
         return tuple(result)
-
 
     # gcc intrinsics
     gcc_intrinsics = set()
