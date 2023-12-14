@@ -70,6 +70,8 @@ def define_env(env):
             file_name = "x" + file_name
             instr = "x" + instr
             intrinsic = intrinsic.replace("m128", "m256").replace("_lsx_", "_lasx_x")
+            # replace vr to xr in instr
+            instr = re.sub("\\bvr\\b", "xr", instr)
         if not os.path.exists(f"code/{file_name}.h"):
             file_name = instr.split(" ")[0].replace(".", "_")
 
