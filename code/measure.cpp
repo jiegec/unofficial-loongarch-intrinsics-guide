@@ -40,7 +40,7 @@ uint64_t perf_read_llc_misses();
 void setup_perf_llc_loads();
 uint64_t perf_read_llc_loads();
 
-int N = 100000;
+int N = 10000;
 
 #define INSTR_TEST(NAME, INST, ...)                                            \
   void test_##NAME(int n) {                                                    \

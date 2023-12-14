@@ -1,4 +1,5 @@
 import glob
+import re
 
 # find known insts from binutils-gdb
 with open("measure.h", "w") as f:
@@ -26,10 +27,20 @@ with open("measure.h", "w") as f:
                 if name.startswith("v") or name.startswith("xv"):
                     print("Processing", name, fmt)
 
+                    # handle instructions where vd/xd is also a source
+                    if re.match("x?vshuf\.[hwd]", name):
+                        vd_source = True
+                    else:
+                        vd_source = False
+
                     # latency test
-                    # at least one op depends on vd
+                    # at least one op depends on vd if vd_source is False
                     fmt_parts = fmt.split(",")
-                    for depend_i in range(1, len(fmt_parts)):
+                    if vd_source:
+                        depend_i_begin = 0
+                    else:
+                        depend_i_begin = 1
+                    for depend_i in range(depend_i_begin, len(fmt_parts)):
                         ops = []
                         for i, part in enumerate(fmt_parts):
                             if part.startswith("v"):
@@ -58,20 +69,44 @@ with open("measure.h", "w") as f:
 
                     # throughput test
                     # no dependency
-                    ops = []
-                    for i, part in enumerate(fmt_parts):
-                        if part.startswith("v"):
-                            ops.append(f"$vr{i}")
-                        elif part.startswith("x"):
-                            ops.append(f"$xr{i}")
-                        elif part.startswith("r"):
-                            ops.append(f"$r0")
-                        elif part.startswith("c"):
-                            ops.append(f"$fcc0")
-                        elif part.startswith("u") or part.startswith("s"):
-                            # imm
-                            ops.append("0")
-                    print(
-                        f'INSTR_TEST({name.replace(".", "_")}_tp, "{name} {", ".join(ops)}\\n")',
-                        file=f,
-                    )
+                    if vd_source:
+                        # repeat unrelated sequence 8 times
+                        insts = []
+                        for j in range(8):
+                            ops = []
+                            for i, part in enumerate(fmt_parts):
+                                i += j * 4
+                                if part.startswith("v"):
+                                    ops.append(f"$vr{i}")
+                                elif part.startswith("x"):
+                                    ops.append(f"$xr{i}")
+                                elif part.startswith("r"):
+                                    ops.append(f"$r0")
+                                elif part.startswith("c"):
+                                    ops.append(f"$fcc0")
+                                elif part.startswith("u") or part.startswith("s"):
+                                    # imm
+                                    ops.append("0")
+                            insts.append(f'{name} {", ".join(ops)}\\n')
+                        print(
+                            f'INSTR_TEST({name.replace(".", "_")}_tp, "{"".join(insts)}")',
+                            file=f,
+                        )
+                    else:
+                        ops = []
+                        for i, part in enumerate(fmt_parts):
+                            if part.startswith("v"):
+                                ops.append(f"$vr{i}")
+                            elif part.startswith("x"):
+                                ops.append(f"$xr{i}")
+                            elif part.startswith("r"):
+                                ops.append(f"$r0")
+                            elif part.startswith("c"):
+                                ops.append(f"$fcc0")
+                            elif part.startswith("u") or part.startswith("s"):
+                                # imm
+                                ops.append("0")
+                        print(
+                            f'INSTR_TEST({name.replace(".", "_")}_tp, "{name} {", ".join(ops)}\\n")',
+                            file=f,
+                        )
