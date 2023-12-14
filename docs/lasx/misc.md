@@ -1,5 +1,18 @@
 # Misc
 
+{{ vext2xv('h', 'b') }}
+{{ vext2xv('hu', 'bu') }}
+{{ vext2xv('w', 'b') }}
+{{ vext2xv('wu', 'bu') }}
+{{ vext2xv('w', 'h') }}
+{{ vext2xv('wu', 'hu') }}
+{{ vext2xv('d', 'b') }}
+{{ vext2xv('du', 'bu') }}
+{{ vext2xv('d', 'h') }}
+{{ vext2xv('du', 'hu') }}
+{{ vext2xv('d', 'w') }}
+{{ vext2xv('du', 'wu') }}
+
 {{ xvilvh('b') }}
 {{ xvilvh('h') }}
 {{ xvilvh('w') }}
@@ -12,6 +25,9 @@
 
 {{ xvinsgr2vr('w') }}
 {{ xvinsgr2vr('d') }}
+
+{{ xvinsve0('w') }}
+{{ xvinsve0('d') }}
 
 {{ xvfrstp('b') }}
 {{ xvfrstp('h') }}
@@ -78,6 +94,11 @@
 {{ xvreplve0('w') }}
 {{ xvreplve0('d') }}
 {{ xvreplve0('q') }}
+
+{{ xvrepl128vei('b') }}
+{{ xvrepl128vei('h') }}
+{{ xvrepl128vei('w') }}
+{{ xvrepl128vei('d') }}
 
 {{ xvsat('b') }}
 {{ xvsat('bu') }}

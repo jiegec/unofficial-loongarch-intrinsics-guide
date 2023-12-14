@@ -512,6 +512,28 @@ CPU Flags: {cur_simd.upper()}
             desc=f"Insert {width}-bit element into lane indexed `imm`.",
         )
 
+    @env.macro
+    def xvinsve0(name):
+        width = widths[name]
+        return instruction(
+            intrinsic=f"__m256i __lasx_xvinsve0_{name} (__m256i a, __m256i b, imm0_{256 // width - 1} imm)",
+            instr=f"xvinsve0.{name} xr, xr, imm",
+            desc=f"Insert the first {width}-bit lane of `b` into lane indexed `imm` of `a`.",
+        )
+
+    @env.macro
+    def vext2xv(name, name2):
+        global cur_simd
+        cur_simd = "lsx" # avoid replacing vext2xv to xvext2xv
+        width = widths[name]
+        width2 = widths[name2]
+        signedness = signednesses[name]
+        return instruction(
+            intrinsic=f"__m256i __lasx_vext2xv_{name}_{name2} (__m256i a)",
+            instr=f"vext2xv.{name} xr, xr",
+            desc=f"Extend {signedness} {width2}-bit lane of `a` to {signedness} {width}-bit elements.",
+        )
+
     @my_macro(env)
     def vminmax(min_max, name):
         width = widths[name]
@@ -953,6 +975,16 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
         return instruction(
             intrinsic=f"__m128i __lsx_vreplvei_{name} (__m128i a, imm0_{imm_upper} idx)",
             instr=f"vreplvei.{name} vr, vr, imm",
+            desc=f"Repeat the element in lane `idx` of `a` to fill whole vector.",
+        )
+
+    @env.macro
+    def xvrepl128vei(name):
+        width = widths[name]
+        imm_upper = 128 // width - 1
+        return instruction(
+            intrinsic=f"__m256i __lsx_vrepl128vei_{name} (__m256i a, imm0_{imm_upper} idx)",
+            instr=f"xvrepl128vei.{name} xr, xr, imm",
             desc=f"Repeat the element in lane `idx` of `a` to fill whole vector.",
         )
 
@@ -1446,8 +1478,24 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
     def xvpermi_d():
         return instruction(
             intrinsic=f"__m256i __lasx_xvpermi_d (__m256i a, imm0_255 imm)",
-            instr=f"xvpermi.w vr, vr, imm",
-            desc=f"Permute double words from `a` with indices recorded in `imm` and store into `dst`.",
+            instr=f"xvpermi.d xr, xr, imm",
+            desc=f"Permute double words from `a` and `b` with indices recorded in `imm` and store into `dst`.",
+        )
+
+    @env.macro
+    def xvperm_w():
+        return instruction(
+            intrinsic=f"__m256i __lasx_xvperm_w (__m256i a, __m256i b)",
+            instr=f"xvperm.w xr, xr, xr",
+            desc=f"Permute words from `a` with indices recorded in `b` and store into `dst`.",
+        )
+
+    @env.macro
+    def xvpermi_q():
+        return instruction(
+            intrinsic=f"__m256i __lasx_xvpermi_q (__m256i a, __m256i b, imm0_255 imm)",
+            instr=f"xvpermi.d xr, xr, imm",
+            desc=f"Permute quad words from `a` and `b` with indices recorded in `imm` and store into `dst`.",
         )
 
     @env.macro

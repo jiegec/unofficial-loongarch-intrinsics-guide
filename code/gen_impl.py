@@ -135,7 +135,10 @@ for vlen, prefix in [(128, "v"), (256, "xv")]:
                         file=f,
                     )
                     print(f"}}", file=f)
-                    print(f"for (int i = {vlen // 2 // double_w};i < {vlen // double_w};i++) {{", file=f)
+                    print(
+                        f"for (int i = {vlen // 2 // double_w};i < {vlen // double_w};i++) {{",
+                        file=f,
+                    )
                     print(
                         f"  dst.{double_m}[i] = ({sign}{double_w})({sign}{w})a.{m}[i + {vlen // 2 // double_w}] << imm;",
                         file=f,
@@ -152,13 +155,18 @@ for vlen, prefix in [(128, "v"), (256, "xv")]:
                             )
                             print(f"}}", file=f)
                         else:
-                            print(f"for (int i = 0;i < {vlen // 2 // w};i++) {{", file=f)
+                            print(
+                                f"for (int i = 0;i < {vlen // 2 // w};i++) {{", file=f
+                            )
                             print(
                                 f"  dst.{m}[i] = (i < {vlen // 4 // w}) ? ({sign}{w})(({sign}{double_w})a.{double_m}[i] >> (b.{double_m}[i] & {double_w-1})) : 0;",
                                 file=f,
                             )
                             print(f"}}", file=f)
-                            print(f"for (int i = {vlen // 2 // w};i < {vlen // w};i++) {{", file=f)
+                            print(
+                                f"for (int i = {vlen // 2 // w};i < {vlen // w};i++) {{",
+                                file=f,
+                            )
                             print(
                                 f"  dst.{m}[i] = (i < {3 * vlen // 4 // w}) ? ({sign}{w})(({sign}{double_w})a.{double_m}[i - {vlen // 4 // w}] >> (b.{double_m}[i - {vlen // 4 // w}] & {double_w-1})) : 0;",
                                 file=f,
@@ -168,7 +176,9 @@ for vlen, prefix in [(128, "v"), (256, "xv")]:
                         if prefix == "v":
                             print(f"for (int i = 0;i < {vlen // w};i++) {{", file=f)
                             print(f"if (i < {vlen // 2 // w}) {{", file=f)
-                            print(f"u8 shift = (b.{double_m}[i] & {double_w-1});", file=f)
+                            print(
+                                f"u8 shift = (b.{double_m}[i] & {double_w-1});", file=f
+                            )
                             print(f"if (shift == 0) {{", file=f)
                             print(
                                 f"  dst.{m}[i] = ({sign}{w})({sign}{double_w})a.{double_m}[i];",
@@ -185,9 +195,13 @@ for vlen, prefix in [(128, "v"), (256, "xv")]:
                             print(f"}}", file=f)
                             print(f"}}", file=f)
                         else:
-                            print(f"for (int i = 0;i < {vlen // 2 // w};i++) {{", file=f)
+                            print(
+                                f"for (int i = 0;i < {vlen // 2 // w};i++) {{", file=f
+                            )
                             print(f"if (i < {vlen // 4 // w}) {{", file=f)
-                            print(f"u8 shift = (b.{double_m}[i] & {double_w-1});", file=f)
+                            print(
+                                f"u8 shift = (b.{double_m}[i] & {double_w-1});", file=f
+                            )
                             print(f"if (shift == 0) {{", file=f)
                             print(
                                 f"  dst.{m}[i] = ({sign}{w})({sign}{double_w})a.{double_m}[i];",
@@ -203,9 +217,15 @@ for vlen, prefix in [(128, "v"), (256, "xv")]:
                             print(f"  dst.{m}[i] = 0;", file=f)
                             print(f"}}", file=f)
                             print(f"}}", file=f)
-                            print(f"for (int i = {vlen // 2 // w};i < {vlen // w};i++) {{", file=f)
+                            print(
+                                f"for (int i = {vlen // 2 // w};i < {vlen // w};i++) {{",
+                                file=f,
+                            )
                             print(f"if (i < {3 * vlen // 4 // w}) {{", file=f)
-                            print(f"u8 shift = (b.{double_m}[i - {vlen // 4 // w}] & {double_w-1});", file=f)
+                            print(
+                                f"u8 shift = (b.{double_m}[i - {vlen // 4 // w}] & {double_w-1});",
+                                file=f,
+                            )
                             print(f"if (shift == 0) {{", file=f)
                             print(
                                 f"  dst.{m}[i] = ({sign}{w})({sign}{double_w})a.{double_m}[i - {vlen // 4 // w}];",
@@ -276,7 +296,10 @@ for vlen, prefix in [(128, "v"), (256, "xv")]:
                         print(f"}}", file=f)
                         print(f"}}", file=f)
 
-                        print(f"for (int i = {vlen // 2 // w};i < {vlen // w};i++) {{", file=f)
+                        print(
+                            f"for (int i = {vlen // 2 // w};i < {vlen // w};i++) {{",
+                            file=f,
+                        )
                         print(f"if (i < {3 * vlen // 4 // w}) {{", file=f)
                         print(
                             f"  {shift_sign}{double_w} temp = ({shift_sign}{double_w})a.{double_m}[i - {vlen // 4 // w}] >> (b.{double_m}[i - {vlen // 4 // w}] & {double_w-1});",
@@ -349,10 +372,16 @@ for vlen, prefix in [(128, "v"), (256, "xv")]:
                         print(f"}}", file=f)
                         print(f"}}", file=f)
 
-                        print(f"for (int i = {vlen // 2 // w};i < {vlen // w};i++) {{", file=f)
+                        print(
+                            f"for (int i = {vlen // 2 // w};i < {vlen // w};i++) {{",
+                            file=f,
+                        )
                         print(f"if (i < {3 * vlen // 4 // w}) {{", file=f)
                         print(f"{shift_sign}{double_w} temp;", file=f)
-                        print(f"if ((b.{double_m}[i - {vlen // 4 // w}] & {double_w-1}) == 0) {{", file=f)
+                        print(
+                            f"if ((b.{double_m}[i - {vlen // 4 // w}] & {double_w-1}) == 0) {{",
+                            file=f,
+                        )
                         print(
                             f"  temp = ({shift_sign}{double_w})a.{double_m}[i - {vlen // 4 // w}];",
                             file=f,
@@ -393,7 +422,10 @@ for vlen, prefix in [(128, "v"), (256, "xv")]:
                         )
                         print(f"}}", file=f)
 
-                        print(f"for (int i = {vlen // 2 // w};i < {vlen // w};i++) {{", file=f)
+                        print(
+                            f"for (int i = {vlen // 2 // w};i < {vlen // w};i++) {{",
+                            file=f,
+                        )
                         print(
                             f"  dst.{m}[i] = (i < {3 * vlen // 4 // w}) ? ({sign}{w})(({sign}{double_w})b.{double_m}[i - {vlen // 4 // w}] >> imm) : ({sign}{w})(({sign}{double_w})a.{double_m}[i - {vlen // 2 // w}] >> imm);",
                             file=f,
@@ -457,7 +489,10 @@ for vlen, prefix in [(128, "v"), (256, "xv")]:
                         print(f"}}", file=f)
                         print(f"}}", file=f)
 
-                        print(f"for (int i = {vlen // 2 // w};i < {vlen // w};i++) {{", file=f)
+                        print(
+                            f"for (int i = {vlen // 2 // w};i < {vlen // w};i++) {{",
+                            file=f,
+                        )
                         print(f"if (i < {3 * vlen // 4 // w}) {{", file=f)
                         print(f"if (imm == 0) {{", file=f)
                         print(
@@ -546,7 +581,9 @@ for vlen, prefix in [(128, "v"), (256, "xv")]:
                     print(f"}}", file=f)
                     print(f"}}", file=f)
 
-                    print(f"for (int i = {vlen // 2 // w};i < {vlen // w};i++) {{", file=f)
+                    print(
+                        f"for (int i = {vlen // 2 // w};i < {vlen // w};i++) {{", file=f
+                    )
                     print(f"if (i < {3 * vlen // 4 // w}) {{", file=f)
                     print(
                         f"  {shift_sign}{double_w} temp = ({shift_sign}{double_w})b.{double_m}[i - {vlen // 4 // w}] >> imm;",
@@ -645,7 +682,9 @@ for vlen, prefix in [(128, "v"), (256, "xv")]:
                     print(f"}}", file=f)
                     print(f"}}", file=f)
 
-                    print(f"for (int i = {vlen // 2 // w};i < {vlen // w};i++) {{", file=f)
+                    print(
+                        f"for (int i = {vlen // 2 // w};i < {vlen // w};i++) {{", file=f
+                    )
                     print(f"if (i < {3 * vlen // 4 // w}) {{", file=f)
                     print(f"{shift_sign}{double_w} temp;", file=f)
                     print(f"if (imm == 0) {{", file=f)
@@ -1000,6 +1039,15 @@ for vlen, prefix in [(128, "v"), (256, "xv")]:
                     file=f,
                 )
                 print(f"}}", file=f)
+        if prefix == "xv" and (width == "d" or width == "w"):
+            # xvinsve0_d/w
+            with open(f"{prefix}insve0_{width}.h", "w") as f:
+                print(f"for (int i = 0;i < {vlen // w};i++) {{", file=f)
+                print(
+                    f"  dst.{m}[i] = (i == imm) ? b.{m}[0] : a.{m}[i];",
+                    file=f,
+                )
+                print(f"}}", file=f)
         with open(f"{prefix}seq_{width}.h", "w") as f:
             print(f"for (int i = 0;i < {vlen // w};i++) {{", file=f)
             print(
@@ -1183,7 +1231,7 @@ for vlen, prefix in [(128, "v"), (256, "xv")]:
                 )
                 print(f"}}", file=f)
         with open(f"{prefix}replve_{width}.h", "w") as f:
-            mask = 128 // w # not vlen
+            mask = 128 // w  # not vlen
             if prefix == "v":
                 print(f"for (int i = 0;i < {vlen // w};i++) {{", file=f)
                 print(
@@ -1206,6 +1254,14 @@ for vlen, prefix in [(128, "v"), (256, "xv")]:
                 print(f"}}", file=f)
         if prefix == "v":
             with open(f"{prefix}replvei_{width}.h", "w") as f:
+                print(f"for (int i = 0;i < {vlen // w};i++) {{", file=f)
+                print(
+                    f"  dst.{m}[i] = a.{m}[idx];",
+                    file=f,
+                )
+                print(f"}}", file=f)
+        else:
+            with open(f"{prefix}repl128vei_{width}.h", "w") as f:
                 print(f"for (int i = 0;i < {vlen // w};i++) {{", file=f)
                 print(
                     f"  dst.{m}[i] = a.{m}[idx];",
@@ -1524,8 +1580,8 @@ for vlen, prefix in [(128, "v"), (256, "xv")]:
                     )
                     print(f"}}", file=f)
 
-    # xvpickve
     if prefix == "xv":
+        # xvpickve
         for width in ["w", "w_f", "d", "d_f"]:
             w = widths[width[0]]
             m = members[width[0]]
@@ -1533,6 +1589,7 @@ for vlen, prefix in [(128, "v"), (256, "xv")]:
                 print(f"for (int i = 0;i < {vlen // w};i++) {{", file=f)
                 print(f"  dst.{m}[i] = (i == 0) ? a.{m}[imm] : 0;", file=f)
                 print(f"}}", file=f)
+        # xvreplve0
         for width in ["b", "h", "w", "q", "d"]:
             w = widths[width]
             m = members[width]
@@ -1540,6 +1597,37 @@ for vlen, prefix in [(128, "v"), (256, "xv")]:
                 print(f"for (int i = 0;i < {vlen // w};i++) {{", file=f)
                 print(
                     f"  dst.{m}[i] = a.{m}[0];",
+                    file=f,
+                )
+                print(f"}}", file=f)
+    if prefix == "v":
+        # vext2xv
+        for width, width2 in [
+            ("h", "b"),
+            ("w", "b"),
+            ("d", "b"),
+            ("w", "h"),
+            ("d", "h"),
+            ("d", "w"),
+            ("hu", "bu"),
+            ("wu", "bu"),
+            ("du", "bu"),
+            ("wu", "hu"),
+            ("du", "hu"),
+            ("du", "wu"),
+        ]:
+            w = widths[width]
+            m = members[width]
+            w2 = widths[width2]
+            m2 = members[width2]
+            if "u" in width:
+                sign = "u"
+            else:
+                sign = "s"
+            with open(f"{prefix}ext2xv_{width}_{width2}.h", "w") as f:
+                print(f"for (int i = 0;i < {vlen // w};i++) {{", file=f)
+                print(
+                    f"  dst.{m}[i] = ({sign}{w})({sign}{w2})a.{m2}[i];",
                     file=f,
                 )
                 print(f"}}", file=f)
