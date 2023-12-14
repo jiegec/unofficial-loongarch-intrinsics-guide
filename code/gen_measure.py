@@ -57,6 +57,10 @@ with open("measure.h", "w") as f:
                     else:
                         depend_i_begin = 1
                     for depend_i in range(depend_i_begin, len(fmt_parts)):
+                        if not (fmt_parts[depend_i].startswith('v') or fmt_parts[depend_i].startswith('x')):
+                            # not a real dependency
+                            continue
+
                         ops = []
                         for i, part in enumerate(fmt_parts):
                             if part.startswith("v"):
