@@ -89,7 +89,7 @@ with open("measure.h", "w") as f:
                                     ops.append("0")
                             insts.append(f'{name} {", ".join(ops)}\\n')
                         print(
-                            f'INSTR_TEST({name.replace(".", "_")}_tp, "{"".join(insts)}")',
+                            f'INSTR_TEST8({name.replace(".", "_")}_tp, "{"".join(insts)}")',
                             file=f,
                         )
                     else:

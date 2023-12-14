@@ -21,6 +21,6 @@ measure: measure.cpp measure.h
 	$(CXX) -O2 $< -o $@
 
 run-measure: measure
-	./measure -p
+	nice -n 19 ./measure -p
 
 .SUFFIXES:

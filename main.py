@@ -15,10 +15,7 @@ measure = {}
 with open('code/measure.csv', newline='') as csvfile:
     reader = csv.DictReader(csvfile)
     for row in reader:
-        measure[row['name']] = {
-            'latency': row['latency'],
-            'throughput(cpi)': row['throughput(cpi)']
-        }
+        measure[row['name']] = row
 
 # depends on implementation of env.macro()
 def my_macro(env):
@@ -99,21 +96,25 @@ def define_env(env):
             latency = []
             for part in measure[instr_name]['latency'].split('/'):
                 lat = float(part)
-                if abs(lat - round(lat)) < 0.05:
+                if abs((lat - round(lat)) / lat) < 0.02:
                     lat = round(lat)
                 latency.append(lat)
-            latency = list(set(latency))
+            latency = sorted(list(set(latency)))
 
-            throughput = float(measure[instr_name]['throughput(cpi)'])
-            if abs(throughput - round(throughput)) < 0.05:
-                throughput = round(throughput)
+            throughput_cpi = float(measure[instr_name]['throughput(cpi)'])
+            if abs(throughput_cpi - round(throughput_cpi)) < 0.03:
+                throughput_cpi = round(throughput_cpi)
+
+            throughput_ipc = float(measure[instr_name]['throughput(ipc)'])
+            if abs(throughput_ipc - round(throughput_ipc)) < 0.03:
+                throughput_ipc = round(throughput_ipc)
 
             latency_throughput = f"""
 ### Latency and Throughput
 
 | Architecture | Latency | Throughput (CPI) |
 |--------------|---------|------------------|
-| 3A6000       | {"/".join(map(str, latency))} | {throughput} |
+| 3A6000       | {", ".join(map(str, latency))} | {throughput_cpi} |
 """
         else:
             latency_throughput = ""

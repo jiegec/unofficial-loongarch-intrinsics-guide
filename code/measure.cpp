@@ -40,7 +40,7 @@ uint64_t perf_read_llc_misses();
 void setup_perf_llc_loads();
 uint64_t perf_read_llc_loads();
 
-int N = 10000;
+int N = 20000;
 
 #define INSTR_TEST(NAME, INST, ...)                                            \
   void test_##NAME(int n) {                                                    \
@@ -48,19 +48,25 @@ int N = 10000;
       asm volatile(".align 4\n" THOUSAND(INST) : : : __VA_ARGS__);             \
     }                                                                          \
   }
+#define INSTR_TEST8(NAME, INST, ...)                                           \
+  INSTR_TEST(NAME, INST __VA_OPT__(, ) __VA_ARGS__)
 
 #include "measure.h"
 
 #undef INSTR_TEST
+#undef INSTR_TEST8
 
 struct InstrTest {
   const char *name;
   const char *inst;
   void (*test)(int);
+  int repeat;
 };
 
 #define INSTR_TEST(NAME, INST, ...)                                            \
-  InstrTest{.name = #NAME, .inst = #INST, .test = test_##NAME},
+  InstrTest{.name = #NAME, .inst = #INST, .test = test_##NAME, .repeat = 1},
+#define INSTR_TEST8(NAME, INST, ...)                                           \
+  InstrTest{.name = #NAME, .inst = #INST, .test = test_##NAME, .repeat = 8},
 
 std::vector<InstrTest> tests = {
 #include "measure.h"
@@ -70,7 +76,8 @@ std::vector<InstrTest> tests = {
 
 struct InstrInfo {
   std::set<double> latency;
-  double throughput;
+  double throughput_cpi;
+  double throughput_ipc;
 };
 
 uint64_t get_time() {
@@ -213,6 +220,7 @@ int main(int argc, char *argv[]) {
     it.test(N);
     uint64_t elapsed = get_time_or_cycles() - begin;
     double cycles = (double)elapsed / unit_elapsed;
+    cycles /= it.repeat; // in some tests, instructiosn are repeated
 
     std::string base_name;
     size_t tp_index = name.find("_tp");
@@ -220,7 +228,8 @@ int main(int argc, char *argv[]) {
       base_name = name.substr(0, tp_index);
       printf("%s: throughput 1/%.2lf=%.2lf instructions\n", it.name, cycles,
              1.0 / cycles);
-      info[base_name].throughput = 1.0 / cycles;
+      info[base_name].throughput_cpi = 1.0 / cycles;
+      info[base_name].throughput_ipc = cycles;
     } else {
       base_name = name;
 
@@ -245,7 +254,7 @@ int main(int argc, char *argv[]) {
 
   FILE *fp = fopen("measure.csv", "w");
   assert(fp);
-  fprintf(fp, "name,latency,throughput(cpi)\n");
+  fprintf(fp, "name,latency,throughput(cpi),throughput(ipc)\n");
   for (auto pair : info) {
     std::string latency;
     auto entry = pair.second;
@@ -257,8 +266,8 @@ int main(int argc, char *argv[]) {
       }
       latency += buffer;
     }
-    fprintf(fp, "%s,%s,%.2lf\n", pair.first.c_str(), latency.c_str(),
-            entry.throughput);
+    fprintf(fp, "%s,%s,%.2lf,%.2lf\n", pair.first.c_str(), latency.c_str(),
+            entry.throughput_cpi, entry.throughput_ipc);
   }
   printf("Result written to measure.csv\n");
 }
