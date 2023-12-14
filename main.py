@@ -32,15 +32,17 @@ for cpu in cpus:
             if abs(throughput_cpi - round(throughput_cpi)) < 0.03:
                 throughput_cpi = round(throughput_cpi)
 
-            # TODO: handle small cpi better by 1/ipc
-            throughput_ipc = float(row["throughput(ipc)"])
-            if abs(throughput_ipc - round(throughput_ipc)) < 0.03:
-                throughput_ipc = round(throughput_ipc)
+            # handle small cpi better by 1/ipc
+            if throughput_cpi < 1.0:
+                throughput_ipc = float(row["throughput(ipc)"])
+                if abs(throughput_ipc - round(throughput_ipc)) < 0.03:
+                    throughput_ipc = round(throughput_ipc)
+
+                throughput_cpi = f"{throughput_cpi}(1/{throughput_ipc})"
 
             measure[cpu][row["name"]] = {
                 "latency": ", ".join(map(str, latency)),
                 "throughput(cpi)": throughput_cpi,
-                "throughput(ipc)": throughput_ipc,
             }
 
 
