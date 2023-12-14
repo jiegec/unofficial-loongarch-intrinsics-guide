@@ -7,18 +7,21 @@ import re
 
 # dirty way to reduce code
 cur_simd = "lsx"
+cur_vlen = 128
 
 # depends on implementation of env.macro()
 def my_macro(env):
     def wrap(fn):
         def vfn(*args):
-            global cur_simd
+            global cur_simd, cur_vlen
             cur_simd = "lsx"
+            cur_vlen = 128
             return fn(*args)
         env.macros[f"{fn.__name__}"] = vfn
         def xvfn(*args):
-            global cur_simd
+            global cur_simd, cur_vlen
             cur_simd = "lasx"
+            cur_vlen = 256
             return fn(*args)
         env.macros[f"x{fn.__name__}"] = xvfn
         return fn
@@ -1031,8 +1034,9 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             "d": "long int",
             "du": "unsigned long int",
         }[name]
+        global cur_vlen
         return instruction(
-            intrinsic=f"{return_type} __lsx_vpickve2gr_{name} (__m128i a, imm0_{128 // width - 1} idx)",
+            intrinsic=f"{return_type} __lsx_vpickve2gr_{name} (__m128i a, imm0_{cur_vlen // width - 1} idx)",
             instr=f"vpickve2gr.{name} r, vr, imm",
             desc=f"Pick the `lane` specified by `idx` from `a` and store into `dst`.",
         )
