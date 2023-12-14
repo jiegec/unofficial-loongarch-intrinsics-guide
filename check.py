@@ -1,9 +1,6 @@
 import glob
 
-# Initial worktree:
-# git worktree add -f ../gh-pages gh-pages
-# Update gh-pages before running:
-# git fetch origin gh-pages && git -C ../gh-pages reset origin/gh-pages --hard
+# Update site directory before running: `poetry run mkdocs build`
 
 for ext in ["lsx", "lasx"]:
     def parse_fn(line, skip_last):
@@ -30,7 +27,7 @@ for ext in ["lsx", "lasx"]:
 
     # find documented intrinsics
     documented_intrinsics = set()
-    for f in glob.glob(f"../gh-pages/{ext}/**/*.html", recursive=True):
+    for f in glob.glob(f"./site/{ext}/**/*.html", recursive=True):
         # forgive me to use the simple but fragile way to parse html
         for line in open(f, "r"):
             if "h2" in line:

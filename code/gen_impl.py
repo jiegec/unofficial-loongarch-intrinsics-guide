@@ -1533,5 +1533,15 @@ for vlen, prefix in [(128, "v"), (256, "xv")]:
                 print(f"for (int i = 0;i < {vlen // w};i++) {{", file=f)
                 print(f"  dst.{m}[i] = (i == 0) ? a.{m}[imm] : 0;", file=f)
                 print(f"}}", file=f)
+        for width in ["b", "h", "w", "q", "d"]:
+            w = widths[width]
+            m = members[width]
+            with open(f"{prefix}replve0_{width}.h", "w") as f:
+                print(f"for (int i = 0;i < {vlen // w};i++) {{", file=f)
+                print(
+                    f"  dst.{m}[i] = a.{m}[0];",
+                    file=f,
+                )
+                print(f"}}", file=f)
 
 os.system("clang-format -i *.cpp *.h")

@@ -73,6 +73,12 @@
 {{ xvreplve('w') }}
 {{ xvreplve('d') }}
 
+{{ xvreplve0('b') }}
+{{ xvreplve0('h') }}
+{{ xvreplve0('w') }}
+{{ xvreplve0('d') }}
+{{ xvreplve0('q') }}
+
 {{ xvsat('b') }}
 {{ xvsat('bu') }}
 {{ xvsat('h') }}

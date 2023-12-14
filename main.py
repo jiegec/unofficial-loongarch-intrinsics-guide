@@ -1456,7 +1456,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
         return instruction(
             intrinsic=f"__m256i __lasx_xvpickve_{name} (__m256i a, imm0_{256 // width - 1} imm)",
             instr=f"xvpickve.{name} xr, xr, imm",
-            desc=f"Copy one lane from `a` specified by `imm` to the first lane of `dst`, and set the other lanes to zero.",
+            desc=f"Copy one {width}-bit lane from `a` specified by `imm` to the first lane of `dst`, and set the other lanes to zero.",
         )
 
     @env.macro
@@ -1469,7 +1469,16 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
         return instruction(
             intrinsic=f"{fp_type} __lasx_xvpickve_{name}_f ({fp_type} a, imm0_{256 // width - 1} imm)",
             instr=f"xvpickve.{name}.f xr, xr, imm",
-            desc=f"Copy one lane from `a` specified by `imm` to the first lane of `dst`, and set the other lanes to zero.",
+            desc=f"Copy one {width}-bit lane from `a` specified by `imm` to the first lane of `dst`, and set the other lanes to zero.",
+        )
+
+    @env.macro
+    def xvreplve0(name):
+        width = widths[name]
+        return instruction(
+            intrinsic=f"__m256i __lasx_xvreplve0_{name} (__m256i a)",
+            instr=f"xvreplve0.{name} xr, xr",
+            desc=f"Repeat the first {width}-bit lane from `a` to all lanes of `dst`.",
         )
 
     @my_macro(env)
