@@ -11,11 +11,16 @@ cur_simd = "lsx"
 cur_vlen = 128
 
 # read latency & throughput
-measure = {}
-with open('code/measure.csv', newline='') as csvfile:
-    reader = csv.DictReader(csvfile)
-    for row in reader:
-        measure[row['name']] = row
+cpus = ["3A6000", "3C5000"]
+measure = {
+    "3A6000": {},
+    "3C5000": {}
+}
+for cpu in cpus:
+    with open(f'code/measure-{cpu}.csv', newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            measure[cpu][row['name']] = row
 
 # depends on implementation of env.macro()
 def my_macro(env):
@@ -91,33 +96,49 @@ def define_env(env):
             tested = ""
 
         global measure
+        global cpus
         instr_name = instr.split(" ")[0].replace(".", "_")
-        if instr_name in measure:
-            latency = []
-            for part in measure[instr_name]['latency'].split('/'):
-                lat = float(part)
-                if abs((lat - round(lat)) / lat) < 0.02:
-                    lat = round(lat)
-                latency.append(lat)
-            latency = sorted(list(set(latency)))
+        show_cpus = []
+        latencies = []
+        throughputs = []
+        for cpu in cpus:
+            if instr_name in measure[cpu]:
+                latency = []
+                for part in measure[cpu][instr_name]['latency'].split('/'):
+                    if part == "":
+                        lat = "N/A"
+                    else:
+                        lat = float(part)
+                        if abs((lat - round(lat)) / lat) < 0.02:
+                            lat = round(lat)
+                    latency.append(lat)
+                latency = sorted(list(set(latency)))
 
-            throughput_cpi = float(measure[instr_name]['throughput(cpi)'])
-            if abs(throughput_cpi - round(throughput_cpi)) < 0.03:
-                throughput_cpi = round(throughput_cpi)
+                throughput_cpi = float(measure[cpu][instr_name]['throughput(cpi)'])
+                if abs(throughput_cpi - round(throughput_cpi)) < 0.03:
+                    throughput_cpi = round(throughput_cpi)
 
-            throughput_ipc = float(measure[instr_name]['throughput(ipc)'])
-            if abs(throughput_ipc - round(throughput_ipc)) < 0.03:
-                throughput_ipc = round(throughput_ipc)
+                # TODO: handle small cpi better by 1/ipc
+                throughput_ipc = float(measure[cpu][instr_name]['throughput(ipc)'])
+                if abs(throughput_ipc - round(throughput_ipc)) < 0.03:
+                    throughput_ipc = round(throughput_ipc)
 
+                show_cpus.append(cpu)
+                latencies.append(", ".join(map(str, latency)))
+                throughputs.append(throughput_cpi)
+
+        if len(show_cpus) > 0:
             latency_throughput = f"""
 ### Latency and Throughput
 
-| Architecture | Latency | Throughput (CPI) |
-|--------------|---------|------------------|
-| 3A6000       | {", ".join(map(str, latency))} | {throughput_cpi} |
+| CPU | Latency | Throughput (CPI) |
+|-----|---------|------------------|
 """
+            for i in range(len(show_cpus)):
+                latency_throughput += f"| {show_cpus[i]} | {latencies[i]} | {throughputs[i]} |\n"
         else:
             latency_throughput = ""
+
         return f"""
 ## {intrinsic}
 
