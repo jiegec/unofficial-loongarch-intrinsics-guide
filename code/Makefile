@@ -17,4 +17,10 @@ clean:
 %: %.cpp %.h common.h
 	$(CXX) $(CFLAGS) $< -mlsx -mlasx -o $@
 
+measure: measure.cpp measure.h
+	$(CXX) -O2 $< -o $@
+
+run-measure: measure
+	./measure -p
+
 .SUFFIXES:

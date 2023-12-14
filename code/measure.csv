@@ -1,0 +1,9 @@
+name,latency,throughput(cpi)
+vfmadd_s,5.00,2.00
+vfmsub_s,5.00,2.00
+vfnmadd_s,5.00,2.00
+vfnmsub_s,5.00,2.00
+xvfmadd_s,5.00,2.00
+xvfmsub_s,5.00,2.00
+xvfnmadd_s,5.00,2.00
+xvfnmsub_s,5.00,2.00
