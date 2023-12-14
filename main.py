@@ -1669,6 +1669,10 @@ Initialize `dst` using predefined patterns:
                             if line.startswith("##"):
                                 body = "\n".join(lines[i + 1 :])
                                 intrinsic = line[2:].strip()
+                                if "_lsx_" in intrinsic:
+                                    extension = "LSX"
+                                else:
+                                    extension = "LASX"
                                 result.append(
                                     {
                                         "name": intrinsic,
@@ -1677,6 +1681,7 @@ Initialize `dst` using predefined patterns:
                                             extensions=["fenced_code", "codehilite"],
                                         ),
                                         "group": title,
+                                        "extension": extension
                                     }
                                 )
                                 break
@@ -1691,4 +1696,4 @@ Initialize `dst` using predefined patterns:
                     title = line[1:].strip()
                     result.append(title)
                     break
-        return json.dumps(sorted(result))
+        return json.dumps(sorted(list(set(result))))

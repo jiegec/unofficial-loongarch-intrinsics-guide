@@ -17,6 +17,15 @@
 </div>
 
 <p></p>
+<b style="padding-top: 10px">Instruction Set Extensions:</b>
+<p></p>
+
+<div v-for="extension in allExtensions">
+  <input type="checkbox" :id="extension" :value="extension" v-model="extensions" />
+  <label :for="extension" style="display: inline">{{ extension }}</label>
+</div>
+
+<p></p>
 <b>Filter by content:</b>
 <p></p>
 
@@ -50,12 +59,16 @@ Found {{intrinsics.length}} intrinsics.
     setup() {
       const search = ref("");
       const allGroups = {% endraw %} {{ all_groups() }} {% raw %};
+      const allExtensions = ["LSX", "LASX"];
       const groups = ref(allGroups);
+      const extensions = ref(allExtensions);
 
       const intrinsics = computed(() => {
         let result = [];
         for (let val of allIntrinsics) {
           if (!groups.value.includes(val.group)) {
+            continue;
+          } else if (!extensions.value.includes(val.extension)) {
             continue;
           } else if (val.name.includes(search.value)) {
             result.push(val);
@@ -72,7 +85,9 @@ Found {{intrinsics.length}} intrinsics.
         intrinsics,
         search,
         groups,
-        allGroups
+        allGroups,
+        extensions,
+        allExtensions
       }
     }
   }).mount('#app')
