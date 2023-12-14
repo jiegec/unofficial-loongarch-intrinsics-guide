@@ -1901,7 +1901,7 @@ Initialize `dst` using predefined patterns:
 
         for inst in insts:
             result += "<tr>"
-            result += f"<td>{inst}</td>"
+            result += f"<td>{inst.replace('_', '.')}</td>"
             for cpu in cpus:
                 result += f"<td>{measure[cpu][inst]['latency']}</td>"
                 result += f"<td>{measure[cpu][inst]['throughput(cpi)']}</td>"
