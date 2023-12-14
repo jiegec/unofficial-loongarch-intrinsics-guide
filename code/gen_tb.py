@@ -5,6 +5,7 @@ widths_unsigned = ["bu", "hu", "wu", "du"]
 widths_fp = ["s", "d"]
 widths_all = ["b", "bu", "h", "hu", "w", "wu", "d", "du"]
 widths_vexth = ["h_b", "hu_bu", "w_h", "wu_hu", "d_w", "du_wu", "q_d", "qu_du"]
+widths_vext2xv = ["h_b", "hu_bu", "w_b", "wu_bu", "w_h", "wu_hu", "d_b", "du_bu", "d_h", "du_hu", "d_w", "du_wu"]
 widths_vsllwil = ["h_b", "hu_bu", "w_h", "wu_hu", "d_w", "du_wu"]
 widths_vsrln = ["b_h", "h_w", "w_d"]
 widths_vssrln = ["b_h", "bu_h", "h_w", "hu_w", "w_d", "wu_d"]
@@ -67,7 +68,7 @@ tb = {
         "v128 a, v128 b, int imm",
         [0, 3, 7, 15, 16, 32, 64, 128, 255],
     ),
-    "vext2xv": (widths_vsllwil, "v128 a"),
+    "vext2xv": (widths_vext2xv, "v128 a"),
     "vfrstp": (widths_vfrstp, "v128 a, v128 b, v128 c"),
     "vfrstpi": (widths_vfrstp, "v128 a, v128 b, int imm", [0, 4, 31]),
     "vhaddw": (widths_vexth, "v128 a, v128 b"),
