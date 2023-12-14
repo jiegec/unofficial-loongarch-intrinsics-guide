@@ -1625,7 +1625,7 @@ for vlen, prefix in [(128, "v"), (256, "xv")]:
             else:
                 sign = "s"
             with open(f"{prefix}ext2xv_{width}_{width2}.h", "w") as f:
-                print(f"for (int i = 0;i < {vlen // w};i++) {{", file=f)
+                print(f"for (int i = 0;i < {256 // w};i++) {{", file=f)
                 print(
                     f"  dst.{m}[i] = ({sign}{w})({sign}{w2})a.{m2}[i];",
                     file=f,

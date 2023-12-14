@@ -67,6 +67,7 @@ tb = {
         "v128 a, v128 b, int imm",
         [0, 3, 7, 15, 16, 32, 64, 128, 255],
     ),
+    "vext2xv": (widths_vsllwil, "v128 a"),
     "vfrstp": (widths_vfrstp, "v128 a, v128 b, v128 c"),
     "vfrstpi": (widths_vfrstp, "v128 a, v128 b, int imm", [0, 4, 31]),
     "vhaddw": (widths_vexth, "v128 a, v128 b"),
@@ -115,12 +116,11 @@ tb = {
     "vsat": (widths_all, "v128 a, int imm", [0, 7]),
     "vseq": (widths_signed, "v128 a, v128 b"),
     "vseqi": (widths_signed, "v128 a, int imm", [-16, 0, 15]),
-    "vshuf4i": (["b", "h", "w"], "v128 a, int imm", [0, 13, 100, 128, 255]),
+    "vshuf": (widths_signed, "v128 a, v128 b, v128 c"),
+    "vshuf4i": (["b", "h", "w", "d"], "v128 a, int imm", [0, 13, 100, 128, 255]),
     "vsigncov": (widths_signed, "v128 a, v128 b"),
     "vsllwil": (widths_vsllwil, "v128 a, int imm", [0, 7]),
     "vssub": (widths_all, "v128 a, v128 b"),
-    "vsub": (widths_signed + ["q"], "v128 a, v128 b"),
-    "vsubi": (widths_unsigned, "v128 a, int imm", [0, 31]),
     "vsll": (widths_signed, "v128 a, v128 b"),
     "vslli": (widths_signed, "v128 a, int imm", [0, 7]),
     "vslt": (widths_all, "v128 a, v128 b"),
@@ -151,7 +151,8 @@ tb = {
     "vssrlni": (widths_vssrlni, "v128 a, v128 b, int imm", [0, 7, 15]),
     "vssrlrn": (widths_vssrln, "v128 a, v128 b"),
     "vssrlrni": (widths_vssrlni, "v128 a, v128 b, int imm", [0, 7, 15]),
-    "vsub": (widths_signed, "v128 a, v128 b"),
+    "vsub": (widths_signed + ["q"], "v128 a, v128 b"),
+    "vsubi": (widths_unsigned, "v128 a, int imm", [0, 31]),
     "vsubwev": (widths_vsubw, "v128 a, v128 b"),
     "vsubwod": (widths_vsubw, "v128 a, v128 b"),
     "vxor": (["v"], "v128 a, v128 b"),
@@ -171,8 +172,14 @@ for name in tb:
             # skip xvinsgr2vr_b/h
             if inst_name in ["xvinsgr2vr_b", "xvinsgr2vr_h"]:
                 continue
+            # skip xvext2xv
+            if inst_name.startswith("xvext2xv"):
+                continue
             # skip xvreplvei
             if inst_name.startswith("xvreplvei"):
+                continue
+            # skip xv/vshuf4i.d due to extra argument
+            if inst_name == "vshuf4i_d" or inst_name == "xvshuf4i_d":
                 continue
 
             fuzz_args = 0
@@ -182,7 +189,8 @@ for name in tb:
 
             print(f"Saving {inst_name}.cpp")
             with open(f"{inst_name}.cpp", "w") as f:
-                if prefix == "":
+                # vext2xv is in lasx
+                if prefix == "" and not inst_name.startswith("vext2xv"):
                     vtype = "v128"
                     fuzz = "FUZZ"
                 else:
