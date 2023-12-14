@@ -1096,7 +1096,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
     def bz_v():
         return instruction(
             intrinsic=f"int __lsx_bz_v (__m128i a)",
-            instr=f"vseteqz.v vr; bcnez",
+            instr=f"vseteqz.v fcc, vr; bcnez",
             desc=f"Expected to be used in branches: branch if the whole vector `a` equals to zero.",
         )
 
@@ -1104,7 +1104,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
     def bnz_v():
         return instruction(
             intrinsic=f"int __lsx_bnz_v (__m128i a)",
-            instr=f"vsetnez.v vr; bcnez",
+            instr=f"vsetnez.v fcc, vr; bcnez",
             desc=f"Expected to be used in branches: branch if the whole vector `a` is non-zero.",
         )
 
@@ -1113,7 +1113,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
         width = widths[name]
         return instruction(
             intrinsic=f"int __lsx_bz_{name} (__m128i a)",
-            instr=f"vsetanyeqz.{name} vr; bcnez",
+            instr=f"vsetanyeqz.{name} fcc, vr; bcnez",
             desc=f"Expected to be used in branches: branch if any {width}-bit element in `a` equals to zero.",
         )
 
@@ -1122,7 +1122,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
         width = widths[name]
         return instruction(
             intrinsic=f"int __lsx_bnz_{name} (__m128i a)",
-            instr=f"vsetallnez.{name} vr; bcnez",
+            instr=f"vsetallnez.{name} fcc, vr; bcnez",
             desc=f"Expected to be used in branches: branch if all {width}-bit elements in `a` are non-zero.",
         )
 

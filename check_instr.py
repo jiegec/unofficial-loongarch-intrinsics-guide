@@ -25,6 +25,8 @@ for ext in ["lsx", "lasx"]:
                         encoded.append("vr")
                     elif part[0] == "r":
                         encoded.append("r")
+                    elif part[0] == "c":
+                        encoded.append("fcc")
                     elif part[0] == "u" or part[0] == "s":
                         encoded.append("imm")
                 encoding[name] = ", ".join(encoded)
