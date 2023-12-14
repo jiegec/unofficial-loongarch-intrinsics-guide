@@ -12,9 +12,23 @@ for ext in ["lsx", "lasx"]:
             parts = line.split(",")
             if '"' in parts[2]:
                 name = parts[2].split('"')[1]
-                fmt = parts[3].split('"')[1]
-                encoding[name] = fmt
-                print(name, fmt)
+                fmt = line.split('"')[3]
+
+                # convert fmt to our naming
+                encoded = []
+                for part in fmt.split(","):
+                    if len(part) == 0:
+                        continue
+                    if part[0] == "x":
+                        encoded.append("xr")
+                    elif part[0] == "v":
+                        encoded.append("vr")
+                    elif part[0] == "r":
+                        encoded.append("r")
+                    elif part[0] == "u" or part[0] == "s":
+                        encoded.append("imm")
+                encoding[name] = ", ".join(encoded)
+                # print(name, ", ".join(encoded))
 
     # find documented intrinsics
     for f in glob.glob(f"./site/{ext}/**/*.html", recursive=True):
@@ -25,4 +39,7 @@ for ext in ["lsx", "lasx"]:
                 inst = line[12:].strip()
                 name = inst.split(" ")[0]
                 fmt = encoding[name]
-                print(inst, fmt)
+
+                args = " ".join(inst.split(";")[0].split(" ")[1:])
+                if args != fmt:
+                    print("Mismatch inst=", inst, ",args=", args, ",fmt=", fmt)

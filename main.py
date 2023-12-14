@@ -1096,7 +1096,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
     def bz_v():
         return instruction(
             intrinsic=f"int __lsx_bz_v (__m128i a)",
-            instr=f"vseteqz.v vr, vr; bcnez",
+            instr=f"vseteqz.v vr; bcnez",
             desc=f"Expected to be used in branches: branch if the whole vector `a` equals to zero.",
         )
 
@@ -1104,7 +1104,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
     def bnz_v():
         return instruction(
             intrinsic=f"int __lsx_bnz_v (__m128i a)",
-            instr=f"vsetnez.v vr, vr; bcnez",
+            instr=f"vsetnez.v vr; bcnez",
             desc=f"Expected to be used in branches: branch if the whole vector `a` is non-zero.",
         )
 
@@ -1113,7 +1113,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
         width = widths[name]
         return instruction(
             intrinsic=f"int __lsx_bz_{name} (__m128i a)",
-            instr=f"vsetanyeqz.{name} vr, vr; bcnez",
+            instr=f"vsetanyeqz.{name} vr; bcnez",
             desc=f"Expected to be used in branches: branch if any {width}-bit element in `a` equals to zero.",
         )
 
@@ -1122,7 +1122,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
         width = widths[name]
         return instruction(
             intrinsic=f"int __lsx_bnz_{name} (__m128i a)",
-            instr=f"vsetallnez.{name} vr, vr; bcnez",
+            instr=f"vsetallnez.{name} vr; bcnez",
             desc=f"Expected to be used in branches: branch if all {width}-bit elements in `a` are non-zero.",
         )
 
@@ -1348,7 +1348,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
         rounding_mode = get_rounding_mode(rounding)
         return instruction(
             intrinsic=f"__m128i __lsx_vftint{rounding}_w_d (__m128d a, __m128d b)",
-            instr=f"vftint{rounding}.w.d vr, vr",
+            instr=f"vftint{rounding}.w.d vr, vr, vr",
             desc=f"Convert double-precision floating point elements in `a` and `b` to 32-bit integer, {rounding_mode}.",
         )
 
@@ -1456,7 +1456,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
         width = widths[name]
         return instruction(
             intrinsic=f"__m128i __lsx_vfrstpi_{name} (__m128i a, __m128i b, imm0_31 imm)",
-            instr=f"vfrstpi.{name} vr, vr, vr",
+            instr=f"vfrstpi.{name} vr, vr, imm",
             desc=f"Find the first negative {width}-bit element in `b`, set the index of the element to the lane of `a` specified by `imm`.",
         )
 
@@ -1567,7 +1567,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
     def vbitsel_v():
         return instruction(
             intrinsic=f"__m128i __lsx_vbitsel_v (__m128i a, __m128i b, __m128i c)",
-            instr=f"vbitsel.v vr, vr, vr",
+            instr=f"vbitsel.v vr, vr, vr, vr",
             desc=f"Compute bitwise selection: for each bit position, if the bit in `c` equals to one, copy the bit from `b` to `dst`, otherwise copy from `a`.",
         )
 
@@ -1647,7 +1647,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
     def vfmadd_s():
         return instruction(
             intrinsic=f"__m128 __lsx_vfmadd_s (__m128 a, __m128 b, __m128 c)",
-            instr=f"vfmadd.s vr, vr, vr",
+            instr=f"vfmadd.s vr, vr, vr, vr",
             desc=f"Compute packed single precision floating point FMA(Fused Multiply-Add): multiply elements in `a` and `b`, accumulate to elements in `c` and store the result in `dst`.",
         )
 
@@ -1655,7 +1655,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
     def vfmadd_d():
         return instruction(
             intrinsic=f"__m128d __lsx_vfmadd_d (__m128d a, __m128d b, __m128d c)",
-            instr=f"vfmadd.d vr, vr, vr",
+            instr=f"vfmadd.d vr, vr, vr, vr",
             desc=f"Compute packed double precision floating point FMA(Fused Multiply-Add): multiply elements in `a` and `b`, accumulate to elements in `c` and store the result in `dst`.",
         )
 
@@ -1663,7 +1663,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
     def vfmsub_s():
         return instruction(
             intrinsic=f"__m128 __lsx_vfmsub_s (__m128 a, __m128 b, __m128 c)",
-            instr=f"vfmsub.s vr, vr, vr",
+            instr=f"vfmsub.s vr, vr, vr, vr",
             desc=f"Compute packed single precision floating point FMA(Fused Multiply-Add): multiply elements in `a` and `b`, subtract elements in `c` and store the result in `dst`.",
         )
 
@@ -1671,7 +1671,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
     def vfmsub_d():
         return instruction(
             intrinsic=f"__m128d __lsx_vfmsub_d (__m128d a, __m128d b, __m128d c)",
-            instr=f"vfmsub.d vr, vr, vr",
+            instr=f"vfmsub.d vr, vr, vr, vr",
             desc=f"Compute packed double precision floating point FMA(Fused Multiply-Add): multiply elements in `a` and `b`, subtract elements in `c` and store the result in `dst`.",
         )
 
@@ -1679,7 +1679,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
     def vfnmadd_s():
         return instruction(
             intrinsic=f"__m128 __lsx_vfnmadd_s (__m128 a, __m128 b, __m128 c)",
-            instr=f"vfnmadd.s vr, vr, vr",
+            instr=f"vfnmadd.s vr, vr, vr, vr",
             desc=f"Compute packed single precision floating point FMA(Fused Multiply-Add): multiply elements in `a` and `b`, accumulate to elements in `c` and store the negated result in `dst`.",
         )
 
@@ -1687,7 +1687,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
     def vfnmadd_d():
         return instruction(
             intrinsic=f"__m128d __lsx_vfnmadd_d (__m128d a, __m128d b, __m128d c)",
-            instr=f"vfnmadd.d vr, vr, vr",
+            instr=f"vfnmadd.d vr, vr, vr, vr",
             desc=f"Compute packed double precision floating point FMA(Fused Multiply-Add): multiply elements in `a` and `b`, accumulate to elements in `c` and store the negated result in `dst`.",
         )
 
@@ -1695,7 +1695,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
     def vfnmsub_s():
         return instruction(
             intrinsic=f"__m128 __lsx_vfnmsub_s (__m128 a, __m128 b, __m128 c)",
-            instr=f"vfnmsub.s vr, vr, vr",
+            instr=f"vfnmsub.s vr, vr, vr, vr",
             desc=f"Compute packed single precision floating point FMA(Fused Multiply-Add): multiply elements in `a` and `b`, subtract elements in `c` and store the negated result in `dst`.",
         )
 
@@ -1703,7 +1703,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
     def vfnmsub_d():
         return instruction(
             intrinsic=f"__m128d __lsx_vfnmsub_d (__m128d a, __m128d b, __m128d c)",
-            instr=f"vfnmsub.d vr, vr, vr",
+            instr=f"vfnmsub.d vr, vr, vr, vr",
             desc=f"Compute packed double precision floating point FMA(Fused Multiply-Add): multiply elements in `a` and `b`, subtract elements in `c` and store the negated result in `dst`.",
         )
 
