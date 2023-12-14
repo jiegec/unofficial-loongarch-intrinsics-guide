@@ -1876,3 +1876,17 @@ Initialize `dst` using predefined patterns:
 
         result += "</tbody>"
         return result
+
+if __name__ == '__main__':
+    # Fake an env
+    class Env:
+        def __init__(self):
+            self.macros = {}
+
+        def macro(self, fn):
+            self.macros[fn.__name__] = fn
+
+    env = Env()
+    define_env(env)
+    result = env.macros["all_intrinsics"]()
+    json.dump(json.loads(result), open("intrinsics.json", 'w'), indent=True)

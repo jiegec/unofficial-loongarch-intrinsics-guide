@@ -4,4 +4,4 @@ Visit <http://jia.je/unofficial-loongarch-intrinsics-guide/>
 
 Arranged from QEMU implementation and [GCC Intrinsics](https://gcc.gnu.org/onlinedocs/gcc/LoongArch-SX-Vector-Intrinsics.html)
 
-All LSX instructions are documented.
+All LSX & LASX instructions are documented.
