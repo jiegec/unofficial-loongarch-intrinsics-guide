@@ -532,7 +532,7 @@ CPU Flags: {cur_simd.upper()}
         signedness = signednesses[name]
         return instruction(
             intrinsic=f"__m256i __lasx_vext2xv_{name}_{name2} (__m256i a)",
-            instr=f"vext2xv.{name} xr, xr",
+            instr=f"vext2xv.{name}.{name2} xr, xr",
             desc=f"Extend {signedness} {width2}-bit lane of `a` to {signedness} {width}-bit elements.",
         )
 
@@ -985,7 +985,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
         width = widths[name]
         imm_upper = 128 // width - 1
         return instruction(
-            intrinsic=f"__m256i __lsx_vrepl128vei_{name} (__m256i a, imm0_{imm_upper} idx)",
+            intrinsic=f"__m256i __lasx_xvrepl128vei_{name} (__m256i a, imm0_{imm_upper} idx)",
             instr=f"xvrepl128vei.{name} xr, xr, imm",
             desc=f"Repeat the element in lane `idx` of `a` to fill whole vector.",
         )
@@ -995,7 +995,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
         width = widths[name]
         return instruction(
             intrinsic=f"__m128i __lsx_vrepli_{name} (imm_n512_511 imm)",
-            instr=f"vldi.{name} vr, imm",
+            instr=f"vldi vr, imm",
             desc=f"Repeat `imm` to fill whole vector.",
         )
 
@@ -1518,7 +1518,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             fp_type = "__m256"
         return instruction(
             intrinsic=f"{fp_type} __lasx_xvpickve_{name}_f ({fp_type} a, imm0_{256 // width - 1} imm)",
-            instr=f"xvpickve.{name}.f xr, xr, imm",
+            instr=f"xvpickve.{name} xr, xr, imm",
             desc=f"Copy one {width}-bit lane from `a` specified by `imm` to the first lane of `dst`, and set the other lanes to zero.",
         )
 
