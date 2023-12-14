@@ -1835,7 +1835,7 @@ Initialize `dst` using predefined patterns:
                                         {
                                             "name": intrinsic,
                                             "content": markdown.markdown(
-                                                body,
+                                                body.strip(),
                                                 extensions=[
                                                     "fenced_code",
                                                     "codehilite",
@@ -1847,13 +1847,22 @@ Initialize `dst` using predefined patterns:
                                         }
                                     )
                                 else:
+                                    insts = []
+                                    for line in body.split("\n"):
+                                        if line.startswith("Instruction:"):
+                                            # check instruction format
+                                            inst = line[12:].strip()
+                                            for name in inst.split(";"):
+                                                insts.append(name.strip().split(" ")[0])
+
                                     # do not render
                                     result.append(
                                         {
                                             "name": intrinsic.split("(")[0]
                                             .strip()
                                             .split(" ")[-1],
-                                            "full_name": intrinsic,
+                                            "c_intrinsic": intrinsic,
+                                            "instructions": insts,
                                             "content": body.strip(),
                                             "group": title,
                                             "extension": extension,
