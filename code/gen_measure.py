@@ -28,7 +28,23 @@ with open("measure.h", "w") as f:
                     print("Processing", name, fmt)
 
                     # handle instructions where vd/xd is also a source
-                    if re.match("x?vshuf\.[hwd]", name):
+                    # use find_vd_source.py
+                    if (
+                        re.match("x?vshuf\.[hwd]", name)
+                        or re.match("x?vm(add|sub).*", name)
+                        or re.match("x?vextrins.*", name)
+                        or re.match("x?vfrstp.*", name)
+                        or re.match("x?vinsve0.*", name)
+                        or re.match("x?vinsgr2vr.*", name)
+                        or re.match("x?vs?(srl|sra)r?ni.*", name)
+                        or name == "xvshuf4i.d"
+                        or name == "xvpermi.w"
+                        or name == "xvpermi.q"
+                        or name == "xvbitseli.b"
+                        or name == "vbitseli.b"
+                        or name == "vpermi.w"
+                        or name == "vshuf4i.d"
+                    ):
                         vd_source = True
                     else:
                         vd_source = False
