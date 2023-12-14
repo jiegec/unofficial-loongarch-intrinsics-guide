@@ -20,7 +20,31 @@ for cpu in cpus:
     with open(f'code/measure-{cpu}.csv', newline='') as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
-            measure[cpu][row['name']] = row
+            latency = []
+            for part in row['latency'].split('/'):
+                if part == "":
+                    lat = "N/A"
+                else:
+                    lat = float(part)
+                    if abs((lat - round(lat)) / lat) < 0.02:
+                        lat = round(lat)
+                latency.append(lat)
+            latency = sorted(list(set(latency)))
+
+            throughput_cpi = float(row['throughput(cpi)'])
+            if abs(throughput_cpi - round(throughput_cpi)) < 0.03:
+                throughput_cpi = round(throughput_cpi)
+
+            # TODO: handle small cpi better by 1/ipc
+            throughput_ipc = float(row['throughput(ipc)'])
+            if abs(throughput_ipc - round(throughput_ipc)) < 0.03:
+                throughput_ipc = round(throughput_ipc)
+
+            measure[cpu][row['name']] = {
+                'latency': ", ".join(map(str, latency)),
+                'throughput(cpi)': throughput_cpi,
+                'throughput(ipc)': throughput_ipc,
+            }
 
 # depends on implementation of env.macro()
 def my_macro(env):
@@ -103,29 +127,9 @@ def define_env(env):
         throughputs = []
         for cpu in cpus:
             if instr_name in measure[cpu]:
-                latency = []
-                for part in measure[cpu][instr_name]['latency'].split('/'):
-                    if part == "":
-                        lat = "N/A"
-                    else:
-                        lat = float(part)
-                        if abs((lat - round(lat)) / lat) < 0.02:
-                            lat = round(lat)
-                    latency.append(lat)
-                latency = sorted(list(set(latency)))
-
-                throughput_cpi = float(measure[cpu][instr_name]['throughput(cpi)'])
-                if abs(throughput_cpi - round(throughput_cpi)) < 0.03:
-                    throughput_cpi = round(throughput_cpi)
-
-                # TODO: handle small cpi better by 1/ipc
-                throughput_ipc = float(measure[cpu][instr_name]['throughput(ipc)'])
-                if abs(throughput_ipc - round(throughput_ipc)) < 0.03:
-                    throughput_ipc = round(throughput_ipc)
-
                 show_cpus.append(cpu)
-                latencies.append(", ".join(map(str, latency)))
-                throughputs.append(throughput_cpi)
+                latencies.append(measure[cpu][instr_name]['latency'])
+                throughputs.append(measure[cpu][instr_name]['throughput(cpi)'])
 
         if len(show_cpus) > 0:
             latency_throughput = f"""
@@ -1844,3 +1848,31 @@ Initialize `dst` using predefined patterns:
                     result.append(title)
                     break
         return json.dumps(sorted(list(set(result))))
+
+    @env.macro
+    def latency_throughput_table():
+        result = "<table><thead><tr><th rowspan=2>Instructino</th>"
+        for cpu in cpus:
+            result += f"<th colspan=2>{cpu}</th>"
+        result += f"</tr><tr>"
+        for cpu in cpus:
+            result += f"<th>Latency</th><th>Throughput (CPI)</th>"
+        result += f"</tr></thead>"
+
+        result += "<tbody>"
+
+        insts = []
+        for cpu in cpus:
+            insts.extend(measure[cpu].keys())
+        insts = sorted(list(set(insts)))
+
+        for inst in insts:
+            result += "<tr>"
+            result += f"<td>{inst}</td>"
+            for cpu in cpus:
+                result += f"<td>{measure[cpu][inst]['latency']}</td>"
+                result += f"<td>{measure[cpu][inst]['throughput(cpi)']}</td>"
+            result += "</tr>"
+
+        result += "</tbody>"
+        return result
