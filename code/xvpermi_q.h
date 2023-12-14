@@ -1,4 +1,3 @@
-dst.word[0] = b.word[imm & 0x3];
-dst.word[1] = b.word[(imm >> 2) & 0x3];
-dst.word[2] = a.word[(imm >> 4) & 0x3];
-dst.word[3] = a.word[(imm >> 6) & 0x3];
+dst.qword[0] = (imm & 2) ? a.qword[imm & 0x1] : b.qword[imm & 0x1];
+dst.qword[1] =
+    (imm & 0x20) ? a.qword[(imm >> 4) & 0x1] : b.qword[(imm >> 4) & 0x1];

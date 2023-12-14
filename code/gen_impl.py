@@ -1262,9 +1262,15 @@ for vlen, prefix in [(128, "v"), (256, "xv")]:
                 print(f"}}", file=f)
         else:
             with open(f"{prefix}repl128vei_{width}.h", "w") as f:
-                print(f"for (int i = 0;i < {vlen // w};i++) {{", file=f)
+                print(f"for (int i = 0;i < {vlen // 2 // w};i++) {{", file=f)
                 print(
                     f"  dst.{m}[i] = a.{m}[idx];",
+                    file=f,
+                )
+                print(f"}}", file=f)
+                print(f"for (int i = {vlen // 2 // w};i < {vlen // w};i++) {{", file=f)
+                print(
+                    f"  dst.{m}[i] = a.{m}[idx + {vlen // 2 // w}];",
                     file=f,
                 )
                 print(f"}}", file=f)
