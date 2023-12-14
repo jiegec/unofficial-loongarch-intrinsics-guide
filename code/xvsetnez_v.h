@@ -1,0 +1,1 @@
+dst = a.qword[0] != 0 || a.qword[1] != 0;

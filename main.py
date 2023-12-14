@@ -61,10 +61,12 @@ def define_env(env):
         for part in intrinsic.split(" "):
             if part.startswith("__lsx_"):
                 file_name = part[6:]
-        if cur_simd == "lasx":
+            elif part.startswith("__lasx_"):
+                file_name = part[7:]
+        if cur_simd == "lasx" and file_name[0] != "x":
             file_name = "x" + file_name
             instr = "x" + instr
-            intrinsic = intrinsic.replace("m128", "m256").replace("_lsx_", "_lasx_")
+            intrinsic = intrinsic.replace("m128", "m256").replace("_lsx_", "_lasx_x")
         if not os.path.exists(f"code/{file_name}.h"):
             file_name = instr.split(" ")[0].replace(".", "_")
 
@@ -1055,7 +1057,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
         return instruction(
             intrinsic=f"int __lsx_bz_v (__m128i a)",
             instr=f"vseteqz.v vr, vr; bcnez",
-            desc=f"Expected to be used in branches: branch if the 128-bit vector `a` equals to zero.",
+            desc=f"Expected to be used in branches: branch if the whole vector `a` equals to zero.",
         )
 
     @my_macro(env)
@@ -1063,7 +1065,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
         return instruction(
             intrinsic=f"int __lsx_bnz_v (__m128i a)",
             instr=f"vsetnez.v vr, vr; bcnez",
-            desc=f"Expected to be used in branches: branch if the 128-bit vector `a` is non-zero.",
+            desc=f"Expected to be used in branches: branch if the whole vector `a` is non-zero.",
         )
 
     @my_macro(env)
@@ -1423,7 +1425,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
         return instruction(
             intrinsic=f"__m128i __lsx_vb{name}_v (__m128i a, imm0_31 imm)",
             instr=f"vb{name}.v vr, vr, imm",
-            desc=f"Compute 128-bit `a` shifted {dir} by `imm * 8` bits.",
+            desc=f"Compute whole vector `a` shifted {dir} by `imm * 8` bits.",
         )
 
     @my_macro(env)
@@ -1434,12 +1436,20 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Permute words from `a` and `b` with indices recorded in `imm` and store into `dst`.",
         )
 
+    @env.macro
+    def xvpermi_d():
+        return instruction(
+            intrinsic=f"__m256i __lasx_xvpermi_d (__m256i a, imm0_255 imm)",
+            instr=f"xvpermi.w vr, vr, imm",
+            desc=f"Permute double words from `a` with indices recorded in `imm` and store into `dst`.",
+        )
+
     @my_macro(env)
     def vld():
         return instruction(
             intrinsic=f"__m128i __lsx_vld (void * addr, imm_n2048_2047 offset)",
             instr=f"vld vr, r, imm",
-            desc=f"Read 128-bit data from memory address `addr + offset`, save the data into `dst`.",
+            desc=f"Read whole vector from memory address `addr + offset`, save the data into `dst`.",
         )
 
     @my_macro(env)
@@ -1447,7 +1457,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
         return instruction(
             intrinsic=f"__m128i __lsx_vldx (void * addr, long int offset)",
             instr=f"vldx vr, r, r",
-            desc=f"Read 128-bit data from memory address `addr + offset`, save the data into `dst`.",
+            desc=f"Read whole vector from memory address `addr + offset`, save the data into `dst`.",
         )
 
     @my_macro(env)
@@ -1455,7 +1465,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
         return instruction(
             intrinsic=f"void __lsx_vst (__m128i data, void * addr, imm_n2048_2047 offset)",
             instr=f"vst vr, r, imm",
-            desc=f"Write 128-bit data in `data` to memory address `addr + offset`.",
+            desc=f"Write whole vector data in `data` to memory address `addr + offset`.",
         )
 
     @my_macro(env)
@@ -1463,7 +1473,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
         return instruction(
             intrinsic=f"void __lsx_vstx (__m128i data, void * addr, long int offset)",
             instr=f"vstx vr, r, r",
-            desc=f"Write 128-bit data in `data` to memory address `addr + offset`.",
+            desc=f"Write whole-vector data in `data` to memory address `addr + offset`.",
         )
 
     @my_macro(env)
