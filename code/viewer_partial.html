@@ -57,13 +57,26 @@ Found {{intrinsics.length}} intrinsics.
 
   createApp({
     setup() {
-      const search = ref("");
+      const urlParams = new URLSearchParams(window.location.search);
+      let initialSearch = urlParams.get('q');
+      if (initialSearch === null) {
+        initialSearch = "";
+      }
+      const search = ref(initialSearch);
+
       const allGroups = {% endraw %} {{ all_groups() }} {% raw %};
       const allExtensions = ["LSX", "LASX"];
       const groups = ref(allGroups);
       const extensions = ref(allExtensions);
 
       const intrinsics = computed(() => {
+        // update search to url
+        // https://stackoverflow.com/questions/10970078/modifying-a-query-string-without-reloading-the-page
+        const url = window.location.href;
+        var r = new URL(url);
+        r.searchParams.set('q', search.value);
+        window.history.pushState({ path: r.href }, '', r.href);
+
         let result = [];
         for (let val of allIntrinsics) {
           if (!groups.value.includes(val.group)) {
