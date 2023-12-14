@@ -1243,7 +1243,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
         return instruction(
             intrinsic=f"__m128i __lsx_vsrani_{name}_{name2} (__m128i a, __m128i b, imm0_{width2-1} imm)",
             instr=f"vsrani.{name}.{name2} vr, vr, imm",
-            desc=f"Arithemtic right shift the signed {width2}-bit elements in `a` and `b` by `imm`, truncate to {width}-bit and store the result to `dst`.",
+            desc=f"Arithmetic right shift the signed {width2}-bit elements in `a` and `b` by `imm`, truncate to {width}-bit and store the result to `dst`.",
         )
 
     @my_macro(env)
@@ -1283,7 +1283,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
         return instruction(
             intrinsic=f"__m128i __lsx_vsrarni_{name}_{name2} (__m128i a, __m128i b, imm0_{width2-1} imm)",
             instr=f"vsrarni.{name}.{name2} vr, vr, imm",
-            desc=f"Arithemtic right shift (with rounding) the signed {width2}-bit elements in `a` and `b` by `imm`, truncate to {width}-bit and store the result to `dst`.",
+            desc=f"Arithmetic right shift (with rounding) the signed {width2}-bit elements in `a` and `b` by `imm`, truncate to {width}-bit and store the result to `dst`.",
         )
 
     @my_macro(env)
@@ -1305,7 +1305,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
         return instruction(
             intrinsic=f"__m128i __lsx_vssran_{name}_{name2} (__m128i a, __m128i b)",
             instr=f"vssran.{name}.{name2} vr, vr, vr",
-            desc=f"Arithemtic right shift the signed {width2}-bit elements in `a` by elements in `b`, clamp to fit in {signedness} {width}-bit integer and store the result to `dst`.",
+            desc=f"Arithmetic right shift the signed {width2}-bit elements in `a` by elements in `b`, clamp to fit in {signedness} {width}-bit integer and store the result to `dst`.",
         )
 
     @my_macro(env)
@@ -1327,7 +1327,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
         return instruction(
             intrinsic=f"__m128i __lsx_vssrani_{name}_{name2} (__m128i a, __m128i b, imm0_{width2-1} imm)",
             instr=f"vssrani.{name}.{name2} vr, vr, imm",
-            desc=f"Arithemtic right shift the signed {width2}-bit elements in `a` and `b` by `imm`, clamp to fit in {signedness} {width}-bit integer and store the result to `dst`.",
+            desc=f"Arithmetic right shift the signed {width2}-bit elements in `a` and `b` by `imm`, clamp to fit in {signedness} {width}-bit integer and store the result to `dst`.",
         )
 
     @my_macro(env)
@@ -1349,7 +1349,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
         return instruction(
             intrinsic=f"__m128i __lsx_vssrarn_{name}_{name2} (__m128i a, __m128i b)",
             instr=f"vssrarn.{name}.{name2} vr, vr, vr",
-            desc=f"Arithemtic right shift (with rounding) the signed {width2}-bit elements in `a` by elements in `b`, clamp to fit in {signedness} {width}-bit integer and store the result to `dst`.",
+            desc=f"Arithmetic right shift (with rounding) the signed {width2}-bit elements in `a` by elements in `b`, clamp to fit in {signedness} {width}-bit integer and store the result to `dst`.",
         )
 
     @my_macro(env)
@@ -1371,7 +1371,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
         return instruction(
             intrinsic=f"__m128i __lsx_vssrarni_{name}_{name2} (__m128i a, __m128i b, imm0_{width2-1} imm)",
             instr=f"vssrarni.{name}.{name2} vr, vr, imm",
-            desc=f"Arithemtic right shift (with rounding) the signed {width2}-bit elements in `a` and `b` by `imm`, clamp to fit in {signedness} {width}-bit integer and store the result to `dst`.",
+            desc=f"Arithmetic right shift (with rounding) the signed {width2}-bit elements in `a` and `b` by `imm`, clamp to fit in {signedness} {width}-bit integer and store the result to `dst`.",
         )
 
     @my_macro(env)
