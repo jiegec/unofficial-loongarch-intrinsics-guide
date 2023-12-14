@@ -227,6 +227,8 @@ void print(const char *s, __m256d num) {
   printf("__m256d %s: %lf %lf %lf %lf\n", s, num[0], num[1], num[2], num[3]);
 }
 
+void print(const char *s, int num) { printf("int %s: %d\n", s, num); }
+
 #define PRINT(x) print(#x, x)
 
 #define FUZZ_N 128

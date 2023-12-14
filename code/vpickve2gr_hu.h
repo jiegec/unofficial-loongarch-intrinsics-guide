@@ -1,1 +1,1 @@
-dst = a.half[idx];
+dst = (u16)a.half[idx];

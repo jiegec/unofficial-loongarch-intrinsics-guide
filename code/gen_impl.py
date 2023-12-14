@@ -795,7 +795,7 @@ for vlen, prefix in [(128, "v"), (256, "xv")]:
         # skip xvpickve2gr_b/bu/h/hu
         if prefix != "xv" or (width[0] != "b" and width[0] != "h"):
             with open(f"{prefix}pickve2gr_{width}.h", "w") as f:
-                print(f"dst = a.{m}[idx];", file=f)
+                print(f"dst = ({sign}{w})a.{m}[idx];", file=f)
 
     for width in ["b", "bu", "h", "hu", "w", "wu", "d", "du"]:
         double_width = double_widths[width]

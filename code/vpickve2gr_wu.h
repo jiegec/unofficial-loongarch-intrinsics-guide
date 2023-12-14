@@ -1,1 +1,1 @@
-dst = a.word[idx];
+dst = (u32)a.word[idx];

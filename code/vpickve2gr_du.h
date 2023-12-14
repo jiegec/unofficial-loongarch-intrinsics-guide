@@ -1,1 +1,1 @@
-dst = a.dword[idx];
+dst = (u64)a.dword[idx];

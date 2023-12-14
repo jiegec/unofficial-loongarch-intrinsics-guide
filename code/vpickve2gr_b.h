@@ -1,1 +1,1 @@
-dst = a.byte[idx];
+dst = (s8)a.byte[idx];
