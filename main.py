@@ -1804,7 +1804,7 @@ Initialize `dst` using predefined patterns:
                                         "name": intrinsic,
                                         "content": markdown.markdown(
                                             body,
-                                            extensions=["fenced_code", "codehilite"],
+                                            extensions=["fenced_code", "codehilite", "tables"],
                                         ),
                                         "group": title,
                                         "extension": extension
