@@ -1,1 +1,0 @@
-dst = a.half[idx];

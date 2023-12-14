@@ -10,8 +10,6 @@
 {{ xvilvl('w') }}
 {{ xvilvl('d') }}
 
-{{ xvinsgr2vr('b') }}
-{{ xvinsgr2vr('h') }}
 {{ xvinsgr2vr('w') }}
 {{ xvinsgr2vr('d') }}
 
@@ -45,10 +43,6 @@
 {{ xvpickev('w') }}
 {{ xvpickev('d') }}
 
-{{ xvpickve2gr('b') }}
-{{ xvpickve2gr('bu') }}
-{{ xvpickve2gr('h') }}
-{{ xvpickve2gr('hu') }}
 {{ xvpickve2gr('w') }}
 {{ xvpickve2gr('wu') }}
 {{ xvpickve2gr('d') }}
@@ -73,11 +67,6 @@
 {{ xvreplve('h') }}
 {{ xvreplve('w') }}
 {{ xvreplve('d') }}
-
-{{ xvreplvei('b') }}
-{{ xvreplvei('h') }}
-{{ xvreplvei('w') }}
-{{ xvreplvei('d') }}
 
 {{ xvsat('b') }}
 {{ xvsat('bu') }}

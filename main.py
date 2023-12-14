@@ -499,8 +499,9 @@ CPU Flags: {cur_simd.upper()}
 
     @my_macro(env)
     def vinsgr2vr(name):
+        global cur_vlen
         width = widths[name]
-        imm_upper = 128 // width - 1
+        imm_upper = cur_vlen // width - 1
         if name == "d":
             long = "long "
         else:
@@ -685,8 +686,9 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
 
     @my_macro(env)
     def vstelm(name):
+        global cur_vlen
         width = widths[name]
-        imm_upper = 128 // width - 1
+        imm_upper = cur_vlen // width - 1
         return instruction(
             intrinsic=f"void __lsx_vstelm_{name} (__m128i data, void * addr, imm_n128_127 offset, imm0_{imm_upper} lane)",
             instr=f"vstelm.{name} vr, r, imm, imm",
