@@ -1450,6 +1450,28 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
             desc=f"Permute double words from `a` with indices recorded in `imm` and store into `dst`.",
         )
 
+    @env.macro
+    def xvpickve_int(name):
+        width = widths[name]
+        return instruction(
+            intrinsic=f"__m256i __lasx_xvpickve_{name} (__m256i a, imm0_{256 // width - 1} imm)",
+            instr=f"xvpickve.{name} xr, xr, imm",
+            desc=f"Copy one lane from `a` specified by `imm` to the first lane of `dst`, and set the other lanes to zero.",
+        )
+
+    @env.macro
+    def xvpickve_fp(name):
+        width = widths[name]
+        if name == "d":
+            fp_type = "__m256d"
+        else:
+            fp_type = "__m256"
+        return instruction(
+            intrinsic=f"{fp_type} __lasx_xvpickve_{name}_f ({fp_type} a, imm0_{256 // width - 1} imm)",
+            instr=f"xvpickve.{name}.f xr, xr, imm",
+            desc=f"Copy one lane from `a` specified by `imm` to the first lane of `dst`, and set the other lanes to zero.",
+        )
+
     @my_macro(env)
     def vld():
         return instruction(

@@ -43,6 +43,11 @@
 {{ xvpickev('w') }}
 {{ xvpickev('d') }}
 
+{{ xvpickve_int('w') }}
+{{ xvpickve_int('d') }}
+{{ xvpickve_fp('w') }}
+{{ xvpickve_fp('d') }}
+
 {{ xvpickve2gr('w') }}
 {{ xvpickve2gr('wu') }}
 {{ xvpickve2gr('d') }}

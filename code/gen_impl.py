@@ -1524,4 +1524,14 @@ for vlen, prefix in [(128, "v"), (256, "xv")]:
                     )
                     print(f"}}", file=f)
 
+    # xvpickve
+    if prefix == "xv":
+        for width in ["w", "w_f", "d", "d_f"]:
+            w = widths[width[0]]
+            m = members[width[0]]
+            with open(f"{prefix}pickve_{width}.h", "w") as f:
+                print(f"for (int i = 0;i < {vlen // w};i++) {{", file=f)
+                print(f"  dst.{m}[i] = (i == 0) ? a.{m}[imm] : 0;", file=f)
+                print(f"}}", file=f)
+
 os.system("clang-format -i *.cpp *.h")
