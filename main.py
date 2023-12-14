@@ -4,10 +4,21 @@ import os
 import json
 import markdown
 import re
+import csv
 
 # dirty way to reduce code
 cur_simd = "lsx"
 cur_vlen = 128
+
+# read latency & throughput
+measure = {}
+with open('code/measure.csv', newline='') as csvfile:
+    reader = csv.DictReader(csvfile)
+    for row in reader:
+        measure[row['name']] = {
+            'latency': row['latency'],
+            'throughput(cpi)': row['throughput(cpi)']
+        }
 
 # depends on implementation of env.macro()
 def my_macro(env):
@@ -81,6 +92,31 @@ def define_env(env):
             tested = "Tested on real machine."
         else:
             tested = ""
+
+        global measure
+        instr_name = instr.split(" ")[0].replace(".", "_")
+        if instr_name in measure:
+            latency = []
+            for part in measure[instr_name]['latency'].split('/'):
+                lat = float(part)
+                if abs(lat - round(lat)) < 0.05:
+                    lat = round(lat)
+                latency.append(lat)
+            latency = list(set(latency))
+
+            throughput = float(measure[instr_name]['throughput(cpi)'])
+            if abs(throughput - round(throughput)) < 0.05:
+                throughput = round(throughput)
+
+            latency_throughput = f"""
+### Latency and Throughput
+
+| Architecture | Latency | Throughput (CPI) |
+|--------------|---------|------------------|
+| 3A6000       | {"/".join(map(str, latency))} | {throughput} |
+"""
+        else:
+            latency_throughput = ""
         return f"""
 ## {intrinsic}
 
@@ -104,6 +140,8 @@ CPU Flags: {cur_simd.upper()}
 ```
 
 {tested}
+
+{latency_throughput}
 
 """
 

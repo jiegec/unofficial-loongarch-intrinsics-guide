@@ -5,7 +5,7 @@ for f in sorted(glob.glob("*.h")):
     src = f.replace(".h", ".cpp")
     if os.path.exists(src):
         # make sure we are testing the expected instruction
-        if src.split(".")[0] not in open(src, 'r').read():
+        if src.split(".")[0] not in open(src, "r").read():
             # intrinsic's name is different from instruction's name
             if src.startswith("vset") or src.startswith("vset"):
                 continue
