@@ -40,7 +40,7 @@ uint64_t perf_read_llc_misses();
 void setup_perf_llc_loads();
 uint64_t perf_read_llc_loads();
 
-int N = 20000;
+int N = 50000;
 
 #define INSTR_TEST(NAME, INST, ...)                                            \
   void test_##NAME(int n) {                                                    \
@@ -252,7 +252,11 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  FILE *fp = fopen("measure.csv", "w");
+#ifdef MACHINE_3C5000
+  FILE *fp = fopen("measure-3C5000.csv", "w");
+#else
+  FILE *fp = fopen("measure-3A6000.csv", "w");
+#endif
   assert(fp);
   fprintf(fp, "name,latency,throughput(cpi),throughput(ipc)\n");
   for (auto pair : info) {

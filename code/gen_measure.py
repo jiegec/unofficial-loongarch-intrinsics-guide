@@ -56,36 +56,38 @@ with open("measure.h", "w") as f:
                         depend_i_begin = 0
                     else:
                         depend_i_begin = 1
-                    for depend_i in range(depend_i_begin, len(fmt_parts)):
-                        if not (fmt_parts[depend_i].startswith('v') or fmt_parts[depend_i].startswith('x')):
-                            # not a real dependency
-                            continue
+                    # skip vset/xvset because therid destination is vd
+                    if not (name.startswith("vset") or name.startswith("xvset")):
+                        for depend_i in range(depend_i_begin, len(fmt_parts)):
+                            if not (fmt_parts[depend_i].startswith('v') or fmt_parts[depend_i].startswith('x')):
+                                # not a real dependency
+                                continue
 
-                        ops = []
-                        for i, part in enumerate(fmt_parts):
-                            if part.startswith("v"):
-                                if i == depend_i:
-                                    # vd is always vr0
-                                    ops.append("$vr0")
-                                else:
-                                    ops.append(f"$vr{i}")
-                            elif part.startswith("x"):
-                                if i == depend_i:
-                                    # vd is always vr0
-                                    ops.append("$xr0")
-                                else:
-                                    ops.append(f"$xr{i}")
-                            elif part.startswith("r"):
-                                ops.append(f"$r0")
-                            elif part.startswith("c"):
-                                ops.append(f"$fcc0")
-                            elif part.startswith("u") or part.startswith("s"):
-                                # imm
-                                ops.append("0")
-                        print(
-                            f'INSTR_TEST({name.replace(".", "_")}_{depend_i}, "{name} {", ".join(ops)}\\n")',
-                            file=f,
-                        )
+                            ops = []
+                            for i, part in enumerate(fmt_parts):
+                                if part.startswith("v"):
+                                    if i == depend_i:
+                                        # vd is always vr0
+                                        ops.append("$vr0")
+                                    else:
+                                        ops.append(f"$vr{i}")
+                                elif part.startswith("x"):
+                                    if i == depend_i:
+                                        # vd is always vr0
+                                        ops.append("$xr0")
+                                    else:
+                                        ops.append(f"$xr{i}")
+                                elif part.startswith("r"):
+                                    ops.append(f"$r0")
+                                elif part.startswith("c"):
+                                    ops.append(f"$fcc0")
+                                elif part.startswith("u") or part.startswith("s"):
+                                    # imm
+                                    ops.append("0")
+                            print(
+                                f'INSTR_TEST({name.replace(".", "_")}_{depend_i}, "{name} {", ".join(ops)}\\n")',
+                                file=f,
+                            )
 
                     # throughput test
                     # no dependency
