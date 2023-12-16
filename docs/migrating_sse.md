@@ -360,27 +360,27 @@ Here is a table of a mapping from SSE intrinsics to their LSX counterpart (WIP):
 | _mm_sign_epi16          |                                       |
 | _mm_sign_epi32          |                                       |
 | _mm_sign_epi8           |                                       |
-| _mm_sll_epi16           | __lsx_vsll_h                                      |
+| _mm_sll_epi16           | __lsx_vsll_h                          |
 | _mm_sll_epi32           | __lsx_vsll_w                          |
-| _mm_sll_epi64           | __lsx_vsll_d                                      |
-| _mm_slli_epi16          | __lsx_vslli_h                                      |
+| _mm_sll_epi64           | __lsx_vsll_d                          |
+| _mm_slli_epi16          | __lsx_vslli_h                         |
 | _mm_slli_epi32          | __lsx_vslli_w                         |
-| _mm_slli_epi64          | __lsx_vslli_d                                      |
+| _mm_slli_epi64          | __lsx_vslli_d                         |
 | _mm_slli_si128          |                                       |
 | _mm_sqrt_pd             | __lsx_vfsqrt_d                        |
 | _mm_sqrt_ps             | __lsx_vfsqrt_s                        |
 | _mm_sqrt_sd             |                                       |
 | _mm_sqrt_ss             |                                       |
-| _mm_sra_epi16           | __lsx_vsra_h                                      |
-| _mm_sra_epi32           | __lsx_vsra_w                                      |
-| _mm_srai_epi16          | __lsx_vsrai_h                                      |
-| _mm_srai_epi32          | __lsx_vsrai_w                                      |
-| _mm_srl_epi16           | __lsx_vsrl_h                                      |
-| _mm_srl_epi32           | __lsx_vsrl_w                                      |
-| _mm_srl_epi64           | __lsx_vsrl_d                                      |
-| _mm_srli_epi16          | __lsx_vsrli_h                                      |
-| _mm_srli_epi32          | __lsx_vsrli_w                                      |
-| _mm_srli_epi64          | __lsx_vsrli_d                                      |
+| _mm_sra_epi16           | __lsx_vsra_h                          |
+| _mm_sra_epi32           | __lsx_vsra_w                          |
+| _mm_srai_epi16          | __lsx_vsrai_h                         |
+| _mm_srai_epi32          | __lsx_vsrai_w                         |
+| _mm_srl_epi16           | __lsx_vsrl_h                          |
+| _mm_srl_epi32           | __lsx_vsrl_w                          |
+| _mm_srl_epi64           | __lsx_vsrl_d                          |
+| _mm_srli_epi16          | __lsx_vsrli_h                         |
+| _mm_srli_epi32          | __lsx_vsrli_w                         |
+| _mm_srli_epi64          | __lsx_vsrli_d                         |
 | _mm_srli_si128          |                                       |
 | _mm_store_pd            | __lsx_vst                             |
 | _mm_store_pd1           |                                       |
