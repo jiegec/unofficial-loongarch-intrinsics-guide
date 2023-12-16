@@ -335,11 +335,11 @@ Here is a table of a mapping from SSE intrinsics to their LSX counterpart (WIP):
 | _mm_set_ps1             | __lsx_vdrepl_w/__lsx_vreplgr2vr_w     |
 | _mm_set_sd              |                                       |
 | _mm_set_ss              |                                       |
-| _mm_set1_epi16          |                                       |
-| _mm_set1_epi32          |                                       |
-| _mm_set1_epi64          |                                       |
+| _mm_set1_epi16          | __lsx_vreplgr2vr_h                    |
+| _mm_set1_epi32          | __lsx_vreplgr2vr_w                    |
+| _mm_set1_epi64          | __lsx_vreplgr2vr_d                    |
 | _mm_set1_epi64x         |                                       |
-| _mm_set1_epi8           |                                       |
+| _mm_set1_epi8           | __lsx_vreplgr2vr_b                    |
 | _mm_set1_pd             |                                       |
 | _mm_set1_ps             |                                       |
 | _mm_setr_epi16          |                                       |
@@ -348,9 +348,9 @@ Here is a table of a mapping from SSE intrinsics to their LSX counterpart (WIP):
 | _mm_setr_epi8           |                                       |
 | _mm_setr_pd             |                                       |
 | _mm_setr_ps             |                                       |
-| _mm_setzero_pd          |                                       |
-| _mm_setzero_ps          |                                       |
-| _mm_setzero_si128       |                                       |
+| _mm_setzero_pd          | (__m128d)__lsx_vldi(0)                |
+| _mm_setzero_ps          | (__m128)__lsx_vldi(0)                 |
+| _mm_setzero_si128       | __lsx_vldi(0)                         |
 | _mm_shuffle_epi32       |                                       |
 | _mm_shuffle_epi8        |                                       |
 | _mm_shuffle_pd          |                                       |
