@@ -27,8 +27,8 @@ Here is a table of a mapping from SSE intrinsics to their LSX counterpart (WIP):
 | _mm_adds_epi8           | __lsx_vsadd_b                         |
 | _mm_adds_epu16          | __lsx_vsadd_hu                        |
 | _mm_adds_epu8           | __lsx_vsadd_bu                        |
-| _mm_addsub_pd           |                                       |
-| _mm_addsub_ps           |                                       |
+| _mm_addsub_pd           | __lsx_vfmadd_d + __lsx_vxor_v         |
+| _mm_addsub_ps           | __lsx_vfmadd_s + __lsx_vxor_v         |
 | _mm_alignr_epi8         |                                       |
 | _mm_and_pd              | __lsx_vand_v                          |
 | _mm_and_ps              | __lsx_vand_v                          |
@@ -41,7 +41,7 @@ Here is a table of a mapping from SSE intrinsics to their LSX counterpart (WIP):
 | _mm_blend_epi16         |                                       |
 | _mm_blend_pd            |                                       |
 | _mm_blend_ps            |                                       |
-| _mm_blendv_epi8         |                                       |
+| _mm_blendv_epi8         | __lsx_vbitsel_v                       |
 | _mm_blendv_pd           |                                       |
 | _mm_blendv_ps           |                                       |
 | _mm_bslli_si128         | __lsx_vbsll_v                         |
@@ -179,8 +179,8 @@ Here is a table of a mapping from SSE intrinsics to their LSX counterpart (WIP):
 | _mm_cvtsd_si64          |                                       |
 | _mm_cvtsd_si64x         |                                       |
 | _mm_cvtsd_ss            |                                       |
-| _mm_cvtsi128_si32       |                                       |
-| _mm_cvtsi128_si64       |                                       |
+| _mm_cvtsi128_si32       | __lsx_vpickve2gr_{b/bu/h/hu/w/wu}     |
+| _mm_cvtsi128_si64       | __lsx_vpickve2gr_{d/du}               |
 | _mm_cvtsi128_si64x      |                                       |
 | _mm_cvtsi32_sd          |                                       |
 | _mm_cvtsi32_si128       |                                       |
@@ -216,8 +216,8 @@ Here is a table of a mapping from SSE intrinsics to their LSX counterpart (WIP):
 | _mm_extract_epi64       |                                       |
 | _mm_extract_epi8        |                                       |
 | _mm_extract_ps          |                                       |
-| _mm_floor_pd            |                                       |
-| _mm_floor_ps            |                                       |
+| _mm_floor_pd            |__lsx_vfrintrm_d                       |
+| _mm_floor_ps            |__lsx_vfrintrm_s                       |
 | _mm_floor_sd            |                                       |
 | _mm_floor_ss            |                                       |
 | _mm_hadd_epi16          |                                       |
