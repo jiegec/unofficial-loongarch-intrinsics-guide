@@ -44,23 +44,6 @@
 {{ vclz('w') }}
 {{ vclz('d') }}
 
-{{ vexth('h', 'b') }}
-{{ vexth('hu', 'bu') }}
-{{ vexth('w', 'h') }}
-{{ vexth('wu', 'hu') }}
-{{ vexth('d', 'w') }}
-{{ vexth('du', 'wu') }}
-{{ vexth('q', 'd') }}
-{{ vexth('qu', 'du') }}
-
-{{ vextl('q', 'd') }}
-{{ vextl('qu', 'du') }}
-
-{{ vextrins('b') }}
-{{ vextrins('h') }}
-{{ vextrins('w') }}
-{{ vextrins('d') }}
-
 {{ vpcnt('b') }}
 {{ vpcnt('h') }}
 {{ vpcnt('w') }}

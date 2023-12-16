@@ -1,5 +1,22 @@
 # Misc
 
+{{ xvexth('h', 'b') }}
+{{ xvexth('hu', 'bu') }}
+{{ xvexth('w', 'h') }}
+{{ xvexth('wu', 'hu') }}
+{{ xvexth('d', 'w') }}
+{{ xvexth('du', 'wu') }}
+{{ xvexth('q', 'd') }}
+{{ xvexth('qu', 'du') }}
+
+{{ xvextl('q', 'd') }}
+{{ xvextl('qu', 'du') }}
+
+{{ xvextrins('b') }}
+{{ xvextrins('h') }}
+{{ xvextrins('w') }}
+{{ xvextrins('d') }}
+
 {{ vext2xv('h', 'b') }}
 {{ vext2xv('hu', 'bu') }}
 {{ vext2xv('w', 'b') }}

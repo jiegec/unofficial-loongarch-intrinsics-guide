@@ -12,9 +12,9 @@ Here is a table of a mapping from SSE intrinsics to their LSX counterpart (WIP):
 
 | SSE                     | LSX                                   |
 |-------------------------|---------------------------------------|
-| _mm_abs_epi16           |                                       |
-| _mm_abs_epi32           |                                       |
-| _mm_abs_epi8            |                                       |
+| _mm_abs_epi16           | __lsx_vsigncov_h                      |
+| _mm_abs_epi32           | __lsx_vsigncov_w                      |
+| _mm_abs_epi8            | __lsx_vsigncov_b                      |
 | _mm_add_epi16           | __lsx_vadd_h                          |
 | _mm_add_epi32           | __lsx_vadd_w                          |
 | _mm_add_epi64           | __lsx_vadd_d                          |

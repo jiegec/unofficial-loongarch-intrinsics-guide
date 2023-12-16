@@ -1089,7 +1089,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
         return instruction(
             intrinsic=f"__m128i __lsx_vsigncov_{name} (__m128i a, __m128i b)",
             instr=f"vsigncov.{name} vr, vr, vr",
-            desc=f"If the {width}-bit element in `a` equals to zero, set the result to zero. If the signed {width}-bit element in `a` is posiive, copy element in `b` to result. Otherwise, copy negated element in `b` to result.",
+            desc=f"If the {width}-bit element in `a` equals to zero, set the result to zero. If the signed {width}-bit element in `a` is positive, copy element in `b` to result. Otherwise, copy negated element in `b` to result. If `a` and `b` are the same vectors, it is equivalent to computing absolute value.",
         )
 
     @my_macro(env)

@@ -1,5 +1,23 @@
 # Misc
 
+{{ vexth('h', 'b') }}
+{{ vexth('hu', 'bu') }}
+{{ vexth('w', 'h') }}
+{{ vexth('wu', 'hu') }}
+{{ vexth('d', 'w') }}
+{{ vexth('du', 'wu') }}
+{{ vexth('q', 'd') }}
+{{ vexth('qu', 'du') }}
+
+{{ vextl('q', 'd') }}
+{{ vextl('qu', 'du') }}
+
+{{ vextrins('b') }}
+{{ vextrins('h') }}
+{{ vextrins('w') }}
+{{ vextrins('d') }}
+
+
 {{ vilvh('b') }}
 {{ vilvh('h') }}
 {{ vilvh('w') }}
