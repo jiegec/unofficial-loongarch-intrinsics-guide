@@ -21,8 +21,8 @@ Here is a table of a mapping from SSE intrinsics to their LSX counterpart (WIP):
 | _mm_add_epi8            | __lsx_vadd_b                          |
 | _mm_add_pd              | __lsx_vfadd_d                         |
 | _mm_add_ps              | __lsx_vfadd_s                         |
-| _mm_add_sd              |                                       |
-| _mm_add_ss              |                                       |
+| _mm_add_sd              | __lsx_vfadd_d + __lsx_vextrins_d      |
+| _mm_add_ss              | __lsx_vfadd_s + __lsx_vextrins_w      |
 | _mm_adds_epi16          | __lsx_vsadd_h                         |
 | _mm_adds_epi8           | __lsx_vsadd_b                         |
 | _mm_adds_epu16          | __lsx_vsadd_hu                        |
@@ -46,14 +46,14 @@ Here is a table of a mapping from SSE intrinsics to their LSX counterpart (WIP):
 | _mm_blendv_ps           |                                       |
 | _mm_bslli_si128         | __lsx_vbsll_v                         |
 | _mm_bsrli_si128         | __lsx_vbsrl_v                         |
-| _mm_castpd_ps           |                                       |
-| _mm_castpd_si128        |                                       |
-| _mm_castps_pd           |                                       |
-| _mm_castps_si128        |                                       |
-| _mm_castsi128_pd        |                                       |
-| _mm_castsi128_ps        |                                       |
-| _mm_ceil_pd             |                                       |
-| _mm_ceil_ps             |                                       |
+| _mm_castpd_ps           | type conversion                       |
+| _mm_castpd_si128        | type conversion                       |
+| _mm_castps_pd           | type conversion                       |
+| _mm_castps_si128        | type conversion                       |
+| _mm_castsi128_pd        | type conversion                       |
+| _mm_castsi128_ps        | type conversion                       |
+| _mm_ceil_pd             | __lsx_vfrintrp_d                      |
+| _mm_ceil_ps             | __lsx_vfrintrp_s                      |
 | _mm_ceil_sd             |                                       |
 | _mm_ceil_ss             |                                       |
 | _mm_cmpeq_epi16         | __lsx_vseq_h                          |
@@ -105,20 +105,20 @@ Here is a table of a mapping from SSE intrinsics to their LSX counterpart (WIP):
 | _mm_cmpneq_ps           | __lsx_vfcmp_cune_s                    |
 | _mm_cmpneq_sd           |                                       |
 | _mm_cmpneq_ss           |                                       |
-| _mm_cmpnge_pd           |                                       |
-| _mm_cmpnge_ps           |                                       |
+| _mm_cmpnge_pd           | __lsx_vfcmp_cult_d                    |
+| _mm_cmpnge_ps           | __lsx_vfcmp_cult_s                    |
 | _mm_cmpnge_sd           |                                       |
 | _mm_cmpnge_ss           |                                       |
-| _mm_cmpngt_pd           |                                       |
-| _mm_cmpngt_ps           |                                       |
+| _mm_cmpngt_pd           | __lsx_vfcmp_cule_d                    |
+| _mm_cmpngt_ps           | __lsx_vfcmp_cule_s                    |
 | _mm_cmpngt_sd           |                                       |
 | _mm_cmpngt_ss           |                                       |
-| _mm_cmpnle_pd           |                                       |
-| _mm_cmpnle_ps           |                                       |
+| _mm_cmpnle_pd           | __lsx_vfcmp_cult_d                    |
+| _mm_cmpnle_ps           | __lsx_vfcmp_cult_s                    |
 | _mm_cmpnle_sd           |                                       |
 | _mm_cmpnle_ss           |                                       |
-| _mm_cmpnlt_pd           |                                       |
-| _mm_cmpnlt_ps           |                                       |
+| _mm_cmpnlt_pd           | __lsx_vfcmp_cule_d                    |
+| _mm_cmpnlt_ps           | __lsx_vfcmp_cule_s                    |
 | _mm_cmpnlt_sd           |                                       |
 | _mm_cmpnlt_ss           |                                       |
 | _mm_cmpord_pd           | __lsx_vfcmp_cor_d                     |
@@ -145,23 +145,23 @@ Here is a table of a mapping from SSE intrinsics to their LSX counterpart (WIP):
 | _mm_cvt_ps2pi           |                                       |
 | _mm_cvt_si2ss           |                                       |
 | _mm_cvt_ss2si           |                                       |
-| _mm_cvtepi16_epi32      |                                       |
+| _mm_cvtepi16_epi32      | __lsx_vsllwil_w_h                     |
 | _mm_cvtepi16_epi64      |                                       |
-| _mm_cvtepi32_epi64      |                                       |
-| _mm_cvtepi32_pd         |                                       |
-| _mm_cvtepi32_ps         |                                       |
-| _mm_cvtepi8_epi16       |                                       |
+| _mm_cvtepi32_epi64      | __lsx_vsllwil_d_w                     |
+| _mm_cvtepi32_pd         | __lsx_vffintl_d_w                     |
+| _mm_cvtepi32_ps         | __lsx_vffint_s_w                      |
+| _mm_cvtepi8_epi16       | __lsx_vsllwil_h_b                     |
 | _mm_cvtepi8_epi32       |                                       |
 | _mm_cvtepi8_epi64       |                                       |
-| _mm_cvtepu16_epi32      |                                       |
+| _mm_cvtepu16_epi32      | __lsx_vsllwil_wu_hu                   |
 | _mm_cvtepu16_epi64      |                                       |
-| _mm_cvtepu32_epi64      |                                       |
-| _mm_cvtepu8_epi16       |                                       |
+| _mm_cvtepu32_epi64      | __lsx_vsllwil_du_wu                   |
+| _mm_cvtepu8_epi16       | __lsx_vsllwil_hu_bu                   |
 | _mm_cvtepu8_epi32       |                                       |
 | _mm_cvtepu8_epi64       |                                       |
-| _mm_cvtpd_epi32         |                                       |
+| _mm_cvtpd_epi32         | __lsx_vftint_w_d                      |
 | _mm_cvtpd_pi32          |                                       |
-| _mm_cvtpd_ps            |                                       |
+| _mm_cvtpd_ps            | __lsx_vfcvt_s_d                       |
 | _mm_cvtpi16_ps          |                                       |
 | _mm_cvtpi32_pd          |                                       |
 | _mm_cvtpi32_ps          |                                       |
