@@ -303,10 +303,10 @@ Here is a table of a mapping from SSE intrinsics to their LSX counterpart (WIP):
 | _mm_mul_ps              | __lsx_vfmul_s                         |
 | _mm_mul_sd              |                                       |
 | _mm_mul_ss              |                                       |
-| _mm_mulhi_epi16         |                                       |
-| _mm_mulhi_epu16         |                                       |
+| _mm_mulhi_epi16         | __lsx_vmulwod_w_h                     |
+| _mm_mulhi_epu16         | __lsx_vmulwod_w_hu                    |
 | _mm_mulhrs_epi16        |                                       |
-| _mm_mullo_epi16         |                                       |
+| _mm_mullo_epi16         | __lsx_vmulwev_w_h                     |
 | _mm_mullo_epi32         |                                       |
 | _mm_or_pd               | __lsx_vor_v                           |
 | _mm_or_ps               | __lsx_vor_v                           |
