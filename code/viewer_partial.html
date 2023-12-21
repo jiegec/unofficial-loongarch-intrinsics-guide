@@ -29,7 +29,7 @@
 <b>Filter by content:</b>
 <p></p>
 
-<input v-model="search" placeholder="Search intrinsics using Fuse.js search syntax" style="width: 100%">
+<input v-model="search" placeholder="Search intrinsics using MiniSearch search syntax" style="width: 100%">
 
 <p></p>
 <p></p>
@@ -52,18 +52,23 @@ Found {{intrinsics.length}} intrinsics.
 
 <script type="module">
   import { createApp, ref, computed, nextTick } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js';
-  import Fuse from 'https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.mjs';
+  import MiniSearch from 'https://cdn.jsdelivr.net/npm/minisearch@6.3.0/dist/es/index.js';
 
   const allIntrinsics = {% endraw %} {{ all_intrinsics() }} {% raw %};
 
-  const fuse = new Fuse(allIntrinsics, {
-    keys: [
-      "name",
-      "markdown",
-      "group",
-      "extension",
-    ]
+  let miniSearch = new MiniSearch({
+    fields: ['name', 'markdown', 'group', 'extension'],
+    storeFields: ['group', 'extension']
   });
+
+  let docs = [];
+  for (let i = 0;i < allIntrinsics.length;i++) {
+    docs.push({
+      id: i,
+      ...allIntrinsics[i],
+    });
+  }
+  miniSearch.addAll(docs);
 
   createApp({
     setup() {
@@ -104,14 +109,14 @@ Found {{intrinsics.length}} intrinsics.
             val.display = false;
           }
 
-          let candidates = fuse.search(search.value);
+          let candidates = miniSearch.search(search.value);
           for (let val of candidates) {
-            if (!groups.value.includes(val.item.group)) {
+            if (!groups.value.includes(val.group)) {
               continue;
-            } else if (!extensions.value.includes(val.item.extension)) {
+            } else if (!extensions.value.includes(val.extension)) {
               continue;
             }
-            allIntrinsics[val.refIndex].display = true;
+            allIntrinsics[val.id].display = true;
             length = length + 1;
           }
         }
