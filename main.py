@@ -1847,6 +1847,7 @@ Initialize `dst` using predefined patterns:
                                             ),
                                             "group": title,
                                             "extension": extension,
+                                            "display": True
                                         }
                                     )
                                 else:

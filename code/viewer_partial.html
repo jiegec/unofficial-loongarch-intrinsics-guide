@@ -39,7 +39,7 @@ Found {{intrinsics.length}} intrinsics.
 <p></p>
 <p></p>
 <p></p>
-<details v-for="intrinsic in intrinsics" style="margin-top: 5px;padding-left: 5px;border-top: 1px solid black;border-left: 5px solid black">
+<details v-for="intrinsic in intrinsics.inner" v-show="intrinsic.display" style="margin-top: 5px;padding-left: 5px;border-top: 1px solid black;border-left: 5px solid black">
   <summary>{{ intrinsic.name }}</summary>
   <div v-html="intrinsic.content" style="padding: 10px"></div>
 </details>
@@ -87,31 +87,39 @@ Found {{intrinsics.length}} intrinsics.
         r.searchParams.set('q', search.value);
         window.history.pushState({ path: r.href }, '', r.href);
 
-        let result = [];
+        let length = 0;
         if (search.value === "") {
           for (let val of allIntrinsics) {
             if (!groups.value.includes(val.group)) {
-              continue;
+              val.display = false;
             } else if (!extensions.value.includes(val.extension)) {
-              continue;
+              val.display = false;
+            } else {
+              val.display = true;
+              length = length + 1;
             }
-            result.push(val);
           }
         } else {
-          let candidates = fuse.search(search.value)
+          for (let val of allIntrinsics) {
+            val.display = false;
+          }
+
+          let candidates = fuse.search(search.value);
           for (let val of candidates) {
             if (!groups.value.includes(val.item.group)) {
               continue;
             } else if (!extensions.value.includes(val.item.extension)) {
               continue;
             }
-            result.push(val.item);
+            allIntrinsics[val.refIndex].display = true;
+            length = length + 1;
           }
         }
 
-
-        nextTick(hljs.highlightAll);
-        return result;
+        return {
+          inner: allIntrinsics,
+          length: length,
+        };
       });
 
       return {
