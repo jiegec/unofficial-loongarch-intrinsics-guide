@@ -1836,6 +1836,7 @@ Initialize `dst` using predefined patterns:
                                     result.append(
                                         {
                                             "name": intrinsic,
+                                            "markdown": body.strip(),
                                             "content": markdown.markdown(
                                                 body.strip(),
                                                 extensions=[

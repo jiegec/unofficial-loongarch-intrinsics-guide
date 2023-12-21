@@ -29,7 +29,7 @@
 <b>Filter by content:</b>
 <p></p>
 
-<input v-model="search" placeholder="Search intrinsics" style="width: 100%">
+<input v-model="search" placeholder="Search intrinsics using Fuse.js search syntax" style="width: 100%">
 
 <p></p>
 <p></p>
@@ -51,9 +51,19 @@ Found {{intrinsics.length}} intrinsics.
 </div>
 
 <script type="module">
-  import { createApp, ref, computed, nextTick } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
+  import { createApp, ref, computed, nextTick } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js';
+  import Fuse from 'https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.mjs';
 
   const allIntrinsics = {% endraw %} {{ all_intrinsics() }} {% raw %};
+
+  const fuse = new Fuse(allIntrinsics, {
+    keys: [
+      "name",
+      "markdown",
+      "group",
+      "extension",
+    ]
+  });
 
   createApp({
     setup() {
@@ -78,17 +88,27 @@ Found {{intrinsics.length}} intrinsics.
         window.history.pushState({ path: r.href }, '', r.href);
 
         let result = [];
-        for (let val of allIntrinsics) {
-          if (!groups.value.includes(val.group)) {
-            continue;
-          } else if (!extensions.value.includes(val.extension)) {
-            continue;
-          } else if (val.name.includes(search.value)) {
-            result.push(val);
-          } else if (val.content.includes(search.value)) {
+        if (search.value === "") {
+          for (let val of allIntrinsics) {
+            if (!groups.value.includes(val.group)) {
+              continue;
+            } else if (!extensions.value.includes(val.extension)) {
+              continue;
+            }
             result.push(val);
           }
+        } else {
+          let candidates = fuse.search(search.value)
+          for (let val of candidates) {
+            if (!groups.value.includes(val.item.group)) {
+              continue;
+            } else if (!extensions.value.includes(val.item.extension)) {
+              continue;
+            }
+            result.push(val.item);
+          }
         }
+
 
         nextTick(hljs.highlightAll);
         return result;
