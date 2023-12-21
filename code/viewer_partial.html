@@ -111,7 +111,8 @@ Found {{intrinsics.length}} intrinsics.
 
           let candidates = miniSearch.search(search.value, {
             prefix: true,
-            fuzzy: 0.2
+            fuzzy: 0.2,
+            combineWith: 'AND'
           });
           for (let val of candidates) {
             if (!groups.value.includes(val.group)) {
