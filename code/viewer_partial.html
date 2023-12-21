@@ -109,7 +109,10 @@ Found {{intrinsics.length}} intrinsics.
             val.display = false;
           }
 
-          let candidates = miniSearch.search(search.value);
+          let candidates = miniSearch.search(search.value, {
+            prefix: true,
+            fuzzy: 0.2
+          });
           for (let val of candidates) {
             if (!groups.value.includes(val.group)) {
               continue;
