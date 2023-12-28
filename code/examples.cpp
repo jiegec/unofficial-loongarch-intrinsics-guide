@@ -1,5 +1,6 @@
 #include "common.h"
 
+// some intrinsics are defined as macros, and they don't linke extra commas
 #define COMMA ,
 
 void test() {
@@ -281,4 +282,76 @@ void test() {
                                   0xabababab12121212, 0x1234567812345678}));
   PRINT(__lasx_xvmskltz_d(__m256i{0x0000111800000000, 0x0081000081111111,
                                   0x8111000008010101, 0x0000000000000000}));
+
+  // Shuffling
+  PRINT(__lsx_vshuf_b(__m128i{0x1122334455667788, 0x99aabbccddeeff00},
+                      __m128i{0xabcdef1314156678, 0x1234123443214321},
+                      __m128i{0x0011021304050607, 0x0811120213031404}));
+  PRINT(__lasx_xvshuf_b(__m256i{0x1122334455667788, 0x99aabbccddeeff00,
+                                0xabcdef1212341234, 0xaabbaabbddeeddee},
+                        __m256i{0xabcdef1314156678, 0x1234123443214321,
+                                0x1234123443214321, 0x5678567856785678},
+                        __m256i{0x1f1f00001a0a1b0b, 0x1111120213031404,
+                                0x0102030405060708, 0x1112131405060708}));
+
+  PRINT(__lsx_vshuf_h(__m128i{0x0001000200030004, 0x0005000a000b000c},
+                      __m128i{0x1122334455667788, 0x99aabbccddeeff00},
+                      __m128i{0xabcdef1314156678, 0x1234123443214321}));
+  PRINT(__lasx_xvshuf_h(__m256i{0x0001000200030004, 0x0005000a000b000c,
+                                0x000f000e00010002, 0x0008000900020001},
+                        __m256i{0x1122334455667788, 0x99aabbccddeeff00,
+                                0xabcdef1212341234, 0xaabbaabbddeeddee},
+                        __m256i{0xabcdef1314156678, 0x1234123443214321,
+                                0x1234123443214321, 0x5678567856785678}));
+
+  PRINT(__lsx_vshuf_w(__m128i{0x0000000200000004, 0x0000000700000005},
+                      __m128i{0x1122334455667788, 0x99aabbccddeeff00},
+                      __m128i{0xabcdef1314156678, 0x1234123443214321}));
+  PRINT(__lasx_xvshuf_w(__m256i{0x0000000200000004, 0x0000000700000005,
+                                0x0000000100000003, 0x0000000400000000},
+                        __m256i{0x1122334455667788, 0x99aabbccddeeff00,
+                                0xabcdef1212341234, 0xaabbaabbddeeddee},
+                        __m256i{0xabcdef1314156678, 0x1234123443214321,
+                                0x1234123443214321, 0x5678567856785678}));
+
+  PRINT(__lsx_vshuf_d(__m128i{0x0000000000000001, 0x0000000000000002},
+                      __m128i{0x1122334455667788, 0x99aabbccddeeff00},
+                      __m128i{0xabcdef1314156678, 0x1234123443214321}));
+  PRINT(__lasx_xvshuf_d(__m256i{0x0000000000000000, 0x0000000000000003,
+                                0x0000000000000002, 0x0000000000000001},
+                        __m256i{0x1122334455667788, 0x99aabbccddeeff00,
+                                0xabcdef1212341234, 0xaabbaabbddeeddee},
+                        __m256i{0xabcdef1314156678, 0x1234123443214321,
+                                0x1234123443214321, 0x5678567856785678}));
+
+  PRINT(__lsx_vshuf4i_b(__m128i{0xabcdef1314156678 COMMA 0x1234123443214321},
+                        0x12));
+  PRINT(__lasx_xvshuf4i_b(
+      __m256i{
+          0xabcdef1314156678 COMMA 0x1234123443214321 COMMA 0x1234123443214321 COMMA 0x5678567856785678},
+      0x12));
+
+  PRINT(__lsx_vshuf4i_h(__m128i{0xabcdef1314156678 COMMA 0x1234123443214321},
+                        0x12));
+  PRINT(__lasx_xvshuf4i_h(
+      __m256i{
+          0xabcdef1314156678 COMMA 0x1234123443214321 COMMA 0x1234123443214321 COMMA 0x5678567856785678},
+      0x12));
+
+  PRINT(__lsx_vshuf4i_w(__m128i{0xabcdef1314156678 COMMA 0x1234123443214321},
+                        0x12));
+  PRINT(__lasx_xvshuf4i_w(
+      __m256i{
+          0xabcdef1314156678 COMMA 0x1234123443214321 COMMA 0x1234123443214321 COMMA 0x5678567856785678},
+      0x12));
+
+  PRINT(__lsx_vshuf4i_d(__m128i{0x1122334455667788 COMMA 0x99aabbccddeeff00},
+                        __m128i{0xabcdef1314156678 COMMA 0x1234123443214321},
+                        0x12));
+  PRINT(__lasx_xvshuf4i_d(
+      __m256i{
+          0x1122334455667788 COMMA 0x99aabbccddeeff00 COMMA 0xabcdef1212341234 COMMA 0xaabbaabbddeeddee},
+      __m256i{
+          0xabcdef1314156678 COMMA 0x1234123443214321 COMMA 0x1234123443214321 COMMA 0x5678567856785678},
+      0x12));
 }
