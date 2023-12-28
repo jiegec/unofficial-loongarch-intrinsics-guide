@@ -185,14 +185,14 @@ union v256 {
 void test();
 
 void print(const char *s, v128 num) {
-  printf("v128 as __m128i %s: %016lx %016lx\n", s, num.dword[0], num.dword[1]);
+  printf("v128 as __m128i %s: 0x%016lx 0x%016lx\n", s, num.dword[0], num.dword[1]);
   printf("v128 as __m128 %s: %f %f %f %f\n", s, num.fp32[0], num.fp32[1],
          num.fp32[2], num.fp32[3]);
   printf("v128 as __m128d %s: %lf %lf\n", s, num.fp64[0], num.fp64[1]);
 }
 
 void print(const char *s, __m128i num) {
-  printf("__m128i %s: %016llx %016llx\n", s, num[0], num[1]);
+  printf("__m128i %s: 0x%016llx 0x%016llx\n", s, num[0], num[1]);
 }
 
 void print(const char *s, __m128 num) {
@@ -204,7 +204,7 @@ void print(const char *s, __m128d num) {
 }
 
 void print(const char *s, v256 num) {
-  printf("v256 as __m256i %s: %016lx %016lx %016lx %016lx\n", s, num.dword[0],
+  printf("v256 as __m256i %s: 0x%016lx 0x%016lx 0x%016lx 0x%016lx\n", s, num.dword[0],
          num.dword[1], num.dword[2], num.dword[3]);
   printf("v256 as __m256 %s: %f %f %f %f %f %f %f %f\n", s, num.fp32[0],
          num.fp32[1], num.fp32[2], num.fp32[3], num.fp32[4], num.fp32[5],
@@ -214,7 +214,7 @@ void print(const char *s, v256 num) {
 }
 
 void print(const char *s, __m256i num) {
-  printf("__m256i %s: %016llx %016llx %016llx %016llx\n", s, num[0], num[1],
+  printf("__m256i %s: 0x%016llx 0x%016llx 0x%016llx 0x%016llx\n", s, num[0], num[1],
          num[2], num[3]);
 }
 

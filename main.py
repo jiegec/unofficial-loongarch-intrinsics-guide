@@ -52,7 +52,9 @@ for line in open('code/examples.md', 'r'):
         name = line.split('(')[0].split(' ')[-1]
         if name not in examples:
             examples[name] = []
-        examples[name].append(line.strip())
+        line = line.strip()
+        expr, res = line.split(":")
+        examples[name].append(f"{expr}\n={res}")
 
 # depends on implementation of env.macro()
 def my_macro(env):
