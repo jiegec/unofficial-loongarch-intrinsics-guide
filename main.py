@@ -49,11 +49,12 @@ for cpu in cpus:
 examples = {}
 for line in open('code/examples.md', 'r'):
     if '(' in line:
-        name = line.split('(')[0].split(' ')[-1]
+        name = line.split('(')[0].strip().split(' ')[-1]
         if name not in examples:
             examples[name] = []
         line = line.strip()
         expr, res = line.split(":")
+        expr = expr.replace(" COMMA ", ", ")
         examples[name].append(f"{expr}\n={res}")
 
 # depends on implementation of env.macro()
@@ -127,6 +128,7 @@ def define_env(env):
             intrinsic = intrinsic.replace("m128", "m256").replace("_lsx_", "_lasx_x")
             # replace vr to xr in instr
             instr = re.sub("\\bvr\\b", "xr", instr)
+            intrinsic_name = intrinsic_name.replace("__lsx_", "__lasx_x")
         if not os.path.exists(f"code/{file_name}.h"):
             file_name = instr.split(" ")[0].replace(".", "_")
 

@@ -1,6 +1,28 @@
 #include "common.h"
 
+#define COMMA ,
+
 void test() {
+  // Bitwise Operations
+  PRINT(__lsx_vbitsel_v(__m128i{0x1122334455667788, 0x99aabbccddeeff00},
+                        __m128i{0xabababababababab, 0x1234123443214321},
+                        __m128i{0xffff0000aaaabbbb, 0x1111222233334444}));
+  PRINT(__lasx_xvbitsel_v(__m256i{0x1122334455667788, 0x99aabbccddeeff00,
+                                  0xabcdef1212341234, 0xaabbaabbddeeddee},
+                          __m256i{0xabababababababab, 0x1234123443214321,
+                                  0x1234123443214321, 0x5678567856785678},
+                          __m256i{0xffff0000aaaabbbb, 0x1111222233334444,
+                                  0x00000000ffffffff, 0xffffffff00000000}));
+  PRINT(__lsx_vbitseli_b(__m128i{0x1122334455667788 COMMA 0x99aabbccddeeff00},
+                         __m128i{0xabababababababab COMMA 0x1234123443214321},
+                         0x12));
+  PRINT(__lasx_xvbitseli_b(__m256i{0x1122334455667788 COMMA 0x99aabbccddeeff00 COMMA
+                                   0xabcdef1212341234 COMMA 0xaabbaabbddeeddee},
+                           __m256i{0xabababababababab COMMA 0x1234123443214321 COMMA
+                                   0x1234123443214321 COMMA 0x5678567856785678},
+                           0x12));
+
+  // Misc
   PRINT(__lsx_vmsknz_b(__m128i{0x1122334455667788, 0x99aabbccddeeff00}));
   PRINT(__lsx_vmsknz_b(__m128i{0x0000111100000000, 0x0011000011111111}));
   PRINT(__lasx_xvmsknz_b(__m256i{0x1122334455667788, 0x99aabbccddeeff00,
@@ -42,15 +64,4 @@ void test() {
                                   0xabababab12121212, 0x1234567812345678}));
   PRINT(__lasx_xvmskltz_d(__m256i{0x0000111800000000, 0x0081000081111111,
                                   0x8111000008010101, 0x0000000000000000}));
-
-  PRINT(__lsx_vbitsel_v(__m128i{0x1122334455667788, 0x99aabbccddeeff00},
-                        __m128i{0xabababababababab, 0x1234123443214321},
-                        __m128i{0xffff0000aaaabbbb, 0x1111222233334444}));
-
-  PRINT(__lasx_xvbitsel_v(__m256i{0x1122334455667788, 0x99aabbccddeeff00,
-                                  0xabcdef1212341234, 0xaabbaabbddeeddee},
-                          __m256i{0xabababababababab, 0x1234123443214321,
-                                  0x1234123443214321, 0x5678567856785678},
-                          __m256i{0xffff0000aaaabbbb, 0x1111222233334444,
-                                  0x00000000ffffffff, 0xffffffff00000000}));
 }
