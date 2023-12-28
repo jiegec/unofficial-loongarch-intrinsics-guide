@@ -79,6 +79,166 @@ void test() {
           0xffffffffffffffff COMMA 0x99aabbccddeeff00 COMMA 0xabcdef1212341234 COMMA 0xaabbaabbddeeddee},
       1));
 
+  PRINT(__lsx_vbitset_b(__m128i{0x0000000000000000, 0x99aabbccddeeff00},
+                        __m128i{0xabababababababab, 0x1234123443214321}));
+  PRINT(__lasx_xvbitset_b(__m256i{0x0000000000000000, 0x99aabbccddeeff00,
+                                  0xabcdef1212341234, 0xaabbaabbddeeddee},
+                          __m256i{0xabababababababab, 0x1234123443214321,
+                                  0x1234123443214321, 0x5678567856785678}));
+
+  PRINT(__lsx_vbitset_h(__m128i{0x0000000000000000, 0x99aabbccddeeff00},
+                        __m128i{0xabababababababab, 0x1234123443214321}));
+  PRINT(__lasx_xvbitset_h(__m256i{0x0000000000000000, 0x99aabbccddeeff00,
+                                  0xabcdef1212341234, 0xaabbaabbddeeddee},
+                          __m256i{0xabababababababab, 0x1234123443214321,
+                                  0x1234123443214321, 0x5678567856785678}));
+
+  PRINT(__lsx_vbitset_w(__m128i{0x0000000000000000, 0x99aabbccddeeff00},
+                        __m128i{0xabababababababab, 0x1234123443214321}));
+  PRINT(__lasx_xvbitset_w(__m256i{0x0000000000000000, 0x99aabbccddeeff00,
+                                  0xabcdef1212341234, 0xaabbaabbddeeddee},
+                          __m256i{0xabababababababab, 0x1234123443214321,
+                                  0x1234123443214321, 0x5678567856785678}));
+
+  PRINT(__lsx_vbitset_d(__m128i{0x0000000000000000, 0x99aabbccddeeff00},
+                        __m128i{0xabababababababab, 0x1234123443214321}));
+  PRINT(__lasx_xvbitset_d(__m256i{0x0000000000000000, 0x99aabbccddeeff00,
+                                  0xabcdef1212341234, 0xaabbaabbddeeddee},
+                          __m256i{0xabababababababab, 0x1234123443214321,
+                                  0x1234123443214321, 0x5678567856785678}));
+
+  PRINT(__lsx_vbitseti_b(__m128i{0x0000000000000000 COMMA 0x99aabbccddeeff00},
+                         1));
+  PRINT(__lasx_xvbitseti_b(
+      __m256i{
+          0x0000000000000000 COMMA 0x99aabbccddeeff00 COMMA 0xabcdef1212341234 COMMA 0xaabbaabbddeeddee},
+      1));
+
+  PRINT(__lsx_vbitseti_h(__m128i{0x0000000000000000 COMMA 0x99aabbccddeeff00},
+                         1));
+  PRINT(__lasx_xvbitseti_h(
+      __m256i{
+          0x0000000000000000 COMMA 0x99aabbccddeeff00 COMMA 0xabcdef1212341234 COMMA 0xaabbaabbddeeddee},
+      1));
+
+  PRINT(__lsx_vbitseti_w(__m128i{0x0000000000000000 COMMA 0x99aabbccddeeff00},
+                         1));
+  PRINT(__lasx_xvbitseti_w(
+      __m256i{
+          0x0000000000000000 COMMA 0x99aabbccddeeff00 COMMA 0xabcdef1212341234 COMMA 0xaabbaabbddeeddee},
+      1));
+
+  PRINT(__lsx_vbitseti_d(__m128i{0x0000000000000000 COMMA 0x99aabbccddeeff00},
+                         1));
+  PRINT(__lasx_xvbitseti_d(
+      __m256i{
+          0x0000000000000000 COMMA 0x99aabbccddeeff00 COMMA 0xabcdef1212341234 COMMA 0xaabbaabbddeeddee},
+      1));
+
+  PRINT(__lsx_vbitrev_b(__m128i{0x0f0f0f0f0f0f0f0f, 0x99aabbccddeeff00},
+                        __m128i{0xabababababababab, 0x1234123443214321}));
+  PRINT(__lasx_xvbitrev_b(__m256i{0x0f0f0f0f0f0f0f0f, 0x99aabbccddeeff00,
+                                  0xabcdef1212341234, 0xaabbaabbddeeddee},
+                          __m256i{0xabababababababab, 0x1234123443214321,
+                                  0x1234123443214321, 0x5678567856785678}));
+
+  PRINT(__lsx_vbitrev_h(__m128i{0x0f0f0f0f0f0f0f0f, 0x99aabbccddeeff00},
+                        __m128i{0xabababababababab, 0x1234123443214321}));
+  PRINT(__lasx_xvbitrev_h(__m256i{0x0f0f0f0f0f0f0f0f, 0x99aabbccddeeff00,
+                                  0xabcdef1212341234, 0xaabbaabbddeeddee},
+                          __m256i{0xabababababababab, 0x1234123443214321,
+                                  0x1234123443214321, 0x5678567856785678}));
+
+  PRINT(__lsx_vbitrev_w(__m128i{0x0f0f0f0f0f0f0f0f, 0x99aabbccddeeff00},
+                        __m128i{0xabababababababab, 0x1234123443214321}));
+  PRINT(__lasx_xvbitrev_w(__m256i{0x0f0f0f0f0f0f0f0f, 0x99aabbccddeeff00,
+                                  0xabcdef1212341234, 0xaabbaabbddeeddee},
+                          __m256i{0xabababababababab, 0x1234123443214321,
+                                  0x1234123443214321, 0x5678567856785678}));
+
+  PRINT(__lsx_vbitrev_d(__m128i{0x0f0f0f0f0f0f0f0f, 0x99aabbccddeeff00},
+                        __m128i{0xabababababababab, 0x1234123443214321}));
+  PRINT(__lasx_xvbitrev_d(__m256i{0x0f0f0f0f0f0f0f0f, 0x99aabbccddeeff00,
+                                  0xabcdef1212341234, 0xaabbaabbddeeddee},
+                          __m256i{0xabababababababab, 0x1234123443214321,
+                                  0x1234123443214321, 0x5678567856785678}));
+
+  PRINT(__lsx_vbitrevi_b(__m128i{0x0f0f0f0f0f0f0f0f COMMA 0x99aabbccddeeff00},
+                         1));
+  PRINT(__lasx_xvbitrevi_b(
+      __m256i{
+          0x0f0f0f0f0f0f0f0f COMMA 0x99aabbccddeeff00 COMMA 0xabcdef1212341234 COMMA 0xaabbaabbddeeddee},
+      1));
+
+  PRINT(__lsx_vbitrevi_h(__m128i{0x0f0f0f0f0f0f0f0f COMMA 0x99aabbccddeeff00},
+                         1));
+  PRINT(__lasx_xvbitrevi_h(
+      __m256i{
+          0x0f0f0f0f0f0f0f0f COMMA 0x99aabbccddeeff00 COMMA 0xabcdef1212341234 COMMA 0xaabbaabbddeeddee},
+      1));
+
+  PRINT(__lsx_vbitrevi_w(__m128i{0x0f0f0f0f0f0f0f0f COMMA 0x99aabbccddeeff00},
+                         1));
+  PRINT(__lasx_xvbitrevi_w(
+      __m256i{
+          0x0f0f0f0f0f0f0f0f COMMA 0x99aabbccddeeff00 COMMA 0xabcdef1212341234 COMMA 0xaabbaabbddeeddee},
+      1));
+
+  PRINT(__lsx_vbitrevi_d(__m128i{0x0f0f0f0f0f0f0f0f COMMA 0x99aabbccddeeff00},
+                         1));
+  PRINT(__lasx_xvbitrevi_d(
+      __m256i{
+          0x0f0f0f0f0f0f0f0f COMMA 0x99aabbccddeeff00 COMMA 0xabcdef1212341234 COMMA 0xaabbaabbddeeddee},
+      1));
+
+  PRINT(__lsx_vclo_b(__m128i{0x1122334455667788 COMMA 0x99aabbccddeeff00}));
+  PRINT(__lasx_xvclo_b(__m256i{
+      0x1122334455667788 COMMA 0x99aabbccddeeff00 COMMA 0xabcdef1212341234 COMMA 0xaabbaabbddeeddee}));
+
+  PRINT(__lsx_vclo_h(__m128i{0x1122334455667788 COMMA 0x99aabbccddeeff00}));
+  PRINT(__lasx_xvclo_h(__m256i{
+      0x1122334455667788 COMMA 0x99aabbccddeeff00 COMMA 0xabcdef1212341234 COMMA 0xaabbaabbddeeddee}));
+
+  PRINT(__lsx_vclo_w(__m128i{0x1122334455667788 COMMA 0x99aabbccddeeff00}));
+  PRINT(__lasx_xvclo_w(__m256i{
+      0x1122334455667788 COMMA 0x99aabbccddeeff00 COMMA 0xabcdef1212341234 COMMA 0xaabbaabbddeeddee}));
+
+  PRINT(__lsx_vclo_d(__m128i{0x1122334455667788 COMMA 0x99aabbccddeeff00}));
+  PRINT(__lasx_xvclo_d(__m256i{
+      0x1122334455667788 COMMA 0x99aabbccddeeff00 COMMA 0xabcdef1212341234 COMMA 0xaabbaabbddeeddee}));
+
+  PRINT(__lsx_vclz_b(__m128i{0x1122334455667788 COMMA 0x99aabbccddeeff00}));
+  PRINT(__lasx_xvclz_b(__m256i{
+      0x1122334455667788 COMMA 0x99aabbccddeeff00 COMMA 0xabcdef1212341234 COMMA 0xaabbaabbddeeddee}));
+
+  PRINT(__lsx_vclz_h(__m128i{0x1122334455667788 COMMA 0x99aabbccddeeff00}));
+  PRINT(__lasx_xvclz_h(__m256i{
+      0x1122334455667788 COMMA 0x99aabbccddeeff00 COMMA 0xabcdef1212341234 COMMA 0xaabbaabbddeeddee}));
+
+  PRINT(__lsx_vclz_w(__m128i{0x1122334455667788 COMMA 0x99aabbccddeeff00}));
+  PRINT(__lasx_xvclz_w(__m256i{
+      0x1122334455667788 COMMA 0x99aabbccddeeff00 COMMA 0xabcdef1212341234 COMMA 0xaabbaabbddeeddee}));
+
+  PRINT(__lsx_vclz_d(__m128i{0x1122334455667788 COMMA 0x99aabbccddeeff00}));
+  PRINT(__lasx_xvclz_d(__m256i{
+      0x1122334455667788 COMMA 0x99aabbccddeeff00 COMMA 0xabcdef1212341234 COMMA 0xaabbaabbddeeddee}));
+
+  PRINT(__lsx_vpcnt_b(__m128i{0x1122334455667788 COMMA 0x99aabbccddeeff00}));
+  PRINT(__lasx_xvpcnt_b(__m256i{
+      0x1122334455667788 COMMA 0x99aabbccddeeff00 COMMA 0xabcdef1212341234 COMMA 0xaabbaabbddeeddee}));
+
+  PRINT(__lsx_vpcnt_h(__m128i{0x1122334455667788 COMMA 0x99aabbccddeeff00}));
+  PRINT(__lasx_xvpcnt_h(__m256i{
+      0x1122334455667788 COMMA 0x99aabbccddeeff00 COMMA 0xabcdef1212341234 COMMA 0xaabbaabbddeeddee}));
+
+  PRINT(__lsx_vpcnt_w(__m128i{0x1122334455667788 COMMA 0x99aabbccddeeff00}));
+  PRINT(__lasx_xvpcnt_w(__m256i{
+      0x1122334455667788 COMMA 0x99aabbccddeeff00 COMMA 0xabcdef1212341234 COMMA 0xaabbaabbddeeddee}));
+
+  PRINT(__lsx_vpcnt_d(__m128i{0x1122334455667788 COMMA 0x99aabbccddeeff00}));
+  PRINT(__lasx_xvpcnt_d(__m256i{
+      0x1122334455667788 COMMA 0x99aabbccddeeff00 COMMA 0xabcdef1212341234 COMMA 0xaabbaabbddeeddee}));
+
   // Misc
   PRINT(__lsx_vmsknz_b(__m128i{0x1122334455667788, 0x99aabbccddeeff00}));
   PRINT(__lsx_vmsknz_b(__m128i{0x0000111100000000, 0x0011000011111111}));
