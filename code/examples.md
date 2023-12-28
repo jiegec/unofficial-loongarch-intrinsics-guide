@@ -2,7 +2,23 @@ Testing ./examples
 __m128i __lsx_vbitsel_v(__m128i{0x1122334455667788, 0x99aabbccddeeff00}, __m128i{0xabababababababab, 0x1234123443214321}, __m128i{0xffff0000aaaabbbb, 0x1111222233334444}): 0xabab3344ffeeefab 0x98ba9beccfedfb00
 __m256i __lasx_xvbitsel_v(__m256i{0x1122334455667788, 0x99aabbccddeeff00, 0xabcdef1212341234, 0xaabbaabbddeeddee}, __m256i{0xabababababababab, 0x1234123443214321, 0x1234123443214321, 0x5678567856785678}, __m256i{0xffff0000aaaabbbb, 0x1111222233334444, 0x00000000ffffffff, 0xffffffff00000000}): 0xabab3344ffeeefab 0x98ba9beccfedfb00 0xabcdef1243214321 0x56785678ddeeddee
 __m128i __lsx_vbitseli_b(__m128i{0x1122334455667788 COMMA 0x99aabbccddeeff00}, __m128i{0xabababababababab COMMA 0x1234123443214321}, 0x12): 0xba8b9aabba8b9a23 0x1216123012031221
-__m256i __lasx_xvbitseli_b(__m256i{0x1122334455667788 COMMA 0x99aabbccddeeff00 COMMA 0xabcdef1212341234 COMMA 0xaabbaabbddeeddee}, __m256i{0xabababababababab COMMA 0x1234123443214321 COMMA 0x1234123443214321 COMMA 0x5678567856785678}, 0x12): 0xba8b9aabba8b9a23 0x1216123012031221 0x1230123653115311 0x5652565212121212
+__m256i __lasx_xvbitseli_b( __m256i{ 0x1122334455667788 COMMA 0x99aabbccddeeff00 COMMA 0xabcdef1212341234 COMMA 0xaabbaabbddeeddee}, __m256i{ 0xabababababababab COMMA 0x1234123443214321 COMMA 0x1234123443214321 COMMA 0x5678567856785678}, 0x12): 0xba8b9aabba8b9a23 0x1216123012031221 0x1230123653115311 0x5652565212121212
+__m128i __lsx_vbitclr_b(__m128i{0xffffffffffffffff, 0x99aabbccddeeff00}, __m128i{0xabababababababab, 0x1234123443214321}): 0xf7f7f7f7f7f7f7f7 0x99aabbccd5ecf700
+__m256i __lasx_xvbitclr_b(__m256i{0xffffffffffffffff, 0x99aabbccddeeff00, 0xabcdef1212341234, 0xaabbaabbddeeddee}, __m256i{0xabababababababab, 0x1234123443214321, 0x1234123443214321, 0x5678567856785678}): 0xf7f7f7f7f7f7f7f7 0x99aabbccd5ecf700 0xabcdeb0212341234 0xaabaaaba9dee9dee
+__m128i __lsx_vbitclr_h(__m128i{0xffffffffffffffff, 0x99aabbccddeeff00}, __m128i{0xabababababababab, 0x1234123443214321}): 0xf7fff7fff7fff7ff 0x99aabbccddecff00
+__m256i __lasx_xvbitclr_h(__m256i{0xffffffffffffffff, 0x99aabbccddeeff00, 0xabcdef1212341234, 0xaabbaabbddeeddee}, __m256i{0xabababababababab, 0x1234123443214321, 0x1234123443214321, 0x5678567856785678}): 0xf7fff7fff7fff7ff 0x99aabbccddecff00 0xabcdef0212341234 0xaabbaabbdceedcee
+__m128i __lsx_vbitclr_w(__m128i{0xffffffffffffffff, 0x99aabbccddeeff00}, __m128i{0xabababababababab, 0x1234123443214321}): 0xfffff7fffffff7ff 0x99aabbccddeeff00
+__m256i __lasx_xvbitclr_w(__m256i{0xffffffffffffffff, 0x99aabbccddeeff00, 0xabcdef1212341234, 0xaabbaabbddeeddee}, __m256i{0xabababababababab, 0x1234123443214321, 0x1234123443214321, 0x5678567856785678}): 0xfffff7fffffff7ff 0x99aabbccddeeff00 0xabcdef1212341234 0xaabbaabbdceeddee
+__m128i __lsx_vbitclr_d(__m128i{0xffffffffffffffff, 0x99aabbccddeeff00}, __m128i{0xabababababababab, 0x1234123443214321}): 0xfffff7ffffffffff 0x99aabbccddeeff00
+__m256i __lasx_xvbitclr_d(__m256i{0xffffffffffffffff, 0x99aabbccddeeff00, 0xabcdef1212341234, 0xaabbaabbddeeddee}, __m256i{0xabababababababab, 0x1234123443214321, 0x1234123443214321, 0x5678567856785678}): 0xfffff7ffffffffff 0x99aabbccddeeff00 0xabcdef1012341234 0xaabbaabbddeeddee
+__m128i __lsx_vbitclri_b(__m128i{0xffffffffffffffff COMMA 0x99aabbccddeeff00}, 1): 0xfdfdfdfdfdfdfdfd 0x99a8b9ccddecfd00
+__m256i __lasx_xvbitclri_b( __m256i{ 0xffffffffffffffff COMMA 0x99aabbccddeeff00 COMMA 0xabcdef1212341234 COMMA 0xaabbaabbddeeddee}, 1): 0xfdfdfdfdfdfdfdfd 0x99a8b9ccddecfd00 0xa9cded1010341034 0xa8b9a8b9ddecddec
+__m128i __lsx_vbitclri_h(__m128i{0xffffffffffffffff COMMA 0x99aabbccddeeff00}, 1): 0xfffdfffdfffdfffd 0x99a8bbccddecff00
+__m256i __lasx_xvbitclri_h( __m256i{ 0xffffffffffffffff COMMA 0x99aabbccddeeff00 COMMA 0xabcdef1212341234 COMMA 0xaabbaabbddeeddee}, 1): 0xfffdfffdfffdfffd 0x99a8bbccddecff00 0xabcdef1012341234 0xaab9aab9ddecddec
+__m128i __lsx_vbitclri_w(__m128i{0xffffffffffffffff COMMA 0x99aabbccddeeff00}, 1): 0xfffffffdfffffffd 0x99aabbccddeeff00
+__m256i __lasx_xvbitclri_w( __m256i{ 0xffffffffffffffff COMMA 0x99aabbccddeeff00 COMMA 0xabcdef1212341234 COMMA 0xaabbaabbddeeddee}, 1): 0xfffffffdfffffffd 0x99aabbccddeeff00 0xabcdef1012341234 0xaabbaab9ddeeddec
+__m128i __lsx_vbitclri_d(__m128i{0xffffffffffffffff COMMA 0x99aabbccddeeff00}, 1): 0xfffffffffffffffd 0x99aabbccddeeff00
+__m256i __lasx_xvbitclri_d( __m256i{ 0xffffffffffffffff COMMA 0x99aabbccddeeff00 COMMA 0xabcdef1212341234 COMMA 0xaabbaabbddeeddee}, 1): 0xfffffffffffffffd 0x99aabbccddeeff00 0xabcdef1212341234 0xaabbaabbddeeddec
 __m128i __lsx_vmsknz_b(__m128i{0x1122334455667788, 0x99aabbccddeeff00}): 0x000000000000feff 0x0000000000000000
 __m128i __lsx_vmsknz_b(__m128i{0x0000111100000000, 0x0011000011111111}): 0x0000000000004f30 0x0000000000000000
 __m256i __lasx_xvmsknz_b(__m256i{0x1122334455667788, 0x99aabbccddeeff00, 0xabababab12121212, 0x1234567812345678}): 0x000000000000feff 0x0000000000000000 0x000000000000ffff 0x0000000000000000
