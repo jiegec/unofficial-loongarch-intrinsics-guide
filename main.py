@@ -45,6 +45,14 @@ for cpu in cpus:
                 "throughput(cpi)": throughput_cpi,
             }
 
+# read examples
+examples = {}
+for line in open('code/examples.md', 'r'):
+    if '(' in line:
+        name = line.split('(')[0].split(' ')[-1]
+        if name not in examples:
+            examples[name] = []
+        examples[name].append(line.strip())
 
 # depends on implementation of env.macro()
 def my_macro(env):
@@ -103,11 +111,14 @@ def define_env(env):
         global cur_simd
         # try to be smart
         file_name = None
+        intrinsic_name = ""
         for part in intrinsic.split(" "):
             if part.startswith("__lsx_"):
                 file_name = part[6:]
+                intrinsic_name = part
             elif part.startswith("__lasx_"):
                 file_name = part[7:]
+                intrinsic_name = part
         if cur_simd == "lasx" and file_name[0] != "x":
             file_name = "x" + file_name
             instr = "x" + instr
@@ -150,6 +161,18 @@ def define_env(env):
         else:
             latency_throughput = ""
 
+        if intrinsic_name in examples:
+            inner = "\n".join(examples[intrinsic_name])
+            examples_text = f"""
+### Examples
+
+```c++
+{inner}
+```
+"""
+        else:
+            examples_text = ""
+
         return f"""
 ## {intrinsic}
 
@@ -165,6 +188,8 @@ CPU Flags: {cur_simd.upper()}
 ### Description
 
 {desc}
+
+{examples_text}
 
 ### Operation
 
