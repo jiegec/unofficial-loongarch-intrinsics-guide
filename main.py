@@ -1636,7 +1636,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
         return instruction(
             intrinsic=f"__m128i __lsx_vld (void * addr, imm_n2048_2047 offset)",
             instr=f"vld vr, r, imm",
-            desc=f"Read whole vector from memory address `addr + offset`, save the data into `dst`.",
+            desc=f"Read whole vector from memory address `addr + offset`, save the data into `dst`. Note that you can use this intrinsic to load floating point vectors, even though the return type represents integer vectors.",
         )
 
     @my_macro(env)
@@ -1644,7 +1644,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
         return instruction(
             intrinsic=f"__m128i __lsx_vldx (void * addr, long int offset)",
             instr=f"vldx vr, r, r",
-            desc=f"Read whole vector from memory address `addr + offset`, save the data into `dst`.",
+            desc=f"Read whole vector from memory address `addr + offset`, save the data into `dst`.  Note that you can use this intrinsic to load floating point vectors, even though the return type represents integer vectors.",
         )
 
     @my_macro(env)
