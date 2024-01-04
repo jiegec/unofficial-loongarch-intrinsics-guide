@@ -113,8 +113,8 @@ Here is a table of a mapping from AVX intrinsics to their LASX counterpart (WIP)
 | _mm256_cvtss_f32            |                    |
 | _mm256_cvttpd_epi32         |                    |
 | _mm256_cvttps_epi32         |                    |
-| _mm256_div_pd               |                    |
-| _mm256_div_ps               |                    |
+| _mm256_div_pd               | __lasx_xvfdiv_d    |
+| _mm256_div_ps               | __lasx_xvfdiv_s    |
 | _mm256_dp_ps                |                    |
 | _mm256_dpbssd_epi32         |                    |
 | _mm256_dpbssds_epi32        |                    |
@@ -216,22 +216,22 @@ Here is a table of a mapping from AVX intrinsics to their LASX counterpart (WIP)
 | _mm256_maskstore_epi64      |                    |
 | _mm256_maskstore_pd         |                    |
 | _mm256_maskstore_ps         |                    |
-| _mm256_max_epi16            |                    |
-| _mm256_max_epi32            |                    |
-| _mm256_max_epi8             |                    |
-| _mm256_max_epu16            |                    |
-| _mm256_max_epu32            |                    |
-| _mm256_max_epu8             |                    |
-| _mm256_max_pd               |                    |
-| _mm256_max_ps               |                    |
-| _mm256_min_epi16            |                    |
-| _mm256_min_epi32            |                    |
-| _mm256_min_epi8             |                    |
-| _mm256_min_epu16            |                    |
-| _mm256_min_epu32            |                    |
-| _mm256_min_epu8             |                    |
-| _mm256_min_pd               |                    |
-| _mm256_min_ps               |                    |
+| _mm256_max_epi16            | __lasx_xvmax_h     |
+| _mm256_max_epi32            | __lasx_xvmax_w     |
+| _mm256_max_epi8             | __lasx_xvmax_b     |
+| _mm256_max_epu16            | __lasx_xvmax_hu    |
+| _mm256_max_epu32            | __lasx_xvmax_wu    |
+| _mm256_max_epu8             | __lasx_xvmax_bu    |
+| _mm256_max_pd               | __lasx_xvfmax_d    |
+| _mm256_max_ps               | __lasx_xvfmax_s    |
+| _mm256_min_epi16            | __lasx_xvmin_h     |
+| _mm256_min_epi32            | __lasx_xvmin_w     |
+| _mm256_min_epi8             | __lasx_xvmin_b     |
+| _mm256_min_epu16            | __lasx_xvmin_hu    |
+| _mm256_min_epu32            | __lasx_xvmin_wu    |
+| _mm256_min_epu8             | __lasx_xvmin_bu    |
+| _mm256_min_pd               | __lasx_xvfmin_d    |
+| _mm256_min_ps               | __lasx_xvfmin_s    |
 | _mm256_movedup_pd           |                    |
 | _mm256_movehdup_ps          |                    |
 | _mm256_moveldup_ps          |                    |
@@ -241,8 +241,8 @@ Here is a table of a mapping from AVX intrinsics to their LASX counterpart (WIP)
 | _mm256_mpsadbw_epu8         |                    |
 | _mm256_mul_epi32            |                    |
 | _mm256_mul_epu32            |                    |
-| _mm256_mul_pd               |                    |
-| _mm256_mul_ps               |                    |
+| _mm256_mul_pd               | __lasx_xvfmul_d    |
+| _mm256_mul_ps               | __lasx_xvfmul_s    |
 | _mm256_mulhi_epi16          |                    |
 | _mm256_mulhi_epu16          |                    |
 | _mm256_mulhrs_epi16         |                    |
@@ -250,7 +250,7 @@ Here is a table of a mapping from AVX intrinsics to their LASX counterpart (WIP)
 | _mm256_mullo_epi32          |                    |
 | _mm256_or_pd                |                    |
 | _mm256_or_ps                |                    |
-| _mm256_or_si256             |                    |
+| _mm256_or_si256             | __lasx_xvor_v      |
 | _mm256_packs_epi16          |                    |
 | _mm256_packs_epi32          |                    |
 | _mm256_packus_epi16         |                    |
@@ -311,12 +311,12 @@ Here is a table of a mapping from AVX intrinsics to their LASX counterpart (WIP)
 | _mm256_sign_epi16           |                    |
 | _mm256_sign_epi32           |                    |
 | _mm256_sign_epi8            |                    |
-| _mm256_sll_epi16            |                    |
-| _mm256_sll_epi32            |                    |
-| _mm256_sll_epi64            |                    |
-| _mm256_slli_epi16           |                    |
-| _mm256_slli_epi32           |                    |
-| _mm256_slli_epi64           |                    |
+| _mm256_sll_epi16            | __lasx_xvsll_h     |
+| _mm256_sll_epi32            | __lasx_xvsll_w     |
+| _mm256_sll_epi64            | __lasx_xvsll_d     |
+| _mm256_slli_epi16           | __lasx_xvslli_h    |
+| _mm256_slli_epi32           | __lasx_xvslli_w    |
+| _mm256_slli_epi64           | __lasx_xvslli_d    |
 | _mm256_slli_si256           |                    |
 | _mm256_sllv_epi32           |                    |
 | _mm256_sllv_epi64           |                    |
@@ -324,17 +324,17 @@ Here is a table of a mapping from AVX intrinsics to their LASX counterpart (WIP)
 | _mm256_sm4rnds4_epi32       |                    |
 | _mm256_sqrt_pd              |                    |
 | _mm256_sqrt_ps              |                    |
-| _mm256_sra_epi16            |                    |
-| _mm256_sra_epi32            |                    |
-| _mm256_srai_epi16           |                    |
-| _mm256_srai_epi32           |                    |
+| _mm256_sra_epi16            | __lasx_xvsra_h     |
+| _mm256_sra_epi32            | __lasx_xvsra_w     |
+| _mm256_srai_epi16           | __lasx_xvsrai_h    |
+| _mm256_srai_epi32           | __lasx_xvsrai_w    |
 | _mm256_srav_epi32           |                    |
-| _mm256_srl_epi16            |                    |
-| _mm256_srl_epi32            |                    |
-| _mm256_srl_epi64            |                    |
-| _mm256_srli_epi16           |                    |
-| _mm256_srli_epi32           |                    |
-| _mm256_srli_epi64           |                    |
+| _mm256_srl_epi16            | __lasx_xvsrl_h     |
+| _mm256_srl_epi32            | __lasx_xvsrl_w     |
+| _mm256_srl_epi64            | __lasx_xvsrl_d     |
+| _mm256_srli_epi16           | __lasx_xvsrli_h    |
+| _mm256_srli_epi32           | __lasx_xvsrli_w    |
+| _mm256_srli_epi64           | __lasx_xvsrli_d    |
 | _mm256_srli_si256           |                    |
 | _mm256_srlv_epi32           |                    |
 | _mm256_srlv_epi64           |                    |
@@ -351,12 +351,12 @@ Here is a table of a mapping from AVX intrinsics to their LASX counterpart (WIP)
 | _mm256_stream_pd            |                    |
 | _mm256_stream_ps            |                    |
 | _mm256_stream_si256         |                    |
-| _mm256_sub_epi16            |                    |
-| _mm256_sub_epi32            |                    |
-| _mm256_sub_epi64            |                    |
-| _mm256_sub_epi8             |                    |
-| _mm256_sub_pd               |                    |
-| _mm256_sub_ps               |                    |
+| _mm256_sub_epi16            | __lasx_xvsub_h     |
+| _mm256_sub_epi32            | __lasx_xvsub_w     |
+| _mm256_sub_epi64            | __lasx_xvsub_d     |
+| _mm256_sub_epi8             | __lasx_xvsub_b     |
+| _mm256_sub_pd               | __lasx_xvfsub_d    |
+| _mm256_sub_ps               | __lasx_xvfsub_s    |
 | _mm256_subs_epi16           |                    |
 | _mm256_subs_epi8            |                    |
 | _mm256_subs_epu16           |                    |
@@ -373,16 +373,16 @@ Here is a table of a mapping from AVX intrinsics to their LASX counterpart (WIP)
 | _mm256_undefined_pd         |                    |
 | _mm256_undefined_ps         |                    |
 | _mm256_undefined_si256      |                    |
-| _mm256_unpackhi_epi16       |                    |
-| _mm256_unpackhi_epi32       |                    |
-| _mm256_unpackhi_epi64       |                    |
-| _mm256_unpackhi_epi8        |                    |
+| _mm256_unpackhi_epi16       | __lasx_xvilvh_h    |
+| _mm256_unpackhi_epi32       | __lasx_xvilvh_w    |
+| _mm256_unpackhi_epi64       | __lasx_xvilvh_d    |
+| _mm256_unpackhi_epi8        | __lasx_xvilvh_b    |
 | _mm256_unpackhi_pd          |                    |
 | _mm256_unpackhi_ps          |                    |
-| _mm256_unpacklo_epi16       |                    |
-| _mm256_unpacklo_epi32       |                    |
-| _mm256_unpacklo_epi64       |                    |
-| _mm256_unpacklo_epi8        |                    |
+| _mm256_unpacklo_epi16       | __lasx_xvilvl_h    |
+| _mm256_unpacklo_epi32       | __lasx_xvilvl_w    |
+| _mm256_unpacklo_epi64       | __lasx_xvilvl_d    |
+| _mm256_unpacklo_epi8        | __lasx_xvilvl_b    |
 | _mm256_unpacklo_pd          |                    |
 | _mm256_unpacklo_ps          |                    |
 | _mm256_xor_pd               |                    |
