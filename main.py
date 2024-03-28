@@ -1539,7 +1539,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
         return instruction(
             intrinsic=f"__m128 __lsx_vffint_s_l (__m128i a, __m128i b)",
             instr=f"vffint.s.l vr, vr, vr",
-            desc=f"Convert 32-bit integer elements in `a` and `b` to single-precision floating point numbers.",
+            desc=f"Convert 64-bit integer elements in `a` and `b` to single-precision floating point numbers.",
         )
 
     @my_macro(env)
