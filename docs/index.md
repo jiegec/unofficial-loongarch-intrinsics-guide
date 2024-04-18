@@ -5,3 +5,27 @@ This is the Unofficial LoongArch Intrinsics Guide by Jiajie Chen et, al. The doc
 - QEMU
 - GCC
 - Observations from real hardware incl. 3C5000 and 3A6000
+
+The guide provides pseudo code for the SIMD intrinsics. The code assumes that the elements of the LSX/LASX vector registers can be accessed via members of a `union`:
+
+```cpp
+union lsx_register {
+  uint8_t byte[16];
+  uint16_t half[8];
+  uint32_t word[4];
+  uint64_t dword[2];
+  uint128_t qword[1];
+  float fp32[4];
+  double fp64[2];
+};
+
+union lasx_register {
+  uint8_t byte[32];
+  uint16_t half[16];
+  uint32_t word[8];
+  uint64_t dword[4];
+  uint128_t qword[2];
+  float fp32[8];
+  double fp64[4];
+};
+```
