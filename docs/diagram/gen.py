@@ -96,11 +96,11 @@ def add_line(f, from_row, from_col, from_index, to_row, to_col, to_index):
     print(f'<line x1="{x1}" y1="{y1}" x2="{x2}" y2="{y2}" stroke="black" />', file=f)
 
 
-def __lasx_xvshuf_d():
+def xvshuf_d():
     global elen, vlen
     elen = 64
     vlen = 256
-    with open("__lasx_xvshuf_d.svg", "w") as f:
+    with open("xvshuf_d.svg", "w") as f:
         init(f, 3, 2)
         add_row(f)
         add_box(f, "b", "data", indices=[3, 2, 3, 2])
@@ -142,4 +142,4 @@ def __lasx_xvshuf_d():
 
 
 if __name__ == "__main__":
-    __lasx_xvshuf_d()
+    xvshuf_d()

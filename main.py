@@ -139,6 +139,11 @@ def define_env(env):
         else:
             tested = ""
 
+        if os.path.exists(f"docs/diagram/{file_name}.svg"):
+            diagram = f'![](../diagram/{file_name}.svg)'
+        else:
+            diagram = ""
+
         global measure
         global cpus
         instr_name = instr.split(" ")[0].replace(".", "_")
@@ -192,6 +197,8 @@ CPU Flags: {cur_simd.upper()}
 ### Description
 
 {desc}
+
+{diagram}
 
 {examples_text}
 
