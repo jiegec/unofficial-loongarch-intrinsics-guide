@@ -7,9 +7,9 @@ row_space = 100
 index_x = 20
 arg_x = 100
 desc_y_off = 15
-element_x = 20
-element_x_unit = 1
-col_space = 320
+element_x = 10
+element_x_unit = 2
+col_space = 570
 box_height = 26
 
 
@@ -96,50 +96,46 @@ def add_line(f, from_row, from_col, from_index, to_row, to_col, to_index):
     print(f'<line x1="{x1}" y1="{y1}" x2="{x2}" y2="{y2}" stroke="black" />', file=f)
 
 
-def xvshuf_d():
+def xvshuf():
     global elen, vlen
-    elen = 64
-    vlen = 256
-    with open("xvshuf_d.svg", "w") as f:
-        init(f, 3, 2)
-        add_row(f)
-        add_box(f, "b", "data", indices=[3, 2, 3, 2])
-        add_box(
-            f,
-            "c",
-            "data",
-            indices=[1, 0, 1, 0],
-        )
-        add_row(f)
-        add_box(f, "a", "indices")
-        add_row(f)
-        add_box(f, "ret", "returns")
+    for el, name in [(64, "d"), (32, "w"), (16, "h"), (8, "b")]:
+        elen = el
+        vlen = 256
+        with open(f"xvshuf_{name}.svg", "w") as f:
+            init(f, 3, 2)
+            add_row(f)
+            add_box(
+                f,
+                "b" if elen > 8 else "a",
+                "data",
+                indices=list(range(vlen // elen - 1, vlen // elen // 2 - 1, -1)) * 2,
+            )
+            add_box(
+                f,
+                "c" if elen > 8 else "b",
+                "data",
+                indices=list(range(vlen // elen // 2 - 1, -1, -1)) * 2,
+            )
+            add_row(f)
+            add_box(f, "a" if elen > 8 else "c", "indices")
+            add_row(f)
+            add_box(f, "ret", "returns")
 
-        # b to a
-        add_line(f, 1, 0, 0, 2, 0, 0)
-        add_line(f, 1, 0, 0, 2, 0, 1)
-        add_line(f, 1, 0, 1, 2, 0, 0)
-        add_line(f, 1, 0, 1, 2, 0, 1)
-        add_line(f, 1, 0, 2, 2, 0, 2)
-        add_line(f, 1, 0, 2, 2, 0, 3)
-        add_line(f, 1, 0, 3, 2, 0, 2)
-        add_line(f, 1, 0, 3, 2, 0, 3)
+            # b to a & c to a
+            for i in range(vlen // elen // 2):
+                for j in range(vlen // elen // 2):
+                    add_line(f, 1, 0, j, 2, 0, i)
+                    add_line(f, 1, 1, j, 2, 0, i)
+            for i in range(vlen // elen // 2, vlen // elen):
+                for j in range(vlen // elen // 2, vlen // elen):
+                    add_line(f, 1, 0, j, 2, 0, i)
+                    add_line(f, 1, 1, j, 2, 0, i)
 
-        # c to a
-        add_line(f, 1, 1, 0, 2, 0, 0)
-        add_line(f, 1, 1, 0, 2, 0, 1)
-        add_line(f, 1, 1, 1, 2, 0, 0)
-        add_line(f, 1, 1, 1, 2, 0, 1)
-        add_line(f, 1, 1, 2, 2, 0, 2)
-        add_line(f, 1, 1, 2, 2, 0, 3)
-        add_line(f, 1, 1, 3, 2, 0, 2)
-        add_line(f, 1, 1, 3, 2, 0, 3)
-
-        # a to ret
-        for i in range(vlen // elen):
-            add_line(f, 2, 0, i, 3, 0, i)
-        end(f)
+            # a to ret
+            for i in range(vlen // elen):
+                add_line(f, 2, 0, i, 3, 0, i)
+            end(f)
 
 
 if __name__ == "__main__":
-    xvshuf_d()
+    xvshuf()
