@@ -9,11 +9,16 @@ arg_x = 100
 desc_y_off = 15
 element_x = 10
 element_x_unit = 2
-col_space = 570
+col_space = -1
 box_height = 26
 
 
 def init(f, rows, cols):
+    global col_space
+    if vlen == 256:
+        col_space = 570
+    else:
+        col_space = 300
     print(
         f"""<svg version="1.1"
      width="{cols * col_space + arg_x}" height="{rows * row_space + 50}"
@@ -136,28 +141,31 @@ def xvshuf():
                 add_line(f, 2, 0, i, 3, 0, i)
             end(f)
 
+
 def xvshuf4i_bhw():
     global elen, vlen
-    for el, name in [(32, "w"), (16, "h"), (8, "b")]:
-        elen = el
-        vlen = 256
-        with open(f"xvshuf4i_{name}.svg", "w") as f:
-            init(f, 2, 1)
-            add_row(f)
-            add_box(
-                f,
-                "a",
-                "data",
-                indices=list(range(3, -1, -1)) * (vlen // el // 4),
-            )
-            add_row(f)
-            add_box(f, "ret", "returns")
+    for vl, prefix in [(256, "xv"), (128, "v")]:
+        for el, name in [(32, "w"), (16, "h"), (8, "b")]:
+            elen = el
+            vlen = vl
+            with open(f"{prefix}shuf4i_{name}.svg", "w") as f:
+                init(f, 2, 1)
+                add_row(f)
+                add_box(
+                    f,
+                    "a",
+                    "data",
+                    indices=list(range(3, -1, -1)) * (vlen // el // 4),
+                )
+                add_row(f)
+                add_box(f, "ret", "returns")
 
-            # a to returns
-            for i in range(vlen // elen):
-                for j in range(4):
-                    add_line(f, 1, 0, i, 2, 0, i // 4 * 4 + j)
-            end(f)
+                # a to returns
+                for i in range(vlen // elen):
+                    for j in range(4):
+                        add_line(f, 1, 0, i, 2, 0, i // 4 * 4 + j)
+                end(f)
+
 
 def xvshuf4i_d():
     global elen, vlen
@@ -200,7 +208,80 @@ def xvshuf4i_d():
         add_line(f, 1, 1, 1, 2, 0, 0)
         end(f)
 
+
+def vshuf():
+    global elen, vlen
+    for el, name in [(64, "d"), (32, "w"), (16, "h"), (8, "b")]:
+        elen = el
+        vlen = 128
+        with open(f"vshuf_{name}.svg", "w") as f:
+            init(f, 3, 2)
+            add_row(f)
+            add_box(
+                f,
+                "b" if elen > 8 else "a",
+                "data",
+                indices=list(range(vlen // elen * 2 - 1, vlen // elen - 1, -1)),
+            )
+            add_box(
+                f,
+                "c" if elen > 8 else "b",
+                "data",
+                indices=list(range(vlen // elen - 1, -1, -1)),
+            )
+            add_row(f)
+            add_box(f, "a" if elen > 8 else "c", "indices")
+            add_row(f)
+            add_box(f, "ret", "returns")
+
+            # b to a & c to a
+            for i in range(vlen // elen):
+                for j in range(vlen // elen):
+                    add_line(f, 1, 0, j, 2, 0, i)
+                    add_line(f, 1, 1, j, 2, 0, i)
+
+            # a to ret
+            for i in range(vlen // elen):
+                add_line(f, 2, 0, i, 3, 0, i)
+            end(f)
+
+def vshuf4i_d():
+    global elen, vlen
+    elen = 64
+    vlen = 128
+    with open("vshuf4i_d.svg", "w") as f:
+        init(f, 2, 2)
+        add_row(f)
+        add_box(
+            f,
+            "b",
+            "data",
+            indices=[3, 2],
+        )
+        add_box(
+            f,
+            "a",
+            "data",
+            indices=[1, 0],
+        )
+        add_row(f)
+        add_box(f, "ret", "returns")
+
+        # a & b to returns
+        add_line(f, 1, 0, 0, 2, 0, 1)
+        add_line(f, 1, 0, 1, 2, 0, 1)
+        add_line(f, 1, 1, 0, 2, 0, 1)
+        add_line(f, 1, 1, 1, 2, 0, 1)
+        add_line(f, 1, 0, 0, 2, 0, 0)
+        add_line(f, 1, 0, 1, 2, 0, 0)
+        add_line(f, 1, 1, 0, 2, 0, 0)
+        add_line(f, 1, 1, 1, 2, 0, 0)
+        end(f)
+
+
 if __name__ == "__main__":
     xvshuf()
     xvshuf4i_bhw()
     xvshuf4i_d()
+    vshuf()
+    vshuf4i_d()
