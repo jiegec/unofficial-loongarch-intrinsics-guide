@@ -10,5 +10,6 @@ plugins:
   #     separator: '[\s\-\._]+' # add "_" and "."
   - macros:
       include_dir: code
+  - glightbox
 extra_css:
   - main.css
