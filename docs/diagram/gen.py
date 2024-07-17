@@ -107,7 +107,7 @@ def xvshuf():
         elen = el
         vlen = 256
         with open(f"xvshuf_{name}.svg", "w") as f:
-            init(f, 3, 2)
+            init(f, 4, 2)
             add_row(f)
             add_box(
                 f,
@@ -122,23 +122,30 @@ def xvshuf():
                 indices=list(range(vlen // elen // 2 - 1, -1, -1)) * 2,
             )
             add_row(f)
+            add_box(f, "hi", "merged", indices=list(range(vlen // elen - 1, -1, -1)))
+            add_box(f, "lo", "merged", indices=list(range(vlen // elen - 1, -1, -1)))
+            add_row(f)
             add_box(f, "a" if elen > 8 else "c", "indices")
             add_row(f)
             add_box(f, "ret", "returns")
 
-            # b to a & c to a
+            # b to merge & c to merge
             for i in range(vlen // elen // 2):
+                add_line(f, 1, 0, i, 2, 0, i)
+                add_line(f, 1, 0, i + vlen // elen // 2, 2, 1, i)
+            for i in range(vlen // elen // 2):
+                add_line(f, 1, 1, i, 2, 0, i + vlen // elen // 2)
+                add_line(f, 1, 1, i + vlen // elen // 2, 2, 1, i + vlen // elen // 2)
+
+            # merge to a
+            for i in range(vlen // elen):
                 for j in range(vlen // elen // 2):
-                    add_line(f, 1, 0, j, 2, 0, i)
-                    add_line(f, 1, 1, j, 2, 0, i)
-            for i in range(vlen // elen // 2, vlen // elen):
-                for j in range(vlen // elen // 2, vlen // elen):
-                    add_line(f, 1, 0, j, 2, 0, i)
-                    add_line(f, 1, 1, j, 2, 0, i)
+                    add_line(f, 2, 0, i, 3, 0, j)
+                    add_line(f, 2, 1, i, 3, 0, j + vlen // elen // 2)
 
             # a to ret
             for i in range(vlen // elen):
-                add_line(f, 2, 0, i, 3, 0, i)
+                add_line(f, 3, 0, i, 4, 0, i)
             end(f)
 
 
