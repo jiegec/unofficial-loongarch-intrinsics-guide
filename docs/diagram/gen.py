@@ -16,7 +16,7 @@ box_height = 26
 def init(f, rows, cols):
     global col_space
     if vlen == 256:
-        col_space = 570
+        col_space = 575
     else:
         col_space = 300
     print(
@@ -179,7 +179,7 @@ def xvshuf4i_d():
     elen = 64
     vlen = 256
     with open("xvshuf4i_d.svg", "w") as f:
-        init(f, 2, 2)
+        init(f, 3, 2)
         add_row(f)
         add_box(
             f,
@@ -194,25 +194,37 @@ def xvshuf4i_d():
             indices=[1, 0, 1, 0],
         )
         add_row(f)
+        add_box(
+            f,
+            "hi",
+            "merged",
+            indices=[3, 2, 1, 0],
+        )
+        add_box(
+            f,
+            "lo",
+            "merged",
+            indices=[3, 2, 1, 0],
+        )
+        add_row(f)
         add_box(f, "ret", "returns")
 
-        # a & b to returns
-        add_line(f, 1, 0, 2, 2, 0, 3)
-        add_line(f, 1, 0, 3, 2, 0, 3)
-        add_line(f, 1, 1, 2, 2, 0, 3)
-        add_line(f, 1, 1, 3, 2, 0, 3)
-        add_line(f, 1, 0, 2, 2, 0, 2)
-        add_line(f, 1, 0, 3, 2, 0, 2)
-        add_line(f, 1, 1, 2, 2, 0, 2)
-        add_line(f, 1, 1, 3, 2, 0, 2)
-        add_line(f, 1, 0, 0, 2, 0, 1)
-        add_line(f, 1, 0, 1, 2, 0, 1)
-        add_line(f, 1, 1, 0, 2, 0, 1)
-        add_line(f, 1, 1, 1, 2, 0, 1)
+        # a & b to merged
         add_line(f, 1, 0, 0, 2, 0, 0)
-        add_line(f, 1, 0, 1, 2, 0, 0)
-        add_line(f, 1, 1, 0, 2, 0, 0)
-        add_line(f, 1, 1, 1, 2, 0, 0)
+        add_line(f, 1, 0, 1, 2, 0, 1)
+        add_line(f, 1, 0, 2, 2, 1, 0)
+        add_line(f, 1, 0, 3, 2, 1, 1)
+        add_line(f, 1, 1, 0, 2, 0, 2)
+        add_line(f, 1, 1, 1, 2, 0, 3)
+        add_line(f, 1, 1, 2, 2, 1, 2)
+        add_line(f, 1, 1, 3, 2, 1, 3)
+
+        # merged to returns
+        for i in range(4):
+            add_line(f, 2, 0, i, 3, 0, 0)
+            add_line(f, 2, 0, i, 3, 0, 1)
+            add_line(f, 2, 1, i, 3, 0, 2)
+            add_line(f, 2, 1, i, 3, 0, 3)
         end(f)
 
 
