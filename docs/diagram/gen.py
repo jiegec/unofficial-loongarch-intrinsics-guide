@@ -136,6 +136,71 @@ def xvshuf():
                 add_line(f, 2, 0, i, 3, 0, i)
             end(f)
 
+def xvshuf4i_bhw():
+    global elen, vlen
+    for el, name in [(32, "w"), (16, "h"), (8, "b")]:
+        elen = el
+        vlen = 256
+        with open(f"xvshuf4i_{name}.svg", "w") as f:
+            init(f, 2, 1)
+            add_row(f)
+            add_box(
+                f,
+                "a",
+                "data",
+                indices=list(range(3, -1, -1)) * (vlen // el // 4),
+            )
+            add_row(f)
+            add_box(f, "ret", "returns")
+
+            # a to returns
+            for i in range(vlen // elen):
+                for j in range(4):
+                    add_line(f, 1, 0, i, 2, 0, i // 4 * 4 + j)
+            end(f)
+
+def xvshuf4i_d():
+    global elen, vlen
+    elen = 64
+    vlen = 256
+    with open("xvshuf4i_d.svg", "w") as f:
+        init(f, 2, 2)
+        add_row(f)
+        add_box(
+            f,
+            "b",
+            "data",
+            indices=[3, 2, 3, 2],
+        )
+        add_box(
+            f,
+            "a",
+            "data",
+            indices=[1, 0, 1, 0],
+        )
+        add_row(f)
+        add_box(f, "ret", "returns")
+
+        # a & b to returns
+        add_line(f, 1, 0, 2, 2, 0, 3)
+        add_line(f, 1, 0, 3, 2, 0, 3)
+        add_line(f, 1, 1, 2, 2, 0, 3)
+        add_line(f, 1, 1, 3, 2, 0, 3)
+        add_line(f, 1, 0, 2, 2, 0, 2)
+        add_line(f, 1, 0, 3, 2, 0, 2)
+        add_line(f, 1, 1, 2, 2, 0, 2)
+        add_line(f, 1, 1, 3, 2, 0, 2)
+        add_line(f, 1, 0, 0, 2, 0, 1)
+        add_line(f, 1, 0, 1, 2, 0, 1)
+        add_line(f, 1, 1, 0, 2, 0, 1)
+        add_line(f, 1, 1, 1, 2, 0, 1)
+        add_line(f, 1, 0, 0, 2, 0, 0)
+        add_line(f, 1, 0, 1, 2, 0, 0)
+        add_line(f, 1, 1, 0, 2, 0, 0)
+        add_line(f, 1, 1, 1, 2, 0, 0)
+        end(f)
 
 if __name__ == "__main__":
     xvshuf()
+    xvshuf4i_bhw()
+    xvshuf4i_d()
