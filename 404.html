@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="/unofficial-loongarch-intrinsics-guide/img/favicon.ico" />
+    <title>Unofficial LoongArch Intrinsics Guide</title>
+    <link rel="stylesheet" href="/unofficial-loongarch-intrinsics-guide/css/theme.css" />
+    <link rel="stylesheet" href="/unofficial-loongarch-intrinsics-guide/css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="/unofficial-loongarch-intrinsics-guide/main.css" rel="stylesheet" />
+    
+    <!--[if lt IE 9]>
+      <script src="/unofficial-loongarch-intrinsics-guide/js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="/unofficial-loongarch-intrinsics-guide/." class="icon icon-home"> Unofficial LoongArch Intrinsics Guide
+        </a>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="/unofficial-loongarch-intrinsics-guide/.">Unofficial LoongArch Intrinsics Guide</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="/unofficial-loongarch-intrinsics-guide/latency_throughput/">Latency and Throughput of Instructions</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="/unofficial-loongarch-intrinsics-guide/migrating_avx/">Migrating from AVX to LASX</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="/unofficial-loongarch-intrinsics-guide/migrating_sse/">Migrating from SSE to LSX</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="/unofficial-loongarch-intrinsics-guide/viewer/">Browse All Intrinsics</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Lasx</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/unofficial-loongarch-intrinsics-guide/lasx/bitwise_operations/">Bitwise Operations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/unofficial-loongarch-intrinsics-guide/lasx/branch/">Branch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/unofficial-loongarch-intrinsics-guide/lasx/float_comparison/">Floating Point Comparison</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/unofficial-loongarch-intrinsics-guide/lasx/float_computation/">Floating Point Computation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/unofficial-loongarch-intrinsics-guide/lasx/float_conversion/">Floating Point Conversion</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/unofficial-loongarch-intrinsics-guide/lasx/float_misc/">Floating Point Misc</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/unofficial-loongarch-intrinsics-guide/lasx/fma/">Fused Multiply-Add</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/unofficial-loongarch-intrinsics-guide/lasx/integer_comparison/">Integer Comparison</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/unofficial-loongarch-intrinsics-guide/lasx/integer_computation/">Integer Computation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/unofficial-loongarch-intrinsics-guide/lasx/logical/">Logical</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/unofficial-loongarch-intrinsics-guide/lasx/memory/">Memory Load & Store</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/unofficial-loongarch-intrinsics-guide/lasx/misc/">Misc</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/unofficial-loongarch-intrinsics-guide/lasx/permutation/">Permutation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/unofficial-loongarch-intrinsics-guide/lasx/shift/">Shift</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/unofficial-loongarch-intrinsics-guide/lasx/shuffling/">Shuffling</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Lsx</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/unofficial-loongarch-intrinsics-guide/lsx/bitwise_operations/">Bitwise Operations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/unofficial-loongarch-intrinsics-guide/lsx/branch/">Branch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/unofficial-loongarch-intrinsics-guide/lsx/float_comparison/">Floating Point Comparison</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/unofficial-loongarch-intrinsics-guide/lsx/float_computation/">Floating Point Computation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/unofficial-loongarch-intrinsics-guide/lsx/float_conversion/">Floating Point Conversion</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/unofficial-loongarch-intrinsics-guide/lsx/float_misc/">Floating Point Misc</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/unofficial-loongarch-intrinsics-guide/lsx/fma/">Fused Multiply-Add</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/unofficial-loongarch-intrinsics-guide/lsx/integer_comparison/">Integer Comparison</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/unofficial-loongarch-intrinsics-guide/lsx/integer_computation/">Integer Computation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/unofficial-loongarch-intrinsics-guide/lsx/logical/">Logical</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/unofficial-loongarch-intrinsics-guide/lsx/memory/">Memory Load & Store</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/unofficial-loongarch-intrinsics-guide/lsx/misc/">Misc</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/unofficial-loongarch-intrinsics-guide/lsx/permutation/">Permutation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/unofficial-loongarch-intrinsics-guide/lsx/shift/">Shift</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/unofficial-loongarch-intrinsics-guide/lsx/shuffling/">Shuffling</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="/unofficial-loongarch-intrinsics-guide/.">Unofficial LoongArch Intrinsics Guide</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="/unofficial-loongarch-intrinsics-guide/." class="icon icon-home" aria-label="Docs"></a></li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+  <h1 id="404-page-not-found">404</h1>
+
+  <p><strong>Page not found</strong></p>
+
+
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p>Copyright &copy; 2023 Jiajie Chen</p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+    
+  </span>
+</div>
+    <script src="/unofficial-loongarch-intrinsics-guide/js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "/unofficial-loongarch-intrinsics-guide/";</script>
+    <script src="/unofficial-loongarch-intrinsics-guide/js/theme_extra.js"></script>
+    <script src="/unofficial-loongarch-intrinsics-guide/js/theme.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
