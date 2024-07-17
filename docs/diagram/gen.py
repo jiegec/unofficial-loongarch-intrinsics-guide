@@ -234,7 +234,7 @@ def vshuf():
         elen = el
         vlen = 128
         with open(f"vshuf_{name}.svg", "w") as f:
-            init(f, 3, 2)
+            init(f, 4, 2)
             add_row(f)
             add_box(
                 f,
@@ -249,19 +249,33 @@ def vshuf():
                 indices=list(range(vlen // elen - 1, -1, -1)),
             )
             add_row(f)
+            # draw with double width
+            vlen = 256
+            add_box(
+                f,
+                "temp",
+                "merged",
+                indices=list(range(vlen // elen - 1, -1, -1)),
+            )
+            vlen = 128
+            add_row(f)
             add_box(f, "a" if elen > 8 else "c", "indices")
             add_row(f)
             add_box(f, "ret", "returns")
 
-            # b to a & c to a
+            # b to merged & c to merged
             for i in range(vlen // elen):
+                add_line(f, 1, 0, i, 2, 0, i)
+                add_line(f, 1, 1, i, 2, 0, i + vlen // elen)
+
+            # merged to a
+            for i in range(vlen // elen * 2):
                 for j in range(vlen // elen):
-                    add_line(f, 1, 0, j, 2, 0, i)
-                    add_line(f, 1, 1, j, 2, 0, i)
+                    add_line(f, 2, 0, i, 3, 0, j)
 
             # a to ret
             for i in range(vlen // elen):
-                add_line(f, 2, 0, i, 3, 0, i)
+                add_line(f, 3, 0, i, 4, 0, i)
             end(f)
 
 def vshuf4i_d():
