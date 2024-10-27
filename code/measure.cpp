@@ -228,8 +228,8 @@ int main(int argc, char *argv[]) {
       base_name = name.substr(0, tp_index);
       printf("%s: throughput 1/%.2lf=%.2lf instructions\n", it.name, cycles,
              1.0 / cycles);
-      info[base_name].throughput_cpi = 1.0 / cycles;
-      info[base_name].throughput_ipc = cycles;
+      info[base_name].throughput_ipc = 1.0 / cycles;
+      info[base_name].throughput_cpi = cycles;
     } else {
       base_name = name;
 
@@ -258,7 +258,7 @@ int main(int argc, char *argv[]) {
   FILE *fp = fopen("measure-3A6000.csv", "w");
 #endif
   assert(fp);
-  fprintf(fp, "name,latency,throughput(cpi),throughput(ipc)\n");
+  fprintf(fp, "name,latency,throughput(ipc),throughput(cpi)\n");
   for (auto pair : info) {
     std::string latency;
     auto entry = pair.second;
@@ -271,7 +271,7 @@ int main(int argc, char *argv[]) {
       latency += buffer;
     }
     fprintf(fp, "%s,%s,%.2lf,%.2lf\n", pair.first.c_str(), latency.c_str(),
-            entry.throughput_cpi, entry.throughput_ipc);
+            entry.throughput_ipc, entry.throughput_cpi);
   }
   printf("Result written to measure.csv\n");
 }

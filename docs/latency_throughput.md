@@ -1,5 +1,5 @@
 # Latency and Throughput of Instructions
 
-Latency and throughput (CPI) of each instruction:
+Latency and throughput (IPC) of each instruction:
 
 {{ latency_throughput_table() }}

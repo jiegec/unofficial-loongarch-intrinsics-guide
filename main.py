@@ -28,21 +28,21 @@ for cpu in cpus:
                 latency.append(lat)
             latency = sorted(list(set(latency)))
 
-            throughput_cpi = float(row["throughput(cpi)"])
-            if abs(throughput_cpi - round(throughput_cpi)) < 0.03:
-                throughput_cpi = round(throughput_cpi)
+            throughput_ipc = float(row["throughput(ipc)"])
+            if abs(throughput_ipc - round(throughput_ipc)) < 0.03:
+                throughput_ipc = round(throughput_ipc)
 
-            # handle small cpi better by 1/ipc
-            if throughput_cpi < 1.0:
-                throughput_ipc = float(row["throughput(ipc)"])
-                if abs(throughput_ipc - round(throughput_ipc)) < 0.03:
-                    throughput_ipc = round(throughput_ipc)
+            # handle small ipc better by 1/cpi
+            if throughput_ipc < 1.0:
+                throughput_cpi = float(row["throughput(cpi)"])
+                if abs(throughput_cpi - round(throughput_cpi)) < 0.03:
+                    throughput_cpi = round(throughput_cpi)
 
-                throughput_cpi = f"{throughput_cpi}(1/{throughput_ipc})"
+                throughput_ipc = f"{throughput_ipc}(1/{throughput_cpi})"
 
             measure[cpu][row["name"]] = {
                 "latency": ", ".join(map(str, latency)),
-                "throughput(cpi)": throughput_cpi,
+                "throughput(ipc)": throughput_ipc,
             }
 
 # read examples
@@ -154,13 +154,13 @@ def define_env(env):
             if instr_name in measure[cpu]:
                 show_cpus.append(cpu)
                 latencies.append(measure[cpu][instr_name]["latency"])
-                throughputs.append(measure[cpu][instr_name]["throughput(cpi)"])
+                throughputs.append(measure[cpu][instr_name]["throughput(ipc)"])
 
         if len(show_cpus) > 0:
             latency_throughput = f"""
 ### Latency and Throughput
 
-| CPU | Latency | Throughput (CPI) |
+| CPU | Latency | Throughput (IPC) |
 |-----|---------|------------------|
 """
             for i in range(len(show_cpus)):
@@ -1929,7 +1929,7 @@ Initialize `dst` using predefined patterns:
             result += f"<th colspan=2>{cpu}</th>"
         result += f"</tr><tr>"
         for cpu in cpus:
-            result += f"<th>Latency</th><th>Throughput (CPI)</th>"
+            result += f"<th>Latency</th><th>Throughput (IPC)</th>"
         result += f"</tr></thead>"
 
         result += "<tbody>"
@@ -1944,7 +1944,7 @@ Initialize `dst` using predefined patterns:
             result += f"<td>{inst.replace('_', '.')}</td>"
             for cpu in cpus:
                 result += f"<td>{measure[cpu][inst]['latency']}</td>"
-                result += f"<td>{measure[cpu][inst]['throughput(cpi)']}</td>"
+                result += f"<td>{measure[cpu][inst]['throughput(ipc)']}</td>"
             result += "</tr>"
 
         result += "</tbody>"

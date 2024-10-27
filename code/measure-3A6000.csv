@@ -1,4 +1,4 @@
-name,latency,throughput(cpi),throughput(ipc)
+name,latency,throughput(ipc),throughput(cpi)
 vabsd_b,2.00,2.00,0.50
 vabsd_bu,2.00,2.00,0.50
 vabsd_d,2.00,2.00,0.50
