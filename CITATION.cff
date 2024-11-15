@@ -6,7 +6,7 @@ authors:
 - family-names: Chenguang
   given-names: Wang
 title: "Unofficial LoongArch Intrinsics Guide"
-version: v20240115.1
+version: v20241115.1
 identifiers:
   - type: doi
     value: 10.5281/zenodo.14169508
