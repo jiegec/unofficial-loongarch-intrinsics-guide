@@ -1,0 +1,4674 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://jia.je/unofficial-loongarch-intrinsics-guide/lsx/misc/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Misc - Unofficial LoongArch Intrinsics Guide</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../../main.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Misc";
+        var mkdocs_page_input_path = "lsx/misc.md";
+        var mkdocs_page_url = "/unofficial-loongarch-intrinsics-guide/lsx/misc/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+ <link href="../../assets/stylesheets/glightbox.min.css" rel="stylesheet"/><style>
+    html.glightbox-open { overflow: initial; height: 100%; }
+    .gslide-title { margin-top: 0px; user-select: text; }
+    .gslide-desc { color: #666; user-select: text; }
+    .gslide-image img { background: white; }</style> <script src="../../assets/javascripts/glightbox.min.js"></script></head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> Unofficial LoongArch Intrinsics Guide
+        </a>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Unofficial LoongArch Intrinsics Guide</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../latency_throughput/">Latency and Throughput of Instructions</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../migrating_avx/">Migrating from AVX to LASX</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../migrating_sse/">Migrating from SSE to LSX</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../viewer/">Browse All Intrinsics</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Lasx</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lasx/bitwise_operations/">Bitwise Operations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lasx/branch/">Branch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lasx/float_comparison/">Floating Point Comparison</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lasx/float_computation/">Floating Point Computation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lasx/float_conversion/">Floating Point Conversion</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lasx/float_misc/">Floating Point Misc</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lasx/fma/">Fused Multiply-Add</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lasx/integer_comparison/">Integer Comparison</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lasx/integer_computation/">Integer Computation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lasx/logical/">Logical</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lasx/memory/">Memory Load & Store</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lasx/misc/">Misc</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lasx/permutation/">Permutation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lasx/shift/">Shift</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lasx/shuffling/">Shuffling</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Lsx</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../bitwise_operations/">Bitwise Operations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../branch/">Branch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../float_comparison/">Floating Point Comparison</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../float_computation/">Floating Point Computation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../float_conversion/">Floating Point Conversion</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../float_misc/">Floating Point Misc</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../fma/">Fused Multiply-Add</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../integer_comparison/">Integer Comparison</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../integer_computation/">Integer Computation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../logical/">Logical</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../memory/">Memory Load & Store</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Misc</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vexth_h_b-__m128i-a">__m128i __lsx_vexth_h_b (__m128i a)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vexth_hu_bu-__m128i-a">__m128i __lsx_vexth_hu_bu (__m128i a)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_1">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_1">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_1">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_1">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vexth_w_h-__m128i-a">__m128i __lsx_vexth_w_h (__m128i a)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_2">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_2">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_2">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_2">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vexth_wu_hu-__m128i-a">__m128i __lsx_vexth_wu_hu (__m128i a)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_3">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_3">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_3">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_3">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vexth_d_w-__m128i-a">__m128i __lsx_vexth_d_w (__m128i a)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_4">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_4">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_4">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_4">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vexth_du_wu-__m128i-a">__m128i __lsx_vexth_du_wu (__m128i a)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_5">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_5">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_5">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_5">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vexth_q_d-__m128i-a">__m128i __lsx_vexth_q_d (__m128i a)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_6">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_6">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_6">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_6">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vexth_qu_du-__m128i-a">__m128i __lsx_vexth_qu_du (__m128i a)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_7">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_7">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_7">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_7">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vextl_q_d-__m128i-a">__m128i __lsx_vextl_q_d (__m128i a)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_8">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_8">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_8">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_8">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vextl_qu_du-__m128i-a">__m128i __lsx_vextl_qu_du (__m128i a)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_9">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_9">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_9">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_9">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vextrins_b-__m128i-a-__m128i-b-imm0_255-imm">__m128i __lsx_vextrins_b (__m128i a, __m128i b, imm0_255 imm)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_10">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_10">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_10">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_10">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vextrins_h-__m128i-a-__m128i-b-imm0_255-imm">__m128i __lsx_vextrins_h (__m128i a, __m128i b, imm0_255 imm)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_11">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_11">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_11">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_11">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vextrins_w-__m128i-a-__m128i-b-imm0_255-imm">__m128i __lsx_vextrins_w (__m128i a, __m128i b, imm0_255 imm)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_12">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_12">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_12">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_12">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vextrins_d-__m128i-a-__m128i-b-imm0_255-imm">__m128i __lsx_vextrins_d (__m128i a, __m128i b, imm0_255 imm)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_13">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_13">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_13">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_13">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vilvh_b-__m128i-a-__m128i-b">__m128i __lsx_vilvh_b (__m128i a, __m128i b)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_14">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_14">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_14">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_14">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vilvh_h-__m128i-a-__m128i-b">__m128i __lsx_vilvh_h (__m128i a, __m128i b)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_15">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_15">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_15">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_15">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vilvh_w-__m128i-a-__m128i-b">__m128i __lsx_vilvh_w (__m128i a, __m128i b)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_16">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_16">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_16">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_16">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vilvh_d-__m128i-a-__m128i-b">__m128i __lsx_vilvh_d (__m128i a, __m128i b)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_17">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_17">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_17">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_17">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vilvl_b-__m128i-a-__m128i-b">__m128i __lsx_vilvl_b (__m128i a, __m128i b)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_18">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_18">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_18">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_18">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vilvl_h-__m128i-a-__m128i-b">__m128i __lsx_vilvl_h (__m128i a, __m128i b)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_19">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_19">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_19">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_19">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vilvl_w-__m128i-a-__m128i-b">__m128i __lsx_vilvl_w (__m128i a, __m128i b)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_20">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_20">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_20">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_20">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vilvl_d-__m128i-a-__m128i-b">__m128i __lsx_vilvl_d (__m128i a, __m128i b)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_21">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_21">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_21">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_21">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vinsgr2vr_b-__m128i-a-int-b-imm0_15-imm">__m128i __lsx_vinsgr2vr_b (__m128i a, int b, imm0_15 imm)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_22">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_22">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_22">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_22">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vinsgr2vr_h-__m128i-a-int-b-imm0_7-imm">__m128i __lsx_vinsgr2vr_h (__m128i a, int b, imm0_7 imm)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_23">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_23">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_23">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_23">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vinsgr2vr_w-__m128i-a-int-b-imm0_3-imm">__m128i __lsx_vinsgr2vr_w (__m128i a, int b, imm0_3 imm)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_24">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_24">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_24">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_24">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vinsgr2vr_d-__m128i-a-long-int-b-imm0_1-imm">__m128i __lsx_vinsgr2vr_d (__m128i a, long int b, imm0_1 imm)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_25">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_25">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_25">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_25">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vfrstp_b-__m128i-a-__m128i-b-__m128i-c">__m128i __lsx_vfrstp_b (__m128i a, __m128i b, __m128i c)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_26">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_26">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_26">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_26">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vfrstp_h-__m128i-a-__m128i-b-__m128i-c">__m128i __lsx_vfrstp_h (__m128i a, __m128i b, __m128i c)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_27">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_27">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_27">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_27">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vfrstpi_b-__m128i-a-__m128i-b-imm0_31-imm">__m128i __lsx_vfrstpi_b (__m128i a, __m128i b, imm0_31 imm)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_28">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_28">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_28">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_28">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vfrstpi_h-__m128i-a-__m128i-b-imm0_31-imm">__m128i __lsx_vfrstpi_h (__m128i a, __m128i b, imm0_31 imm)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_29">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_29">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_29">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_29">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vmskgez_b-__m128i-a">__m128i __lsx_vmskgez_b (__m128i a)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_30">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_30">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#examples">Examples</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_30">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_30">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vmskltz_b-__m128i-a">__m128i __lsx_vmskltz_b (__m128i a)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_31">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_31">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#examples_1">Examples</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_31">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_31">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vmskltz_h-__m128i-a">__m128i __lsx_vmskltz_h (__m128i a)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_32">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_32">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#examples_2">Examples</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_32">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_32">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vmskltz_w-__m128i-a">__m128i __lsx_vmskltz_w (__m128i a)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_33">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_33">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#examples_3">Examples</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_33">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_33">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vmskltz_d-__m128i-a">__m128i __lsx_vmskltz_d (__m128i a)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_34">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_34">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#examples_4">Examples</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_34">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_34">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vmsknz_b-__m128i-a">__m128i __lsx_vmsknz_b (__m128i a)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_35">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_35">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#examples_5">Examples</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_35">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_35">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vpackev_b-__m128i-a-__m128i-b">__m128i __lsx_vpackev_b (__m128i a, __m128i b)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_36">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_36">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_36">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_36">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vpackev_h-__m128i-a-__m128i-b">__m128i __lsx_vpackev_h (__m128i a, __m128i b)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_37">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_37">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_37">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_37">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vpackev_w-__m128i-a-__m128i-b">__m128i __lsx_vpackev_w (__m128i a, __m128i b)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_38">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_38">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_38">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_38">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vpackev_d-__m128i-a-__m128i-b">__m128i __lsx_vpackev_d (__m128i a, __m128i b)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_39">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_39">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_39">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_39">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vpackod_b-__m128i-a-__m128i-b">__m128i __lsx_vpackod_b (__m128i a, __m128i b)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_40">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_40">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_40">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_40">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vpackod_h-__m128i-a-__m128i-b">__m128i __lsx_vpackod_h (__m128i a, __m128i b)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_41">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_41">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_41">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_41">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vpackod_w-__m128i-a-__m128i-b">__m128i __lsx_vpackod_w (__m128i a, __m128i b)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_42">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_42">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_42">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_42">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vpackod_d-__m128i-a-__m128i-b">__m128i __lsx_vpackod_d (__m128i a, __m128i b)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_43">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_43">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_43">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_43">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vpickev_b-__m128i-a-__m128i-b">__m128i __lsx_vpickev_b (__m128i a, __m128i b)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_44">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_44">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_44">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_44">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vpickev_h-__m128i-a-__m128i-b">__m128i __lsx_vpickev_h (__m128i a, __m128i b)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_45">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_45">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_45">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_45">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vpickev_w-__m128i-a-__m128i-b">__m128i __lsx_vpickev_w (__m128i a, __m128i b)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_46">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_46">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_46">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_46">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vpickev_d-__m128i-a-__m128i-b">__m128i __lsx_vpickev_d (__m128i a, __m128i b)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_47">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_47">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_47">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_47">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#int-__lsx_vpickve2gr_b-__m128i-a-imm0_15-idx">int __lsx_vpickve2gr_b (__m128i a, imm0_15 idx)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_48">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_48">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_48">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_48">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#unsigned-int-__lsx_vpickve2gr_bu-__m128i-a-imm0_15-idx">unsigned int __lsx_vpickve2gr_bu (__m128i a, imm0_15 idx)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_49">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_49">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_49">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_49">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#int-__lsx_vpickve2gr_h-__m128i-a-imm0_7-idx">int __lsx_vpickve2gr_h (__m128i a, imm0_7 idx)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_50">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_50">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_50">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_50">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#unsigned-int-__lsx_vpickve2gr_hu-__m128i-a-imm0_7-idx">unsigned int __lsx_vpickve2gr_hu (__m128i a, imm0_7 idx)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_51">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_51">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_51">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_51">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#int-__lsx_vpickve2gr_w-__m128i-a-imm0_3-idx">int __lsx_vpickve2gr_w (__m128i a, imm0_3 idx)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_52">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_52">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_52">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_52">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#unsigned-int-__lsx_vpickve2gr_wu-__m128i-a-imm0_3-idx">unsigned int __lsx_vpickve2gr_wu (__m128i a, imm0_3 idx)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_53">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_53">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_53">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_53">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#long-int-__lsx_vpickve2gr_d-__m128i-a-imm0_1-idx">long int __lsx_vpickve2gr_d (__m128i a, imm0_1 idx)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_54">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_54">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_54">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_54">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#unsigned-long-int-__lsx_vpickve2gr_du-__m128i-a-imm0_1-idx">unsigned long int __lsx_vpickve2gr_du (__m128i a, imm0_1 idx)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_55">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_55">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_55">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_55">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vpickod_b-__m128i-a-__m128i-b">__m128i __lsx_vpickod_b (__m128i a, __m128i b)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_56">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_56">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_56">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_56">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vpickod_h-__m128i-a-__m128i-b">__m128i __lsx_vpickod_h (__m128i a, __m128i b)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_57">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_57">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_57">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_57">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vpickod_w-__m128i-a-__m128i-b">__m128i __lsx_vpickod_w (__m128i a, __m128i b)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_58">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_58">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_58">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_58">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vpickod_d-__m128i-a-__m128i-b">__m128i __lsx_vpickod_d (__m128i a, __m128i b)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_59">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_59">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_59">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_59">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vrepli_b-imm_n512_511-imm">__m128i __lsx_vrepli_b (imm_n512_511 imm)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_60">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_60">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_60">Operation</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vrepli_h-imm_n512_511-imm">__m128i __lsx_vrepli_h (imm_n512_511 imm)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_61">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_61">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_61">Operation</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vrepli_w-imm_n512_511-imm">__m128i __lsx_vrepli_w (imm_n512_511 imm)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_62">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_62">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_62">Operation</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vrepli_d-imm_n512_511-imm">__m128i __lsx_vrepli_d (imm_n512_511 imm)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_63">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_63">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_63">Operation</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vreplgr2vr_b-int-val">__m128i __lsx_vreplgr2vr_b (int val)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_64">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_64">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_64">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_60">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vreplgr2vr_h-int-val">__m128i __lsx_vreplgr2vr_h (int val)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_65">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_65">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_65">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_61">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vreplgr2vr_w-int-val">__m128i __lsx_vreplgr2vr_w (int val)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_66">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_66">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_66">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_62">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vreplgr2vr_d-long-int-val">__m128i __lsx_vreplgr2vr_d (long int val)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_67">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_67">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_67">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_63">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vreplve_b-__m128i-a-int-idx">__m128i __lsx_vreplve_b (__m128i a, int idx)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_68">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_68">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_68">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_64">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vreplve_h-__m128i-a-int-idx">__m128i __lsx_vreplve_h (__m128i a, int idx)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_69">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_69">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_69">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_65">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vreplve_w-__m128i-a-int-idx">__m128i __lsx_vreplve_w (__m128i a, int idx)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_70">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_70">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_70">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_66">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vreplve_d-__m128i-a-int-idx">__m128i __lsx_vreplve_d (__m128i a, int idx)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_71">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_71">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_71">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_67">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vreplvei_b-__m128i-a-imm0_15-idx">__m128i __lsx_vreplvei_b (__m128i a, imm0_15 idx)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_72">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_72">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_72">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_68">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vreplvei_h-__m128i-a-imm0_7-idx">__m128i __lsx_vreplvei_h (__m128i a, imm0_7 idx)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_73">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_73">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_73">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_69">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vreplvei_w-__m128i-a-imm0_3-idx">__m128i __lsx_vreplvei_w (__m128i a, imm0_3 idx)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_74">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_74">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_74">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_70">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vreplvei_d-__m128i-a-imm0_1-idx">__m128i __lsx_vreplvei_d (__m128i a, imm0_1 idx)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_75">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_75">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_75">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_71">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vsat_b-__m128i-a-imm0_7-imm">__m128i __lsx_vsat_b (__m128i a, imm0_7 imm)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_76">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_76">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_76">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_72">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vsat_bu-__m128i-a-imm0_7-imm">__m128i __lsx_vsat_bu (__m128i a, imm0_7 imm)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_77">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_77">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_77">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_73">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vsat_h-__m128i-a-imm0_15-imm">__m128i __lsx_vsat_h (__m128i a, imm0_15 imm)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_78">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_78">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_78">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_74">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vsat_hu-__m128i-a-imm0_15-imm">__m128i __lsx_vsat_hu (__m128i a, imm0_15 imm)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_79">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_79">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_79">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_75">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vsat_w-__m128i-a-imm0_31-imm">__m128i __lsx_vsat_w (__m128i a, imm0_31 imm)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_80">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_80">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_80">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_76">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vsat_wu-__m128i-a-imm0_31-imm">__m128i __lsx_vsat_wu (__m128i a, imm0_31 imm)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_81">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_81">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_81">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_77">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vsat_d-__m128i-a-imm0_63-imm">__m128i __lsx_vsat_d (__m128i a, imm0_63 imm)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_82">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_82">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_82">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_78">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vsat_du-__m128i-a-imm0_63-imm">__m128i __lsx_vsat_du (__m128i a, imm0_63 imm)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_83">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_83">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_83">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_79">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vsigncov_b-__m128i-a-__m128i-b">__m128i __lsx_vsigncov_b (__m128i a, __m128i b)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_84">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_84">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_84">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_80">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vsigncov_h-__m128i-a-__m128i-b">__m128i __lsx_vsigncov_h (__m128i a, __m128i b)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_85">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_85">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_85">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_81">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vsigncov_w-__m128i-a-__m128i-b">__m128i __lsx_vsigncov_w (__m128i a, __m128i b)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_86">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_86">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_86">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_82">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vsigncov_d-__m128i-a-__m128i-b">__m128i __lsx_vsigncov_d (__m128i a, __m128i b)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_87">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_87">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_87">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_83">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m128i-__lsx_vldi-imm_n1024_1023-imm">__m128i __lsx_vldi (imm_n1024_1023 imm)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_88">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_88">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_88">Operation</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../permutation/">Permutation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../shift/">Shift</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../shuffling/">Shuffling</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">Unofficial LoongArch Intrinsics Guide</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Lsx</li>
+      <li class="breadcrumb-item active">Misc</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="misc">Misc</h1>
+<h2 id="__m128i-__lsx_vexth_h_b-__m128i-a">__m128i __lsx_vexth_h_b (__m128i a)</h2>
+<h3 id="synopsis">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vexth_h_b (__m128i a)
+#include &lt;lsxintrin.h&gt;
+Instruction: vexth.h.b vr, vr
+CPU Flags: LSX
+</code></pre>
+<h3 id="description">Description</h3>
+<p>Extend signed 8-bit elements in the higher half of <code>a</code> to 16-bit.</p>
+<h3 id="operation">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 8; i++) {
+  dst.half[i] = (s16)(s8)a.byte[8 + i];
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vexth_hu_bu-__m128i-a">__m128i __lsx_vexth_hu_bu (__m128i a)</h2>
+<h3 id="synopsis_1">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vexth_hu_bu (__m128i a)
+#include &lt;lsxintrin.h&gt;
+Instruction: vexth.hu.bu vr, vr
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_1">Description</h3>
+<p>Extend unsigned 8-bit elements in the higher half of <code>a</code> to 16-bit.</p>
+<h3 id="operation_1">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 8; i++) {
+  dst.half[i] = (u16)(u8)a.byte[8 + i];
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_1">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vexth_w_h-__m128i-a">__m128i __lsx_vexth_w_h (__m128i a)</h2>
+<h3 id="synopsis_2">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vexth_w_h (__m128i a)
+#include &lt;lsxintrin.h&gt;
+Instruction: vexth.w.h vr, vr
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_2">Description</h3>
+<p>Extend signed 16-bit elements in the higher half of <code>a</code> to 32-bit.</p>
+<h3 id="operation_2">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 4; i++) {
+  dst.word[i] = (s32)(s16)a.half[4 + i];
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_2">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vexth_wu_hu-__m128i-a">__m128i __lsx_vexth_wu_hu (__m128i a)</h2>
+<h3 id="synopsis_3">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vexth_wu_hu (__m128i a)
+#include &lt;lsxintrin.h&gt;
+Instruction: vexth.wu.hu vr, vr
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_3">Description</h3>
+<p>Extend unsigned 16-bit elements in the higher half of <code>a</code> to 32-bit.</p>
+<h3 id="operation_3">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 4; i++) {
+  dst.word[i] = (u32)(u16)a.half[4 + i];
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_3">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vexth_d_w-__m128i-a">__m128i __lsx_vexth_d_w (__m128i a)</h2>
+<h3 id="synopsis_4">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vexth_d_w (__m128i a)
+#include &lt;lsxintrin.h&gt;
+Instruction: vexth.d.w vr, vr
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_4">Description</h3>
+<p>Extend signed 32-bit elements in the higher half of <code>a</code> to 64-bit.</p>
+<h3 id="operation_4">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 2; i++) {
+  dst.dword[i] = (s64)(s32)a.word[2 + i];
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_4">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vexth_du_wu-__m128i-a">__m128i __lsx_vexth_du_wu (__m128i a)</h2>
+<h3 id="synopsis_5">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vexth_du_wu (__m128i a)
+#include &lt;lsxintrin.h&gt;
+Instruction: vexth.du.wu vr, vr
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_5">Description</h3>
+<p>Extend unsigned 32-bit elements in the higher half of <code>a</code> to 64-bit.</p>
+<h3 id="operation_5">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 2; i++) {
+  dst.dword[i] = (u64)(u32)a.word[2 + i];
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_5">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vexth_q_d-__m128i-a">__m128i __lsx_vexth_q_d (__m128i a)</h2>
+<h3 id="synopsis_6">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vexth_q_d (__m128i a)
+#include &lt;lsxintrin.h&gt;
+Instruction: vexth.q.d vr, vr
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_6">Description</h3>
+<p>Extend signed 64-bit elements in the higher half of <code>a</code> to 128-bit.</p>
+<h3 id="operation_6">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 1; i++) {
+  dst.qword[i] = (s128)(s64)a.dword[1 + i];
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_6">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vexth_qu_du-__m128i-a">__m128i __lsx_vexth_qu_du (__m128i a)</h2>
+<h3 id="synopsis_7">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vexth_qu_du (__m128i a)
+#include &lt;lsxintrin.h&gt;
+Instruction: vexth.qu.du vr, vr
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_7">Description</h3>
+<p>Extend unsigned 64-bit elements in the higher half of <code>a</code> to 128-bit.</p>
+<h3 id="operation_7">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 1; i++) {
+  dst.qword[i] = (u128)(u64)a.dword[1 + i];
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_7">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vextl_q_d-__m128i-a">__m128i __lsx_vextl_q_d (__m128i a)</h2>
+<h3 id="synopsis_8">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vextl_q_d (__m128i a)
+#include &lt;lsxintrin.h&gt;
+Instruction: vextl.q.d vr, vr
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_8">Description</h3>
+<p>Extend signed 64-bit elements in the lower half of <code>a</code> to 128-bit.</p>
+<h3 id="operation_8">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 1; i++) {
+  dst.qword[i] = (s128)(s64)a.dword[i];
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_8">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vextl_qu_du-__m128i-a">__m128i __lsx_vextl_qu_du (__m128i a)</h2>
+<h3 id="synopsis_9">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vextl_qu_du (__m128i a)
+#include &lt;lsxintrin.h&gt;
+Instruction: vextl.qu.du vr, vr
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_9">Description</h3>
+<p>Extend unsigned 64-bit elements in the lower half of <code>a</code> to 128-bit.</p>
+<h3 id="operation_9">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 1; i++) {
+  dst.qword[i] = (u128)(u64)a.dword[i];
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_9">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vextrins_b-__m128i-a-__m128i-b-imm0_255-imm">__m128i __lsx_vextrins_b (__m128i a, __m128i b, imm0_255 imm)</h2>
+<h3 id="synopsis_10">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vextrins_b (__m128i a, __m128i b, imm0_255 imm)
+#include &lt;lsxintrin.h&gt;
+Instruction: vextrins.b vr, vr, imm
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_10">Description</h3>
+<p>Extract one 8-bit element in <code>b</code> and insert it to <code>a</code> according to <code>imm</code>.</p>
+<h3 id="operation_10">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 16; i++) {
+  dst.byte[i] = (i == ((imm &gt;&gt; 4) &amp; 15)) ? b.byte[imm &amp; 15] : a.byte[i];
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_10">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vextrins_h-__m128i-a-__m128i-b-imm0_255-imm">__m128i __lsx_vextrins_h (__m128i a, __m128i b, imm0_255 imm)</h2>
+<h3 id="synopsis_11">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vextrins_h (__m128i a, __m128i b, imm0_255 imm)
+#include &lt;lsxintrin.h&gt;
+Instruction: vextrins.h vr, vr, imm
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_11">Description</h3>
+<p>Extract one 16-bit element in <code>b</code> and insert it to <code>a</code> according to <code>imm</code>.</p>
+<h3 id="operation_11">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 8; i++) {
+  dst.half[i] = (i == ((imm &gt;&gt; 4) &amp; 7)) ? b.half[imm &amp; 7] : a.half[i];
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_11">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vextrins_w-__m128i-a-__m128i-b-imm0_255-imm">__m128i __lsx_vextrins_w (__m128i a, __m128i b, imm0_255 imm)</h2>
+<h3 id="synopsis_12">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vextrins_w (__m128i a, __m128i b, imm0_255 imm)
+#include &lt;lsxintrin.h&gt;
+Instruction: vextrins.w vr, vr, imm
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_12">Description</h3>
+<p>Extract one 32-bit element in <code>b</code> and insert it to <code>a</code> according to <code>imm</code>.</p>
+<h3 id="operation_12">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 4; i++) {
+  dst.word[i] = (i == ((imm &gt;&gt; 4) &amp; 3)) ? b.word[imm &amp; 3] : a.word[i];
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_12">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vextrins_d-__m128i-a-__m128i-b-imm0_255-imm">__m128i __lsx_vextrins_d (__m128i a, __m128i b, imm0_255 imm)</h2>
+<h3 id="synopsis_13">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vextrins_d (__m128i a, __m128i b, imm0_255 imm)
+#include &lt;lsxintrin.h&gt;
+Instruction: vextrins.d vr, vr, imm
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_13">Description</h3>
+<p>Extract one 64-bit element in <code>b</code> and insert it to <code>a</code> according to <code>imm</code>.</p>
+<h3 id="operation_13">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 2; i++) {
+  dst.dword[i] = (i == ((imm &gt;&gt; 4) &amp; 1)) ? b.dword[imm &amp; 1] : a.dword[i];
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_13">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vilvh_b-__m128i-a-__m128i-b">__m128i __lsx_vilvh_b (__m128i a, __m128i b)</h2>
+<h3 id="synopsis_14">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vilvh_b (__m128i a, __m128i b)
+#include &lt;lsxintrin.h&gt;
+Instruction: vilvh.b vr, vr, vr
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_14">Description</h3>
+<p>Interleave 8-bit elements in higher half of <code>a</code> and <code>b</code>.</p>
+<h3 id="operation_14">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 16; i++) {
+  dst.byte[i] = (i % 2 == 1) ? a.byte[i / 2 + 8] : b.byte[i / 2 + 8];
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_14">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vilvh_h-__m128i-a-__m128i-b">__m128i __lsx_vilvh_h (__m128i a, __m128i b)</h2>
+<h3 id="synopsis_15">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vilvh_h (__m128i a, __m128i b)
+#include &lt;lsxintrin.h&gt;
+Instruction: vilvh.h vr, vr, vr
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_15">Description</h3>
+<p>Interleave 16-bit elements in higher half of <code>a</code> and <code>b</code>.</p>
+<h3 id="operation_15">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 8; i++) {
+  dst.half[i] = (i % 2 == 1) ? a.half[i / 2 + 4] : b.half[i / 2 + 4];
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_15">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vilvh_w-__m128i-a-__m128i-b">__m128i __lsx_vilvh_w (__m128i a, __m128i b)</h2>
+<h3 id="synopsis_16">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vilvh_w (__m128i a, __m128i b)
+#include &lt;lsxintrin.h&gt;
+Instruction: vilvh.w vr, vr, vr
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_16">Description</h3>
+<p>Interleave 32-bit elements in higher half of <code>a</code> and <code>b</code>.</p>
+<h3 id="operation_16">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 4; i++) {
+  dst.word[i] = (i % 2 == 1) ? a.word[i / 2 + 2] : b.word[i / 2 + 2];
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_16">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vilvh_d-__m128i-a-__m128i-b">__m128i __lsx_vilvh_d (__m128i a, __m128i b)</h2>
+<h3 id="synopsis_17">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vilvh_d (__m128i a, __m128i b)
+#include &lt;lsxintrin.h&gt;
+Instruction: vilvh.d vr, vr, vr
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_17">Description</h3>
+<p>Interleave 64-bit elements in higher half of <code>a</code> and <code>b</code>.</p>
+<h3 id="operation_17">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 2; i++) {
+  dst.dword[i] = (i % 2 == 1) ? a.dword[i / 2 + 1] : b.dword[i / 2 + 1];
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_17">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vilvl_b-__m128i-a-__m128i-b">__m128i __lsx_vilvl_b (__m128i a, __m128i b)</h2>
+<h3 id="synopsis_18">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vilvl_b (__m128i a, __m128i b)
+#include &lt;lsxintrin.h&gt;
+Instruction: vilvl.b vr, vr, vr
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_18">Description</h3>
+<p>Interleave 8-bit elements in lower half of <code>a</code> and <code>b</code>.</p>
+<h3 id="operation_18">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 16; i++) {
+  dst.byte[i] = (i % 2 == 1) ? a.byte[i / 2] : b.byte[i / 2];
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_18">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vilvl_h-__m128i-a-__m128i-b">__m128i __lsx_vilvl_h (__m128i a, __m128i b)</h2>
+<h3 id="synopsis_19">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vilvl_h (__m128i a, __m128i b)
+#include &lt;lsxintrin.h&gt;
+Instruction: vilvl.h vr, vr, vr
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_19">Description</h3>
+<p>Interleave 16-bit elements in lower half of <code>a</code> and <code>b</code>.</p>
+<h3 id="operation_19">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 8; i++) {
+  dst.half[i] = (i % 2 == 1) ? a.half[i / 2] : b.half[i / 2];
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_19">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vilvl_w-__m128i-a-__m128i-b">__m128i __lsx_vilvl_w (__m128i a, __m128i b)</h2>
+<h3 id="synopsis_20">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vilvl_w (__m128i a, __m128i b)
+#include &lt;lsxintrin.h&gt;
+Instruction: vilvl.w vr, vr, vr
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_20">Description</h3>
+<p>Interleave 32-bit elements in lower half of <code>a</code> and <code>b</code>.</p>
+<h3 id="operation_20">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 4; i++) {
+  dst.word[i] = (i % 2 == 1) ? a.word[i / 2] : b.word[i / 2];
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_20">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vilvl_d-__m128i-a-__m128i-b">__m128i __lsx_vilvl_d (__m128i a, __m128i b)</h2>
+<h3 id="synopsis_21">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vilvl_d (__m128i a, __m128i b)
+#include &lt;lsxintrin.h&gt;
+Instruction: vilvl.d vr, vr, vr
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_21">Description</h3>
+<p>Interleave 64-bit elements in lower half of <code>a</code> and <code>b</code>.</p>
+<h3 id="operation_21">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 2; i++) {
+  dst.dword[i] = (i % 2 == 1) ? a.dword[i / 2] : b.dword[i / 2];
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_21">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vinsgr2vr_b-__m128i-a-int-b-imm0_15-imm">__m128i __lsx_vinsgr2vr_b (__m128i a, int b, imm0_15 imm)</h2>
+<h3 id="synopsis_22">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vinsgr2vr_b (__m128i a, int b, imm0_15 imm)
+#include &lt;lsxintrin.h&gt;
+Instruction: vinsgr2vr.b vr, r, imm
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_22">Description</h3>
+<p>Insert 8-bit element into lane indexed <code>imm</code>.</p>
+<h3 id="operation_22">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 16; i++) {
+  dst.byte[i] = (i == imm) ? b : a.byte[i];
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_22">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vinsgr2vr_h-__m128i-a-int-b-imm0_7-imm">__m128i __lsx_vinsgr2vr_h (__m128i a, int b, imm0_7 imm)</h2>
+<h3 id="synopsis_23">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vinsgr2vr_h (__m128i a, int b, imm0_7 imm)
+#include &lt;lsxintrin.h&gt;
+Instruction: vinsgr2vr.h vr, r, imm
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_23">Description</h3>
+<p>Insert 16-bit element into lane indexed <code>imm</code>.</p>
+<h3 id="operation_23">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 8; i++) {
+  dst.half[i] = (i == imm) ? b : a.half[i];
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_23">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vinsgr2vr_w-__m128i-a-int-b-imm0_3-imm">__m128i __lsx_vinsgr2vr_w (__m128i a, int b, imm0_3 imm)</h2>
+<h3 id="synopsis_24">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vinsgr2vr_w (__m128i a, int b, imm0_3 imm)
+#include &lt;lsxintrin.h&gt;
+Instruction: vinsgr2vr.w vr, r, imm
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_24">Description</h3>
+<p>Insert 32-bit element into lane indexed <code>imm</code>.</p>
+<h3 id="operation_24">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 4; i++) {
+  dst.word[i] = (i == imm) ? b : a.word[i];
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_24">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vinsgr2vr_d-__m128i-a-long-int-b-imm0_1-imm">__m128i __lsx_vinsgr2vr_d (__m128i a, long int b, imm0_1 imm)</h2>
+<h3 id="synopsis_25">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vinsgr2vr_d (__m128i a, long int b, imm0_1 imm)
+#include &lt;lsxintrin.h&gt;
+Instruction: vinsgr2vr.d vr, r, imm
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_25">Description</h3>
+<p>Insert 64-bit element into lane indexed <code>imm</code>.</p>
+<h3 id="operation_25">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 2; i++) {
+  dst.dword[i] = (i == imm) ? b : a.dword[i];
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_25">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vfrstp_b-__m128i-a-__m128i-b-__m128i-c">__m128i __lsx_vfrstp_b (__m128i a, __m128i b, __m128i c)</h2>
+<h3 id="synopsis_26">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vfrstp_b (__m128i a, __m128i b, __m128i c)
+#include &lt;lsxintrin.h&gt;
+Instruction: vfrstp.b vr, vr, vr
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_26">Description</h3>
+<p>Find the first negative 8-bit element in <code>b</code>, set the index of the element to the lane of <code>a</code> specified by <code>c</code>.</p>
+<h3 id="operation_26">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 16; i++) {
+  dst.byte[i] = a.byte[i];
+}
+int i;
+for (i = 0; i &lt; 16; i++) {
+  if ((s8)b.byte[i] &lt; 0) {
+    break;
+  }
+}
+dst.byte[c.byte[0] % 16] = i;
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_26">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>2</td>
+<td>2</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>2</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vfrstp_h-__m128i-a-__m128i-b-__m128i-c">__m128i __lsx_vfrstp_h (__m128i a, __m128i b, __m128i c)</h2>
+<h3 id="synopsis_27">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vfrstp_h (__m128i a, __m128i b, __m128i c)
+#include &lt;lsxintrin.h&gt;
+Instruction: vfrstp.h vr, vr, vr
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_27">Description</h3>
+<p>Find the first negative 16-bit element in <code>b</code>, set the index of the element to the lane of <code>a</code> specified by <code>c</code>.</p>
+<h3 id="operation_27">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 8; i++) {
+  dst.half[i] = a.half[i];
+}
+int i;
+for (i = 0; i &lt; 8; i++) {
+  if ((s16)b.half[i] &lt; 0) {
+    break;
+  }
+}
+dst.half[c.half[0] % 8] = i;
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_27">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>2</td>
+<td>2</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>2</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vfrstpi_b-__m128i-a-__m128i-b-imm0_31-imm">__m128i __lsx_vfrstpi_b (__m128i a, __m128i b, imm0_31 imm)</h2>
+<h3 id="synopsis_28">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vfrstpi_b (__m128i a, __m128i b, imm0_31 imm)
+#include &lt;lsxintrin.h&gt;
+Instruction: vfrstpi.b vr, vr, imm
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_28">Description</h3>
+<p>Find the first negative 8-bit element in <code>b</code>, set the index of the element to the lane of <code>a</code> specified by <code>imm</code>.</p>
+<h3 id="operation_28">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 16; i++) {
+  dst.byte[i] = a.byte[i];
+}
+int i;
+for (i = 0; i &lt; 16; i++) {
+  if ((s8)b.byte[i] &lt; 0) {
+    break;
+  }
+}
+dst.byte[imm % 16] = i;
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_28">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>2</td>
+<td>2</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>2</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vfrstpi_h-__m128i-a-__m128i-b-imm0_31-imm">__m128i __lsx_vfrstpi_h (__m128i a, __m128i b, imm0_31 imm)</h2>
+<h3 id="synopsis_29">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vfrstpi_h (__m128i a, __m128i b, imm0_31 imm)
+#include &lt;lsxintrin.h&gt;
+Instruction: vfrstpi.h vr, vr, imm
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_29">Description</h3>
+<p>Find the first negative 16-bit element in <code>b</code>, set the index of the element to the lane of <code>a</code> specified by <code>imm</code>.</p>
+<h3 id="operation_29">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 8; i++) {
+  dst.half[i] = a.half[i];
+}
+int i;
+for (i = 0; i &lt; 8; i++) {
+  if ((s16)b.half[i] &lt; 0) {
+    break;
+  }
+}
+dst.half[imm % 8] = i;
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_29">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>2</td>
+<td>2</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>2</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vmskgez_b-__m128i-a">__m128i __lsx_vmskgez_b (__m128i a)</h2>
+<h3 id="synopsis_30">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vmskgez_b (__m128i a)
+#include &lt;lsxintrin.h&gt;
+Instruction: vmskgez.b vr, vr
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_30">Description</h3>
+<p>For each 8-bit element in <code>a</code>, if the element is greater than or equal to zero, set one bit in <code>dst</code>, otherwise clear it.</p>
+<h3 id="examples">Examples</h3>
+<pre><code class="language-c++">__m128i __lsx_vmskgez_b(__m128i{0x1122334455667788, 0x99aabbccddeeff00})
+= 0x00000000000001fe 0x0000000000000000
+__m128i __lsx_vmskgez_b(__m128i{0x0000808000000000, 0x0081000081716151})
+= 0x000000000000b7cf 0x0000000000000000
+</code></pre>
+<h3 id="operation_30">Operation</h3>
+<pre><code class="language-c++">u64 m = 0x8080808080808080;
+u64 c = m &amp; a.dword[0];
+c |= c &lt;&lt; 7;
+c |= c &lt;&lt; 14;
+c |= c &lt;&lt; 28;
+c &gt;&gt;= 56;
+dst.dword[0] = c;
+c = m &amp; a.dword[1];
+c |= c &lt;&lt; 7;
+c |= c &lt;&lt; 14;
+c |= c &lt;&lt; 28;
+c &gt;&gt;= 56;
+dst.dword[0] |= c &lt;&lt; 8;
+dst.dword[0] = (u16)~dst.dword[0];
+dst.dword[1] = 0;
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_30">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vmskltz_b-__m128i-a">__m128i __lsx_vmskltz_b (__m128i a)</h2>
+<h3 id="synopsis_31">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vmskltz_b (__m128i a)
+#include &lt;lsxintrin.h&gt;
+Instruction: vmskltz.b vr, vr
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_31">Description</h3>
+<p>For each 8-bit element in <code>a</code>, if the element is less than zero, set one bit in <code>dst</code>, otherwise clear it.</p>
+<h3 id="examples_1">Examples</h3>
+<pre><code class="language-c++">__m128i __lsx_vmskltz_b(__m128i{0x1122334455667788, 0x99aabbccddeeff00})
+= 0x000000000000fe01 0x0000000000000000
+__m128i __lsx_vmskltz_b(__m128i{0x0000808000000000, 0x0081000081716151})
+= 0x0000000000004830 0x0000000000000000
+</code></pre>
+<h3 id="operation_31">Operation</h3>
+<pre><code class="language-c++">u64 m = 0x8080808080808080;
+u64 c = m &amp; a.dword[0];
+c |= c &lt;&lt; 7;
+c |= c &lt;&lt; 14;
+c |= c &lt;&lt; 28;
+c &gt;&gt;= 56;
+dst.dword[0] = c;
+c = m &amp; a.dword[1];
+c |= c &lt;&lt; 7;
+c |= c &lt;&lt; 14;
+c |= c &lt;&lt; 28;
+c &gt;&gt;= 56;
+dst.dword[0] |= c &lt;&lt; 8;
+dst.dword[1] = 0;
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_31">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vmskltz_h-__m128i-a">__m128i __lsx_vmskltz_h (__m128i a)</h2>
+<h3 id="synopsis_32">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vmskltz_h (__m128i a)
+#include &lt;lsxintrin.h&gt;
+Instruction: vmskltz.h vr, vr
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_32">Description</h3>
+<p>For each 16-bit element in <code>a</code>, if the element is less than zero, set one bit in <code>dst</code>, otherwise clear it.</p>
+<h3 id="examples_2">Examples</h3>
+<pre><code class="language-c++">__m128i __lsx_vmskltz_h(__m128i{0x1122334455667788, 0x99aabbccddeeff00})
+= 0x00000000000000f0 0x0000000000000000
+__m128i __lsx_vmskltz_h(__m128i{0x0000808000000000, 0x0081000081716151})
+= 0x0000000000000024 0x0000000000000000
+</code></pre>
+<h3 id="operation_32">Operation</h3>
+<pre><code class="language-c++">u64 m = 0x8000800080008000;
+u64 c = m &amp; a.dword[0];
+c |= c &lt;&lt; 15;
+c |= c &lt;&lt; 30;
+c &gt;&gt;= 60;
+dst.dword[0] = c;
+c = m &amp; a.dword[1];
+c |= c &lt;&lt; 15;
+c |= c &lt;&lt; 30;
+c &gt;&gt;= 60;
+dst.dword[0] |= c &lt;&lt; 4;
+dst.dword[1] = 0;
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_32">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vmskltz_w-__m128i-a">__m128i __lsx_vmskltz_w (__m128i a)</h2>
+<h3 id="synopsis_33">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vmskltz_w (__m128i a)
+#include &lt;lsxintrin.h&gt;
+Instruction: vmskltz.w vr, vr
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_33">Description</h3>
+<p>For each 32-bit element in <code>a</code>, if the element is less than zero, set one bit in <code>dst</code>, otherwise clear it.</p>
+<h3 id="examples_3">Examples</h3>
+<pre><code class="language-c++">__m128i __lsx_vmskltz_w(__m128i{0x1122334455667788, 0x99aabbccddeeff00})
+= 0x000000000000000c 0x0000000000000000
+__m128i __lsx_vmskltz_w(__m128i{0x0000808000000000, 0x0081000081716151})
+= 0x0000000000000004 0x0000000000000000
+</code></pre>
+<h3 id="operation_33">Operation</h3>
+<pre><code class="language-c++">u64 m = 0x8000000080000000;
+u64 c = m &amp; a.dword[0];
+c |= c &lt;&lt; 31;
+c &gt;&gt;= 62;
+dst.dword[0] = c;
+c = m &amp; a.dword[1];
+c |= c &lt;&lt; 31;
+c &gt;&gt;= 62;
+dst.dword[0] |= c &lt;&lt; 2;
+dst.dword[1] = 0;
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_33">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vmskltz_d-__m128i-a">__m128i __lsx_vmskltz_d (__m128i a)</h2>
+<h3 id="synopsis_34">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vmskltz_d (__m128i a)
+#include &lt;lsxintrin.h&gt;
+Instruction: vmskltz.d vr, vr
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_34">Description</h3>
+<p>For each 64-bit element in <code>a</code>, if the element is less than zero, set one bit in <code>dst</code>, otherwise clear it.</p>
+<h3 id="examples_4">Examples</h3>
+<pre><code class="language-c++">__m128i __lsx_vmskltz_d(__m128i{0x1122334455667788, 0x99aabbccddeeff00})
+= 0x0000000000000002 0x0000000000000000
+__m128i __lsx_vmskltz_d(__m128i{0x0000808000000000, 0x0081000081716151})
+= 0x0000000000000000 0x0000000000000000
+</code></pre>
+<h3 id="operation_34">Operation</h3>
+<pre><code class="language-c++">u64 m = 0x8000000000000000;
+u64 c = m &amp; a.dword[0];
+c &gt;&gt;= 63;
+dst.dword[0] = c;
+c = m &amp; a.dword[1];
+c &gt;&gt;= 63;
+dst.dword[0] |= c &lt;&lt; 1;
+dst.dword[1] = 0;
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_34">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vmsknz_b-__m128i-a">__m128i __lsx_vmsknz_b (__m128i a)</h2>
+<h3 id="synopsis_35">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vmsknz_b (__m128i a)
+#include &lt;lsxintrin.h&gt;
+Instruction: vmsknz.b vr, vr
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_35">Description</h3>
+<p>For each 8-bit element in <code>a</code>, if the element is non-zero, set one bit in <code>dst</code>, otherwise clear it.</p>
+<h3 id="examples_5">Examples</h3>
+<pre><code class="language-c++">__m128i __lsx_vmsknz_b(__m128i{0x1122334455667788, 0x99aabbccddeeff00})
+= 0x000000000000feff 0x0000000000000000
+__m128i __lsx_vmsknz_b(__m128i{0x0000111100000000, 0x0011000011111111})
+= 0x0000000000004f30 0x0000000000000000
+</code></pre>
+<h3 id="operation_35">Operation</h3>
+<pre><code class="language-c++">u64 m = 0x7F7F7F7F7F7F7F7F;
+u64 c = ~(((a.dword[0] &amp; m) + m) | a.dword[0] | m);
+c |= c &lt;&lt; 7;
+c |= c &lt;&lt; 14;
+c |= c &lt;&lt; 28;
+c &gt;&gt;= 56;
+dst.dword[0] = c;
+c = ~(((a.dword[1] &amp; m) + m) | a.dword[1] | m);
+c |= c &lt;&lt; 7;
+c |= c &lt;&lt; 14;
+c |= c &lt;&lt; 28;
+c &gt;&gt;= 56;
+dst.dword[0] |= c &lt;&lt; 8;
+dst.dword[0] = (u16)~dst.dword[0];
+dst.dword[1] = 0;
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_35">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vpackev_b-__m128i-a-__m128i-b">__m128i __lsx_vpackev_b (__m128i a, __m128i b)</h2>
+<h3 id="synopsis_36">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vpackev_b (__m128i a, __m128i b)
+#include &lt;lsxintrin.h&gt;
+Instruction: vpackev.b vr, vr, vr
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_36">Description</h3>
+<p>Collect and pack even-positioned 8-bit elements in <code>a</code> and <code>b</code> and store <code>dst</code>.</p>
+<h3 id="operation_36">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 16; i++) {
+  dst.byte[i] = (i % 2 == 1) ? a.byte[i - 1] : b.byte[i];
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_36">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vpackev_h-__m128i-a-__m128i-b">__m128i __lsx_vpackev_h (__m128i a, __m128i b)</h2>
+<h3 id="synopsis_37">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vpackev_h (__m128i a, __m128i b)
+#include &lt;lsxintrin.h&gt;
+Instruction: vpackev.h vr, vr, vr
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_37">Description</h3>
+<p>Collect and pack even-positioned 16-bit elements in <code>a</code> and <code>b</code> and store <code>dst</code>.</p>
+<h3 id="operation_37">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 8; i++) {
+  dst.half[i] = (i % 2 == 1) ? a.half[i - 1] : b.half[i];
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_37">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vpackev_w-__m128i-a-__m128i-b">__m128i __lsx_vpackev_w (__m128i a, __m128i b)</h2>
+<h3 id="synopsis_38">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vpackev_w (__m128i a, __m128i b)
+#include &lt;lsxintrin.h&gt;
+Instruction: vpackev.w vr, vr, vr
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_38">Description</h3>
+<p>Collect and pack even-positioned 32-bit elements in <code>a</code> and <code>b</code> and store <code>dst</code>.</p>
+<h3 id="operation_38">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 4; i++) {
+  dst.word[i] = (i % 2 == 1) ? a.word[i - 1] : b.word[i];
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_38">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vpackev_d-__m128i-a-__m128i-b">__m128i __lsx_vpackev_d (__m128i a, __m128i b)</h2>
+<h3 id="synopsis_39">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vpackev_d (__m128i a, __m128i b)
+#include &lt;lsxintrin.h&gt;
+Instruction: vpackev.d vr, vr, vr
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_39">Description</h3>
+<p>Collect and pack even-positioned 64-bit elements in <code>a</code> and <code>b</code> and store <code>dst</code>.</p>
+<h3 id="operation_39">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 2; i++) {
+  dst.dword[i] = (i % 2 == 1) ? a.dword[i - 1] : b.dword[i];
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_39">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vpackod_b-__m128i-a-__m128i-b">__m128i __lsx_vpackod_b (__m128i a, __m128i b)</h2>
+<h3 id="synopsis_40">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vpackod_b (__m128i a, __m128i b)
+#include &lt;lsxintrin.h&gt;
+Instruction: vpackod.b vr, vr, vr
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_40">Description</h3>
+<p>Collect and pack odd-positioned 8-bit elements in <code>a</code> and <code>b</code> and store <code>dst</code>.</p>
+<h3 id="operation_40">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 16; i++) {
+  dst.byte[i] = (i % 2 == 1) ? a.byte[i] : b.byte[i + 1];
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_40">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vpackod_h-__m128i-a-__m128i-b">__m128i __lsx_vpackod_h (__m128i a, __m128i b)</h2>
+<h3 id="synopsis_41">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vpackod_h (__m128i a, __m128i b)
+#include &lt;lsxintrin.h&gt;
+Instruction: vpackod.h vr, vr, vr
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_41">Description</h3>
+<p>Collect and pack odd-positioned 16-bit elements in <code>a</code> and <code>b</code> and store <code>dst</code>.</p>
+<h3 id="operation_41">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 8; i++) {
+  dst.half[i] = (i % 2 == 1) ? a.half[i] : b.half[i + 1];
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_41">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vpackod_w-__m128i-a-__m128i-b">__m128i __lsx_vpackod_w (__m128i a, __m128i b)</h2>
+<h3 id="synopsis_42">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vpackod_w (__m128i a, __m128i b)
+#include &lt;lsxintrin.h&gt;
+Instruction: vpackod.w vr, vr, vr
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_42">Description</h3>
+<p>Collect and pack odd-positioned 32-bit elements in <code>a</code> and <code>b</code> and store <code>dst</code>.</p>
+<h3 id="operation_42">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 4; i++) {
+  dst.word[i] = (i % 2 == 1) ? a.word[i] : b.word[i + 1];
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_42">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vpackod_d-__m128i-a-__m128i-b">__m128i __lsx_vpackod_d (__m128i a, __m128i b)</h2>
+<h3 id="synopsis_43">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vpackod_d (__m128i a, __m128i b)
+#include &lt;lsxintrin.h&gt;
+Instruction: vpackod.d vr, vr, vr
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_43">Description</h3>
+<p>Collect and pack odd-positioned 64-bit elements in <code>a</code> and <code>b</code> and store <code>dst</code>.</p>
+<h3 id="operation_43">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 2; i++) {
+  dst.dword[i] = (i % 2 == 1) ? a.dword[i] : b.dword[i + 1];
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_43">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vpickev_b-__m128i-a-__m128i-b">__m128i __lsx_vpickev_b (__m128i a, __m128i b)</h2>
+<h3 id="synopsis_44">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vpickev_b (__m128i a, __m128i b)
+#include &lt;lsxintrin.h&gt;
+Instruction: vpickev.b vr, vr, vr
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_44">Description</h3>
+<p>Pick even-positioned 8-bit elements in <code>b</code> first, then pick even-positioned 8-bit elements in <code>a</code>.</p>
+<h3 id="operation_44">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 16; i++) {
+  dst.byte[i] = (i &lt; 8) ? b.byte[i * 2] : a.byte[(i - 8) * 2];
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_44">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vpickev_h-__m128i-a-__m128i-b">__m128i __lsx_vpickev_h (__m128i a, __m128i b)</h2>
+<h3 id="synopsis_45">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vpickev_h (__m128i a, __m128i b)
+#include &lt;lsxintrin.h&gt;
+Instruction: vpickev.h vr, vr, vr
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_45">Description</h3>
+<p>Pick even-positioned 16-bit elements in <code>b</code> first, then pick even-positioned 16-bit elements in <code>a</code>.</p>
+<h3 id="operation_45">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 8; i++) {
+  dst.half[i] = (i &lt; 4) ? b.half[i * 2] : a.half[(i - 4) * 2];
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_45">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vpickev_w-__m128i-a-__m128i-b">__m128i __lsx_vpickev_w (__m128i a, __m128i b)</h2>
+<h3 id="synopsis_46">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vpickev_w (__m128i a, __m128i b)
+#include &lt;lsxintrin.h&gt;
+Instruction: vpickev.w vr, vr, vr
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_46">Description</h3>
+<p>Pick even-positioned 32-bit elements in <code>b</code> first, then pick even-positioned 32-bit elements in <code>a</code>.</p>
+<h3 id="operation_46">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 4; i++) {
+  dst.word[i] = (i &lt; 2) ? b.word[i * 2] : a.word[(i - 2) * 2];
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_46">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vpickev_d-__m128i-a-__m128i-b">__m128i __lsx_vpickev_d (__m128i a, __m128i b)</h2>
+<h3 id="synopsis_47">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vpickev_d (__m128i a, __m128i b)
+#include &lt;lsxintrin.h&gt;
+Instruction: vpickev.d vr, vr, vr
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_47">Description</h3>
+<p>Pick even-positioned 64-bit elements in <code>b</code> first, then pick even-positioned 64-bit elements in <code>a</code>.</p>
+<h3 id="operation_47">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 2; i++) {
+  dst.dword[i] = (i &lt; 1) ? b.dword[i * 2] : a.dword[(i - 1) * 2];
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_47">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="int-__lsx_vpickve2gr_b-__m128i-a-imm0_15-idx">int __lsx_vpickve2gr_b (__m128i a, imm0_15 idx)</h2>
+<h3 id="synopsis_48">Synopsis</h3>
+<pre><code class="language-c++">int __lsx_vpickve2gr_b (__m128i a, imm0_15 idx)
+#include &lt;lsxintrin.h&gt;
+Instruction: vpickve2gr.b r, vr, imm
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_48">Description</h3>
+<p>Pick the <code>lane</code> specified by <code>idx</code> from <code>a</code> and store into <code>dst</code>.</p>
+<h3 id="operation_48">Operation</h3>
+<pre><code class="language-c++">dst = (s8)a.byte[idx];
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_48">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<h2 id="unsigned-int-__lsx_vpickve2gr_bu-__m128i-a-imm0_15-idx">unsigned int __lsx_vpickve2gr_bu (__m128i a, imm0_15 idx)</h2>
+<h3 id="synopsis_49">Synopsis</h3>
+<pre><code class="language-c++">unsigned int __lsx_vpickve2gr_bu (__m128i a, imm0_15 idx)
+#include &lt;lsxintrin.h&gt;
+Instruction: vpickve2gr.bu r, vr, imm
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_49">Description</h3>
+<p>Pick the <code>lane</code> specified by <code>idx</code> from <code>a</code> and store into <code>dst</code>.</p>
+<h3 id="operation_49">Operation</h3>
+<pre><code class="language-c++">dst = (u8)a.byte[idx];
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_49">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<h2 id="int-__lsx_vpickve2gr_h-__m128i-a-imm0_7-idx">int __lsx_vpickve2gr_h (__m128i a, imm0_7 idx)</h2>
+<h3 id="synopsis_50">Synopsis</h3>
+<pre><code class="language-c++">int __lsx_vpickve2gr_h (__m128i a, imm0_7 idx)
+#include &lt;lsxintrin.h&gt;
+Instruction: vpickve2gr.h r, vr, imm
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_50">Description</h3>
+<p>Pick the <code>lane</code> specified by <code>idx</code> from <code>a</code> and store into <code>dst</code>.</p>
+<h3 id="operation_50">Operation</h3>
+<pre><code class="language-c++">dst = (s16)a.half[idx];
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_50">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<h2 id="unsigned-int-__lsx_vpickve2gr_hu-__m128i-a-imm0_7-idx">unsigned int __lsx_vpickve2gr_hu (__m128i a, imm0_7 idx)</h2>
+<h3 id="synopsis_51">Synopsis</h3>
+<pre><code class="language-c++">unsigned int __lsx_vpickve2gr_hu (__m128i a, imm0_7 idx)
+#include &lt;lsxintrin.h&gt;
+Instruction: vpickve2gr.hu r, vr, imm
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_51">Description</h3>
+<p>Pick the <code>lane</code> specified by <code>idx</code> from <code>a</code> and store into <code>dst</code>.</p>
+<h3 id="operation_51">Operation</h3>
+<pre><code class="language-c++">dst = (u16)a.half[idx];
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_51">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<h2 id="int-__lsx_vpickve2gr_w-__m128i-a-imm0_3-idx">int __lsx_vpickve2gr_w (__m128i a, imm0_3 idx)</h2>
+<h3 id="synopsis_52">Synopsis</h3>
+<pre><code class="language-c++">int __lsx_vpickve2gr_w (__m128i a, imm0_3 idx)
+#include &lt;lsxintrin.h&gt;
+Instruction: vpickve2gr.w r, vr, imm
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_52">Description</h3>
+<p>Pick the <code>lane</code> specified by <code>idx</code> from <code>a</code> and store into <code>dst</code>.</p>
+<h3 id="operation_52">Operation</h3>
+<pre><code class="language-c++">dst = (s32)a.word[idx];
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_52">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<h2 id="unsigned-int-__lsx_vpickve2gr_wu-__m128i-a-imm0_3-idx">unsigned int __lsx_vpickve2gr_wu (__m128i a, imm0_3 idx)</h2>
+<h3 id="synopsis_53">Synopsis</h3>
+<pre><code class="language-c++">unsigned int __lsx_vpickve2gr_wu (__m128i a, imm0_3 idx)
+#include &lt;lsxintrin.h&gt;
+Instruction: vpickve2gr.wu r, vr, imm
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_53">Description</h3>
+<p>Pick the <code>lane</code> specified by <code>idx</code> from <code>a</code> and store into <code>dst</code>.</p>
+<h3 id="operation_53">Operation</h3>
+<pre><code class="language-c++">dst = (u32)a.word[idx];
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_53">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<h2 id="long-int-__lsx_vpickve2gr_d-__m128i-a-imm0_1-idx">long int __lsx_vpickve2gr_d (__m128i a, imm0_1 idx)</h2>
+<h3 id="synopsis_54">Synopsis</h3>
+<pre><code class="language-c++">long int __lsx_vpickve2gr_d (__m128i a, imm0_1 idx)
+#include &lt;lsxintrin.h&gt;
+Instruction: vpickve2gr.d r, vr, imm
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_54">Description</h3>
+<p>Pick the <code>lane</code> specified by <code>idx</code> from <code>a</code> and store into <code>dst</code>.</p>
+<h3 id="operation_54">Operation</h3>
+<pre><code class="language-c++">dst = (s64)a.dword[idx];
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_54">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<h2 id="unsigned-long-int-__lsx_vpickve2gr_du-__m128i-a-imm0_1-idx">unsigned long int __lsx_vpickve2gr_du (__m128i a, imm0_1 idx)</h2>
+<h3 id="synopsis_55">Synopsis</h3>
+<pre><code class="language-c++">unsigned long int __lsx_vpickve2gr_du (__m128i a, imm0_1 idx)
+#include &lt;lsxintrin.h&gt;
+Instruction: vpickve2gr.du r, vr, imm
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_55">Description</h3>
+<p>Pick the <code>lane</code> specified by <code>idx</code> from <code>a</code> and store into <code>dst</code>.</p>
+<h3 id="operation_55">Operation</h3>
+<pre><code class="language-c++">dst = (u64)a.dword[idx];
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_55">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vpickod_b-__m128i-a-__m128i-b">__m128i __lsx_vpickod_b (__m128i a, __m128i b)</h2>
+<h3 id="synopsis_56">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vpickod_b (__m128i a, __m128i b)
+#include &lt;lsxintrin.h&gt;
+Instruction: vpickod.b vr, vr, vr
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_56">Description</h3>
+<p>Pick odd-positioned 8-bit elements in <code>b</code> first, then pick odd-positioned 8-bit elements in <code>a</code>.</p>
+<h3 id="operation_56">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 16; i++) {
+  dst.byte[i] = (i &lt; 8) ? b.byte[i * 2 + 1] : a.byte[(i - 8) * 2 + 1];
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_56">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vpickod_h-__m128i-a-__m128i-b">__m128i __lsx_vpickod_h (__m128i a, __m128i b)</h2>
+<h3 id="synopsis_57">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vpickod_h (__m128i a, __m128i b)
+#include &lt;lsxintrin.h&gt;
+Instruction: vpickod.h vr, vr, vr
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_57">Description</h3>
+<p>Pick odd-positioned 16-bit elements in <code>b</code> first, then pick odd-positioned 16-bit elements in <code>a</code>.</p>
+<h3 id="operation_57">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 8; i++) {
+  dst.half[i] = (i &lt; 4) ? b.half[i * 2 + 1] : a.half[(i - 4) * 2 + 1];
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_57">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vpickod_w-__m128i-a-__m128i-b">__m128i __lsx_vpickod_w (__m128i a, __m128i b)</h2>
+<h3 id="synopsis_58">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vpickod_w (__m128i a, __m128i b)
+#include &lt;lsxintrin.h&gt;
+Instruction: vpickod.w vr, vr, vr
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_58">Description</h3>
+<p>Pick odd-positioned 32-bit elements in <code>b</code> first, then pick odd-positioned 32-bit elements in <code>a</code>.</p>
+<h3 id="operation_58">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 4; i++) {
+  dst.word[i] = (i &lt; 2) ? b.word[i * 2 + 1] : a.word[(i - 2) * 2 + 1];
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_58">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vpickod_d-__m128i-a-__m128i-b">__m128i __lsx_vpickod_d (__m128i a, __m128i b)</h2>
+<h3 id="synopsis_59">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vpickod_d (__m128i a, __m128i b)
+#include &lt;lsxintrin.h&gt;
+Instruction: vpickod.d vr, vr, vr
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_59">Description</h3>
+<p>Pick odd-positioned 64-bit elements in <code>b</code> first, then pick odd-positioned 64-bit elements in <code>a</code>.</p>
+<h3 id="operation_59">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 2; i++) {
+  dst.dword[i] = (i &lt; 1) ? b.dword[i * 2 + 1] : a.dword[(i - 1) * 2 + 1];
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_59">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vrepli_b-imm_n512_511-imm">__m128i __lsx_vrepli_b (imm_n512_511 imm)</h2>
+<h3 id="synopsis_60">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vrepli_b (imm_n512_511 imm)
+#include &lt;lsxintrin.h&gt;
+Instruction: vldi vr, imm
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_60">Description</h3>
+<p>Repeat <code>imm</code> to fill whole vector.</p>
+<h3 id="operation_60">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 16; i++) {
+  dst.byte[i] = imm;
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h2 id="__m128i-__lsx_vrepli_h-imm_n512_511-imm">__m128i __lsx_vrepli_h (imm_n512_511 imm)</h2>
+<h3 id="synopsis_61">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vrepli_h (imm_n512_511 imm)
+#include &lt;lsxintrin.h&gt;
+Instruction: vldi vr, imm
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_61">Description</h3>
+<p>Repeat <code>imm</code> to fill whole vector.</p>
+<h3 id="operation_61">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 8; i++) {
+  dst.half[i] = imm;
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h2 id="__m128i-__lsx_vrepli_w-imm_n512_511-imm">__m128i __lsx_vrepli_w (imm_n512_511 imm)</h2>
+<h3 id="synopsis_62">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vrepli_w (imm_n512_511 imm)
+#include &lt;lsxintrin.h&gt;
+Instruction: vldi vr, imm
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_62">Description</h3>
+<p>Repeat <code>imm</code> to fill whole vector.</p>
+<h3 id="operation_62">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 4; i++) {
+  dst.word[i] = imm;
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h2 id="__m128i-__lsx_vrepli_d-imm_n512_511-imm">__m128i __lsx_vrepli_d (imm_n512_511 imm)</h2>
+<h3 id="synopsis_63">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vrepli_d (imm_n512_511 imm)
+#include &lt;lsxintrin.h&gt;
+Instruction: vldi vr, imm
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_63">Description</h3>
+<p>Repeat <code>imm</code> to fill whole vector.</p>
+<h3 id="operation_63">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 2; i++) {
+  dst.dword[i] = imm;
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h2 id="__m128i-__lsx_vreplgr2vr_b-int-val">__m128i __lsx_vreplgr2vr_b (int val)</h2>
+<h3 id="synopsis_64">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vreplgr2vr_b (int val)
+#include &lt;lsxintrin.h&gt;
+Instruction: vreplgr2vr.b vr, r
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_64">Description</h3>
+<p>Repeat <code>val</code> to whole vector.</p>
+<h3 id="operation_64">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 16; i++) {
+  dst.byte[i] = val;
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_60">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>N/A</td>
+<td>1</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>N/A</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vreplgr2vr_h-int-val">__m128i __lsx_vreplgr2vr_h (int val)</h2>
+<h3 id="synopsis_65">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vreplgr2vr_h (int val)
+#include &lt;lsxintrin.h&gt;
+Instruction: vreplgr2vr.h vr, r
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_65">Description</h3>
+<p>Repeat <code>val</code> to whole vector.</p>
+<h3 id="operation_65">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 8; i++) {
+  dst.half[i] = val;
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_61">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>N/A</td>
+<td>1</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>N/A</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vreplgr2vr_w-int-val">__m128i __lsx_vreplgr2vr_w (int val)</h2>
+<h3 id="synopsis_66">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vreplgr2vr_w (int val)
+#include &lt;lsxintrin.h&gt;
+Instruction: vreplgr2vr.w vr, r
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_66">Description</h3>
+<p>Repeat <code>val</code> to whole vector.</p>
+<h3 id="operation_66">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 4; i++) {
+  dst.word[i] = val;
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_62">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>N/A</td>
+<td>1</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>N/A</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vreplgr2vr_d-long-int-val">__m128i __lsx_vreplgr2vr_d (long int val)</h2>
+<h3 id="synopsis_67">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vreplgr2vr_d (long int val)
+#include &lt;lsxintrin.h&gt;
+Instruction: vreplgr2vr.d vr, r
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_67">Description</h3>
+<p>Repeat <code>val</code> to whole vector.</p>
+<h3 id="operation_67">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 2; i++) {
+  dst.dword[i] = val;
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_63">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>N/A</td>
+<td>1</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>N/A</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vreplve_b-__m128i-a-int-idx">__m128i __lsx_vreplve_b (__m128i a, int idx)</h2>
+<h3 id="synopsis_68">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vreplve_b (__m128i a, int idx)
+#include &lt;lsxintrin.h&gt;
+Instruction: vreplve.b vr, vr, r
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_68">Description</h3>
+<p>Repeat the element in lane <code>idx</code> of <code>a</code> to fill whole vector.</p>
+<h3 id="operation_68">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 16; i++) {
+  dst.byte[i] = a.byte[idx % 16];
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_64">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vreplve_h-__m128i-a-int-idx">__m128i __lsx_vreplve_h (__m128i a, int idx)</h2>
+<h3 id="synopsis_69">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vreplve_h (__m128i a, int idx)
+#include &lt;lsxintrin.h&gt;
+Instruction: vreplve.h vr, vr, r
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_69">Description</h3>
+<p>Repeat the element in lane <code>idx</code> of <code>a</code> to fill whole vector.</p>
+<h3 id="operation_69">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 8; i++) {
+  dst.half[i] = a.half[idx % 8];
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_65">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vreplve_w-__m128i-a-int-idx">__m128i __lsx_vreplve_w (__m128i a, int idx)</h2>
+<h3 id="synopsis_70">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vreplve_w (__m128i a, int idx)
+#include &lt;lsxintrin.h&gt;
+Instruction: vreplve.w vr, vr, r
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_70">Description</h3>
+<p>Repeat the element in lane <code>idx</code> of <code>a</code> to fill whole vector.</p>
+<h3 id="operation_70">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 4; i++) {
+  dst.word[i] = a.word[idx % 4];
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_66">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vreplve_d-__m128i-a-int-idx">__m128i __lsx_vreplve_d (__m128i a, int idx)</h2>
+<h3 id="synopsis_71">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vreplve_d (__m128i a, int idx)
+#include &lt;lsxintrin.h&gt;
+Instruction: vreplve.d vr, vr, r
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_71">Description</h3>
+<p>Repeat the element in lane <code>idx</code> of <code>a</code> to fill whole vector.</p>
+<h3 id="operation_71">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 2; i++) {
+  dst.dword[i] = a.dword[idx % 2];
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_67">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vreplvei_b-__m128i-a-imm0_15-idx">__m128i __lsx_vreplvei_b (__m128i a, imm0_15 idx)</h2>
+<h3 id="synopsis_72">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vreplvei_b (__m128i a, imm0_15 idx)
+#include &lt;lsxintrin.h&gt;
+Instruction: vreplvei.b vr, vr, imm
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_72">Description</h3>
+<p>Repeat the element in lane <code>idx</code> of <code>a</code> to fill whole vector.</p>
+<h3 id="operation_72">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 16; i++) {
+  dst.byte[i] = a.byte[idx];
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_68">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vreplvei_h-__m128i-a-imm0_7-idx">__m128i __lsx_vreplvei_h (__m128i a, imm0_7 idx)</h2>
+<h3 id="synopsis_73">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vreplvei_h (__m128i a, imm0_7 idx)
+#include &lt;lsxintrin.h&gt;
+Instruction: vreplvei.h vr, vr, imm
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_73">Description</h3>
+<p>Repeat the element in lane <code>idx</code> of <code>a</code> to fill whole vector.</p>
+<h3 id="operation_73">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 8; i++) {
+  dst.half[i] = a.half[idx];
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_69">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vreplvei_w-__m128i-a-imm0_3-idx">__m128i __lsx_vreplvei_w (__m128i a, imm0_3 idx)</h2>
+<h3 id="synopsis_74">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vreplvei_w (__m128i a, imm0_3 idx)
+#include &lt;lsxintrin.h&gt;
+Instruction: vreplvei.w vr, vr, imm
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_74">Description</h3>
+<p>Repeat the element in lane <code>idx</code> of <code>a</code> to fill whole vector.</p>
+<h3 id="operation_74">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 4; i++) {
+  dst.word[i] = a.word[idx];
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_70">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vreplvei_d-__m128i-a-imm0_1-idx">__m128i __lsx_vreplvei_d (__m128i a, imm0_1 idx)</h2>
+<h3 id="synopsis_75">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vreplvei_d (__m128i a, imm0_1 idx)
+#include &lt;lsxintrin.h&gt;
+Instruction: vreplvei.d vr, vr, imm
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_75">Description</h3>
+<p>Repeat the element in lane <code>idx</code> of <code>a</code> to fill whole vector.</p>
+<h3 id="operation_75">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 2; i++) {
+  dst.dword[i] = a.dword[idx];
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_71">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vsat_b-__m128i-a-imm0_7-imm">__m128i __lsx_vsat_b (__m128i a, imm0_7 imm)</h2>
+<h3 id="synopsis_76">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vsat_b (__m128i a, imm0_7 imm)
+#include &lt;lsxintrin.h&gt;
+Instruction: vsat.b vr, vr, imm
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_76">Description</h3>
+<p>Clamp signed 8-bit elements in <code>a</code> to range specified by <code>imm</code>.</p>
+<h3 id="operation_76">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 16; i++) {
+  dst.byte[i] = clamp&lt;s8&gt;(a.byte[i], -(1 &lt;&lt; imm), (1 &lt;&lt; imm) - 1);
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_72">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>2</td>
+<td>2</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>2</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vsat_bu-__m128i-a-imm0_7-imm">__m128i __lsx_vsat_bu (__m128i a, imm0_7 imm)</h2>
+<h3 id="synopsis_77">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vsat_bu (__m128i a, imm0_7 imm)
+#include &lt;lsxintrin.h&gt;
+Instruction: vsat.bu vr, vr, imm
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_77">Description</h3>
+<p>Clamp unsigned 8-bit elements in <code>a</code> to range specified by <code>imm</code>.</p>
+<h3 id="operation_77">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 16; i++) {
+  dst.byte[i] = clamp&lt;u8&gt;(a.byte[i], 0, (1 &lt;&lt; (imm + 1)) - 1);
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_73">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>2</td>
+<td>2</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>2</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vsat_h-__m128i-a-imm0_15-imm">__m128i __lsx_vsat_h (__m128i a, imm0_15 imm)</h2>
+<h3 id="synopsis_78">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vsat_h (__m128i a, imm0_15 imm)
+#include &lt;lsxintrin.h&gt;
+Instruction: vsat.h vr, vr, imm
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_78">Description</h3>
+<p>Clamp signed 16-bit elements in <code>a</code> to range specified by <code>imm</code>.</p>
+<h3 id="operation_78">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 8; i++) {
+  dst.half[i] = clamp&lt;s16&gt;(a.half[i], -(1 &lt;&lt; imm), (1 &lt;&lt; imm) - 1);
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_74">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>2</td>
+<td>2</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>2</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vsat_hu-__m128i-a-imm0_15-imm">__m128i __lsx_vsat_hu (__m128i a, imm0_15 imm)</h2>
+<h3 id="synopsis_79">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vsat_hu (__m128i a, imm0_15 imm)
+#include &lt;lsxintrin.h&gt;
+Instruction: vsat.hu vr, vr, imm
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_79">Description</h3>
+<p>Clamp unsigned 16-bit elements in <code>a</code> to range specified by <code>imm</code>.</p>
+<h3 id="operation_79">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 8; i++) {
+  dst.half[i] = clamp&lt;u16&gt;(a.half[i], 0, (1 &lt;&lt; (imm + 1)) - 1);
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_75">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>2</td>
+<td>2</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>2</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vsat_w-__m128i-a-imm0_31-imm">__m128i __lsx_vsat_w (__m128i a, imm0_31 imm)</h2>
+<h3 id="synopsis_80">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vsat_w (__m128i a, imm0_31 imm)
+#include &lt;lsxintrin.h&gt;
+Instruction: vsat.w vr, vr, imm
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_80">Description</h3>
+<p>Clamp signed 32-bit elements in <code>a</code> to range specified by <code>imm</code>.</p>
+<h3 id="operation_80">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 4; i++) {
+  dst.word[i] = clamp&lt;s32&gt;(a.word[i], -(1 &lt;&lt; imm), (1 &lt;&lt; imm) - 1);
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_76">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>2</td>
+<td>2</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>2</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vsat_wu-__m128i-a-imm0_31-imm">__m128i __lsx_vsat_wu (__m128i a, imm0_31 imm)</h2>
+<h3 id="synopsis_81">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vsat_wu (__m128i a, imm0_31 imm)
+#include &lt;lsxintrin.h&gt;
+Instruction: vsat.wu vr, vr, imm
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_81">Description</h3>
+<p>Clamp unsigned 32-bit elements in <code>a</code> to range specified by <code>imm</code>.</p>
+<h3 id="operation_81">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 4; i++) {
+  dst.word[i] = clamp&lt;u32&gt;(a.word[i], 0, (1 &lt;&lt; (imm + 1)) - 1);
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_77">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>2</td>
+<td>2</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>2</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vsat_d-__m128i-a-imm0_63-imm">__m128i __lsx_vsat_d (__m128i a, imm0_63 imm)</h2>
+<h3 id="synopsis_82">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vsat_d (__m128i a, imm0_63 imm)
+#include &lt;lsxintrin.h&gt;
+Instruction: vsat.d vr, vr, imm
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_82">Description</h3>
+<p>Clamp signed 64-bit elements in <code>a</code> to range specified by <code>imm</code>.</p>
+<h3 id="operation_82">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 2; i++) {
+  dst.dword[i] = clamp&lt;s64&gt;(a.dword[i], -(1 &lt;&lt; imm), (1 &lt;&lt; imm) - 1);
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_78">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>2</td>
+<td>2</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>2</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vsat_du-__m128i-a-imm0_63-imm">__m128i __lsx_vsat_du (__m128i a, imm0_63 imm)</h2>
+<h3 id="synopsis_83">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vsat_du (__m128i a, imm0_63 imm)
+#include &lt;lsxintrin.h&gt;
+Instruction: vsat.du vr, vr, imm
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_83">Description</h3>
+<p>Clamp unsigned 64-bit elements in <code>a</code> to range specified by <code>imm</code>.</p>
+<h3 id="operation_83">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 2; i++) {
+  dst.dword[i] = clamp&lt;u64&gt;(a.dword[i], 0, (1 &lt;&lt; (imm + 1)) - 1);
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_79">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>2</td>
+<td>2</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>2</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vsigncov_b-__m128i-a-__m128i-b">__m128i __lsx_vsigncov_b (__m128i a, __m128i b)</h2>
+<h3 id="synopsis_84">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vsigncov_b (__m128i a, __m128i b)
+#include &lt;lsxintrin.h&gt;
+Instruction: vsigncov.b vr, vr, vr
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_84">Description</h3>
+<p>If the 8-bit element in <code>a</code> equals to zero, set the result to zero. If the signed 8-bit element in <code>a</code> is positive, copy element in <code>b</code> to result. Otherwise, copy negated element in <code>b</code> to result. If <code>a</code> and <code>b</code> are the same vectors, it is equivalent to computing absolute value.</p>
+<h3 id="operation_84">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 16; i++) {
+  dst.byte[i] =
+      (a.byte[i] == 0) ? 0 : ((s8)a.byte[i] &gt; 0 ? b.byte[i] : -b.byte[i]);
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_80">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vsigncov_h-__m128i-a-__m128i-b">__m128i __lsx_vsigncov_h (__m128i a, __m128i b)</h2>
+<h3 id="synopsis_85">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vsigncov_h (__m128i a, __m128i b)
+#include &lt;lsxintrin.h&gt;
+Instruction: vsigncov.h vr, vr, vr
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_85">Description</h3>
+<p>If the 16-bit element in <code>a</code> equals to zero, set the result to zero. If the signed 16-bit element in <code>a</code> is positive, copy element in <code>b</code> to result. Otherwise, copy negated element in <code>b</code> to result. If <code>a</code> and <code>b</code> are the same vectors, it is equivalent to computing absolute value.</p>
+<h3 id="operation_85">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 8; i++) {
+  dst.half[i] =
+      (a.half[i] == 0) ? 0 : ((s16)a.half[i] &gt; 0 ? b.half[i] : -b.half[i]);
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_81">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vsigncov_w-__m128i-a-__m128i-b">__m128i __lsx_vsigncov_w (__m128i a, __m128i b)</h2>
+<h3 id="synopsis_86">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vsigncov_w (__m128i a, __m128i b)
+#include &lt;lsxintrin.h&gt;
+Instruction: vsigncov.w vr, vr, vr
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_86">Description</h3>
+<p>If the 32-bit element in <code>a</code> equals to zero, set the result to zero. If the signed 32-bit element in <code>a</code> is positive, copy element in <code>b</code> to result. Otherwise, copy negated element in <code>b</code> to result. If <code>a</code> and <code>b</code> are the same vectors, it is equivalent to computing absolute value.</p>
+<h3 id="operation_86">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 4; i++) {
+  dst.word[i] =
+      (a.word[i] == 0) ? 0 : ((s32)a.word[i] &gt; 0 ? b.word[i] : -b.word[i]);
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_82">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vsigncov_d-__m128i-a-__m128i-b">__m128i __lsx_vsigncov_d (__m128i a, __m128i b)</h2>
+<h3 id="synopsis_87">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vsigncov_d (__m128i a, __m128i b)
+#include &lt;lsxintrin.h&gt;
+Instruction: vsigncov.d vr, vr, vr
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_87">Description</h3>
+<p>If the 64-bit element in <code>a</code> equals to zero, set the result to zero. If the signed 64-bit element in <code>a</code> is positive, copy element in <code>b</code> to result. Otherwise, copy negated element in <code>b</code> to result. If <code>a</code> and <code>b</code> are the same vectors, it is equivalent to computing absolute value.</p>
+<h3 id="operation_87">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 2; i++) {
+  dst.dword[i] =
+      (a.dword[i] == 0) ? 0 : ((s64)a.dword[i] &gt; 0 ? b.dword[i] : -b.dword[i]);
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_83">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m128i-__lsx_vldi-imm_n1024_1023-imm">__m128i __lsx_vldi (imm_n1024_1023 imm)</h2>
+<h3 id="synopsis_88">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vldi (imm_n1024_1023 imm)
+#include &lt;lsxintrin.h&gt;
+Instruction: vldi vr, imm
+CPU Flags: LSX
+</code></pre>
+<h3 id="description_88">Description</h3>
+<p>Initialize <code>dst</code> using predefined patterns:</p>
+<ul>
+<li><code>imm[12:10]=0b000</code>: broadcast <code>imm[7:0]</code> as 8-bit elements to all lanes</li>
+<li><code>imm[12:10]=0b001</code>: broadcast sign-extended <code>imm[9:0]</code> as 16-bit elements to all lanes</li>
+<li><code>imm[12:10]=0b010</code>: broadcast sign-extended <code>imm[9:0]</code> as 32-bit elements to all lanes</li>
+<li><code>imm[12:10]=0b011</code>: broadcast sign-extended <code>imm[9:0]</code> as 64-bit elements to all lanes</li>
+<li><code>imm[12:8]=0b10000</code>: broadcast <code>imm[7:0]</code> as 32-bit elements to all lanes</li>
+<li><code>imm[12:8]=0b10001</code>: broadcast <code>imm[7:0] &lt;&lt; 8</code> as 32-bit elements to all lanes</li>
+<li><code>imm[12:8]=0b10010</code>: broadcast <code>imm[7:0] &lt;&lt; 16</code> as 32-bit elements to all lanes</li>
+<li><code>imm[12:8]=0b10011</code>: broadcast <code>imm[7:0] &lt;&lt; 24</code> as 32-bit elements to all lanes</li>
+<li><code>imm[12:8]=0b10100</code>: broadcast <code>imm[7:0]</code> as 16-bit elements to all lanes</li>
+<li><code>imm[12:8]=0b10101</code>: broadcast <code>imm[7:0] &lt;&lt; 8</code> as 16-bit elements to all lanes</li>
+<li><code>imm[12:8]=0b10110</code>: broadcast <code>(imm[7:0] &lt;&lt; 8) | 0xFF</code> as 32-bit elements to all lanes</li>
+<li><code>imm[12:8]=0b10111</code>: broadcast <code>(imm[7:0] &lt;&lt; 16) | 0xFFFF</code> as 32-bit elements to all lanes</li>
+<li><code>imm[12:8]=0b11000</code>: broadcast <code>imm[7:0]</code> as 8-bit elements to all lanes</li>
+<li><code>imm[12:8]=0b11001</code>: repeat each bit of <code>imm[7:0]</code> eight times, and broadcast the result as 64-bit elements to all lanes</li>
+<li><code>imm[12:8]=0b11010</code>: broadcast <code>(imm[7] &lt;&lt; 31) | ((1-imm[6]) &lt;&lt; 30) | ((imm[6] * 0x1F) &lt;&lt; 25) | (imm[5:0] &lt;&lt; 19)</code> as 32-bit elements to all lanes</li>
+<li><code>imm[12:8]=0b11011</code>: broadcast <code>(imm[7] &lt;&lt; 31) | ((1-imm[6]) &lt;&lt; 30) | ((imm[6] * 0x1F) &lt;&lt; 25) | (imm[5:0] &lt;&lt; 19)</code> as 64-bit elements to all lanes</li>
+<li><code>imm[12:8]=0b11100</code>: broadcast <code>(imm[7] &lt;&lt; 63) | ((1-imm[6]) &lt;&lt; 62) | ((imm[6] * 0xFF) &lt;&lt; 54) | (imm[5:0] &lt;&lt; 48)</code> as 64-bit elements to all lanes</li>
+</ul>
+<h3 id="operation_88">Operation</h3>
+<pre><code class="language-c++">u64 imm12_10 = (imm &gt;&gt; 10) &amp; 0b111;
+u64 imm12_8 = (imm &gt;&gt; 8) &amp; 0b11111;
+u64 imm9_0 = imm &amp; 0x3FF;
+s64 simm9_0 = ((s64)imm9_0 &lt;&lt; 54) &gt;&gt; 54;
+u64 imm7_0 = imm &amp; 0xFF;
+u64 imm7 = (imm &gt;&gt; 7) &amp; 0x1;
+u64 imm6 = (imm &gt;&gt; 6) &amp; 0x1;
+u64 imm5 = (imm &gt;&gt; 5) &amp; 0x1;
+u64 imm5_0 = imm &amp; 0x3F;
+u64 imm4 = (imm &gt;&gt; 4) &amp; 0x1;
+u64 imm3 = (imm &gt;&gt; 3) &amp; 0x1;
+u64 imm2 = (imm &gt;&gt; 2) &amp; 0x1;
+u64 imm1 = (imm &gt;&gt; 1) &amp; 0x1;
+u64 imm0 = imm &amp; 0x1;
+
+u64 broadcast_value;
+u64 broadcast_width;
+if (imm12_10 == 0b000) {
+  broadcast_value = imm7_0;
+  broadcast_width = 8;
+} else if (imm12_10 == 0b001) {
+  broadcast_value = simm9_0;
+  broadcast_width = 16;
+} else if (imm12_10 == 0b010) {
+  broadcast_value = simm9_0;
+  broadcast_width = 32;
+} else if (imm12_10 == 0b011) {
+  broadcast_value = simm9_0;
+  broadcast_width = 64;
+} else if (imm12_8 == 0b10000) {
+  broadcast_value = imm7_0;
+  broadcast_width = 32;
+} else if (imm12_8 == 0b10001) {
+  broadcast_value = imm7_0 &lt;&lt; 8;
+  broadcast_width = 32;
+} else if (imm12_8 == 0b10010) {
+  broadcast_value = imm7_0 &lt;&lt; 16;
+  broadcast_width = 32;
+} else if (imm12_8 == 0b10011) {
+  broadcast_value = imm7_0 &lt;&lt; 24;
+  broadcast_width = 32;
+} else if (imm12_8 == 0b10100) {
+  broadcast_value = imm7_0;
+  broadcast_width = 16;
+} else if (imm12_8 == 0b10101) {
+  broadcast_value = imm7_0 &lt;&lt; 8;
+  broadcast_width = 16;
+} else if (imm12_8 == 0b10110) {
+  broadcast_value = (imm7_0 &lt;&lt; 8) | 0xFF;
+  broadcast_width = 32;
+} else if (imm12_8 == 0b10111) {
+  broadcast_value = (imm7_0 &lt;&lt; 16) | 0xFFFF;
+  broadcast_width = 32;
+} else if (imm12_8 == 0b11000) {
+  broadcast_value = imm7_0;
+  broadcast_width = 8;
+} else if (imm12_8 == 0b11001) {
+  broadcast_value = imm0 * 0xFF + imm1 * 0xFF00 + imm2 * 0xFF0000 +
+                    imm3 * 0xFF000000 + imm4 * 0xFF00000000 +
+                    imm5 * 0xFF0000000000 + imm6 * 0xFF000000000000 +
+                    imm7 * 0xFF00000000000000;
+  broadcast_width = 64;
+} else if (imm12_8 == 0b11010) {
+  broadcast_value = (imm7 &lt;&lt; 31) | ((1 - imm6) &lt;&lt; 30) | ((imm6 * 0x1F) &lt;&lt; 25) |
+                    (imm5_0 &lt;&lt; 19);
+  broadcast_width = 32;
+} else if (imm12_8 == 0b11011) {
+  broadcast_value = (imm7 &lt;&lt; 31) | ((1 - imm6) &lt;&lt; 30) | ((imm6 * 0x1F) &lt;&lt; 25) |
+                    (imm5_0 &lt;&lt; 19);
+  broadcast_width = 64;
+} else if (imm12_8 == 0b11100) {
+  broadcast_value = (imm7 &lt;&lt; 63) | ((1 - imm6) &lt;&lt; 62) | ((imm6 * 0xFF) &lt;&lt; 54) |
+                    (imm5_0 &lt;&lt; 48);
+  broadcast_width = 64;
+}
+
+if (broadcast_width == 8) {
+  for (int i = 0; i &lt; 16; i++) {
+    dst.byte[i] = broadcast_value;
+  }
+} else if (broadcast_width == 16) {
+  for (int i = 0; i &lt; 8; i++) {
+    dst.half[i] = broadcast_value;
+  }
+} else if (broadcast_width == 32) {
+  for (int i = 0; i &lt; 4; i++) {
+    dst.word[i] = broadcast_value;
+  }
+} else if (broadcast_width == 64) {
+  for (int i = 0; i &lt; 2; i++) {
+    dst.dword[i] = broadcast_value;
+  }
+}
+</code></pre>
+<p>Tested on real machine.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../memory/" class="btn btn-neutral float-left" title="Memory Load & Store"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../permutation/" class="btn btn-neutral float-right" title="Permutation">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p>Copyright &copy; 2023 Jiajie Chen</p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../memory/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../permutation/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+<script id="init-glightbox">const lightbox = GLightbox({"touchNavigation": true, "loop": false, "zoomable": true, "draggable": true, "openEffect": "zoom", "closeEffect": "zoom", "slideEffect": "slide"});
+</script></body>
+</html>

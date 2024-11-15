@@ -1,0 +1,2002 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://jia.je/unofficial-loongarch-intrinsics-guide/migrating_sse/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Migrating from SSE to LSX - Unofficial LoongArch Intrinsics Guide</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../main.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Migrating from SSE to LSX";
+        var mkdocs_page_input_path = "migrating_sse.md";
+        var mkdocs_page_url = "/unofficial-loongarch-intrinsics-guide/migrating_sse/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+ <link href="../assets/stylesheets/glightbox.min.css" rel="stylesheet"/><style>
+    html.glightbox-open { overflow: initial; height: 100%; }
+    .gslide-title { margin-top: 0px; user-select: text; }
+    .gslide-desc { color: #666; user-select: text; }
+    .gslide-image img { background: white; }</style> <script src="../assets/javascripts/glightbox.min.js"></script></head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Unofficial LoongArch Intrinsics Guide
+        </a>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Unofficial LoongArch Intrinsics Guide</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../latency_throughput/">Latency and Throughput of Instructions</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../migrating_avx/">Migrating from AVX to LASX</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="./">Migrating from SSE to LSX</a>
+    <ul class="current">
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../viewer/">Browse All Intrinsics</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Lasx</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../lasx/bitwise_operations/">Bitwise Operations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lasx/branch/">Branch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lasx/float_comparison/">Floating Point Comparison</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lasx/float_computation/">Floating Point Computation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lasx/float_conversion/">Floating Point Conversion</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lasx/float_misc/">Floating Point Misc</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lasx/fma/">Fused Multiply-Add</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lasx/integer_comparison/">Integer Comparison</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lasx/integer_computation/">Integer Computation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lasx/logical/">Logical</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lasx/memory/">Memory Load & Store</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lasx/misc/">Misc</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lasx/permutation/">Permutation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lasx/shift/">Shift</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lasx/shuffling/">Shuffling</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Lsx</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../lsx/bitwise_operations/">Bitwise Operations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lsx/branch/">Branch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lsx/float_comparison/">Floating Point Comparison</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lsx/float_computation/">Floating Point Computation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lsx/float_conversion/">Floating Point Conversion</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lsx/float_misc/">Floating Point Misc</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lsx/fma/">Fused Multiply-Add</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lsx/integer_comparison/">Integer Comparison</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lsx/integer_computation/">Integer Computation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lsx/logical/">Logical</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lsx/memory/">Memory Load & Store</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lsx/misc/">Misc</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lsx/permutation/">Permutation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lsx/shift/">Shift</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lsx/shuffling/">Shuffling</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Unofficial LoongArch Intrinsics Guide</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Migrating from SSE to LSX</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="migrating-from-sse-to-lsx">Migrating from SSE to LSX</h1>
+<p>SSE is a 128-bit SIMD extension to X86. It is possible to migrate existing SSE code to leverage LoongArch LSX extension by rewriting the intrinsics or instructions manually, or by using tools like <a href="https://github.com/simd-everywhere/simde">SIMD Everywhere</a> to implement SSE intrinsics with LSX counterparts. But to unleash the full performance, you may want to port your code to LSX manually.</p>
+<p>Thankfully, LSX intrinsics adopt the same type as SSE: you can use the following familiar types for SIMD:</p>
+<ul>
+<li>__m128: 128-bit vector of single precision floating point numbers</li>
+<li>__m128d: 128-bit vector of double precision floating point numbers</li>
+<li>__m128i: 128-bit vector of integers, which can be of any width</li>
+</ul>
+<p>Here is a table of a mapping from SSE intrinsics to their LSX counterpart (WIP):</p>
+<table>
+<thead>
+<tr>
+<th>SSE</th>
+<th>LSX</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>_mm_abs_epi16</td>
+<td>__lsx_vsigncov_h</td>
+</tr>
+<tr>
+<td>_mm_abs_epi32</td>
+<td>__lsx_vsigncov_w</td>
+</tr>
+<tr>
+<td>_mm_abs_epi8</td>
+<td>__lsx_vsigncov_b</td>
+</tr>
+<tr>
+<td>_mm_add_epi16</td>
+<td>__lsx_vadd_h</td>
+</tr>
+<tr>
+<td>_mm_add_epi32</td>
+<td>__lsx_vadd_w</td>
+</tr>
+<tr>
+<td>_mm_add_epi64</td>
+<td>__lsx_vadd_d</td>
+</tr>
+<tr>
+<td>_mm_add_epi8</td>
+<td>__lsx_vadd_b</td>
+</tr>
+<tr>
+<td>_mm_add_pd</td>
+<td>__lsx_vfadd_d</td>
+</tr>
+<tr>
+<td>_mm_add_ps</td>
+<td>__lsx_vfadd_s</td>
+</tr>
+<tr>
+<td>_mm_add_sd</td>
+<td>__lsx_vfadd_d + __lsx_vextrins_d</td>
+</tr>
+<tr>
+<td>_mm_add_ss</td>
+<td>__lsx_vfadd_s + __lsx_vextrins_w</td>
+</tr>
+<tr>
+<td>_mm_adds_epi16</td>
+<td>__lsx_vsadd_h</td>
+</tr>
+<tr>
+<td>_mm_adds_epi8</td>
+<td>__lsx_vsadd_b</td>
+</tr>
+<tr>
+<td>_mm_adds_epu16</td>
+<td>__lsx_vsadd_hu</td>
+</tr>
+<tr>
+<td>_mm_adds_epu8</td>
+<td>__lsx_vsadd_bu</td>
+</tr>
+<tr>
+<td>_mm_addsub_pd</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_addsub_ps</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_alignr_epi8</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_and_pd</td>
+<td>__lsx_vand_v</td>
+</tr>
+<tr>
+<td>_mm_and_ps</td>
+<td>__lsx_vand_v</td>
+</tr>
+<tr>
+<td>_mm_and_si128</td>
+<td>__lsx_vand_v</td>
+</tr>
+<tr>
+<td>_mm_andnot_pd</td>
+<td>__lsx_vandn_v</td>
+</tr>
+<tr>
+<td>_mm_andnot_ps</td>
+<td>__lsx_vandn_v</td>
+</tr>
+<tr>
+<td>_mm_andnot_si128</td>
+<td>__lsx_vandn_v</td>
+</tr>
+<tr>
+<td>_mm_avg_epu16</td>
+<td>__lsx_vavgr_hu</td>
+</tr>
+<tr>
+<td>_mm_avg_epu8</td>
+<td>__lsx_vavgr_bu</td>
+</tr>
+<tr>
+<td>_mm_blend_epi16</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_blend_pd</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_blend_ps</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_blendv_epi8</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_blendv_pd</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_blendv_ps</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_bslli_si128</td>
+<td>__lsx_vbsll_v</td>
+</tr>
+<tr>
+<td>_mm_bsrli_si128</td>
+<td>__lsx_vbsrl_v</td>
+</tr>
+<tr>
+<td>_mm_castpd_ps</td>
+<td>type conversion</td>
+</tr>
+<tr>
+<td>_mm_castpd_si128</td>
+<td>type conversion</td>
+</tr>
+<tr>
+<td>_mm_castps_pd</td>
+<td>type conversion</td>
+</tr>
+<tr>
+<td>_mm_castps_si128</td>
+<td>type conversion</td>
+</tr>
+<tr>
+<td>_mm_castsi128_pd</td>
+<td>type conversion</td>
+</tr>
+<tr>
+<td>_mm_castsi128_ps</td>
+<td>type conversion</td>
+</tr>
+<tr>
+<td>_mm_ceil_pd</td>
+<td>__lsx_vfrintrp_d</td>
+</tr>
+<tr>
+<td>_mm_ceil_ps</td>
+<td>__lsx_vfrintrp_s</td>
+</tr>
+<tr>
+<td>_mm_ceil_sd</td>
+<td>__lsx_vfrintrp_d + __lsx_vextrins_d</td>
+</tr>
+<tr>
+<td>_mm_ceil_ss</td>
+<td>__lsx_vfrintrp_s + __lsx_vextrins_w</td>
+</tr>
+<tr>
+<td>_mm_cmpeq_epi16</td>
+<td>__lsx_vseq_h</td>
+</tr>
+<tr>
+<td>_mm_cmpeq_epi32</td>
+<td>__lsx_vseq_w</td>
+</tr>
+<tr>
+<td>_mm_cmpeq_epi64</td>
+<td>__lsx_vseq_d</td>
+</tr>
+<tr>
+<td>_mm_cmpeq_epi8</td>
+<td>__lsx_vseq_b</td>
+</tr>
+<tr>
+<td>_mm_cmpeq_pd</td>
+<td>__lsx_vfcmp_ceq_d</td>
+</tr>
+<tr>
+<td>_mm_cmpeq_ps</td>
+<td>__lsx_vfcmp_ceq_s</td>
+</tr>
+<tr>
+<td>_mm_cmpeq_sd</td>
+<td>__lsx_vfcmp_ceq_d + __lsx_vextrins_d</td>
+</tr>
+<tr>
+<td>_mm_cmpeq_ss</td>
+<td>__lsx_vfcmp_ceq_s + __lsx_vextrins_w</td>
+</tr>
+<tr>
+<td>_mm_cmpestra</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_cmpestrc</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_cmpestri</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_cmpestrm</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_cmpestro</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_cmpestrs</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_cmpestrz</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_cmpge_pd</td>
+<td>__lsx_vfcmp_cle_d</td>
+</tr>
+<tr>
+<td>_mm_cmpge_ps</td>
+<td>__lsx_vfcmp_cle_s</td>
+</tr>
+<tr>
+<td>_mm_cmpge_sd</td>
+<td>__lsx_vfcmp_cle_d + __lsx_vextrins_d</td>
+</tr>
+<tr>
+<td>_mm_cmpge_ss</td>
+<td>__lsx_vfcmp_cle_s + __lsx_vextrins_w</td>
+</tr>
+<tr>
+<td>_mm_cmpgt_epi16</td>
+<td>__lsx_vslt_h</td>
+</tr>
+<tr>
+<td>_mm_cmpgt_epi32</td>
+<td>__lsx_vslt_w</td>
+</tr>
+<tr>
+<td>_mm_cmpgt_epi64</td>
+<td>__lsx_vslt_d</td>
+</tr>
+<tr>
+<td>_mm_cmpgt_epi8</td>
+<td>__lsx_vslt_b</td>
+</tr>
+<tr>
+<td>_mm_cmpgt_pd</td>
+<td>__lsx_vfcmp_clt_d</td>
+</tr>
+<tr>
+<td>_mm_cmpgt_ps</td>
+<td>__lsx_vfcmp_clt_s</td>
+</tr>
+<tr>
+<td>_mm_cmpgt_sd</td>
+<td>__lsx_vfcmp_clt_d + __lsx_vextrins_d</td>
+</tr>
+<tr>
+<td>_mm_cmpgt_ss</td>
+<td>__lsx_vfcmp_clt_s + __lsx_vextrins_w</td>
+</tr>
+<tr>
+<td>_mm_cmpistra</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_cmpistrc</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_cmpistri</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_cmpistrm</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_cmpistro</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_cmpistrs</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_cmpistrz</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_cmple_pd</td>
+<td>__lsx_vfcmp_cle_d</td>
+</tr>
+<tr>
+<td>_mm_cmple_ps</td>
+<td>__lsx_vfcmp_cle_s</td>
+</tr>
+<tr>
+<td>_mm_cmple_sd</td>
+<td>__lsx_vfcmp_cle_d + __lsx_vextrins_d</td>
+</tr>
+<tr>
+<td>_mm_cmple_ss</td>
+<td>__lsx_vfcmp_cle_s + __lsx_vextrins_w</td>
+</tr>
+<tr>
+<td>_mm_cmplt_epi16</td>
+<td>__lsx_vslt_h</td>
+</tr>
+<tr>
+<td>_mm_cmplt_epi32</td>
+<td>__lsx_vslt_w</td>
+</tr>
+<tr>
+<td>_mm_cmplt_epi8</td>
+<td>__lsx_vslt_b</td>
+</tr>
+<tr>
+<td>_mm_cmplt_pd</td>
+<td>__lsx_vfcmp_clt_d</td>
+</tr>
+<tr>
+<td>_mm_cmplt_ps</td>
+<td>__lsx_vfcmp_clt_s</td>
+</tr>
+<tr>
+<td>_mm_cmplt_sd</td>
+<td>__lsx_vfcmp_clt_d + __lsx_vextrins_d</td>
+</tr>
+<tr>
+<td>_mm_cmplt_ss</td>
+<td>__lsx_vfcmp_clt_s + __lsx_vextrins_w</td>
+</tr>
+<tr>
+<td>_mm_cmpneq_pd</td>
+<td>__lsx_vfcmp_cune_d</td>
+</tr>
+<tr>
+<td>_mm_cmpneq_ps</td>
+<td>__lsx_vfcmp_cune_s</td>
+</tr>
+<tr>
+<td>_mm_cmpneq_sd</td>
+<td>__lsx_vfcmp_cune_d + __lsx_vextrins_d</td>
+</tr>
+<tr>
+<td>_mm_cmpneq_ss</td>
+<td>__lsx_vfcmp_cune_s + __lsx_vextrins_w</td>
+</tr>
+<tr>
+<td>_mm_cmpnge_pd</td>
+<td>__lsx_vfcmp_cult_d</td>
+</tr>
+<tr>
+<td>_mm_cmpnge_ps</td>
+<td>__lsx_vfcmp_cult_s</td>
+</tr>
+<tr>
+<td>_mm_cmpnge_sd</td>
+<td>__lsx_vfcmp_cult_d + __lsx_vextrins_d</td>
+</tr>
+<tr>
+<td>_mm_cmpnge_ss</td>
+<td>__lsx_vfcmp_cult_s + __lsx_vextrins_w</td>
+</tr>
+<tr>
+<td>_mm_cmpngt_pd</td>
+<td>__lsx_vfcmp_cule_d</td>
+</tr>
+<tr>
+<td>_mm_cmpngt_ps</td>
+<td>__lsx_vfcmp_cule_s</td>
+</tr>
+<tr>
+<td>_mm_cmpngt_sd</td>
+<td>__lsx_vfcmp_cule_d + __lsx_vextrins_d</td>
+</tr>
+<tr>
+<td>_mm_cmpngt_ss</td>
+<td>__lsx_vfcmp_cule_s + __lsx_vextrins_w</td>
+</tr>
+<tr>
+<td>_mm_cmpnle_pd</td>
+<td>__lsx_vfcmp_cult_d</td>
+</tr>
+<tr>
+<td>_mm_cmpnle_ps</td>
+<td>__lsx_vfcmp_cult_s</td>
+</tr>
+<tr>
+<td>_mm_cmpnle_sd</td>
+<td>__lsx_vfcmp_cult_d + __lsx_vextrins_d</td>
+</tr>
+<tr>
+<td>_mm_cmpnle_ss</td>
+<td>__lsx_vfcmp_cult_s + __lsx_vextrins_w</td>
+</tr>
+<tr>
+<td>_mm_cmpnlt_pd</td>
+<td>__lsx_vfcmp_cule_d</td>
+</tr>
+<tr>
+<td>_mm_cmpnlt_ps</td>
+<td>__lsx_vfcmp_cule_s</td>
+</tr>
+<tr>
+<td>_mm_cmpnlt_sd</td>
+<td>__lsx_vfcmp_cule_d + __lsx_vextrins_d</td>
+</tr>
+<tr>
+<td>_mm_cmpnlt_ss</td>
+<td>__lsx_vfcmp_cule_s + __lsx_vextrins_w</td>
+</tr>
+<tr>
+<td>_mm_cmpord_pd</td>
+<td>__lsx_vfcmp_cor_d</td>
+</tr>
+<tr>
+<td>_mm_cmpord_ps</td>
+<td>__lsx_vfcmp_cor_s</td>
+</tr>
+<tr>
+<td>_mm_cmpord_sd</td>
+<td>__lsx_vfcmp_cor_d + __lsx_vextrins_d</td>
+</tr>
+<tr>
+<td>_mm_cmpord_ss</td>
+<td>__lsx_vfcmp_cor_s + __lsx_vextrins_w</td>
+</tr>
+<tr>
+<td>_mm_cmpunord_pd</td>
+<td>__lsx_vfcmp_cun_d</td>
+</tr>
+<tr>
+<td>_mm_cmpunord_ps</td>
+<td>__lsx_vfcmp_cun_s</td>
+</tr>
+<tr>
+<td>_mm_cmpunord_sd</td>
+<td>__lsx_vfcmp_cun_d + __lsx_vextrins_d</td>
+</tr>
+<tr>
+<td>_mm_cmpunord_ss</td>
+<td>__lsx_vfcmp_cun_s + __lsx_vextrins_w</td>
+</tr>
+<tr>
+<td>_mm_comieq_sd</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_comieq_ss</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_comige_sd</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_comige_ss</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_comigt_sd</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_comigt_ss</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_comile_sd</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_comile_ss</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_comilt_sd</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_comilt_ss</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_comineq_sd</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_comineq_ss</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_cvt_pi2ps</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_cvt_ps2pi</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_cvt_si2ss</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_cvt_ss2si</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_cvtepi16_epi32</td>
+<td>__lsx_vsllwil_w_h</td>
+</tr>
+<tr>
+<td>_mm_cvtepi16_epi64</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_cvtepi32_epi64</td>
+<td>__lsx_vsllwil_d_w</td>
+</tr>
+<tr>
+<td>_mm_cvtepi32_pd</td>
+<td>__lsx_vffintl_d_w</td>
+</tr>
+<tr>
+<td>_mm_cvtepi32_ps</td>
+<td>__lsx_vffint_s_w</td>
+</tr>
+<tr>
+<td>_mm_cvtepi8_epi16</td>
+<td>__lsx_vsllwil_h_b</td>
+</tr>
+<tr>
+<td>_mm_cvtepi8_epi32</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_cvtepi8_epi64</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_cvtepu16_epi32</td>
+<td>__lsx_vsllwil_wu_hu</td>
+</tr>
+<tr>
+<td>_mm_cvtepu16_epi64</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_cvtepu32_epi64</td>
+<td>__lsx_vsllwil_du_wu</td>
+</tr>
+<tr>
+<td>_mm_cvtepu8_epi16</td>
+<td>__lsx_vsllwil_hu_bu</td>
+</tr>
+<tr>
+<td>_mm_cvtepu8_epi32</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_cvtepu8_epi64</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_cvtpd_epi32</td>
+<td>__lsx_vftint_w_d</td>
+</tr>
+<tr>
+<td>_mm_cvtpd_pi32</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_cvtpd_ps</td>
+<td>__lsx_vfcvt_s_d</td>
+</tr>
+<tr>
+<td>_mm_cvtpi16_ps</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_cvtpi32_pd</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_cvtpi32_ps</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_cvtpi32x2_ps</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_cvtpi8_ps</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_cvtps_epi32</td>
+<td>__lsx_vftint_w_s</td>
+</tr>
+<tr>
+<td>_mm_cvtps_pd</td>
+<td>__lsx_vfcvtl_d_s</td>
+</tr>
+<tr>
+<td>_mm_cvtps_pi16</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_cvtps_pi32</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_cvtps_pi8</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_cvtpu16_ps</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_cvtpu8_ps</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_cvtsd_f64</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_cvtsd_si32</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_cvtsd_si64</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_cvtsd_si64x</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_cvtsd_ss</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_cvtsi128_si32</td>
+<td>__lsx_vpickve2gr_w</td>
+</tr>
+<tr>
+<td>_mm_cvtsi128_si64</td>
+<td>__lsx_vpickve2gr_d</td>
+</tr>
+<tr>
+<td>_mm_cvtsi128_si64x</td>
+<td>__lsx_vpickve2gr_d</td>
+</tr>
+<tr>
+<td>_mm_cvtsi32_sd</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_cvtsi32_si128</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_cvtsi32_ss</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_cvtsi64_sd</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_cvtsi64_si128</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_cvtsi64_ss</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_cvtsi64x_sd</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_cvtsi64x_si128</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_cvtss_f32</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_cvtss_sd</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_cvtss_si32</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_cvtss_si64</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_cvtt_ps2pi</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_cvtt_ss2si</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_cvttpd_epi32</td>
+<td>__lsx_vftint_w_d</td>
+</tr>
+<tr>
+<td>_mm_cvttpd_pi32</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_cvttps_epi32</td>
+<td>__lsx_vftint_w_s</td>
+</tr>
+<tr>
+<td>_mm_cvttps_pi32</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_cvttsd_si32</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_cvttsd_si64</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_cvttsd_si64x</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_cvttss_si32</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_cvttss_si64</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_div_pd</td>
+<td>__lsx_vfdiv_d</td>
+</tr>
+<tr>
+<td>_mm_div_ps</td>
+<td>__lsx_vfdiv_s</td>
+</tr>
+<tr>
+<td>_mm_div_sd</td>
+<td>__lsx_vfdiv_d + __lsx_vextrins_d</td>
+</tr>
+<tr>
+<td>_mm_div_ss</td>
+<td>__lsx_vfdiv_s + __lsx_vextrins_w</td>
+</tr>
+<tr>
+<td>_mm_dp_pd</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_dp_ps</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_extract_epi16</td>
+<td>__lsx_vpickve2gr_h</td>
+</tr>
+<tr>
+<td>_mm_extract_epi32</td>
+<td>__lsx_vpickve2gr_w</td>
+</tr>
+<tr>
+<td>_mm_extract_epi64</td>
+<td>__lsx_vpickve2gr_d</td>
+</tr>
+<tr>
+<td>_mm_extract_epi8</td>
+<td>__lsx_vpickve2gr_b</td>
+</tr>
+<tr>
+<td>_mm_extract_ps</td>
+<td>__lsx_vpickve2gr_w</td>
+</tr>
+<tr>
+<td>_mm_floor_pd</td>
+<td>__lsx_vfrintrm_d</td>
+</tr>
+<tr>
+<td>_mm_floor_ps</td>
+<td>__lsx_vfrintrm_s</td>
+</tr>
+<tr>
+<td>_mm_floor_sd</td>
+<td>__lsx_vfrintrm_d + __lsx_vextrins_d</td>
+</tr>
+<tr>
+<td>_mm_floor_ss</td>
+<td>__lsx_vfrintrm_s + __lsx_vextrins_w</td>
+</tr>
+<tr>
+<td>_mm_hadd_epi16</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_hadd_epi32</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_hadd_pd</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_hadd_ps</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_hadds_epi16</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_hsub_epi16</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_hsub_epi32</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_hsub_pd</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_hsub_ps</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_hsubs_epi16</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_insert_epi16</td>
+<td>__lsx_vinsgr2vr_h</td>
+</tr>
+<tr>
+<td>_mm_insert_epi32</td>
+<td>__lsx_vinsgr2vr_w</td>
+</tr>
+<tr>
+<td>_mm_insert_epi64</td>
+<td>__lsx_vinsgr2vr_d</td>
+</tr>
+<tr>
+<td>_mm_insert_epi8</td>
+<td>__lsx_vinsgr2vr_b</td>
+</tr>
+<tr>
+<td>_mm_insert_ps</td>
+<td>__lsx_vinsgr2vr_w</td>
+</tr>
+<tr>
+<td>_mm_lddqu_si128</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_load_pd</td>
+<td>__lsx_vld</td>
+</tr>
+<tr>
+<td>_mm_load_pd1</td>
+<td>__lsx_vldrepl_d</td>
+</tr>
+<tr>
+<td>_mm_load_ps</td>
+<td>__lsx_vld</td>
+</tr>
+<tr>
+<td>_mm_load_ps1</td>
+<td>__lsx_vldrepl_w</td>
+</tr>
+<tr>
+<td>_mm_load_sd</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_load_si128</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_load_ss</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_load1_pd</td>
+<td>__lsx_vldrepl_d</td>
+</tr>
+<tr>
+<td>_mm_load1_ps</td>
+<td>__lsx_vldrepl_w</td>
+</tr>
+<tr>
+<td>_mm_loaddup_pd</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_loadh_pd</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_loadh_pi</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_loadl_epi64</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_loadl_pd</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_loadl_pi</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_loadr_pd</td>
+<td>__lsx_vld + __lsx_vshuf4i_w</td>
+</tr>
+<tr>
+<td>_mm_loadr_ps</td>
+<td>__lsx_vld + __lsx_vshuf4i_w</td>
+</tr>
+<tr>
+<td>_mm_loadu_pd</td>
+<td>__lsx_vld</td>
+</tr>
+<tr>
+<td>_mm_loadu_ps</td>
+<td>__lsx_vld</td>
+</tr>
+<tr>
+<td>_mm_loadu_si128</td>
+<td>__lsx_vld</td>
+</tr>
+<tr>
+<td>_mm_loadu_si16</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_loadu_si32</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_loadu_si64</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_madd_epi16</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_maddubs_epi16</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_maskmoveu_si128</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_max_epi16</td>
+<td>__lsx_vmax_h</td>
+</tr>
+<tr>
+<td>_mm_max_epi32</td>
+<td>__lsx_vmax_w</td>
+</tr>
+<tr>
+<td>_mm_max_epi8</td>
+<td>__lsx_vmax_b</td>
+</tr>
+<tr>
+<td>_mm_max_epu16</td>
+<td>__lsx_vmax_hu</td>
+</tr>
+<tr>
+<td>_mm_max_epu32</td>
+<td>__lsx_vmax_wu</td>
+</tr>
+<tr>
+<td>_mm_max_epu8</td>
+<td>__lsx_vmax_bu</td>
+</tr>
+<tr>
+<td>_mm_max_pd</td>
+<td>__lsx_vfmax_d</td>
+</tr>
+<tr>
+<td>_mm_max_ps</td>
+<td>__lsx_vfmax_s</td>
+</tr>
+<tr>
+<td>_mm_max_sd</td>
+<td>__lsx_vfmax_d + __lsx_vextrins_d</td>
+</tr>
+<tr>
+<td>_mm_max_ss</td>
+<td>__lsx_vfmax_s + __lsx_vextrins_w</td>
+</tr>
+<tr>
+<td>_mm_min_epi16</td>
+<td>__lsx_vmin_h</td>
+</tr>
+<tr>
+<td>_mm_min_epi32</td>
+<td>__lsx_vmin_w</td>
+</tr>
+<tr>
+<td>_mm_min_epi8</td>
+<td>__lsx_vmin_b</td>
+</tr>
+<tr>
+<td>_mm_min_epu16</td>
+<td>__lsx_vmin_hu</td>
+</tr>
+<tr>
+<td>_mm_min_epu32</td>
+<td>__lsx_vmin_wu</td>
+</tr>
+<tr>
+<td>_mm_min_epu8</td>
+<td>__lsx_vmin_bu</td>
+</tr>
+<tr>
+<td>_mm_min_pd</td>
+<td>__lsx_vfmin_d</td>
+</tr>
+<tr>
+<td>_mm_min_ps</td>
+<td>__lsx_vfmin_s</td>
+</tr>
+<tr>
+<td>_mm_min_sd</td>
+<td>__lsx_vfmin_d + __lsx_vextrins_d</td>
+</tr>
+<tr>
+<td>_mm_min_ss</td>
+<td>__lsx_vfmin_s + __lsx_vextrins_w</td>
+</tr>
+<tr>
+<td>_mm_minpos_epu16</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_move_epi64</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_move_sd</td>
+<td>__lsx_vextrins_d</td>
+</tr>
+<tr>
+<td>_mm_move_ss</td>
+<td>__lsx_vextrins_w</td>
+</tr>
+<tr>
+<td>_mm_movedup_pd</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_movehdup_ps</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_movehl_ps</td>
+<td>__lsx_vilvh_d</td>
+</tr>
+<tr>
+<td>_mm_moveldup_ps</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_movelh_ps</td>
+<td>__lsx_vilvl_d</td>
+</tr>
+<tr>
+<td>_mm_movemask_epi8</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_movemask_pd</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_movemask_ps</td>
+<td>__lsx_vmskltz_w + __lsx_vpickve2gr_wu</td>
+</tr>
+<tr>
+<td>_mm_movepi64_pi64</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_movpi64_epi64</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_mpsadbw_epu8</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_mul_epi32</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_mul_epu32</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_mul_pd</td>
+<td>__lsx_vfmul_d</td>
+</tr>
+<tr>
+<td>_mm_mul_ps</td>
+<td>__lsx_vfmul_s</td>
+</tr>
+<tr>
+<td>_mm_mul_sd</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_mul_ss</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_mulhi_epi16</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_mulhi_epu16</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_mulhrs_epi16</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_mullo_epi16</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_mullo_epi32</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_or_pd</td>
+<td>__lsx_vor_v</td>
+</tr>
+<tr>
+<td>_mm_or_ps</td>
+<td>__lsx_vor_v</td>
+</tr>
+<tr>
+<td>_mm_or_si128</td>
+<td>__lsx_vor_v</td>
+</tr>
+<tr>
+<td>_mm_packs_epi16</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_packs_epi32</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_packus_epi16</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_packus_epi32</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_rcp_ps</td>
+<td>__lsx_vfrecip_s</td>
+</tr>
+<tr>
+<td>_mm_rcp_ss</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_round_pd</td>
+<td>__lsx_vfrintr*_d</td>
+</tr>
+<tr>
+<td>_mm_round_ps</td>
+<td>__lsx_vfrintr*_s</td>
+</tr>
+<tr>
+<td>_mm_round_sd</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_round_ss</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_rsqrt_ps</td>
+<td>__lsx_vfrsqrt_s</td>
+</tr>
+<tr>
+<td>_mm_rsqrt_ss</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_sad_epu8</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_set_epi16</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_set_epi32</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_set_epi64</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_set_epi64x</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_set_epi8</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_set_pd</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_set_pd1</td>
+<td>__lsx_vdrepl_d/__lsx_vreplgr2vd_d</td>
+</tr>
+<tr>
+<td>_mm_set_ps</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_set_ps1</td>
+<td>__lsx_vdrepl_w/__lsx_vreplgr2vr_w</td>
+</tr>
+<tr>
+<td>_mm_set_sd</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_set_ss</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_set1_epi16</td>
+<td>__lsx_vreplgr2vr_h</td>
+</tr>
+<tr>
+<td>_mm_set1_epi32</td>
+<td>__lsx_vreplgr2vr_w</td>
+</tr>
+<tr>
+<td>_mm_set1_epi64</td>
+<td>__lsx_vreplgr2vr_d</td>
+</tr>
+<tr>
+<td>_mm_set1_epi64x</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_set1_epi8</td>
+<td>__lsx_vreplgr2vr_b</td>
+</tr>
+<tr>
+<td>_mm_set1_pd</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_set1_ps</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_setr_epi16</td>
+<td>use lsxintrin.h--v8i16 to reverse construction</td>
+</tr>
+<tr>
+<td>_mm_setr_epi32</td>
+<td>use lsxintrin.h--v4i32 to reverse construction</td>
+</tr>
+<tr>
+<td>_mm_setr_epi64</td>
+<td>use lsxintrin.h--v2i64 to reverse construction</td>
+</tr>
+<tr>
+<td>_mm_setr_epi8</td>
+<td>use lsxintrin.h--v16i8 to reverse construction</td>
+</tr>
+<tr>
+<td>_mm_setr_pd</td>
+<td>use lsxintrin.h--v2f64 to reverse construction</td>
+</tr>
+<tr>
+<td>_mm_setr_ps</td>
+<td>use lsxintrin.h--v4f32 to reverse construction</td>
+</tr>
+<tr>
+<td>_mm_setzero_pd</td>
+<td>(__m128d)__lsx_vldi(0)</td>
+</tr>
+<tr>
+<td>_mm_setzero_ps</td>
+<td>(__m128)__lsx_vldi(0)</td>
+</tr>
+<tr>
+<td>_mm_setzero_si128</td>
+<td>__lsx_vldi(0)</td>
+</tr>
+<tr>
+<td>_mm_shuffle_epi32</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_shuffle_epi8</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_shuffle_pd</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_shuffle_ps</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_shufflehi_epi16</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_shufflelo_epi16</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_sign_epi16</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_sign_epi32</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_sign_epi8</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_sll_epi16</td>
+<td>__lsx_vsll_h</td>
+</tr>
+<tr>
+<td>_mm_sll_epi32</td>
+<td>__lsx_vsll_w</td>
+</tr>
+<tr>
+<td>_mm_sll_epi64</td>
+<td>__lsx_vsll_d</td>
+</tr>
+<tr>
+<td>_mm_slli_epi16</td>
+<td>__lsx_vslli_h</td>
+</tr>
+<tr>
+<td>_mm_slli_epi32</td>
+<td>__lsx_vslli_w</td>
+</tr>
+<tr>
+<td>_mm_slli_epi64</td>
+<td>__lsx_vslli_d</td>
+</tr>
+<tr>
+<td>_mm_slli_si128</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_sqrt_pd</td>
+<td>__lsx_vfsqrt_d</td>
+</tr>
+<tr>
+<td>_mm_sqrt_ps</td>
+<td>__lsx_vfsqrt_s</td>
+</tr>
+<tr>
+<td>_mm_sqrt_sd</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_sqrt_ss</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_sra_epi16</td>
+<td>__lsx_vsra_h</td>
+</tr>
+<tr>
+<td>_mm_sra_epi32</td>
+<td>__lsx_vsra_w</td>
+</tr>
+<tr>
+<td>_mm_srai_epi16</td>
+<td>__lsx_vsrai_h</td>
+</tr>
+<tr>
+<td>_mm_srai_epi32</td>
+<td>__lsx_vsrai_w</td>
+</tr>
+<tr>
+<td>_mm_srl_epi16</td>
+<td>__lsx_vsrl_h</td>
+</tr>
+<tr>
+<td>_mm_srl_epi32</td>
+<td>__lsx_vsrl_w</td>
+</tr>
+<tr>
+<td>_mm_srl_epi64</td>
+<td>__lsx_vsrl_d</td>
+</tr>
+<tr>
+<td>_mm_srli_epi16</td>
+<td>__lsx_vsrli_h</td>
+</tr>
+<tr>
+<td>_mm_srli_epi32</td>
+<td>__lsx_vsrli_w</td>
+</tr>
+<tr>
+<td>_mm_srli_epi64</td>
+<td>__lsx_vsrli_d</td>
+</tr>
+<tr>
+<td>_mm_srli_si128</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_store_pd</td>
+<td>__lsx_vst</td>
+</tr>
+<tr>
+<td>_mm_store_pd1</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_store_ps</td>
+<td>__lsx_vst</td>
+</tr>
+<tr>
+<td>_mm_store_ps1</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_store_sd</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_store_si128</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_store_ss</td>
+<td>__lsx_vstelm_w</td>
+</tr>
+<tr>
+<td>_mm_store1_pd</td>
+<td>__lsx_vreplvei_d + __lsx_vst</td>
+</tr>
+<tr>
+<td>_mm_store1_ps</td>
+<td>__lsx_vreplvei_w + __lsx_vst</td>
+</tr>
+<tr>
+<td>_mm_storeh_pd</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_storeh_pi</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_storel_epi64</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_storel_pd</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_storel_pi</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_storer_pd</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_storer_ps</td>
+<td>__lsx_vshuf4i_w + __lsx_vst</td>
+</tr>
+<tr>
+<td>_mm_storeu_pd</td>
+<td>__lsx_vst</td>
+</tr>
+<tr>
+<td>_mm_storeu_ps</td>
+<td>__lsx_vst</td>
+</tr>
+<tr>
+<td>_mm_storeu_si128</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_storeu_si16</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_storeu_si32</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_storeu_si64</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_stream_load_si128</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_stream_pd</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_stream_ps</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_stream_si128</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_sub_epi16</td>
+<td>__lsx_vsub_h</td>
+</tr>
+<tr>
+<td>_mm_sub_epi32</td>
+<td>__lsx_vsub_w</td>
+</tr>
+<tr>
+<td>_mm_sub_epi64</td>
+<td>__lsx_vsub_d</td>
+</tr>
+<tr>
+<td>_mm_sub_epi8</td>
+<td>__lsx_vsub_b</td>
+</tr>
+<tr>
+<td>_mm_sub_pd</td>
+<td>__lsx_vfsub_s</td>
+</tr>
+<tr>
+<td>_mm_sub_ps</td>
+<td>__lsx_vfsub_s</td>
+</tr>
+<tr>
+<td>_mm_sub_sd</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_sub_ss</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_subs_epi16</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_subs_epi8</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_subs_epu16</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_subs_epu8</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_test_all_ones</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_test_all_zeros</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_test_mix_ones_zeros</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_testc_si128</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_testnzc_si128</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_testz_si128</td>
+<td></td>
+</tr>
+<tr>
+<td>_MM_TRANSPOSE4_PS</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_ucomieq_sd</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_ucomieq_ss</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_ucomige_sd</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_ucomige_ss</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_ucomigt_sd</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_ucomigt_ss</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_ucomile_sd</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_ucomile_ss</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_ucomilt_sd</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_ucomilt_ss</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_ucomineq_sd</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_ucomineq_ss</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_undefined_pd</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_undefined_ps</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_undefined_si128</td>
+<td></td>
+</tr>
+<tr>
+<td>_mm_unpackhi_epi16</td>
+<td>__lsx_vilvh_h</td>
+</tr>
+<tr>
+<td>_mm_unpackhi_epi32</td>
+<td>__lsx_vilvh_w</td>
+</tr>
+<tr>
+<td>_mm_unpackhi_epi64</td>
+<td>__lsx_vilvh_d</td>
+</tr>
+<tr>
+<td>_mm_unpackhi_epi8</td>
+<td>__lsx_vilvh_b</td>
+</tr>
+<tr>
+<td>_mm_unpackhi_pd</td>
+<td>__lsx_vilvh_d</td>
+</tr>
+<tr>
+<td>_mm_unpackhi_ps</td>
+<td>__lsx_vilvh_w</td>
+</tr>
+<tr>
+<td>_mm_unpacklo_epi16</td>
+<td>__lsx_vilvl_h</td>
+</tr>
+<tr>
+<td>_mm_unpacklo_epi32</td>
+<td>__lsx_vilvl_w</td>
+</tr>
+<tr>
+<td>_mm_unpacklo_epi64</td>
+<td>__lsx_vilvl_d</td>
+</tr>
+<tr>
+<td>_mm_unpacklo_epi8</td>
+<td>__lsx_vilvl_b</td>
+</tr>
+<tr>
+<td>_mm_unpacklo_pd</td>
+<td>__lsx_vilvl_d</td>
+</tr>
+<tr>
+<td>_mm_unpacklo_ps</td>
+<td>__lsx_vilvl_w</td>
+</tr>
+<tr>
+<td>_mm_xor_pd</td>
+<td>__lsx_vxor_v</td>
+</tr>
+<tr>
+<td>_mm_xor_ps</td>
+<td>__lsx_vxor_v</td>
+</tr>
+<tr>
+<td>_mm_xor_si128</td>
+<td>__lsx_vxor_v</td>
+</tr>
+</tbody>
+</table>
+<p>The list of SSE intrinsics came from <a href="https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.htm">Intel Intrinsics Guide</a>.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../migrating_avx/" class="btn btn-neutral float-left" title="Migrating from AVX to LASX"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../viewer/" class="btn btn-neutral float-right" title="Browse All Intrinsics">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p>Copyright &copy; 2023 Jiajie Chen</p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../migrating_avx/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../viewer/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+<script id="init-glightbox">const lightbox = GLightbox({"touchNavigation": true, "loop": false, "zoomable": true, "draggable": true, "openEffect": "zoom", "closeEffect": "zoom", "slideEffect": "slide"});
+</script></body>
+</html>
