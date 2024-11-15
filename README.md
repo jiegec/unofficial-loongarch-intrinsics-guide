@@ -1,5 +1,7 @@
 # Unofficial LoongArch Intrinsics Guide
 
+[![DOI](https://zenodo.org/badge/730251036.svg)](https://doi.org/10.5281/zenodo.14169508)
+
 Visit <http://jia.je/unofficial-loongarch-intrinsics-guide/>
 
 Arranged from QEMU implementation and [GCC Intrinsics](https://gcc.gnu.org/onlinedocs/gcc/LoongArch-SX-Vector-Intrinsics.html)
