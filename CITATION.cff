@@ -11,3 +11,6 @@ identifiers:
   - type: doi
     value: 10.5281/zenodo.14169508
 date-released: 2024-11-15
+repository-code: >-
+  https://github.com/jiegec/unofficial-loongarch-intrinsics-guide
+url: 'https://jia.je/unofficial-loongarch-intrinsics-guide/'
