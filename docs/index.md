@@ -31,3 +31,7 @@ union lasx_register {
   double fp64[4];
 };
 ```
+
+The GitHub repo is [jiegec/unofficial-loongarch-intrinsics-guide](https://github.com/jiegec/unofficial-loongarch-intrinsics-guide).
+
+Contributions are welcome.
