@@ -1,0 +1,2164 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://jia.je/unofficial-loongarch-intrinsics-guide/lasx/integer_comparison/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Integer Comparison - Unofficial LoongArch Intrinsics Guide</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../../main.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Integer Comparison";
+        var mkdocs_page_input_path = "lasx/integer_comparison.md";
+        var mkdocs_page_url = "/unofficial-loongarch-intrinsics-guide/lasx/integer_comparison/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+ <link href="../../assets/stylesheets/glightbox.min.css" rel="stylesheet"/><style>
+    html.glightbox-open { overflow: initial; height: 100%; }
+    .gslide-title { margin-top: 0px; user-select: text; }
+    .gslide-desc { color: #666; user-select: text; }
+    .gslide-image img { background: white; }</style> <script src="../../assets/javascripts/glightbox.min.js"></script></head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> Unofficial LoongArch Intrinsics Guide
+        </a>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Unofficial LoongArch Intrinsics Guide</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../latency_throughput/">Latency and Throughput of Instructions</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../migrating_avx/">Migrating from AVX to LASX</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../migrating_sse/">Migrating from SSE to LSX</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../viewer/">Browse All Intrinsics</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Lasx</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../bitwise_operations/">Bitwise Operations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../branch/">Branch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../float_comparison/">Floating Point Comparison</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../float_computation/">Floating Point Computation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../float_conversion/">Floating Point Conversion</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../float_misc/">Floating Point Misc</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../fma/">Fused Multiply-Add</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Integer Comparison</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#__m256i-__lasx_xvseq_b-__m256i-a-__m256i-b">__m256i __lasx_xvseq_b (__m256i a, __m256i b)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m256i-__lasx_xvseq_h-__m256i-a-__m256i-b">__m256i __lasx_xvseq_h (__m256i a, __m256i b)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_1">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_1">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_1">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_1">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m256i-__lasx_xvseq_w-__m256i-a-__m256i-b">__m256i __lasx_xvseq_w (__m256i a, __m256i b)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_2">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_2">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_2">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_2">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m256i-__lasx_xvseq_d-__m256i-a-__m256i-b">__m256i __lasx_xvseq_d (__m256i a, __m256i b)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_3">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_3">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_3">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_3">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m256i-__lasx_xvseqi_b-__m256i-a-imm_n16_15-imm">__m256i __lasx_xvseqi_b (__m256i a, imm_n16_15 imm)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_4">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_4">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_4">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_4">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m256i-__lasx_xvseqi_h-__m256i-a-imm_n16_15-imm">__m256i __lasx_xvseqi_h (__m256i a, imm_n16_15 imm)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_5">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_5">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_5">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_5">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m256i-__lasx_xvseqi_w-__m256i-a-imm_n16_15-imm">__m256i __lasx_xvseqi_w (__m256i a, imm_n16_15 imm)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_6">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_6">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_6">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_6">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m256i-__lasx_xvseqi_d-__m256i-a-imm_n16_15-imm">__m256i __lasx_xvseqi_d (__m256i a, imm_n16_15 imm)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_7">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_7">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_7">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_7">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m256i-__lasx_xvslt_b-__m256i-a-__m256i-b">__m256i __lasx_xvslt_b (__m256i a, __m256i b)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_8">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_8">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_8">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_8">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m256i-__lasx_xvslt_bu-__m256i-a-__m256i-b">__m256i __lasx_xvslt_bu (__m256i a, __m256i b)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_9">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_9">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_9">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_9">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m256i-__lasx_xvslt_h-__m256i-a-__m256i-b">__m256i __lasx_xvslt_h (__m256i a, __m256i b)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_10">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_10">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_10">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_10">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m256i-__lasx_xvslt_hu-__m256i-a-__m256i-b">__m256i __lasx_xvslt_hu (__m256i a, __m256i b)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_11">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_11">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_11">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_11">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m256i-__lasx_xvslt_w-__m256i-a-__m256i-b">__m256i __lasx_xvslt_w (__m256i a, __m256i b)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_12">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_12">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_12">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_12">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m256i-__lasx_xvslt_wu-__m256i-a-__m256i-b">__m256i __lasx_xvslt_wu (__m256i a, __m256i b)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_13">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_13">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_13">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_13">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m256i-__lasx_xvslt_d-__m256i-a-__m256i-b">__m256i __lasx_xvslt_d (__m256i a, __m256i b)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_14">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_14">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_14">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_14">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m256i-__lasx_xvslt_du-__m256i-a-__m256i-b">__m256i __lasx_xvslt_du (__m256i a, __m256i b)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_15">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_15">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_15">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_15">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m256i-__lasx_xvslti_b-__m256i-a-imm_n16_15-imm">__m256i __lasx_xvslti_b (__m256i a, imm_n16_15 imm)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_16">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_16">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_16">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_16">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m256i-__lasx_xvslti_bu-__m256i-a-imm0_31-imm">__m256i __lasx_xvslti_bu (__m256i a, imm0_31 imm)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_17">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_17">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_17">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_17">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m256i-__lasx_xvslti_h-__m256i-a-imm_n16_15-imm">__m256i __lasx_xvslti_h (__m256i a, imm_n16_15 imm)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_18">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_18">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_18">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_18">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m256i-__lasx_xvslti_hu-__m256i-a-imm0_31-imm">__m256i __lasx_xvslti_hu (__m256i a, imm0_31 imm)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_19">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_19">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_19">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_19">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m256i-__lasx_xvslti_w-__m256i-a-imm_n16_15-imm">__m256i __lasx_xvslti_w (__m256i a, imm_n16_15 imm)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_20">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_20">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_20">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_20">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m256i-__lasx_xvslti_wu-__m256i-a-imm0_31-imm">__m256i __lasx_xvslti_wu (__m256i a, imm0_31 imm)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_21">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_21">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_21">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_21">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m256i-__lasx_xvslti_d-__m256i-a-imm_n16_15-imm">__m256i __lasx_xvslti_d (__m256i a, imm_n16_15 imm)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_22">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_22">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_22">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_22">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m256i-__lasx_xvslti_du-__m256i-a-imm0_31-imm">__m256i __lasx_xvslti_du (__m256i a, imm0_31 imm)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_23">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_23">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_23">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_23">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m256i-__lasx_xvsle_b-__m256i-a-__m256i-b">__m256i __lasx_xvsle_b (__m256i a, __m256i b)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_24">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_24">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_24">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_24">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m256i-__lasx_xvsle_bu-__m256i-a-__m256i-b">__m256i __lasx_xvsle_bu (__m256i a, __m256i b)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_25">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_25">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_25">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_25">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m256i-__lasx_xvsle_h-__m256i-a-__m256i-b">__m256i __lasx_xvsle_h (__m256i a, __m256i b)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_26">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_26">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_26">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_26">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m256i-__lasx_xvsle_hu-__m256i-a-__m256i-b">__m256i __lasx_xvsle_hu (__m256i a, __m256i b)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_27">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_27">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_27">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_27">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m256i-__lasx_xvsle_w-__m256i-a-__m256i-b">__m256i __lasx_xvsle_w (__m256i a, __m256i b)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_28">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_28">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_28">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_28">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m256i-__lasx_xvsle_wu-__m256i-a-__m256i-b">__m256i __lasx_xvsle_wu (__m256i a, __m256i b)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_29">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_29">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_29">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_29">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m256i-__lasx_xvsle_d-__m256i-a-__m256i-b">__m256i __lasx_xvsle_d (__m256i a, __m256i b)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_30">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_30">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_30">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_30">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m256i-__lasx_xvsle_du-__m256i-a-__m256i-b">__m256i __lasx_xvsle_du (__m256i a, __m256i b)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_31">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_31">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_31">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_31">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m256i-__lasx_xvslei_b-__m256i-a-imm_n16_15-imm">__m256i __lasx_xvslei_b (__m256i a, imm_n16_15 imm)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_32">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_32">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_32">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_32">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m256i-__lasx_xvslei_bu-__m256i-a-imm0_31-imm">__m256i __lasx_xvslei_bu (__m256i a, imm0_31 imm)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_33">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_33">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_33">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_33">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m256i-__lasx_xvslei_h-__m256i-a-imm_n16_15-imm">__m256i __lasx_xvslei_h (__m256i a, imm_n16_15 imm)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_34">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_34">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_34">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_34">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m256i-__lasx_xvslei_hu-__m256i-a-imm0_31-imm">__m256i __lasx_xvslei_hu (__m256i a, imm0_31 imm)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_35">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_35">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_35">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_35">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m256i-__lasx_xvslei_w-__m256i-a-imm_n16_15-imm">__m256i __lasx_xvslei_w (__m256i a, imm_n16_15 imm)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_36">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_36">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_36">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_36">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m256i-__lasx_xvslei_wu-__m256i-a-imm0_31-imm">__m256i __lasx_xvslei_wu (__m256i a, imm0_31 imm)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_37">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_37">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_37">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_37">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m256i-__lasx_xvslei_d-__m256i-a-imm_n16_15-imm">__m256i __lasx_xvslei_d (__m256i a, imm_n16_15 imm)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_38">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_38">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_38">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_38">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m256i-__lasx_xvslei_du-__m256i-a-imm0_31-imm">__m256i __lasx_xvslei_du (__m256i a, imm0_31 imm)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_39">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_39">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_39">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_39">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../integer_computation/">Integer Computation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../logical/">Logical</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../memory/">Memory Load & Store</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../misc/">Misc</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../permutation/">Permutation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../shift/">Shift</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../shuffling/">Shuffling</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Lsx</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/bitwise_operations/">Bitwise Operations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/branch/">Branch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/float_comparison/">Floating Point Comparison</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/float_computation/">Floating Point Computation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/float_conversion/">Floating Point Conversion</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/float_misc/">Floating Point Misc</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/fma/">Fused Multiply-Add</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/integer_comparison/">Integer Comparison</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/integer_computation/">Integer Computation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/logical/">Logical</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/memory/">Memory Load & Store</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/misc/">Misc</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/permutation/">Permutation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/shift/">Shift</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/shuffling/">Shuffling</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">Unofficial LoongArch Intrinsics Guide</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Lasx</li>
+      <li class="breadcrumb-item active">Integer Comparison</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="integer-comparison">Integer Comparison</h1>
+<h2 id="__m256i-__lasx_xvseq_b-__m256i-a-__m256i-b">__m256i __lasx_xvseq_b (__m256i a, __m256i b)</h2>
+<h3 id="synopsis">Synopsis</h3>
+<pre><code class="language-c++">__m256i __lasx_xvseq_b (__m256i a, __m256i b)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvseq.b xr, xr, xr
+CPU Flags: LASX
+</code></pre>
+<h3 id="description">Description</h3>
+<p>Compare the 8-bit elements in <code>a</code> and <code>b</code>, store all-ones to <code>dst</code> if equal, zero otherwise.</p>
+<h3 id="operation">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 32; i++) {
+  dst.byte[i] = (a.byte[i] == b.byte[i]) ? 0xFF : 0;
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m256i-__lasx_xvseq_h-__m256i-a-__m256i-b">__m256i __lasx_xvseq_h (__m256i a, __m256i b)</h2>
+<h3 id="synopsis_1">Synopsis</h3>
+<pre><code class="language-c++">__m256i __lasx_xvseq_h (__m256i a, __m256i b)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvseq.h xr, xr, xr
+CPU Flags: LASX
+</code></pre>
+<h3 id="description_1">Description</h3>
+<p>Compare the 16-bit elements in <code>a</code> and <code>b</code>, store all-ones to <code>dst</code> if equal, zero otherwise.</p>
+<h3 id="operation_1">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 16; i++) {
+  dst.half[i] = (a.half[i] == b.half[i]) ? 0xFFFF : 0;
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_1">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m256i-__lasx_xvseq_w-__m256i-a-__m256i-b">__m256i __lasx_xvseq_w (__m256i a, __m256i b)</h2>
+<h3 id="synopsis_2">Synopsis</h3>
+<pre><code class="language-c++">__m256i __lasx_xvseq_w (__m256i a, __m256i b)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvseq.w xr, xr, xr
+CPU Flags: LASX
+</code></pre>
+<h3 id="description_2">Description</h3>
+<p>Compare the 32-bit elements in <code>a</code> and <code>b</code>, store all-ones to <code>dst</code> if equal, zero otherwise.</p>
+<h3 id="operation_2">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 8; i++) {
+  dst.word[i] = (a.word[i] == b.word[i]) ? 0xFFFFFFFF : 0;
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_2">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m256i-__lasx_xvseq_d-__m256i-a-__m256i-b">__m256i __lasx_xvseq_d (__m256i a, __m256i b)</h2>
+<h3 id="synopsis_3">Synopsis</h3>
+<pre><code class="language-c++">__m256i __lasx_xvseq_d (__m256i a, __m256i b)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvseq.d xr, xr, xr
+CPU Flags: LASX
+</code></pre>
+<h3 id="description_3">Description</h3>
+<p>Compare the 64-bit elements in <code>a</code> and <code>b</code>, store all-ones to <code>dst</code> if equal, zero otherwise.</p>
+<h3 id="operation_3">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 4; i++) {
+  dst.dword[i] = (a.dword[i] == b.dword[i]) ? 0xFFFFFFFFFFFFFFFF : 0;
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_3">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m256i-__lasx_xvseqi_b-__m256i-a-imm_n16_15-imm">__m256i __lasx_xvseqi_b (__m256i a, imm_n16_15 imm)</h2>
+<h3 id="synopsis_4">Synopsis</h3>
+<pre><code class="language-c++">__m256i __lasx_xvseqi_b (__m256i a, imm_n16_15 imm)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvseqi.b xr, xr, imm
+CPU Flags: LASX
+</code></pre>
+<h3 id="description_4">Description</h3>
+<p>Compare the 8-bit elements in <code>a</code> and <code>imm</code>, store all-ones to <code>dst</code> if equal, zero otherwise.</p>
+<h3 id="operation_4">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 32; i++) {
+  dst.byte[i] = ((s8)a.byte[i] == imm) ? 0xFF : 0;
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_4">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m256i-__lasx_xvseqi_h-__m256i-a-imm_n16_15-imm">__m256i __lasx_xvseqi_h (__m256i a, imm_n16_15 imm)</h2>
+<h3 id="synopsis_5">Synopsis</h3>
+<pre><code class="language-c++">__m256i __lasx_xvseqi_h (__m256i a, imm_n16_15 imm)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvseqi.h xr, xr, imm
+CPU Flags: LASX
+</code></pre>
+<h3 id="description_5">Description</h3>
+<p>Compare the 16-bit elements in <code>a</code> and <code>imm</code>, store all-ones to <code>dst</code> if equal, zero otherwise.</p>
+<h3 id="operation_5">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 16; i++) {
+  dst.half[i] = ((s16)a.half[i] == imm) ? 0xFFFF : 0;
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_5">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m256i-__lasx_xvseqi_w-__m256i-a-imm_n16_15-imm">__m256i __lasx_xvseqi_w (__m256i a, imm_n16_15 imm)</h2>
+<h3 id="synopsis_6">Synopsis</h3>
+<pre><code class="language-c++">__m256i __lasx_xvseqi_w (__m256i a, imm_n16_15 imm)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvseqi.w xr, xr, imm
+CPU Flags: LASX
+</code></pre>
+<h3 id="description_6">Description</h3>
+<p>Compare the 32-bit elements in <code>a</code> and <code>imm</code>, store all-ones to <code>dst</code> if equal, zero otherwise.</p>
+<h3 id="operation_6">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 8; i++) {
+  dst.word[i] = ((s32)a.word[i] == imm) ? 0xFFFFFFFF : 0;
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_6">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m256i-__lasx_xvseqi_d-__m256i-a-imm_n16_15-imm">__m256i __lasx_xvseqi_d (__m256i a, imm_n16_15 imm)</h2>
+<h3 id="synopsis_7">Synopsis</h3>
+<pre><code class="language-c++">__m256i __lasx_xvseqi_d (__m256i a, imm_n16_15 imm)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvseqi.d xr, xr, imm
+CPU Flags: LASX
+</code></pre>
+<h3 id="description_7">Description</h3>
+<p>Compare the 64-bit elements in <code>a</code> and <code>imm</code>, store all-ones to <code>dst</code> if equal, zero otherwise.</p>
+<h3 id="operation_7">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 4; i++) {
+  dst.dword[i] = ((s64)a.dword[i] == imm) ? 0xFFFFFFFFFFFFFFFF : 0;
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_7">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m256i-__lasx_xvslt_b-__m256i-a-__m256i-b">__m256i __lasx_xvslt_b (__m256i a, __m256i b)</h2>
+<h3 id="synopsis_8">Synopsis</h3>
+<pre><code class="language-c++">__m256i __lasx_xvslt_b (__m256i a, __m256i b)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvslt.b xr, xr, xr
+CPU Flags: LASX
+</code></pre>
+<h3 id="description_8">Description</h3>
+<p>Compare the signed 8-bit elements in <code>a</code> and <code>b</code>, store all-ones to <code>dst</code> if corresponding element in <code>a</code> is less than <code>b</code>, zero otherwise.</p>
+<h3 id="operation_8">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 32; i++) {
+  dst.byte[i] = ((s8)a.byte[i] &lt; (s8)b.byte[i]) ? 0xFF : 0;
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_8">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m256i-__lasx_xvslt_bu-__m256i-a-__m256i-b">__m256i __lasx_xvslt_bu (__m256i a, __m256i b)</h2>
+<h3 id="synopsis_9">Synopsis</h3>
+<pre><code class="language-c++">__m256i __lasx_xvslt_bu (__m256i a, __m256i b)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvslt.bu xr, xr, xr
+CPU Flags: LASX
+</code></pre>
+<h3 id="description_9">Description</h3>
+<p>Compare the unsigned 8-bit elements in <code>a</code> and <code>b</code>, store all-ones to <code>dst</code> if corresponding element in <code>a</code> is less than <code>b</code>, zero otherwise.</p>
+<h3 id="operation_9">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 32; i++) {
+  dst.byte[i] = ((u8)a.byte[i] &lt; (u8)b.byte[i]) ? 0xFF : 0;
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_9">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m256i-__lasx_xvslt_h-__m256i-a-__m256i-b">__m256i __lasx_xvslt_h (__m256i a, __m256i b)</h2>
+<h3 id="synopsis_10">Synopsis</h3>
+<pre><code class="language-c++">__m256i __lasx_xvslt_h (__m256i a, __m256i b)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvslt.h xr, xr, xr
+CPU Flags: LASX
+</code></pre>
+<h3 id="description_10">Description</h3>
+<p>Compare the signed 16-bit elements in <code>a</code> and <code>b</code>, store all-ones to <code>dst</code> if corresponding element in <code>a</code> is less than <code>b</code>, zero otherwise.</p>
+<h3 id="operation_10">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 16; i++) {
+  dst.half[i] = ((s16)a.half[i] &lt; (s16)b.half[i]) ? 0xFFFF : 0;
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_10">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m256i-__lasx_xvslt_hu-__m256i-a-__m256i-b">__m256i __lasx_xvslt_hu (__m256i a, __m256i b)</h2>
+<h3 id="synopsis_11">Synopsis</h3>
+<pre><code class="language-c++">__m256i __lasx_xvslt_hu (__m256i a, __m256i b)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvslt.hu xr, xr, xr
+CPU Flags: LASX
+</code></pre>
+<h3 id="description_11">Description</h3>
+<p>Compare the unsigned 16-bit elements in <code>a</code> and <code>b</code>, store all-ones to <code>dst</code> if corresponding element in <code>a</code> is less than <code>b</code>, zero otherwise.</p>
+<h3 id="operation_11">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 16; i++) {
+  dst.half[i] = ((u16)a.half[i] &lt; (u16)b.half[i]) ? 0xFFFF : 0;
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_11">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m256i-__lasx_xvslt_w-__m256i-a-__m256i-b">__m256i __lasx_xvslt_w (__m256i a, __m256i b)</h2>
+<h3 id="synopsis_12">Synopsis</h3>
+<pre><code class="language-c++">__m256i __lasx_xvslt_w (__m256i a, __m256i b)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvslt.w xr, xr, xr
+CPU Flags: LASX
+</code></pre>
+<h3 id="description_12">Description</h3>
+<p>Compare the signed 32-bit elements in <code>a</code> and <code>b</code>, store all-ones to <code>dst</code> if corresponding element in <code>a</code> is less than <code>b</code>, zero otherwise.</p>
+<h3 id="operation_12">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 8; i++) {
+  dst.word[i] = ((s32)a.word[i] &lt; (s32)b.word[i]) ? 0xFFFFFFFF : 0;
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_12">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m256i-__lasx_xvslt_wu-__m256i-a-__m256i-b">__m256i __lasx_xvslt_wu (__m256i a, __m256i b)</h2>
+<h3 id="synopsis_13">Synopsis</h3>
+<pre><code class="language-c++">__m256i __lasx_xvslt_wu (__m256i a, __m256i b)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvslt.wu xr, xr, xr
+CPU Flags: LASX
+</code></pre>
+<h3 id="description_13">Description</h3>
+<p>Compare the unsigned 32-bit elements in <code>a</code> and <code>b</code>, store all-ones to <code>dst</code> if corresponding element in <code>a</code> is less than <code>b</code>, zero otherwise.</p>
+<h3 id="operation_13">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 8; i++) {
+  dst.word[i] = ((u32)a.word[i] &lt; (u32)b.word[i]) ? 0xFFFFFFFF : 0;
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_13">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m256i-__lasx_xvslt_d-__m256i-a-__m256i-b">__m256i __lasx_xvslt_d (__m256i a, __m256i b)</h2>
+<h3 id="synopsis_14">Synopsis</h3>
+<pre><code class="language-c++">__m256i __lasx_xvslt_d (__m256i a, __m256i b)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvslt.d xr, xr, xr
+CPU Flags: LASX
+</code></pre>
+<h3 id="description_14">Description</h3>
+<p>Compare the signed 64-bit elements in <code>a</code> and <code>b</code>, store all-ones to <code>dst</code> if corresponding element in <code>a</code> is less than <code>b</code>, zero otherwise.</p>
+<h3 id="operation_14">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 4; i++) {
+  dst.dword[i] = ((s64)a.dword[i] &lt; (s64)b.dword[i]) ? 0xFFFFFFFFFFFFFFFF : 0;
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_14">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>2</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>2</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m256i-__lasx_xvslt_du-__m256i-a-__m256i-b">__m256i __lasx_xvslt_du (__m256i a, __m256i b)</h2>
+<h3 id="synopsis_15">Synopsis</h3>
+<pre><code class="language-c++">__m256i __lasx_xvslt_du (__m256i a, __m256i b)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvslt.du xr, xr, xr
+CPU Flags: LASX
+</code></pre>
+<h3 id="description_15">Description</h3>
+<p>Compare the unsigned 64-bit elements in <code>a</code> and <code>b</code>, store all-ones to <code>dst</code> if corresponding element in <code>a</code> is less than <code>b</code>, zero otherwise.</p>
+<h3 id="operation_15">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 4; i++) {
+  dst.dword[i] = ((u64)a.dword[i] &lt; (u64)b.dword[i]) ? 0xFFFFFFFFFFFFFFFF : 0;
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_15">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>2</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>2</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m256i-__lasx_xvslti_b-__m256i-a-imm_n16_15-imm">__m256i __lasx_xvslti_b (__m256i a, imm_n16_15 imm)</h2>
+<h3 id="synopsis_16">Synopsis</h3>
+<pre><code class="language-c++">__m256i __lasx_xvslti_b (__m256i a, imm_n16_15 imm)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvslti.b xr, xr, imm
+CPU Flags: LASX
+</code></pre>
+<h3 id="description_16">Description</h3>
+<p>Compare the signed 8-bit elements in <code>a</code> and <code>imm</code>, store all-ones to <code>dst</code> if corresponding element in <code>a</code> is less than <code>b</code>, zero otherwise.</p>
+<h3 id="operation_16">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 32; i++) {
+  dst.byte[i] = ((s8)a.byte[i] &lt; imm) ? 0xFF : 0;
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_16">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m256i-__lasx_xvslti_bu-__m256i-a-imm0_31-imm">__m256i __lasx_xvslti_bu (__m256i a, imm0_31 imm)</h2>
+<h3 id="synopsis_17">Synopsis</h3>
+<pre><code class="language-c++">__m256i __lasx_xvslti_bu (__m256i a, imm0_31 imm)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvslti.bu xr, xr, imm
+CPU Flags: LASX
+</code></pre>
+<h3 id="description_17">Description</h3>
+<p>Compare the unsigned 8-bit elements in <code>a</code> and <code>imm</code>, store all-ones to <code>dst</code> if corresponding element in <code>a</code> is less than <code>b</code>, zero otherwise.</p>
+<h3 id="operation_17">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 32; i++) {
+  dst.byte[i] = ((u8)a.byte[i] &lt; imm) ? 0xFF : 0;
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_17">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m256i-__lasx_xvslti_h-__m256i-a-imm_n16_15-imm">__m256i __lasx_xvslti_h (__m256i a, imm_n16_15 imm)</h2>
+<h3 id="synopsis_18">Synopsis</h3>
+<pre><code class="language-c++">__m256i __lasx_xvslti_h (__m256i a, imm_n16_15 imm)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvslti.h xr, xr, imm
+CPU Flags: LASX
+</code></pre>
+<h3 id="description_18">Description</h3>
+<p>Compare the signed 16-bit elements in <code>a</code> and <code>imm</code>, store all-ones to <code>dst</code> if corresponding element in <code>a</code> is less than <code>b</code>, zero otherwise.</p>
+<h3 id="operation_18">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 16; i++) {
+  dst.half[i] = ((s16)a.half[i] &lt; imm) ? 0xFFFF : 0;
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_18">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m256i-__lasx_xvslti_hu-__m256i-a-imm0_31-imm">__m256i __lasx_xvslti_hu (__m256i a, imm0_31 imm)</h2>
+<h3 id="synopsis_19">Synopsis</h3>
+<pre><code class="language-c++">__m256i __lasx_xvslti_hu (__m256i a, imm0_31 imm)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvslti.hu xr, xr, imm
+CPU Flags: LASX
+</code></pre>
+<h3 id="description_19">Description</h3>
+<p>Compare the unsigned 16-bit elements in <code>a</code> and <code>imm</code>, store all-ones to <code>dst</code> if corresponding element in <code>a</code> is less than <code>b</code>, zero otherwise.</p>
+<h3 id="operation_19">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 16; i++) {
+  dst.half[i] = ((u16)a.half[i] &lt; imm) ? 0xFFFF : 0;
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_19">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m256i-__lasx_xvslti_w-__m256i-a-imm_n16_15-imm">__m256i __lasx_xvslti_w (__m256i a, imm_n16_15 imm)</h2>
+<h3 id="synopsis_20">Synopsis</h3>
+<pre><code class="language-c++">__m256i __lasx_xvslti_w (__m256i a, imm_n16_15 imm)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvslti.w xr, xr, imm
+CPU Flags: LASX
+</code></pre>
+<h3 id="description_20">Description</h3>
+<p>Compare the signed 32-bit elements in <code>a</code> and <code>imm</code>, store all-ones to <code>dst</code> if corresponding element in <code>a</code> is less than <code>b</code>, zero otherwise.</p>
+<h3 id="operation_20">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 8; i++) {
+  dst.word[i] = ((s32)a.word[i] &lt; imm) ? 0xFFFFFFFF : 0;
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_20">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m256i-__lasx_xvslti_wu-__m256i-a-imm0_31-imm">__m256i __lasx_xvslti_wu (__m256i a, imm0_31 imm)</h2>
+<h3 id="synopsis_21">Synopsis</h3>
+<pre><code class="language-c++">__m256i __lasx_xvslti_wu (__m256i a, imm0_31 imm)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvslti.wu xr, xr, imm
+CPU Flags: LASX
+</code></pre>
+<h3 id="description_21">Description</h3>
+<p>Compare the unsigned 32-bit elements in <code>a</code> and <code>imm</code>, store all-ones to <code>dst</code> if corresponding element in <code>a</code> is less than <code>b</code>, zero otherwise.</p>
+<h3 id="operation_21">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 8; i++) {
+  dst.word[i] = ((u32)a.word[i] &lt; imm) ? 0xFFFFFFFF : 0;
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_21">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m256i-__lasx_xvslti_d-__m256i-a-imm_n16_15-imm">__m256i __lasx_xvslti_d (__m256i a, imm_n16_15 imm)</h2>
+<h3 id="synopsis_22">Synopsis</h3>
+<pre><code class="language-c++">__m256i __lasx_xvslti_d (__m256i a, imm_n16_15 imm)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvslti.d xr, xr, imm
+CPU Flags: LASX
+</code></pre>
+<h3 id="description_22">Description</h3>
+<p>Compare the signed 64-bit elements in <code>a</code> and <code>imm</code>, store all-ones to <code>dst</code> if corresponding element in <code>a</code> is less than <code>b</code>, zero otherwise.</p>
+<h3 id="operation_22">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 4; i++) {
+  dst.dword[i] = ((s64)a.dword[i] &lt; imm) ? 0xFFFFFFFFFFFFFFFF : 0;
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_22">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>2</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>2</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m256i-__lasx_xvslti_du-__m256i-a-imm0_31-imm">__m256i __lasx_xvslti_du (__m256i a, imm0_31 imm)</h2>
+<h3 id="synopsis_23">Synopsis</h3>
+<pre><code class="language-c++">__m256i __lasx_xvslti_du (__m256i a, imm0_31 imm)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvslti.du xr, xr, imm
+CPU Flags: LASX
+</code></pre>
+<h3 id="description_23">Description</h3>
+<p>Compare the unsigned 64-bit elements in <code>a</code> and <code>imm</code>, store all-ones to <code>dst</code> if corresponding element in <code>a</code> is less than <code>b</code>, zero otherwise.</p>
+<h3 id="operation_23">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 4; i++) {
+  dst.dword[i] = ((u64)a.dword[i] &lt; imm) ? 0xFFFFFFFFFFFFFFFF : 0;
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_23">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>2</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>2</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m256i-__lasx_xvsle_b-__m256i-a-__m256i-b">__m256i __lasx_xvsle_b (__m256i a, __m256i b)</h2>
+<h3 id="synopsis_24">Synopsis</h3>
+<pre><code class="language-c++">__m256i __lasx_xvsle_b (__m256i a, __m256i b)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvsle.b xr, xr, xr
+CPU Flags: LASX
+</code></pre>
+<h3 id="description_24">Description</h3>
+<p>Compare the signed 8-bit elements in <code>a</code> and <code>b</code>, store all-ones to <code>dst</code> if corresponding element in <code>a</code> is less than or equal <code>b</code>, zero otherwise.</p>
+<h3 id="operation_24">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 32; i++) {
+  dst.byte[i] = ((s8)a.byte[i] &lt;= (s8)b.byte[i]) ? 0xFF : 0;
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_24">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m256i-__lasx_xvsle_bu-__m256i-a-__m256i-b">__m256i __lasx_xvsle_bu (__m256i a, __m256i b)</h2>
+<h3 id="synopsis_25">Synopsis</h3>
+<pre><code class="language-c++">__m256i __lasx_xvsle_bu (__m256i a, __m256i b)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvsle.bu xr, xr, xr
+CPU Flags: LASX
+</code></pre>
+<h3 id="description_25">Description</h3>
+<p>Compare the unsigned 8-bit elements in <code>a</code> and <code>b</code>, store all-ones to <code>dst</code> if corresponding element in <code>a</code> is less than or equal <code>b</code>, zero otherwise.</p>
+<h3 id="operation_25">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 32; i++) {
+  dst.byte[i] = ((u8)a.byte[i] &lt;= (u8)b.byte[i]) ? 0xFF : 0;
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_25">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m256i-__lasx_xvsle_h-__m256i-a-__m256i-b">__m256i __lasx_xvsle_h (__m256i a, __m256i b)</h2>
+<h3 id="synopsis_26">Synopsis</h3>
+<pre><code class="language-c++">__m256i __lasx_xvsle_h (__m256i a, __m256i b)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvsle.h xr, xr, xr
+CPU Flags: LASX
+</code></pre>
+<h3 id="description_26">Description</h3>
+<p>Compare the signed 16-bit elements in <code>a</code> and <code>b</code>, store all-ones to <code>dst</code> if corresponding element in <code>a</code> is less than or equal <code>b</code>, zero otherwise.</p>
+<h3 id="operation_26">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 16; i++) {
+  dst.half[i] = ((s16)a.half[i] &lt;= (s16)b.half[i]) ? 0xFFFF : 0;
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_26">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m256i-__lasx_xvsle_hu-__m256i-a-__m256i-b">__m256i __lasx_xvsle_hu (__m256i a, __m256i b)</h2>
+<h3 id="synopsis_27">Synopsis</h3>
+<pre><code class="language-c++">__m256i __lasx_xvsle_hu (__m256i a, __m256i b)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvsle.hu xr, xr, xr
+CPU Flags: LASX
+</code></pre>
+<h3 id="description_27">Description</h3>
+<p>Compare the unsigned 16-bit elements in <code>a</code> and <code>b</code>, store all-ones to <code>dst</code> if corresponding element in <code>a</code> is less than or equal <code>b</code>, zero otherwise.</p>
+<h3 id="operation_27">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 16; i++) {
+  dst.half[i] = ((u16)a.half[i] &lt;= (u16)b.half[i]) ? 0xFFFF : 0;
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_27">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m256i-__lasx_xvsle_w-__m256i-a-__m256i-b">__m256i __lasx_xvsle_w (__m256i a, __m256i b)</h2>
+<h3 id="synopsis_28">Synopsis</h3>
+<pre><code class="language-c++">__m256i __lasx_xvsle_w (__m256i a, __m256i b)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvsle.w xr, xr, xr
+CPU Flags: LASX
+</code></pre>
+<h3 id="description_28">Description</h3>
+<p>Compare the signed 32-bit elements in <code>a</code> and <code>b</code>, store all-ones to <code>dst</code> if corresponding element in <code>a</code> is less than or equal <code>b</code>, zero otherwise.</p>
+<h3 id="operation_28">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 8; i++) {
+  dst.word[i] = ((s32)a.word[i] &lt;= (s32)b.word[i]) ? 0xFFFFFFFF : 0;
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_28">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m256i-__lasx_xvsle_wu-__m256i-a-__m256i-b">__m256i __lasx_xvsle_wu (__m256i a, __m256i b)</h2>
+<h3 id="synopsis_29">Synopsis</h3>
+<pre><code class="language-c++">__m256i __lasx_xvsle_wu (__m256i a, __m256i b)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvsle.wu xr, xr, xr
+CPU Flags: LASX
+</code></pre>
+<h3 id="description_29">Description</h3>
+<p>Compare the unsigned 32-bit elements in <code>a</code> and <code>b</code>, store all-ones to <code>dst</code> if corresponding element in <code>a</code> is less than or equal <code>b</code>, zero otherwise.</p>
+<h3 id="operation_29">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 8; i++) {
+  dst.word[i] = ((u32)a.word[i] &lt;= (u32)b.word[i]) ? 0xFFFFFFFF : 0;
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_29">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m256i-__lasx_xvsle_d-__m256i-a-__m256i-b">__m256i __lasx_xvsle_d (__m256i a, __m256i b)</h2>
+<h3 id="synopsis_30">Synopsis</h3>
+<pre><code class="language-c++">__m256i __lasx_xvsle_d (__m256i a, __m256i b)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvsle.d xr, xr, xr
+CPU Flags: LASX
+</code></pre>
+<h3 id="description_30">Description</h3>
+<p>Compare the signed 64-bit elements in <code>a</code> and <code>b</code>, store all-ones to <code>dst</code> if corresponding element in <code>a</code> is less than or equal <code>b</code>, zero otherwise.</p>
+<h3 id="operation_30">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 4; i++) {
+  dst.dword[i] = ((s64)a.dword[i] &lt;= (s64)b.dword[i]) ? 0xFFFFFFFFFFFFFFFF : 0;
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_30">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>2</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>2</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m256i-__lasx_xvsle_du-__m256i-a-__m256i-b">__m256i __lasx_xvsle_du (__m256i a, __m256i b)</h2>
+<h3 id="synopsis_31">Synopsis</h3>
+<pre><code class="language-c++">__m256i __lasx_xvsle_du (__m256i a, __m256i b)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvsle.du xr, xr, xr
+CPU Flags: LASX
+</code></pre>
+<h3 id="description_31">Description</h3>
+<p>Compare the unsigned 64-bit elements in <code>a</code> and <code>b</code>, store all-ones to <code>dst</code> if corresponding element in <code>a</code> is less than or equal <code>b</code>, zero otherwise.</p>
+<h3 id="operation_31">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 4; i++) {
+  dst.dword[i] = ((u64)a.dword[i] &lt;= (u64)b.dword[i]) ? 0xFFFFFFFFFFFFFFFF : 0;
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_31">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>2</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>2</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m256i-__lasx_xvslei_b-__m256i-a-imm_n16_15-imm">__m256i __lasx_xvslei_b (__m256i a, imm_n16_15 imm)</h2>
+<h3 id="synopsis_32">Synopsis</h3>
+<pre><code class="language-c++">__m256i __lasx_xvslei_b (__m256i a, imm_n16_15 imm)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvslei.b xr, xr, imm
+CPU Flags: LASX
+</code></pre>
+<h3 id="description_32">Description</h3>
+<p>Compare the signed 8-bit elements in <code>a</code> and <code>b</code>, store all-ones to <code>dst</code> if corresponding element in <code>a</code> is less than or equal <code>b</code>, zero otherwise.</p>
+<h3 id="operation_32">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 32; i++) {
+  dst.byte[i] = ((s8)a.byte[i] &lt;= imm) ? 0xFF : 0;
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_32">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m256i-__lasx_xvslei_bu-__m256i-a-imm0_31-imm">__m256i __lasx_xvslei_bu (__m256i a, imm0_31 imm)</h2>
+<h3 id="synopsis_33">Synopsis</h3>
+<pre><code class="language-c++">__m256i __lasx_xvslei_bu (__m256i a, imm0_31 imm)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvslei.bu xr, xr, imm
+CPU Flags: LASX
+</code></pre>
+<h3 id="description_33">Description</h3>
+<p>Compare the unsigned 8-bit elements in <code>a</code> and <code>b</code>, store all-ones to <code>dst</code> if corresponding element in <code>a</code> is less than or equal <code>b</code>, zero otherwise.</p>
+<h3 id="operation_33">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 32; i++) {
+  dst.byte[i] = ((u8)a.byte[i] &lt;= imm) ? 0xFF : 0;
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_33">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m256i-__lasx_xvslei_h-__m256i-a-imm_n16_15-imm">__m256i __lasx_xvslei_h (__m256i a, imm_n16_15 imm)</h2>
+<h3 id="synopsis_34">Synopsis</h3>
+<pre><code class="language-c++">__m256i __lasx_xvslei_h (__m256i a, imm_n16_15 imm)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvslei.h xr, xr, imm
+CPU Flags: LASX
+</code></pre>
+<h3 id="description_34">Description</h3>
+<p>Compare the signed 16-bit elements in <code>a</code> and <code>b</code>, store all-ones to <code>dst</code> if corresponding element in <code>a</code> is less than or equal <code>b</code>, zero otherwise.</p>
+<h3 id="operation_34">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 16; i++) {
+  dst.half[i] = ((s16)a.half[i] &lt;= imm) ? 0xFFFF : 0;
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_34">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m256i-__lasx_xvslei_hu-__m256i-a-imm0_31-imm">__m256i __lasx_xvslei_hu (__m256i a, imm0_31 imm)</h2>
+<h3 id="synopsis_35">Synopsis</h3>
+<pre><code class="language-c++">__m256i __lasx_xvslei_hu (__m256i a, imm0_31 imm)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvslei.hu xr, xr, imm
+CPU Flags: LASX
+</code></pre>
+<h3 id="description_35">Description</h3>
+<p>Compare the unsigned 16-bit elements in <code>a</code> and <code>b</code>, store all-ones to <code>dst</code> if corresponding element in <code>a</code> is less than or equal <code>b</code>, zero otherwise.</p>
+<h3 id="operation_35">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 16; i++) {
+  dst.half[i] = ((u16)a.half[i] &lt;= imm) ? 0xFFFF : 0;
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_35">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m256i-__lasx_xvslei_w-__m256i-a-imm_n16_15-imm">__m256i __lasx_xvslei_w (__m256i a, imm_n16_15 imm)</h2>
+<h3 id="synopsis_36">Synopsis</h3>
+<pre><code class="language-c++">__m256i __lasx_xvslei_w (__m256i a, imm_n16_15 imm)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvslei.w xr, xr, imm
+CPU Flags: LASX
+</code></pre>
+<h3 id="description_36">Description</h3>
+<p>Compare the signed 32-bit elements in <code>a</code> and <code>b</code>, store all-ones to <code>dst</code> if corresponding element in <code>a</code> is less than or equal <code>b</code>, zero otherwise.</p>
+<h3 id="operation_36">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 8; i++) {
+  dst.word[i] = ((s32)a.word[i] &lt;= imm) ? 0xFFFFFFFF : 0;
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_36">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m256i-__lasx_xvslei_wu-__m256i-a-imm0_31-imm">__m256i __lasx_xvslei_wu (__m256i a, imm0_31 imm)</h2>
+<h3 id="synopsis_37">Synopsis</h3>
+<pre><code class="language-c++">__m256i __lasx_xvslei_wu (__m256i a, imm0_31 imm)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvslei.wu xr, xr, imm
+CPU Flags: LASX
+</code></pre>
+<h3 id="description_37">Description</h3>
+<p>Compare the unsigned 32-bit elements in <code>a</code> and <code>b</code>, store all-ones to <code>dst</code> if corresponding element in <code>a</code> is less than or equal <code>b</code>, zero otherwise.</p>
+<h3 id="operation_37">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 8; i++) {
+  dst.word[i] = ((u32)a.word[i] &lt;= imm) ? 0xFFFFFFFF : 0;
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_37">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m256i-__lasx_xvslei_d-__m256i-a-imm_n16_15-imm">__m256i __lasx_xvslei_d (__m256i a, imm_n16_15 imm)</h2>
+<h3 id="synopsis_38">Synopsis</h3>
+<pre><code class="language-c++">__m256i __lasx_xvslei_d (__m256i a, imm_n16_15 imm)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvslei.d xr, xr, imm
+CPU Flags: LASX
+</code></pre>
+<h3 id="description_38">Description</h3>
+<p>Compare the signed 64-bit elements in <code>a</code> and <code>b</code>, store all-ones to <code>dst</code> if corresponding element in <code>a</code> is less than or equal <code>b</code>, zero otherwise.</p>
+<h3 id="operation_38">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 4; i++) {
+  dst.dword[i] = ((s64)a.dword[i] &lt;= imm) ? 0xFFFFFFFFFFFFFFFF : 0;
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_38">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>2</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>2</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m256i-__lasx_xvslei_du-__m256i-a-imm0_31-imm">__m256i __lasx_xvslei_du (__m256i a, imm0_31 imm)</h2>
+<h3 id="synopsis_39">Synopsis</h3>
+<pre><code class="language-c++">__m256i __lasx_xvslei_du (__m256i a, imm0_31 imm)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvslei.du xr, xr, imm
+CPU Flags: LASX
+</code></pre>
+<h3 id="description_39">Description</h3>
+<p>Compare the unsigned 64-bit elements in <code>a</code> and <code>b</code>, store all-ones to <code>dst</code> if corresponding element in <code>a</code> is less than or equal <code>b</code>, zero otherwise.</p>
+<h3 id="operation_39">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 4; i++) {
+  dst.dword[i] = ((u64)a.dword[i] &lt;= imm) ? 0xFFFFFFFFFFFFFFFF : 0;
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_39">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>2</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>2</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../fma/" class="btn btn-neutral float-left" title="Fused Multiply-Add"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../integer_computation/" class="btn btn-neutral float-right" title="Integer Computation">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p>Copyright &copy; 2023 Jiajie Chen</p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../fma/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../integer_computation/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+<script id="init-glightbox">const lightbox = GLightbox({"touchNavigation": true, "loop": false, "zoomable": true, "draggable": true, "openEffect": "zoom", "closeEffect": "zoom", "slideEffect": "slide"});
+</script></body>
+</html>

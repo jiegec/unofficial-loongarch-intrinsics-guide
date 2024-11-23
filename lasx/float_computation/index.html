@@ -1,0 +1,1452 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://jia.je/unofficial-loongarch-intrinsics-guide/lasx/float_computation/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Floating Point Computation - Unofficial LoongArch Intrinsics Guide</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../../main.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Floating Point Computation";
+        var mkdocs_page_input_path = "lasx/float_computation.md";
+        var mkdocs_page_url = "/unofficial-loongarch-intrinsics-guide/lasx/float_computation/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+ <link href="../../assets/stylesheets/glightbox.min.css" rel="stylesheet"/><style>
+    html.glightbox-open { overflow: initial; height: 100%; }
+    .gslide-title { margin-top: 0px; user-select: text; }
+    .gslide-desc { color: #666; user-select: text; }
+    .gslide-image img { background: white; }</style> <script src="../../assets/javascripts/glightbox.min.js"></script></head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> Unofficial LoongArch Intrinsics Guide
+        </a>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Unofficial LoongArch Intrinsics Guide</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../latency_throughput/">Latency and Throughput of Instructions</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../migrating_avx/">Migrating from AVX to LASX</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../migrating_sse/">Migrating from SSE to LSX</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../viewer/">Browse All Intrinsics</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Lasx</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../bitwise_operations/">Bitwise Operations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../branch/">Branch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../float_comparison/">Floating Point Comparison</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Floating Point Computation</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#__m256-__lasx_xvfadd_s-__m256-a-__m256-b">__m256 __lasx_xvfadd_s (__m256 a, __m256 b)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m256d-__lasx_xvfadd_d-__m256d-a-__m256d-b">__m256d __lasx_xvfadd_d (__m256d a, __m256d b)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_1">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_1">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_1">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_1">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m256-__lasx_xvfdiv_s-__m256-a-__m256-b">__m256 __lasx_xvfdiv_s (__m256 a, __m256 b)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_2">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_2">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_2">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_2">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m256d-__lasx_xvfdiv_d-__m256d-a-__m256d-b">__m256d __lasx_xvfdiv_d (__m256d a, __m256d b)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_3">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_3">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_3">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_3">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m256-__lasx_xvfmax_s-__m256-a-__m256-b">__m256 __lasx_xvfmax_s (__m256 a, __m256 b)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_4">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_4">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_4">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_4">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m256d-__lasx_xvfmax_d-__m256d-a-__m256d-b">__m256d __lasx_xvfmax_d (__m256d a, __m256d b)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_5">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_5">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_5">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_5">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m256-__lasx_xvfmaxa_s-__m256-a-__m256-b">__m256 __lasx_xvfmaxa_s (__m256 a, __m256 b)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_6">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_6">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_6">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_6">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m256d-__lasx_xvfmaxa_d-__m256d-a-__m256d-b">__m256d __lasx_xvfmaxa_d (__m256d a, __m256d b)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_7">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_7">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_7">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_7">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m256-__lasx_xvfmin_s-__m256-a-__m256-b">__m256 __lasx_xvfmin_s (__m256 a, __m256 b)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_8">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_8">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_8">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_8">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m256d-__lasx_xvfmin_d-__m256d-a-__m256d-b">__m256d __lasx_xvfmin_d (__m256d a, __m256d b)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_9">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_9">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_9">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_9">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m256-__lasx_xvfmina_s-__m256-a-__m256-b">__m256 __lasx_xvfmina_s (__m256 a, __m256 b)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_10">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_10">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_10">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_10">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m256d-__lasx_xvfmina_d-__m256d-a-__m256d-b">__m256d __lasx_xvfmina_d (__m256d a, __m256d b)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_11">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_11">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_11">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_11">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m256-__lasx_xvfmul_s-__m256-a-__m256-b">__m256 __lasx_xvfmul_s (__m256 a, __m256 b)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_12">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_12">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_12">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_12">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m256d-__lasx_xvfmul_d-__m256d-a-__m256d-b">__m256d __lasx_xvfmul_d (__m256d a, __m256d b)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_13">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_13">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_13">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_13">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m256-__lasx_xvfsub_s-__m256-a-__m256-b">__m256 __lasx_xvfsub_s (__m256 a, __m256 b)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_14">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_14">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_14">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_14">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m256d-__lasx_xvfsub_d-__m256d-a-__m256d-b">__m256d __lasx_xvfsub_d (__m256d a, __m256d b)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_15">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_15">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_15">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_15">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m256-__lasx_xvflogb_s-__m256-a">__m256 __lasx_xvflogb_s (__m256 a)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_16">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_16">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_16">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_16">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m256d-__lasx_xvflogb_d-__m256d-a">__m256d __lasx_xvflogb_d (__m256d a)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_17">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_17">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_17">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_17">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m256-__lasx_xvfsqrt_s-__m256-a">__m256 __lasx_xvfsqrt_s (__m256 a)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_18">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_18">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_18">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_18">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m256d-__lasx_xvfsqrt_d-__m256d-a">__m256d __lasx_xvfsqrt_d (__m256d a)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_19">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_19">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_19">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_19">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m256-__lasx_xvfrsqrt_s-__m256-a">__m256 __lasx_xvfrsqrt_s (__m256 a)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_20">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_20">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_20">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_20">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m256d-__lasx_xvfrsqrt_d-__m256d-a">__m256d __lasx_xvfrsqrt_d (__m256d a)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_21">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_21">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_21">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_21">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m256-__lasx_xvfrecip_s-__m256-a">__m256 __lasx_xvfrecip_s (__m256 a)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_22">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_22">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_22">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_22">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m256d-__lasx_xvfrecip_d-__m256d-a">__m256d __lasx_xvfrecip_d (__m256d a)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_23">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_23">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_23">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_23">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m256-__lasx_xvfrsqrte_s-__m256-a">__m256 __lasx_xvfrsqrte_s (__m256 a)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_24">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_24">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_24">Operation</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m256d-__lasx_xvfrsqrte_d-__m256d-a">__m256d __lasx_xvfrsqrte_d (__m256d a)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_25">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_25">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_25">Operation</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m256-__lasx_xvfrecipe_s-__m256-a">__m256 __lasx_xvfrecipe_s (__m256 a)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_26">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_26">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_26">Operation</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#__m256d-__lasx_xvfrecipe_d-__m256d-a">__m256d __lasx_xvfrecipe_d (__m256d a)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_27">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_27">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_27">Operation</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../float_conversion/">Floating Point Conversion</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../float_misc/">Floating Point Misc</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../fma/">Fused Multiply-Add</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../integer_comparison/">Integer Comparison</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../integer_computation/">Integer Computation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../logical/">Logical</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../memory/">Memory Load & Store</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../misc/">Misc</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../permutation/">Permutation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../shift/">Shift</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../shuffling/">Shuffling</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Lsx</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/bitwise_operations/">Bitwise Operations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/branch/">Branch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/float_comparison/">Floating Point Comparison</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/float_computation/">Floating Point Computation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/float_conversion/">Floating Point Conversion</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/float_misc/">Floating Point Misc</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/fma/">Fused Multiply-Add</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/integer_comparison/">Integer Comparison</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/integer_computation/">Integer Computation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/logical/">Logical</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/memory/">Memory Load & Store</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/misc/">Misc</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/permutation/">Permutation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/shift/">Shift</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/shuffling/">Shuffling</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">Unofficial LoongArch Intrinsics Guide</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Lasx</li>
+      <li class="breadcrumb-item active">Floating Point Computation</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="floating-point-computation">Floating Point Computation</h1>
+<h2 id="__m256-__lasx_xvfadd_s-__m256-a-__m256-b">__m256 __lasx_xvfadd_s (__m256 a, __m256 b)</h2>
+<h3 id="synopsis">Synopsis</h3>
+<pre><code class="language-c++">__m256 __lasx_xvfadd_s (__m256 a, __m256 b)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvfadd.s xr, xr, xr
+CPU Flags: LASX
+</code></pre>
+<h3 id="description">Description</h3>
+<p>Add single precision floating point elements in <code>a</code> to elements in <code>b</code>.</p>
+<h3 id="operation">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 8; i++) {
+  dst.fp32[i] = a.fp32[i] + b.fp32[i];
+}
+</code></pre>
+<h3 id="latency-and-throughput">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>3</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>5</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m256d-__lasx_xvfadd_d-__m256d-a-__m256d-b">__m256d __lasx_xvfadd_d (__m256d a, __m256d b)</h2>
+<h3 id="synopsis_1">Synopsis</h3>
+<pre><code class="language-c++">__m256d __lasx_xvfadd_d (__m256d a, __m256d b)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvfadd.d xr, xr, xr
+CPU Flags: LASX
+</code></pre>
+<h3 id="description_1">Description</h3>
+<p>Add double precision floating point elements in <code>a</code> to elements in <code>b</code>.</p>
+<h3 id="operation_1">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 4; i++) {
+  dst.fp64[i] = a.fp64[i] + b.fp64[i];
+}
+</code></pre>
+<h3 id="latency-and-throughput_1">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>3</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>5</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m256-__lasx_xvfdiv_s-__m256-a-__m256-b">__m256 __lasx_xvfdiv_s (__m256 a, __m256 b)</h2>
+<h3 id="synopsis_2">Synopsis</h3>
+<pre><code class="language-c++">__m256 __lasx_xvfdiv_s (__m256 a, __m256 b)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvfdiv.s xr, xr, xr
+CPU Flags: LASX
+</code></pre>
+<h3 id="description_2">Description</h3>
+<p>Divide single precision floating point elements in <code>a</code> by elements in <code>b</code>.</p>
+<h3 id="operation_2">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 8; i++) {
+  dst.fp32[i] = a.fp32[i] / b.fp32[i];
+}
+</code></pre>
+<h3 id="latency-and-throughput_2">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>11</td>
+<td>0.18(1/5.5)</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>11, 19.5</td>
+<td>0.1(1/10.5)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m256d-__lasx_xvfdiv_d-__m256d-a-__m256d-b">__m256d __lasx_xvfdiv_d (__m256d a, __m256d b)</h2>
+<h3 id="synopsis_3">Synopsis</h3>
+<pre><code class="language-c++">__m256d __lasx_xvfdiv_d (__m256d a, __m256d b)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvfdiv.d xr, xr, xr
+CPU Flags: LASX
+</code></pre>
+<h3 id="description_3">Description</h3>
+<p>Divide double precision floating point elements in <code>a</code> by elements in <code>b</code>.</p>
+<h3 id="operation_3">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 4; i++) {
+  dst.fp64[i] = a.fp64[i] / b.fp64[i];
+}
+</code></pre>
+<h3 id="latency-and-throughput_3">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>8, 21.5</td>
+<td>0.25(1/4)</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>8, 17</td>
+<td>0.08(1/12.5)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m256-__lasx_xvfmax_s-__m256-a-__m256-b">__m256 __lasx_xvfmax_s (__m256 a, __m256 b)</h2>
+<h3 id="synopsis_4">Synopsis</h3>
+<pre><code class="language-c++">__m256 __lasx_xvfmax_s (__m256 a, __m256 b)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvfmax.s xr, xr, xr
+CPU Flags: LASX
+</code></pre>
+<h3 id="description_4">Description</h3>
+<p>Compute maximum of single precision floating point elements in <code>a</code> and <code>b</code>.</p>
+<h3 id="operation_4">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 8; i++) {
+  dst.fp32[i] = fmax(a.fp32[i], b.fp32[i]);
+}
+</code></pre>
+<h3 id="latency-and-throughput_4">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>2</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>2</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m256d-__lasx_xvfmax_d-__m256d-a-__m256d-b">__m256d __lasx_xvfmax_d (__m256d a, __m256d b)</h2>
+<h3 id="synopsis_5">Synopsis</h3>
+<pre><code class="language-c++">__m256d __lasx_xvfmax_d (__m256d a, __m256d b)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvfmax.d xr, xr, xr
+CPU Flags: LASX
+</code></pre>
+<h3 id="description_5">Description</h3>
+<p>Compute maximum of double precision floating point elements in <code>a</code> and <code>b</code>.</p>
+<h3 id="operation_5">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 4; i++) {
+  dst.fp64[i] = fmax(a.fp64[i], b.fp64[i]);
+}
+</code></pre>
+<h3 id="latency-and-throughput_5">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>2</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>2</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m256-__lasx_xvfmaxa_s-__m256-a-__m256-b">__m256 __lasx_xvfmaxa_s (__m256 a, __m256 b)</h2>
+<h3 id="synopsis_6">Synopsis</h3>
+<pre><code class="language-c++">__m256 __lasx_xvfmaxa_s (__m256 a, __m256 b)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvfmaxa.s xr, xr, xr
+CPU Flags: LASX
+</code></pre>
+<h3 id="description_6">Description</h3>
+<p>Compute maximum of single precision floating point elements in <code>a</code> and <code>b</code> by magnitude.</p>
+<h3 id="operation_6">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 8; i++) {
+  dst.fp32[i] = (abs(a.fp32[i]) &gt; abs(b.fp32[i])) ? a.fp32[i] : b.fp32[i];
+}
+</code></pre>
+<h3 id="latency-and-throughput_6">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>2</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>2</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m256d-__lasx_xvfmaxa_d-__m256d-a-__m256d-b">__m256d __lasx_xvfmaxa_d (__m256d a, __m256d b)</h2>
+<h3 id="synopsis_7">Synopsis</h3>
+<pre><code class="language-c++">__m256d __lasx_xvfmaxa_d (__m256d a, __m256d b)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvfmaxa.d xr, xr, xr
+CPU Flags: LASX
+</code></pre>
+<h3 id="description_7">Description</h3>
+<p>Compute maximum of double precision floating point elements in <code>a</code> and <code>b</code> by magnitude.</p>
+<h3 id="operation_7">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 4; i++) {
+  dst.fp64[i] = (abs(a.fp64[i]) &gt; abs(b.fp64[i])) ? a.fp64[i] : b.fp64[i];
+}
+</code></pre>
+<h3 id="latency-and-throughput_7">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>2</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>2</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m256-__lasx_xvfmin_s-__m256-a-__m256-b">__m256 __lasx_xvfmin_s (__m256 a, __m256 b)</h2>
+<h3 id="synopsis_8">Synopsis</h3>
+<pre><code class="language-c++">__m256 __lasx_xvfmin_s (__m256 a, __m256 b)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvfmax.s xr, xr, xr
+CPU Flags: LASX
+</code></pre>
+<h3 id="description_8">Description</h3>
+<p>Compute minimum of single precision floating point elements in <code>a</code> and <code>b</code>.</p>
+<h3 id="operation_8">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 8; i++) {
+  dst.fp32[i] = fmin(a.fp32[i], b.fp32[i]);
+}
+</code></pre>
+<h3 id="latency-and-throughput_8">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>2</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>2</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m256d-__lasx_xvfmin_d-__m256d-a-__m256d-b">__m256d __lasx_xvfmin_d (__m256d a, __m256d b)</h2>
+<h3 id="synopsis_9">Synopsis</h3>
+<pre><code class="language-c++">__m256d __lasx_xvfmin_d (__m256d a, __m256d b)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvfmax.d xr, xr, xr
+CPU Flags: LASX
+</code></pre>
+<h3 id="description_9">Description</h3>
+<p>Compute minimum of double precision floating point elements in <code>a</code> and <code>b</code>.</p>
+<h3 id="operation_9">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 4; i++) {
+  dst.fp64[i] = fmin(a.fp64[i], b.fp64[i]);
+}
+</code></pre>
+<h3 id="latency-and-throughput_9">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>2</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>2</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m256-__lasx_xvfmina_s-__m256-a-__m256-b">__m256 __lasx_xvfmina_s (__m256 a, __m256 b)</h2>
+<h3 id="synopsis_10">Synopsis</h3>
+<pre><code class="language-c++">__m256 __lasx_xvfmina_s (__m256 a, __m256 b)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvfmina.s xr, xr, xr
+CPU Flags: LASX
+</code></pre>
+<h3 id="description_10">Description</h3>
+<p>Compute minimum of single precision floating point elements in <code>a</code> and <code>b</code> by magnitude.</p>
+<h3 id="operation_10">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 8; i++) {
+  dst.fp32[i] = (abs(a.fp32[i]) &lt; abs(b.fp32[i])) ? a.fp32[i] : b.fp32[i];
+}
+</code></pre>
+<h3 id="latency-and-throughput_10">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>2</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>2</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m256d-__lasx_xvfmina_d-__m256d-a-__m256d-b">__m256d __lasx_xvfmina_d (__m256d a, __m256d b)</h2>
+<h3 id="synopsis_11">Synopsis</h3>
+<pre><code class="language-c++">__m256d __lasx_xvfmina_d (__m256d a, __m256d b)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvfmina.d xr, xr, xr
+CPU Flags: LASX
+</code></pre>
+<h3 id="description_11">Description</h3>
+<p>Compute minimum of double precision floating point elements in <code>a</code> and <code>b</code> by magnitude.</p>
+<h3 id="operation_11">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 4; i++) {
+  dst.fp64[i] = (abs(a.fp64[i]) &lt; abs(b.fp64[i])) ? a.fp64[i] : b.fp64[i];
+}
+</code></pre>
+<h3 id="latency-and-throughput_11">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>2</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>2</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m256-__lasx_xvfmul_s-__m256-a-__m256-b">__m256 __lasx_xvfmul_s (__m256 a, __m256 b)</h2>
+<h3 id="synopsis_12">Synopsis</h3>
+<pre><code class="language-c++">__m256 __lasx_xvfmul_s (__m256 a, __m256 b)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvfmul.s xr, xr, xr
+CPU Flags: LASX
+</code></pre>
+<h3 id="description_12">Description</h3>
+<p>Multiply single precision floating point elements in <code>a</code> and elements in <code>b</code>.</p>
+<h3 id="operation_12">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 8; i++) {
+  dst.fp32[i] = a.fp32[i] * b.fp32[i];
+}
+</code></pre>
+<h3 id="latency-and-throughput_12">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>5</td>
+<td>2</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>5</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m256d-__lasx_xvfmul_d-__m256d-a-__m256d-b">__m256d __lasx_xvfmul_d (__m256d a, __m256d b)</h2>
+<h3 id="synopsis_13">Synopsis</h3>
+<pre><code class="language-c++">__m256d __lasx_xvfmul_d (__m256d a, __m256d b)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvfmul.d xr, xr, xr
+CPU Flags: LASX
+</code></pre>
+<h3 id="description_13">Description</h3>
+<p>Multiply double precision floating point elements in <code>a</code> and elements in <code>b</code>.</p>
+<h3 id="operation_13">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 4; i++) {
+  dst.fp64[i] = a.fp64[i] * b.fp64[i];
+}
+</code></pre>
+<h3 id="latency-and-throughput_13">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>5</td>
+<td>2</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>5</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m256-__lasx_xvfsub_s-__m256-a-__m256-b">__m256 __lasx_xvfsub_s (__m256 a, __m256 b)</h2>
+<h3 id="synopsis_14">Synopsis</h3>
+<pre><code class="language-c++">__m256 __lasx_xvfsub_s (__m256 a, __m256 b)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvfsub.s xr, xr, xr
+CPU Flags: LASX
+</code></pre>
+<h3 id="description_14">Description</h3>
+<p>Subtract single precision floating point elements in <code>a</code> by elements in <code>b</code>.</p>
+<h3 id="operation_14">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 8; i++) {
+  dst.fp32[i] = a.fp32[i] - b.fp32[i];
+}
+</code></pre>
+<h3 id="latency-and-throughput_14">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>3</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>5</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m256d-__lasx_xvfsub_d-__m256d-a-__m256d-b">__m256d __lasx_xvfsub_d (__m256d a, __m256d b)</h2>
+<h3 id="synopsis_15">Synopsis</h3>
+<pre><code class="language-c++">__m256d __lasx_xvfsub_d (__m256d a, __m256d b)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvfsub.d xr, xr, xr
+CPU Flags: LASX
+</code></pre>
+<h3 id="description_15">Description</h3>
+<p>Subtract double precision floating point elements in <code>a</code> by elements in <code>b</code>.</p>
+<h3 id="operation_15">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 4; i++) {
+  dst.fp64[i] = a.fp64[i] - b.fp64[i];
+}
+</code></pre>
+<h3 id="latency-and-throughput_15">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>3</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>5</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m256-__lasx_xvflogb_s-__m256-a">__m256 __lasx_xvflogb_s (__m256 a)</h2>
+<h3 id="synopsis_16">Synopsis</h3>
+<pre><code class="language-c++">__m256 __lasx_xvflogb_s (__m256 a)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvflogb.s xr, xr
+CPU Flags: LASX
+</code></pre>
+<h3 id="description_16">Description</h3>
+<p>Compute 2-based logarithm of single precision floating point elements in <code>a</code>.</p>
+<h3 id="operation_16">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 8; i++) {
+  dst.fp32[i] = log2(a.fp32[i]);
+}
+</code></pre>
+<h3 id="latency-and-throughput_16">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>4</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>4</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m256d-__lasx_xvflogb_d-__m256d-a">__m256d __lasx_xvflogb_d (__m256d a)</h2>
+<h3 id="synopsis_17">Synopsis</h3>
+<pre><code class="language-c++">__m256d __lasx_xvflogb_d (__m256d a)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvflogb.d xr, xr
+CPU Flags: LASX
+</code></pre>
+<h3 id="description_17">Description</h3>
+<p>Compute 2-based logarithm of double precision floating point elements in <code>a</code>.</p>
+<h3 id="operation_17">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 4; i++) {
+  dst.fp64[i] = log2(a.fp64[i]);
+}
+</code></pre>
+<h3 id="latency-and-throughput_17">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>4</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>4</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m256-__lasx_xvfsqrt_s-__m256-a">__m256 __lasx_xvfsqrt_s (__m256 a)</h2>
+<h3 id="synopsis_18">Synopsis</h3>
+<pre><code class="language-c++">__m256 __lasx_xvfsqrt_s (__m256 a)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvfsqrt.s xr, xr
+CPU Flags: LASX
+</code></pre>
+<h3 id="description_18">Description</h3>
+<p>Compute square root of single precision floating point elements in <code>a</code>.</p>
+<h3 id="operation_18">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 8; i++) {
+  dst.fp32[i] = sqrt(a.fp32[i]);
+}
+</code></pre>
+<h3 id="latency-and-throughput_18">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>15</td>
+<td>0.08(1/12)</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>15</td>
+<td>0.07(1/13.5)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m256d-__lasx_xvfsqrt_d-__m256d-a">__m256d __lasx_xvfsqrt_d (__m256d a)</h2>
+<h3 id="synopsis_19">Synopsis</h3>
+<pre><code class="language-c++">__m256d __lasx_xvfsqrt_d (__m256d a)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvfsqrt.d xr, xr
+CPU Flags: LASX
+</code></pre>
+<h3 id="description_19">Description</h3>
+<p>Compute square root of double precision floating point elements in <code>a</code>.</p>
+<h3 id="operation_19">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 4; i++) {
+  dst.fp64[i] = sqrt(a.fp64[i]);
+}
+</code></pre>
+<h3 id="latency-and-throughput_19">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>36</td>
+<td>0.06(1/17.5)</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>36</td>
+<td>0.05(1/18.5)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m256-__lasx_xvfrsqrt_s-__m256-a">__m256 __lasx_xvfrsqrt_s (__m256 a)</h2>
+<h3 id="synopsis_20">Synopsis</h3>
+<pre><code class="language-c++">__m256 __lasx_xvfrsqrt_s (__m256 a)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvfrsqrt.s xr, xr
+CPU Flags: LASX
+</code></pre>
+<h3 id="description_20">Description</h3>
+<p>Compute reciprocal of square root of single precision floating point elements in <code>a</code>.</p>
+<h3 id="operation_20">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 8; i++) {
+  dst.fp32[i] = 1.0 / sqrt(a.fp32[i]);
+}
+</code></pre>
+<h3 id="latency-and-throughput_20">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>25</td>
+<td>0.05(1/19)</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>25</td>
+<td>0.03(1/32)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m256d-__lasx_xvfrsqrt_d-__m256d-a">__m256d __lasx_xvfrsqrt_d (__m256d a)</h2>
+<h3 id="synopsis_21">Synopsis</h3>
+<pre><code class="language-c++">__m256d __lasx_xvfrsqrt_d (__m256d a)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvfrsqrt.d xr, xr
+CPU Flags: LASX
+</code></pre>
+<h3 id="description_21">Description</h3>
+<p>Compute reciprocal of square root of double precision floating point elements in <code>a</code>.</p>
+<h3 id="operation_21">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 4; i++) {
+  dst.fp64[i] = 1.0 / sqrt(a.fp64[i]);
+}
+</code></pre>
+<h3 id="latency-and-throughput_21">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>15</td>
+<td>0.04(1/26.5)</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>15</td>
+<td>0.04(1/27.5)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m256-__lasx_xvfrecip_s-__m256-a">__m256 __lasx_xvfrecip_s (__m256 a)</h2>
+<h3 id="synopsis_22">Synopsis</h3>
+<pre><code class="language-c++">__m256 __lasx_xvfrecip_s (__m256 a)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvfrecip.s xr, xr
+CPU Flags: LASX
+</code></pre>
+<h3 id="description_22">Description</h3>
+<p>Compute reciprocal of single precision floating point elements in <code>a</code>.</p>
+<h3 id="operation_22">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 8; i++) {
+  dst.fp32[i] = 1 / a.fp32[i];
+}
+</code></pre>
+<h3 id="latency-and-throughput_22">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>27</td>
+<td>0.18(1/5.5)</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>27</td>
+<td>0.14(1/7)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m256d-__lasx_xvfrecip_d-__m256d-a">__m256d __lasx_xvfrecip_d (__m256d a)</h2>
+<h3 id="synopsis_23">Synopsis</h3>
+<pre><code class="language-c++">__m256d __lasx_xvfrecip_d (__m256d a)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvfrecip.d xr, xr
+CPU Flags: LASX
+</code></pre>
+<h3 id="description_23">Description</h3>
+<p>Compute reciprocal of double precision floating point elements in <code>a</code>.</p>
+<h3 id="operation_23">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 4; i++) {
+  dst.fp64[i] = 1 / a.fp64[i];
+}
+</code></pre>
+<h3 id="latency-and-throughput_23">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3A6000</td>
+<td>23</td>
+<td>0.25(1/4)</td>
+</tr>
+<tr>
+<td>3C5000</td>
+<td>23</td>
+<td>0.08(1/12)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="__m256-__lasx_xvfrsqrte_s-__m256-a">__m256 __lasx_xvfrsqrte_s (__m256 a)</h2>
+<h3 id="synopsis_24">Synopsis</h3>
+<pre><code class="language-c++">__m256 __lasx_xvfrsqrte_s (__m256 a)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvfrsqrte.s xr, xr
+CPU Flags: LASX
+</code></pre>
+<h3 id="description_24">Description</h3>
+<p>Compute estimated reciprocal of square root of single precision floating point elements in <code>a</code>.</p>
+<h3 id="operation_24">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 8; i++) {
+  dst.fp32[i] = 1.0 / sqrt(a.fp32[i]); // estimated
+}
+</code></pre>
+<h2 id="__m256d-__lasx_xvfrsqrte_d-__m256d-a">__m256d __lasx_xvfrsqrte_d (__m256d a)</h2>
+<h3 id="synopsis_25">Synopsis</h3>
+<pre><code class="language-c++">__m256d __lasx_xvfrsqrte_d (__m256d a)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvfrsqrte.d xr, xr
+CPU Flags: LASX
+</code></pre>
+<h3 id="description_25">Description</h3>
+<p>Compute estimated reciprocal of square root of double precision floating point elements in <code>a</code>.</p>
+<h3 id="operation_25">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 4; i++) {
+  dst.fp64[i] = 1.0 / sqrt(a.fp64[i]); // estimated
+}
+</code></pre>
+<h2 id="__m256-__lasx_xvfrecipe_s-__m256-a">__m256 __lasx_xvfrecipe_s (__m256 a)</h2>
+<h3 id="synopsis_26">Synopsis</h3>
+<pre><code class="language-c++">__m256 __lasx_xvfrecipe_s (__m256 a)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvfrecipe.s xr, xr
+CPU Flags: LASX
+</code></pre>
+<h3 id="description_26">Description</h3>
+<p>Compute estimated reciprocal of single precision floating point elements in <code>a</code>.</p>
+<h3 id="operation_26">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 8; i++) {
+  dst.fp32[i] = 1 / a.fp32[i]; // estimated
+}
+</code></pre>
+<h2 id="__m256d-__lasx_xvfrecipe_d-__m256d-a">__m256d __lasx_xvfrecipe_d (__m256d a)</h2>
+<h3 id="synopsis_27">Synopsis</h3>
+<pre><code class="language-c++">__m256d __lasx_xvfrecipe_d (__m256d a)
+#include &lt;lasxintrin.h&gt;
+Instruction: xvfrecipe.d xr, xr
+CPU Flags: LASX
+</code></pre>
+<h3 id="description_27">Description</h3>
+<p>Compute estimated reciprocal of double precision floating point elements in <code>a</code>.</p>
+<h3 id="operation_27">Operation</h3>
+<pre><code class="language-c++">for (int i = 0; i &lt; 4; i++) {
+  dst.fp64[i] = 1 / a.fp64[i]; // estimated
+}
+</code></pre>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../float_comparison/" class="btn btn-neutral float-left" title="Floating Point Comparison"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../float_conversion/" class="btn btn-neutral float-right" title="Floating Point Conversion">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p>Copyright &copy; 2023 Jiajie Chen</p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../float_comparison/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../float_conversion/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+<script id="init-glightbox">const lightbox = GLightbox({"touchNavigation": true, "loop": false, "zoomable": true, "draggable": true, "openEffect": "zoom", "closeEffect": "zoom", "slideEffect": "slide"});
+</script></body>
+</html>
