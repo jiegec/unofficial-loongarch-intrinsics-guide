@@ -24,6 +24,10 @@ void test() {
   assert(__lsx_bnz_w(a) == bnz_w(a));
 
   a = __m128i{0x1111111111111100, 0x1111111111111111};
+  assert(__lsx_bnz_w(a));
+  assert(__lsx_bnz_w(a) == bnz_w(a));
+
+  a = __m128i{0x1111111100000000, 0x1111111111111111};
   assert(!__lsx_bnz_w(a));
   assert(__lsx_bnz_w(a) == bnz_w(a));
 }
