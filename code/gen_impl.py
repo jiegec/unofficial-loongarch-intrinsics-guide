@@ -1463,12 +1463,26 @@ for vlen, prefix in [(128, "v"), (256, "xv")]:
         if width == "d":
             for rounding in ["", "rm", "rp", "rz", "rne"]:
                 with open(f"{prefix}ftint{rounding}_w_{width}.h", "w") as f:
-                    print(f"for (int i = 0;i < {vlen // w};i++) {{", file=f)
-                    print(
-                        f"  dst.{int_m}[i] = (i < {vlen // 2 // w}) ? (s{int_w})a.{m}[i] : (s{int_w})b.{m}[i]; // rounding mode is not expressed in C",
-                        file=f,
-                    )
-                    print(f"}}", file=f)
+                    if prefix == "v":
+                        print(f"for (int i = 0;i < {vlen // w * 2};i++) {{", file=f)
+                        print(
+                            f"  dst.word[i] = (i < {vlen // w}) ? (s32)b.{m}[i] : (s32)a.{m}[i - {vlen // w}]; // rounding mode is not expressed in C",
+                            file=f,
+                        )
+                        print(f"}}", file=f)
+                    else:
+                        print(f"for (int i = 0;i < {vlen // w};i++) {{", file=f)
+                        print(
+                            f"  dst.word[i] = (i < {vlen // 2 // w}) ? (s32)b.{m}[i] : (s32)a.{m}[i - {vlen // 2 // w}]; // rounding mode is not expressed in C",
+                            file=f,
+                        )
+                        print(f"}}", file=f)
+                        print(f"for (int i = {vlen // w};i < {vlen // w * 2};i++) {{", file=f)
+                        print(
+                            f"  dst.word[i] = (i < {vlen // 2 // w + vlen // w}) ? (s32)b.{m}[i - {vlen // 2 // w}] : (s32)a.{m}[i - {vlen // w}]; // rounding mode is not expressed in C",
+                            file=f,
+                        )
+                        print(f"}}", file=f)
         with open(f"{prefix}ffint_{width}_{int_width}.h", "w") as f:
             print(f"for (int i = 0;i < {vlen // w};i++) {{", file=f)
             print(
@@ -1488,7 +1502,7 @@ for vlen, prefix in [(128, "v"), (256, "xv")]:
             with open(f"{prefix}f{name}_{width}.h", "w") as f:
                 print(f"for (int i = 0;i < {vlen // w};i++) {{", file=f)
                 print(
-                    f"  dst.{m}[i] = {op}(a.{m}[i], b.{m}[i]);",
+                    f"  dst.{m}[i] = f{name}(a.{m}[i], b.{m}[i]);",
                     file=f,
                 )
                 print(f"}}", file=f)
