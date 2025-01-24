@@ -3,7 +3,7 @@ site_url: https://jia.je/unofficial-loongarch-intrinsics-guide
 site_description: Unofficial LoongArch Intrinsics Guide
 theme:
   name: readthedocs
-copyright: Copyright &copy; 2023 Jiajie Chen
+copyright: Copyright &copy; 2023-2025 Jiajie Chen
 plugins:
   # we use our own search
   # - search:
