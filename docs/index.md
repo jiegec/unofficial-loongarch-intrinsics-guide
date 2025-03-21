@@ -32,6 +32,11 @@ union lasx_register {
 };
 ```
 
+In hardware, the lower bits of FP/LSX/LASX registers are shared, that is:
+
+- FP register f0 and LSX register v0 and LASX register x0 share the lowest 64 bits
+- LSX register v0 and LASX register x0 share the lowest 128 bits
+
 The GitHub repo is [jiegec/unofficial-loongarch-intrinsics-guide](https://github.com/jiegec/unofficial-loongarch-intrinsics-guide).
 
 Contributions are welcome.
