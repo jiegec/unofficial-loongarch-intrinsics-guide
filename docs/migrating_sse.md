@@ -29,7 +29,7 @@ Here is a table of a mapping from SSE intrinsics to their LSX counterpart (WIP):
 | _mm_adds_epu8           | __lsx_vsadd_bu                                 |
 | _mm_addsub_pd           |                                                |
 | _mm_addsub_ps           |                                                |
-| _mm_alignr_epi8         |                                                |
+| _mm_alignr_epi8         | __lsx_vshuf_b                                  |
 | _mm_and_pd              | __lsx_vand_v                                   |
 | _mm_and_ps              | __lsx_vand_v                                   |
 | _mm_and_si128           | __lsx_vand_v                                   |
