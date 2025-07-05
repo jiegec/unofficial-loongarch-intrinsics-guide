@@ -220,7 +220,7 @@ int main(int argc, char *argv[]) {
     it.test(N);
     uint64_t elapsed = get_time_or_cycles() - begin;
     double cycles = (double)elapsed / unit_elapsed;
-    cycles /= it.repeat; // in some tests, instructiosn are repeated
+    cycles /= it.repeat; // in some tests, instructions are repeated
 
     std::string base_name;
     size_t tp_index = name.find("_tp");
