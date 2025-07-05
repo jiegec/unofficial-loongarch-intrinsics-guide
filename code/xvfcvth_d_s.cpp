@@ -7,4 +7,3 @@ v256 xvfcvth_d_s(v256 a) {
 }
 
 void test() { XFUZZ1(xvfcvth_d_s); }
-

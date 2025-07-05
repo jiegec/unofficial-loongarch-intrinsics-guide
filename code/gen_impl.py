@@ -1431,19 +1431,47 @@ for vlen, prefix in [(128, "v"), (256, "xv")]:
         if width == "s":
             for rounding in ["", "rm", "rp", "rz", "rne"]:
                 with open(f"{prefix}ftint{rounding}l_l_{width}.h", "w") as f:
-                    print(f"for (int i = 0;i < {vlen // 2 // w};i++) {{", file=f)
-                    print(
-                        f"  dst.dword[i] = (s{int_w})a.{m}[i]; // rounding mode is not expressed in C",
-                        file=f,
-                    )
-                    print(f"}}", file=f)
+                    if vlen == 128:
+                        print(f"for (int i = 0;i < {vlen // 2 // w};i++) {{", file=f)
+                        print(
+                            f"  dst.dword[i] = (s64)a.{m}[i]; // rounding mode is not expressed in C",
+                            file=f,
+                        )
+                        print(f"}}", file=f)
+                    else:
+                        print(f"for (int i = 0;i < {vlen // 2 // w // 2};i++) {{", file=f)
+                        print(
+                            f"  dst.dword[i] = (s64)a.{m}[i]; // rounding mode is not expressed in C",
+                            file=f,
+                        )
+                        print(f"}}", file=f)
+                        print(f"for (int i = {vlen // 2 // w // 2};i < {vlen // 2 // w};i++) {{", file=f)
+                        print(
+                            f"  dst.dword[i] = (s64)a.{m}[i + {vlen // 2 // w // 2}]; // rounding mode is not expressed in C",
+                            file=f,
+                        )
+                        print(f"}}", file=f)
                 with open(f"{prefix}ftint{rounding}h_l_{width}.h", "w") as f:
-                    print(f"for (int i = 0;i < {vlen // 2 // w};i++) {{", file=f)
-                    print(
-                        f"  dst.dword[i] = (s{int_w})a.{m}[i + {vlen // 2 // w}]; // rounding mode is not expressed in C",
-                        file=f,
-                    )
-                    print(f"}}", file=f)
+                    if vlen == 128:
+                        print(f"for (int i = 0;i < {vlen // 2 // w};i++) {{", file=f)
+                        print(
+                            f"  dst.dword[i] = (s64)a.{m}[i + {vlen // 2 // w}]; // rounding mode is not expressed in C",
+                            file=f,
+                        )
+                        print(f"}}", file=f)
+                    else:
+                        print(f"for (int i = 0;i < {vlen // 2 // w // 2};i++) {{", file=f)
+                        print(
+                            f"  dst.dword[i] = (s64)a.{m}[i + {vlen // 2 // w // 2}]; // rounding mode is not expressed in C",
+                            file=f,
+                        )
+                        print(f"}}", file=f)
+                        print(f"for (int i = {vlen // 2 // w // 2};i < {vlen // 2 // w};i++) {{", file=f)
+                        print(
+                            f"  dst.dword[i] = (s64)a.{m}[i + {vlen // 2 // w}]; // rounding mode is not expressed in C",
+                            file=f,
+                        )
+                        print(f"}}", file=f)
         for rounding in ["", "rm", "rp", "rz", "rne"]:
             with open(f"{prefix}ftint{rounding}_{int_width}_{width}.h", "w") as f:
                 print(f"for (int i = 0;i < {vlen // w};i++) {{", file=f)

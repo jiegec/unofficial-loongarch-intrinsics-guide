@@ -7,4 +7,3 @@ v256 xvffintl_d_w(v256 a) {
 }
 
 void test() { XFUZZ1(xvffintl_d_w); }
-
