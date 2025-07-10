@@ -5,3 +5,4 @@ The following intrinsics are undocumented: they are not supported by either comp
 {{ xvfscale('IEEE754 scaleB', 's') }}
 {{ xvfscale('IEEE754 scaleB', 'd') }}
 
+{{ xvmepatmsk() }}

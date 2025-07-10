@@ -1495,6 +1495,14 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
         )
 
     @my_macro(env)
+    def vmepatmsk():
+        return instruction(
+            intrinsic=f"__m128i __lsx_vmepatmsk_v (int mode, int uimm5)",
+            instr=f"vmepatmsk.v vr, mode, uimm5",
+            desc=f"Compute pattern according to `mode`, then add `uimm5` to each element.",
+        )
+
+    @my_macro(env)
     def vfrint(rounding, name):
         if name == "s":
             precision = "single"

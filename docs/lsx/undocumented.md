@@ -4,3 +4,5 @@ The following intrinsics are undocumented: they are not supported by either comp
 
 {{ vfscale('IEEE754 scaleB', 's') }}
 {{ vfscale('IEEE754 scaleB', 'd') }}
+
+{{ vmepatmsk() }}
