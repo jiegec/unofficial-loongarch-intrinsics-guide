@@ -1,5 +1,6 @@
 import glob
 import re
+import os
 
 # find known insts from binutils-gdb
 with open("measure.h", "w") as f:
@@ -59,7 +60,10 @@ with open("measure.h", "w") as f:
                     # skip vset/xvset because therid destination is vd
                     if not (name.startswith("vset") or name.startswith("xvset")):
                         for depend_i in range(depend_i_begin, len(fmt_parts)):
-                            if not (fmt_parts[depend_i].startswith('v') or fmt_parts[depend_i].startswith('x')):
+                            if not (
+                                fmt_parts[depend_i].startswith("v")
+                                or fmt_parts[depend_i].startswith("x")
+                            ):
                                 # not a real dependency
                                 continue
 
@@ -132,3 +136,30 @@ with open("measure.h", "w") as f:
                             f'INSTR_TEST({name.replace(".", "_")}_tp, "{name} {", ".join(ops)}\\n")',
                             file=f,
                         )
+
+    # test undocumented intrinsics
+    for name, opcode in [
+        ("vfscaleb_s", "0x71448000"),
+        ("vfscaleb_d", "0x71450000"),
+        ("xvfscaleb_s", "0x75448000"),
+        ("xvfscaleb_d", "0x75450000"),
+    ]:
+        # inst vr0, vr0, vr1
+        print(
+            f'INSTR_TEST({name}_1, ".word {opcode} + 0 + (0 << 5) + (1 << 10)\\n")',
+            file=f,
+        )
+
+        # inst vr0, vr1, vr0
+        print(
+            f'INSTR_TEST({name}_2, ".word {opcode} + 0 + (1 << 5) + (0 << 10)\\n")',
+            file=f,
+        )
+
+        # inst vr0, vr1, vr2
+        print(
+            f'INSTR_TEST({name}_tp, ".word {opcode} + 0 + (1 << 5) + (2 << 10)\\n")',
+            file=f,
+        )
+
+os.system("clang-format -i measure.h")

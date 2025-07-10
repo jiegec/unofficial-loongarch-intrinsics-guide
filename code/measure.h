@@ -4707,3 +4707,15 @@ INSTR_TEST8(
     "xvpermi.q $xr0, $xr1, 0\nxvpermi.q $xr4, $xr5, 0\nxvpermi.q $xr8, $xr9, "
     "0\nxvpermi.q $xr12, $xr13, 0\nxvpermi.q $xr16, $xr17, 0\nxvpermi.q $xr20, "
     "$xr21, 0\nxvpermi.q $xr24, $xr25, 0\nxvpermi.q $xr28, $xr29, 0\n")
+INSTR_TEST(vfscaleb_s_1, ".word 0x71448000 + 0 + (0 << 5) + (1 << 10)\n")
+INSTR_TEST(vfscaleb_s_2, ".word 0x71448000 + 0 + (1 << 5) + (0 << 10)\n")
+INSTR_TEST(vfscaleb_s_tp, ".word 0x71448000 + 0 + (1 << 5) + (2 << 10)\n")
+INSTR_TEST(vfscaleb_d_1, ".word 0x71450000 + 0 + (0 << 5) + (1 << 10)\n")
+INSTR_TEST(vfscaleb_d_2, ".word 0x71450000 + 0 + (1 << 5) + (0 << 10)\n")
+INSTR_TEST(vfscaleb_d_tp, ".word 0x71450000 + 0 + (1 << 5) + (2 << 10)\n")
+INSTR_TEST(xvfscaleb_s_1, ".word 0x75448000 + 0 + (0 << 5) + (1 << 10)\n")
+INSTR_TEST(xvfscaleb_s_2, ".word 0x75448000 + 0 + (1 << 5) + (0 << 10)\n")
+INSTR_TEST(xvfscaleb_s_tp, ".word 0x75448000 + 0 + (1 << 5) + (2 << 10)\n")
+INSTR_TEST(xvfscaleb_d_1, ".word 0x75450000 + 0 + (0 << 5) + (1 << 10)\n")
+INSTR_TEST(xvfscaleb_d_2, ".word 0x75450000 + 0 + (1 << 5) + (0 << 10)\n")
+INSTR_TEST(xvfscaleb_d_tp, ".word 0x75450000 + 0 + (1 << 5) + (2 << 10)\n")
