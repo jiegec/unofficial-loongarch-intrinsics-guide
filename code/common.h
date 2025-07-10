@@ -355,3 +355,16 @@ int main(int argc, char *argv[]) {
   test();
   return 0;
 }
+
+// add undocumented intrinsics
+__m128 __lsx_vfscaleb_s(__m128 a, __m128i b) {
+  register __m128 a_reg asm("vr1") = a;
+  register __m128i b_reg asm("vr2") = b;
+  register __m128 result asm("vr0");
+  // vfscaleb.s v0, v1, v2
+  asm volatile(".word 0x71448000 + 0 + (1 << 5) + (2 << 10)"
+               : "=f"(result)
+               : "f"(a_reg), "f"(b_reg)
+               : "memory");
+  return result;
+}
