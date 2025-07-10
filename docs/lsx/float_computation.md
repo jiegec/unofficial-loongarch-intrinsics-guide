@@ -41,6 +41,3 @@
 
 {{ vfop('estimated reciprocal', 'recipe', 's') }}
 {{ vfop('estimated reciprocal', 'recipe', 'd') }}
-
-{{ vfscale('IEEE754 scaleB', 's') }}
-{{ vfscale('IEEE754 scaleB', 'd') }}
