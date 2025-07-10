@@ -162,4 +162,14 @@ with open("measure.h", "w") as f:
             file=f,
         )
 
+    for name, opcode in [
+        ("vmepatmsk_v", "0x729b8000"),
+        ("xvmepatmsk_v", "0x769b8000"),
+    ]:
+        # inst xr0, 0, 0
+        print(
+            f'INSTR_TEST({name}_tp, ".word {opcode} + 0 + (0 << 5) + (0 << 10)\\n")',
+            file=f,
+        )
+
 os.system("clang-format -i measure.h")
