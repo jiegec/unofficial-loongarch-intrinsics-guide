@@ -1842,6 +1842,21 @@ Initialize `dst` using predefined patterns:
 """,
         )
 
+    @my_macro(env)
+    def vfscale(desc, ty):
+        name = "scaleb"
+        if ty == "s":
+            precision = "single"
+            arg_type = "__m128"
+        else:
+            precision = "double"
+            arg_type = "__m128d"
+        return instruction(
+            intrinsic=f"{arg_type} __lsx_vf{name}_{ty} ({arg_type} a, __m128i b)",
+            instr=f"vf{name}.{ty} vr, vr, vr",
+            desc=f"Compute {desc} of {precision} precision floating point elements in `a` by integer elements in `b`.",
+        )
+
     @env.macro
     def all_intrinsics(render=True):
         result = []
