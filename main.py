@@ -1854,7 +1854,7 @@ Initialize `dst` using predefined patterns:
         return instruction(
             intrinsic=f"{arg_type} __lsx_vf{name}_{ty} ({arg_type} a, __m128i b)",
             instr=f"vf{name}.{ty} vr, vr, vr",
-            desc=f"Compute {desc} of {precision} precision floating point elements in `a` by integer elements in `b`.",
+            desc=f"Compute {desc} of {precision} precision floating point elements in `a` by integer elements in `b`. Currently undocumented.",
         )
 
     @env.macro

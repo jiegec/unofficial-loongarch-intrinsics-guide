@@ -41,3 +41,6 @@
 
 {{ xvfop('estimated reciprocal', 'recipe', 's') }}
 {{ xvfop('estimated reciprocal', 'recipe', 'd') }}
+
+{{ xvfscale('IEEE754 scaleB', 's') }}
+{{ xvfscale('IEEE754 scaleB', 'd') }}

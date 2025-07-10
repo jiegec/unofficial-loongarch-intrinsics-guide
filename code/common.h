@@ -361,7 +361,7 @@ __m128 __lsx_vfscaleb_s(__m128 a, __m128i b) {
   register __m128 a_reg asm("vr1") = a;
   register __m128i b_reg asm("vr2") = b;
   register __m128 result asm("vr0");
-  // vfscaleb.s v0, v1, v2
+  // vfscaleb.s vr0, vr1, vr2
   asm volatile(".word 0x71448000 + 0 + (1 << 5) + (2 << 10)"
                : "=f"(result)
                : "f"(a_reg), "f"(b_reg)
@@ -373,8 +373,32 @@ __m128d __lsx_vfscaleb_d(__m128d a, __m128i b) {
   register __m128d a_reg asm("vr1") = a;
   register __m128i b_reg asm("vr2") = b;
   register __m128d result asm("vr0");
-  // vfscaleb.d v0, v1, v2
+  // vfscaleb.d vr0, vr1, vr2
   asm volatile(".word 0x71450000 + 0 + (1 << 5) + (2 << 10)"
+               : "=f"(result)
+               : "f"(a_reg), "f"(b_reg)
+               : "memory");
+  return result;
+}
+
+__m256 __lasx_xvfscaleb_s(__m256 a, __m256i b) {
+  register __m256 a_reg asm("xr1") = a;
+  register __m256i b_reg asm("xr2") = b;
+  register __m256 result asm("xr0");
+  // xvfscaleb.s xr0, xr1, xr2
+  asm volatile(".word 0x75448000 + 0 + (1 << 5) + (2 << 10)"
+               : "=f"(result)
+               : "f"(a_reg), "f"(b_reg)
+               : "memory");
+  return result;
+}
+
+__m256d __lasx_xvfscaleb_d(__m256d a, __m256i b) {
+  register __m256d a_reg asm("xr1") = a;
+  register __m256i b_reg asm("xr2") = b;
+  register __m256d result asm("xr0");
+  // xvfscaleb.d xr0, xr1, xr2
+  asm volatile(".word 0x75450000 + 0 + (1 << 5) + (2 << 10)"
                : "=f"(result)
                : "f"(a_reg), "f"(b_reg)
                : "memory");
