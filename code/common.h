@@ -404,3 +404,14 @@ __m256d __lasx_xvfscaleb_d(__m256d a, __m256i b) {
                : "memory");
   return result;
 }
+
+// xvfscaleb.d xr0, xr1, xr2
+#define __lsx_vmepatmsk_v(mode, imm) \
+  ([=]() { \
+  register __m128i result asm("xr0"); \
+  asm volatile(".word 0x729b8000 + 0 + (" #mode " << 5) + (" #imm " << 10)" \
+               : "=f"(result) \
+               :  \
+               : "memory"); \
+               return result; \
+  })()
