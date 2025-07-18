@@ -1775,6 +1775,9 @@ for file in glob.glob("*.h"):
         and "wod_" not in file
         and "addw" not in file
         and "subw" not in file
+        and "exth" not in file
+        and "extl" not in file
+        and "extrins" not in file
     ):
         continue
     orig = open(file, "r", encoding="utf-8").read()
