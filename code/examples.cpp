@@ -357,8 +357,8 @@ void test() {
 
   // Permutation
   PRINT(__lsx_vpermi_w(__m128i{0x1122334455667788 COMMA 0x99aabbccddeeff00},
-                         __m128i{0xababababbbbbbbbb COMMA 0x1234123443214321},
-                         0x12));
+                       __m128i{0xababababbbbbbbbb COMMA 0x1234123443214321},
+                       0x12));
   PRINT(__lasx_xvpermi_w(
       __m256i{
           0x1122334455667788 COMMA 0x99aabbccddeeff00 COMMA 0xabcdef1212341234 COMMA 0xaabbaabbddeeddee},
@@ -377,4 +377,8 @@ void test() {
       __m256i{
           0xababababbbbbbbbb COMMA 0x1234123443214321 COMMA 0x1234123443214321 COMMA 0x5678567856785678},
       0x12));
+
+  // Undocumented
+  PRINT(__lsx_vmepatmsk_v(3, 1));
+  PRINT(__lasx_xvmepatmsk_v(3, 1));
 }
