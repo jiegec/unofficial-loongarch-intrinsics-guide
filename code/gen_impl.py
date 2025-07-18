@@ -1,6 +1,7 @@
 import os
 import glob
 import pycparser
+import subprocess
 from pycparser import c_generator
 
 widths = {
@@ -1765,11 +1766,11 @@ def evaluate(ast, i):
 # for file in glob.glob("*.h"):
 for file in glob.glob("xv*.h"):
     orig = open(file, "r", encoding="utf-8").read()
-    content = "void test() {" + orig + "}"
+    content = "void test() {" + subprocess.check_output(["cpp", "-"], stdin=open(file, "r", encoding="utf-8"), encoding='utf-8') + "\n}"
     try:
         parser = pycparser.CParser()
         parsed = parser.parse(content, "test.c")
-    except pycparser.plyparser.ParseError:
+    except pycparser.plyparser.ParseError as err:
         continue
     expanded = []
     output_content = orig
@@ -1786,6 +1787,9 @@ for file in glob.glob("xv*.h"):
                 if item.init.lvalue.name != "i":
                     continue
                 range_from = int(item.init.rvalue.value)
+            elif item.init is None:
+                # inherit i from last loop
+                range_from = range_to
             else:
                 continue
 
@@ -1802,9 +1806,12 @@ for file in glob.glob("xv*.h"):
                     expanded.append(c_generator.CGenerator().visit(new_stmt))
 
     # add comments
-    output_content += "\n // Expands to:\n"
-    for expand in expanded:
-        output_content += "// " + expand + ";\n"
+    if len(expanded) > 0:
+        output_content += "\n// Expands to:\n"
+        output_content += "\nif (0) {\n"
+        for expand in expanded:
+            output_content += expand + ";\n"
+        output_content += "\n}\n"
 
     open(file, "w", encoding="utf-8").write(output_content)
 
