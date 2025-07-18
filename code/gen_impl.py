@@ -1,4 +1,7 @@
 import os
+import glob
+import pycparser
+from pycparser import c_generator
 
 widths = {
     "b": 8,
@@ -1692,5 +1695,117 @@ for vlen, prefix in [(128, "v"), (256, "xv")]:
                     file=f,
                 )
                 print(f"}}", file=f)
+
+
+# expand i to known value
+def evaluate(ast, i):
+    if isinstance(ast, pycparser.c_ast.Assignment):
+        return pycparser.c_ast.Assignment(
+            op=ast.op, lvalue=evaluate(ast.lvalue, i), rvalue=evaluate(ast.rvalue, i)
+        )
+    elif isinstance(ast, pycparser.c_ast.ArrayRef):
+        return pycparser.c_ast.ArrayRef(
+            name=ast.name, subscript=evaluate(ast.subscript, i)
+        )
+    elif isinstance(ast, pycparser.c_ast.ID):
+        if ast.name == "i":
+            return pycparser.c_ast.Constant(type="int", value=str(i))
+    elif isinstance(ast, pycparser.c_ast.BinaryOp):
+        op = ast.op
+        left = evaluate(ast.left, i)
+        right = evaluate(ast.right, i)
+        # see if we can expand right now
+        if isinstance(left, pycparser.c_ast.Constant) and isinstance(
+            right, pycparser.c_ast.Constant
+        ):
+            if op == "<":
+                return pycparser.c_ast.Constant(
+                    type="bool", value=str(int(left.value) < int(right.value))
+                )
+            elif op == "==":
+                return pycparser.c_ast.Constant(
+                    type="bool", value=str(int(left.value) == int(right.value))
+                )
+            elif op == "+":
+                return pycparser.c_ast.Constant(
+                    type="int", value=str(int(left.value) + int(right.value))
+                )
+            elif op == "-":
+                return pycparser.c_ast.Constant(
+                    type="int", value=str(int(left.value) - int(right.value))
+                )
+            elif op == "*":
+                return pycparser.c_ast.Constant(
+                    type="int", value=str(int(left.value) * int(right.value))
+                )
+            elif op == "/":
+                return pycparser.c_ast.Constant(
+                    type="int", value=str(int(left.value) // int(right.value))
+                )
+            elif op == "%":
+                return pycparser.c_ast.Constant(
+                    type="int", value=str(int(left.value) % int(right.value))
+                )
+        return pycparser.c_ast.BinaryOp(op=ast.op, left=left, right=right)
+    elif isinstance(ast, pycparser.c_ast.TernaryOp):
+        cond = evaluate(ast.cond, i)
+        iftrue = evaluate(ast.iftrue, i)
+        iffalse = evaluate(ast.iffalse, i)
+        if isinstance(cond, pycparser.c_ast.Constant):
+            if cond.type == "bool" and cond.value == "True":
+                return iftrue
+            elif cond.type == "bool" and cond.value == "False":
+                return iffalse
+        return pycparser.c_ast.TernaryOp(cond=cond, iftrue=iftrue, iffalse=iffalse)
+
+    return ast
+
+
+# attempt to expand loops
+# for file in glob.glob("*.h"):
+for file in glob.glob("xv*.h"):
+    orig = open(file, "r", encoding="utf-8").read()
+    content = "void test() {" + orig + "}"
+    try:
+        parser = pycparser.CParser()
+        parsed = parser.parse(content, "test.c")
+    except pycparser.plyparser.ParseError:
+        continue
+    expanded = []
+    output_content = orig
+    for item in parsed.ext[0].body:
+        if isinstance(item, pycparser.c_ast.For):
+            # print("Got For", item)
+
+            # extract range_from
+            if isinstance(item.init, pycparser.c_ast.DeclList):
+                if item.init.decls[0].name != "i":
+                    continue
+                range_from = int(item.init.decls[0].init.value)
+            elif isinstance(item.init, pycparser.c_ast.Assignment):
+                if item.init.lvalue.name != "i":
+                    continue
+                range_from = int(item.init.rvalue.value)
+            else:
+                continue
+
+            # extract range_to
+            if item.cond.op != "<" or item.cond.left.name != "i":
+                continue
+            range_to = int(item.cond.right.value)
+
+            for i in range(range_from, range_to):
+                # expand i in body
+                for stmt in item.stmt:
+                    # replace [i] with actual value
+                    new_stmt = evaluate(stmt, i)
+                    expanded.append(c_generator.CGenerator().visit(new_stmt))
+
+    # add comments
+    output_content += "\n // Expands to:\n"
+    for expand in expanded:
+        output_content += "// " + expand + ";\n"
+
+    open(file, "w", encoding="utf-8").write(output_content)
 
 os.system("clang-format -i *.cpp *.h")
