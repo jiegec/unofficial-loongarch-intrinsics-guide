@@ -1596,7 +1596,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
         return instruction(
             intrinsic=f"__m256i __lasx_xvpermi_d (__m256i a, imm0_255 imm)",
             instr=f"xvpermi.d xr, xr, imm",
-            desc=f"Permute double words from `a` and `b` with indices recorded in `imm` and store into `dst`.",
+            desc=f"Permute double words from `a` with indices recorded in `imm` and store into `dst`.",
         )
 
     @env.macro
