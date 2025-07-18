@@ -1773,6 +1773,8 @@ for file in glob.glob("*.h"):
         and "vilv" not in file
         and "wev_" not in file
         and "wod_" not in file
+        and "addw" not in file
+        and "subw" not in file
     ):
         continue
     orig = open(file, "r", encoding="utf-8").read()
