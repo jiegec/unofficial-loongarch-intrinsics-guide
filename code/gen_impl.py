@@ -1763,8 +1763,9 @@ def evaluate(ast, i):
 
 
 # attempt to expand loops
-# for file in glob.glob("*.h"):
-for file in glob.glob("xv*.h"):
+for file in glob.glob("*.h"):
+    if "pick" not in file and "vilv" not in file:
+        continue
     orig = open(file, "r", encoding="utf-8").read()
     content = "void test() {" + subprocess.check_output(["cpp", "-"], stdin=open(file, "r", encoding="utf-8"), encoding='utf-8') + "\n}"
     try:
