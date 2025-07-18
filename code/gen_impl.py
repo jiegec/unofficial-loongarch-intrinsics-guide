@@ -1764,10 +1764,22 @@ def evaluate(ast, i):
 
 # attempt to expand loops
 for file in glob.glob("*.h"):
-    if "pick" not in file and "vilv" not in file:
+    if (
+        "pick" not in file
+        and "pack" not in file
+        and "vilv" not in file
+        and "ev_" not in file
+        and "od_" not in file
+    ):
         continue
     orig = open(file, "r", encoding="utf-8").read()
-    content = "void test() {" + subprocess.check_output(["cpp", "-"], stdin=open(file, "r", encoding="utf-8"), encoding='utf-8') + "\n}"
+    content = (
+        "void test() {"
+        + subprocess.check_output(
+            ["cpp", "-"], stdin=open(file, "r", encoding="utf-8"), encoding="utf-8"
+        )
+        + "\n}"
+    )
     try:
         parser = pycparser.CParser()
         parsed = parser.parse(content, "test.c")
