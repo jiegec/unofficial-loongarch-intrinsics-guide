@@ -1758,6 +1758,9 @@ def evaluate(ast, i):
             elif cond.type == "bool" and cond.value == "False":
                 return iffalse
         return pycparser.c_ast.TernaryOp(cond=cond, iftrue=iftrue, iffalse=iffalse)
+    elif isinstance(ast, pycparser.c_ast.Cast):
+        expr = evaluate(ast.expr, i)
+        return pycparser.c_ast.Cast(to_type=ast.to_type, expr=expr)
 
     return ast
 
@@ -1768,12 +1771,26 @@ for file in glob.glob("*.h"):
         "pick" not in file
         and "pack" not in file
         and "vilv" not in file
-        and "ev_" not in file
-        and "od_" not in file
+        and "wev_" not in file
+        and "wod_" not in file
     ):
         continue
     orig = open(file, "r", encoding="utf-8").read()
     content = (
+        """
+        typedef signed char s8;
+        typedef unsigned char u8;
+        typedef signed short s16;
+        typedef unsigned short u16;
+        typedef signed int s32;
+        typedef unsigned int u32;
+        typedef signed long long s64;
+        typedef unsigned long long u64;
+        typedef __int128 s128;
+        typedef unsigned __int128 u128;
+        typedef float f32;
+        typedef double f64;
+        """ +
         "void test() {"
         + subprocess.check_output(
             ["cpp", "-"], stdin=open(file, "r", encoding="utf-8"), encoding="utf-8"
@@ -1787,7 +1804,7 @@ for file in glob.glob("*.h"):
         continue
     expanded = []
     output_content = orig
-    for item in parsed.ext[0].body:
+    for item in parsed.ext[-1].body:
         if isinstance(item, pycparser.c_ast.For):
             # print("Got For", item)
 

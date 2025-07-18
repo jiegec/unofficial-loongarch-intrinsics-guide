@@ -1,3 +1,16 @@
 for (int i = 0; i < 8; i++) {
   dst.word[i] = (u32)(u16)a.half[2 * i + 1] + (s32)(s16)b.half[2 * i + 1];
 }
+
+// Expands to:
+
+if (0) {
+  dst.word[0] = ((u32)((u16)a.half[1])) + ((s32)((s16)b.half[1]));
+  dst.word[1] = ((u32)((u16)a.half[3])) + ((s32)((s16)b.half[3]));
+  dst.word[2] = ((u32)((u16)a.half[5])) + ((s32)((s16)b.half[5]));
+  dst.word[3] = ((u32)((u16)a.half[7])) + ((s32)((s16)b.half[7]));
+  dst.word[4] = ((u32)((u16)a.half[9])) + ((s32)((s16)b.half[9]));
+  dst.word[5] = ((u32)((u16)a.half[11])) + ((s32)((s16)b.half[11]));
+  dst.word[6] = ((u32)((u16)a.half[13])) + ((s32)((s16)b.half[13]));
+  dst.word[7] = ((u32)((u16)a.half[15])) + ((s32)((s16)b.half[15]));
+}

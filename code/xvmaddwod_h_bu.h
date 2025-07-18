@@ -2,3 +2,40 @@ for (int i = 0; i < 16; i++) {
   dst.half[i] =
       (u16)(u8)b.byte[2 * i + 1] * (u16)(u8)c.byte[2 * i + 1] + (u16)a.half[i];
 }
+
+// Expands to:
+
+if (0) {
+  dst.half[0] =
+      (((u16)((u8)b.byte[1])) * ((u16)((u8)c.byte[1]))) + ((u16)a.half[0]);
+  dst.half[1] =
+      (((u16)((u8)b.byte[3])) * ((u16)((u8)c.byte[3]))) + ((u16)a.half[1]);
+  dst.half[2] =
+      (((u16)((u8)b.byte[5])) * ((u16)((u8)c.byte[5]))) + ((u16)a.half[2]);
+  dst.half[3] =
+      (((u16)((u8)b.byte[7])) * ((u16)((u8)c.byte[7]))) + ((u16)a.half[3]);
+  dst.half[4] =
+      (((u16)((u8)b.byte[9])) * ((u16)((u8)c.byte[9]))) + ((u16)a.half[4]);
+  dst.half[5] =
+      (((u16)((u8)b.byte[11])) * ((u16)((u8)c.byte[11]))) + ((u16)a.half[5]);
+  dst.half[6] =
+      (((u16)((u8)b.byte[13])) * ((u16)((u8)c.byte[13]))) + ((u16)a.half[6]);
+  dst.half[7] =
+      (((u16)((u8)b.byte[15])) * ((u16)((u8)c.byte[15]))) + ((u16)a.half[7]);
+  dst.half[8] =
+      (((u16)((u8)b.byte[17])) * ((u16)((u8)c.byte[17]))) + ((u16)a.half[8]);
+  dst.half[9] =
+      (((u16)((u8)b.byte[19])) * ((u16)((u8)c.byte[19]))) + ((u16)a.half[9]);
+  dst.half[10] =
+      (((u16)((u8)b.byte[21])) * ((u16)((u8)c.byte[21]))) + ((u16)a.half[10]);
+  dst.half[11] =
+      (((u16)((u8)b.byte[23])) * ((u16)((u8)c.byte[23]))) + ((u16)a.half[11]);
+  dst.half[12] =
+      (((u16)((u8)b.byte[25])) * ((u16)((u8)c.byte[25]))) + ((u16)a.half[12]);
+  dst.half[13] =
+      (((u16)((u8)b.byte[27])) * ((u16)((u8)c.byte[27]))) + ((u16)a.half[13]);
+  dst.half[14] =
+      (((u16)((u8)b.byte[29])) * ((u16)((u8)c.byte[29]))) + ((u16)a.half[14]);
+  dst.half[15] =
+      (((u16)((u8)b.byte[31])) * ((u16)((u8)c.byte[31]))) + ((u16)a.half[15]);
+}
