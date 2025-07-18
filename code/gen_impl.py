@@ -1793,6 +1793,8 @@ for file in glob.glob("*.h"):
         and "extl" not in file
         and "extrins" not in file
         and "vshuf4i" not in file
+        and "fcvth" not in file
+        and ("ftint" not in file or "_w_d" not in file)
     ):
         continue
     orig = open(file, "r", encoding="utf-8").read()
