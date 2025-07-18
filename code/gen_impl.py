@@ -1711,6 +1711,16 @@ def evaluate(ast, i):
     elif isinstance(ast, pycparser.c_ast.ID):
         if ast.name == "i":
             return pycparser.c_ast.Constant(type="int", value=str(i))
+    elif isinstance(ast, pycparser.c_ast.UnaryOp):
+        op = ast.op
+        expr = evaluate(ast.expr, i)
+        # see if we can expand right now
+        if isinstance(expr, pycparser.c_ast.Constant):
+            if op == "~":
+                return pycparser.c_ast.Constant(
+                    type="int", value=str(~eval(expr.value))
+                )
+        return pycparser.c_ast.UnaryOp(op=ast.op, expr=expr)
     elif isinstance(ast, pycparser.c_ast.BinaryOp):
         op = ast.op
         left = evaluate(ast.left, i)
@@ -1747,6 +1757,10 @@ def evaluate(ast, i):
                 return pycparser.c_ast.Constant(
                     type="int", value=str(int(left.value) % int(right.value))
                 )
+            elif op == "&":
+                return pycparser.c_ast.Constant(
+                    type="int", value=str(eval(left.value) & eval(right.value))
+                )
         return pycparser.c_ast.BinaryOp(op=ast.op, left=left, right=right)
     elif isinstance(ast, pycparser.c_ast.TernaryOp):
         cond = evaluate(ast.cond, i)
@@ -1778,6 +1792,7 @@ for file in glob.glob("*.h"):
         and "exth" not in file
         and "extl" not in file
         and "extrins" not in file
+        and "vshuf4i" not in file
     ):
         continue
     orig = open(file, "r", encoding="utf-8").read()
