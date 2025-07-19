@@ -1,16 +1,25 @@
 for (int i = 0; i < 2; i++) {
-  // dst[0,1] <- b[0,1]
   dst.fp32[i] = b.fp64[i];
 }
-for (int i = 2; i < 4; i++) {
-  // dst[2,3] <- a[0,1]
+for (; i < 4; i++) {
   dst.fp32[i] = a.fp64[i - 2];
 }
-for (int i = 4; i < 6; i++) {
-  // dst[4,5] <- b[2,3]
+for (; i < 6; i++) {
   dst.fp32[i] = b.fp64[i - 2];
 }
-for (int i = 6; i < 8; i++) {
-  // dst[6,7] <- a[2,3]
+for (; i < 8; i++) {
   dst.fp32[i] = a.fp64[i - 4];
+}
+
+// Expands to:
+
+if (0) {
+  dst.fp32[0] = b.fp64[0];
+  dst.fp32[1] = b.fp64[1];
+  dst.fp32[2] = a.fp64[0];
+  dst.fp32[3] = a.fp64[1];
+  dst.fp32[4] = b.fp64[2];
+  dst.fp32[5] = b.fp64[3];
+  dst.fp32[6] = a.fp64[2];
+  dst.fp32[7] = a.fp64[3];
 }

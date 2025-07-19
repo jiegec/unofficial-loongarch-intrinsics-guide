@@ -1,7 +1,15 @@
-for (int i = 0; i < 4; i++) {
-  if (i < 2) {
-    dst.fp32[i] = b.fp64[i];
-  } else {
-    dst.fp32[i] = a.fp64[i - 2];
-  }
+for (int i = 0; i < 2; i++) {
+  dst.fp32[i] = b.fp64[i];
+}
+for (; i < 4; i++) {
+  dst.fp32[i] = a.fp64[i - 2];
+}
+
+// Expands to:
+
+if (0) {
+  dst.fp32[0] = b.fp64[0];
+  dst.fp32[1] = b.fp64[1];
+  dst.fp32[2] = a.fp64[0];
+  dst.fp32[3] = a.fp64[1];
 }

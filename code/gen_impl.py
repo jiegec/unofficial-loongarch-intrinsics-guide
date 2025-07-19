@@ -1645,6 +1645,103 @@ for vlen, prefix in [(128, "v"), (256, "xv")]:
                     )
                     print(f"}}", file=f)
 
+        dest_width = {
+            "s": "h",
+            "d": "s"
+        }[width]
+        dest_m = {
+            "s": "fp16",
+            "d": "fp32"
+        }[width]
+        with open(f"{prefix}fcvt_{dest_width}_{width}.h", "w") as f:
+            if prefix == "v":
+                print(f"for (int i = 0;i < {vlen // w};i++) {{", file=f)
+                print(
+                    f"  dst.{dest_m}[i] = b.{m}[i];",
+                    file=f,
+                )
+                print(f"}}", file=f)
+                print(f"for (;i < {vlen // w * 2};i++) {{", file=f)
+                print(
+                    f"  dst.{dest_m}[i] = a.{m}[i - {vlen // w}];",
+                    file=f,
+                )
+                print(f"}}", file=f)
+            else:
+                print(f"for (int i = 0;i < {vlen // w // 2};i++) {{", file=f)
+                print(
+                    f"  dst.{dest_m}[i] = b.{m}[i];",
+                    file=f,
+                )
+                print(f"}}", file=f)
+                print(f"for (;i < {vlen // w};i++) {{", file=f)
+                print(
+                    f"  dst.{dest_m}[i] = a.{m}[i - {vlen // w // 2}];",
+                    file=f,
+                )
+                print(f"}}", file=f)
+                print(f"for (;i < {vlen // w // 2 * 3};i++) {{", file=f)
+                print(
+                    f"  dst.{dest_m}[i] = b.{m}[i - {vlen // w // 2}];",
+                    file=f,
+                )
+                print(f"}}", file=f)
+                print(f"for (;i < {vlen // w * 2};i++) {{", file=f)
+                print(
+                    f"  dst.{dest_m}[i] = a.{m}[i - {vlen // w}];",
+                    file=f,
+                )
+                print(f"}}", file=f)
+
+        src_width = {
+            "s": "h",
+            "d": "s"
+        }[width]
+        src_m = {
+            "s": "fp16",
+            "d": "fp32"
+        }[width]
+        for half in ["h", "l"]:
+            with open(f"{prefix}fcvt{half}_{width}_{src_width}.h", "w") as f:
+                if prefix == "v":
+                    print(f"for (int i = 0;i < {vlen // w};i++) {{", file=f)
+                    if half == "h":
+                        print(
+                            f"  dst.{m}[i] = a.{src_m}[{vlen // w} + i];",
+                            file=f,
+                        )
+                    else:
+                        print(
+                            f"  dst.{m}[i] = a.{src_m}[i];",
+                            file=f,
+                        )
+                    print(f"}}", file=f)
+                else:
+                    print(f"for (int i = 0;i < {vlen // w // 2};i++) {{", file=f)
+                    if half == "h":
+                        print(
+                            f"  dst.{m}[i] = a.{src_m}[{vlen // w // 2} + i];",
+                            file=f,
+                        )
+                    else:
+                        print(
+                            f"  dst.{m}[i] = a.{src_m}[i];",
+                            file=f,
+                        )
+                    print(f"}}", file=f)
+                    print(f"for (;i < {vlen // w};i++) {{", file=f)
+                    if half == "h":
+                        print(
+                            f"  dst.{m}[i] = a.{src_m}[{vlen // w} + i];",
+                            file=f,
+                        )
+                    else:
+                        print(
+                            f"  dst.{m}[i] = a.{src_m}[{vlen // w // 2} + i];",
+                            file=f,
+                        )
+                    print(f"}}", file=f)
+
     if prefix == "xv":
         # xvpickve
         for width in ["w", "w_f", "d", "d_f"]:
@@ -1793,7 +1890,7 @@ for file in glob.glob("*.h"):
         and "extl" not in file
         and "extrins" not in file
         and "vshuf4i" not in file
-        and "fcvth" not in file
+        and "fcvt" not in file
         and ("ftint" not in file or "_w_d" not in file)
     ):
         continue

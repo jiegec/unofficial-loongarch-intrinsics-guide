@@ -1,8 +1,8 @@
 for (int i = 0; i < 4; i++) {
-  dst.fp32[i] = a.fp16[i + 4];
+  dst.fp32[i] = a.fp16[4 + i];
 }
-for (int i = 4; i < 8; i++) {
-  dst.fp32[i] = a.fp16[i + 8];
+for (; i < 8; i++) {
+  dst.fp32[i] = a.fp16[8 + i];
 }
 
 // Expands to:
