@@ -96,7 +96,7 @@ for vlen, prefix in [(128, "v"), (256, "xv")]:
             if prefix == "v":
                 print(f"for (int i = 0;i < {vlen // double_w};i++) {{", file=f)
                 print(
-                    f"  dst.{double_m}[i] = ({sign}{double_w})({sign}{w})a.{m}[{vlen // double_w} + i];",
+                    f"  dst.{double_m}[i] = ({sign}{double_w})({sign}{w})a.{m}[i + {vlen // double_w}];",
                     file=f,
                 )
                 print(f"}}", file=f)
@@ -104,13 +104,13 @@ for vlen, prefix in [(128, "v"), (256, "xv")]:
                 print(f"int i;", file=f)
                 print(f"for (i = 0;i < {vlen // 2 // double_w};i++) {{", file=f)
                 print(
-                    f"  dst.{double_m}[i] = ({sign}{double_w})({sign}{w})a.{m}[{vlen // 2 // double_w} + i];",
+                    f"  dst.{double_m}[i] = ({sign}{double_w})({sign}{w})a.{m}[i + {vlen // 2 // double_w}];",
                     file=f,
                 )
                 print(f"}}", file=f)
                 print(f"for (;i < {vlen // double_w};i++) {{", file=f)
                 print(
-                    f"  dst.{double_m}[i] = ({sign}{double_w})({sign}{w})a.{m}[{vlen // double_w} + i];",
+                    f"  dst.{double_m}[i] = ({sign}{double_w})({sign}{w})a.{m}[i + {vlen // double_w}];",
                     file=f,
                 )
                 print(f"}}", file=f)
@@ -1707,7 +1707,7 @@ for vlen, prefix in [(128, "v"), (256, "xv")]:
                     print(f"for (int i = 0;i < {vlen // w};i++) {{", file=f)
                     if half == "h":
                         print(
-                            f"  dst.{m}[i] = a.{src_m}[{vlen // w} + i];",
+                            f"  dst.{m}[i] = a.{src_m}[i + {vlen // w}];",
                             file=f,
                         )
                     else:
@@ -1720,7 +1720,7 @@ for vlen, prefix in [(128, "v"), (256, "xv")]:
                     print(f"for (int i = 0;i < {vlen // w // 2};i++) {{", file=f)
                     if half == "h":
                         print(
-                            f"  dst.{m}[i] = a.{src_m}[{vlen // w // 2} + i];",
+                            f"  dst.{m}[i] = a.{src_m}[i + {vlen // w // 2}];",
                             file=f,
                         )
                     else:
@@ -1732,12 +1732,12 @@ for vlen, prefix in [(128, "v"), (256, "xv")]:
                     print(f"for (;i < {vlen // w};i++) {{", file=f)
                     if half == "h":
                         print(
-                            f"  dst.{m}[i] = a.{src_m}[{vlen // w} + i];",
+                            f"  dst.{m}[i] = a.{src_m}[i + {vlen // w}];",
                             file=f,
                         )
                     else:
                         print(
-                            f"  dst.{m}[i] = a.{src_m}[{vlen // w // 2} + i];",
+                            f"  dst.{m}[i] = a.{src_m}[i + {vlen // w // 2}];",
                             file=f,
                         )
                     print(f"}}", file=f)
