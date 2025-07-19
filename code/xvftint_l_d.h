@@ -1,3 +1,12 @@
 for (int i = 0; i < 4; i++) {
   dst.dword[i] = (s64)a.fp64[i]; // rounding mode is not expressed in C
 }
+
+// Expands to:
+
+if (0) {
+  dst.dword[0] = (s64)a.fp64[0];
+  dst.dword[1] = (s64)a.fp64[1];
+  dst.dword[2] = (s64)a.fp64[2];
+  dst.dword[3] = (s64)a.fp64[3];
+}

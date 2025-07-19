@@ -1891,6 +1891,9 @@ for file in glob.glob("*.h"):
         and "extrins" not in file
         and "vshuf4i" not in file
         and "fcvt" not in file
+        and "xvsllwil" not in file
+        and "xvftint" not in file
+        and "xvffint" not in file
         and ("ftint" not in file or "_w_d" not in file)
     ):
         continue
