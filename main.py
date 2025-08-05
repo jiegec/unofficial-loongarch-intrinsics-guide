@@ -1611,7 +1611,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
     def xvpermi_q():
         return instruction(
             intrinsic=f"__m256i __lasx_xvpermi_q (__m256i a, __m256i b, imm0_255 imm)",
-            instr=f"xvpermi.d xr, xr, imm",
+            instr=f"xvpermi.q xr, xr, imm",
             desc=f"Permute quad words from `a` and `b` with indices recorded in `imm` and store into `dst`.",
         )
 
