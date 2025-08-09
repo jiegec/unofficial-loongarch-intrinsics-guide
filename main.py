@@ -1866,6 +1866,14 @@ Initialize `dst` using predefined patterns:
         )
 
     @env.macro
+    def xvhseli_d():
+        return instruction(
+            intrinsic=f"__m256i __lasx_xvhseli.d (__m256i a, imm0_31 imm)",
+            instr=f"xvhseli.d xr, xr, imm",
+            desc=f"Select double words from `a` with indices recorded in `imm` and store into `dst`.",
+        )
+
+    @env.macro
     def all_intrinsics(render=True):
         result = []
         for file in glob.glob("docs/*/*.md"):

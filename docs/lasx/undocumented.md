@@ -6,3 +6,7 @@ The following intrinsics are undocumented: they are not supported by either comp
 {{ xvfscale('IEEE754 scaleB', 'd') }}
 
 {{ xvmepatmsk() }}
+
+The following intrinsics are undocumented in another way: they are not supported by compiler but supported by assembler. You have to use inline assembly to use them in C/C++.
+
+{{ xvhseli_d() }}
