@@ -413,6 +413,33 @@ def xvpermi_q():
         add_line(f, 1, 1, 1, 2, 0, 1)
         end(f)
 
+def xvhseli_d():
+    global elen, vlen
+    elen = 64
+    vlen = 256
+    with open("xvhseli_d.svg", "w") as f:
+        init(f, 2, 1)
+        add_row(f)
+        add_box(
+            f,
+            "a",
+            "data",
+            indices=[1, 0, 1, 0],
+        )
+        add_row(f)
+        add_box(f, "ret", "returns")
+
+        # a to returns
+        add_line(f, 1, 0, 0, 2, 0, 0)
+        add_line(f, 1, 0, 1, 2, 0, 0)
+        add_line(f, 1, 0, 0, 2, 0, 1)
+        add_line(f, 1, 0, 1, 2, 0, 1)
+        add_line(f, 1, 0, 2, 2, 0, 2)
+        add_line(f, 1, 0, 3, 2, 0, 2)
+        add_line(f, 1, 0, 2, 2, 0, 3)
+        add_line(f, 1, 0, 3, 2, 0, 3)
+        end(f)
+
 
 if __name__ == "__main__":
     xvshuf()
@@ -423,3 +450,4 @@ if __name__ == "__main__":
     xvpermi_w()
     xvpermi_d()
     xvpermi_q()
+    xvhseli_d()
