@@ -426,3 +426,12 @@ __m256d __lasx_xvfscaleb_d(__m256d a, __m256i b) {
                  : "memory");                                                  \
     return result;                                                             \
   })()
+
+// xvhseli.d xr0, xr1, imm
+#define __lasx_xvhseli_d(a, imm)                                               \
+  ([=]() {                                                                     \
+    register __m256i a_reg asm("xr1") = a.m256i;                               \
+    register __m256i result asm("xr0");                                        \
+    asm volatile("xvhseli.d $xr0, $xr1, " #imm : "=f"(result) : : "memory");   \
+    return result;                                                             \
+  })()
