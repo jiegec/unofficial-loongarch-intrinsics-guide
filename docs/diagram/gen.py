@@ -278,6 +278,7 @@ def vshuf():
                 add_line(f, 3, 0, i, 4, 0, i)
             end(f)
 
+
 def vshuf4i_d():
     global elen, vlen
     elen = 64
@@ -312,9 +313,113 @@ def vshuf4i_d():
         end(f)
 
 
+def xvpermi_w():
+    global elen, vlen
+    elen = 32
+    vlen = 256
+    with open("xvpermi_w.svg", "w") as f:
+        init(f, 2, 2)
+        add_row(f)
+        add_box(
+            f,
+            "b",
+            "data",
+            indices=[3, 2, 1, 0, 3, 2, 1, 0],
+        )
+        add_box(
+            f,
+            "a",
+            "data",
+            indices=[3, 2, 1, 0, 3, 2, 1, 0],
+        )
+        add_row(f)
+        add_box(f, "ret", "returns")
+
+        # a & b to returns
+        for i in range(2):
+            # dst.word[7:6]
+            add_line(f, 1, 1, 0, 2, 0, i)
+            add_line(f, 1, 1, 1, 2, 0, i)
+            add_line(f, 1, 1, 2, 2, 0, i)
+            add_line(f, 1, 1, 3, 2, 0, i)
+            # dst.word[5:4]
+            add_line(f, 1, 0, 0, 2, 0, i + 2)
+            add_line(f, 1, 0, 1, 2, 0, i + 2)
+            add_line(f, 1, 0, 2, 2, 0, i + 2)
+            add_line(f, 1, 0, 3, 2, 0, i + 2)
+            # dst.word[3:2]
+            add_line(f, 1, 1, 4, 2, 0, i + 4)
+            add_line(f, 1, 1, 5, 2, 0, i + 4)
+            add_line(f, 1, 1, 6, 2, 0, i + 4)
+            add_line(f, 1, 1, 7, 2, 0, i + 4)
+            # dst.word[1:0]
+            add_line(f, 1, 0, 4, 2, 0, i + 6)
+            add_line(f, 1, 0, 5, 2, 0, i + 6)
+            add_line(f, 1, 0, 6, 2, 0, i + 6)
+            add_line(f, 1, 0, 7, 2, 0, i + 6)
+        end(f)
+
+def xvpermi_d():
+    global elen, vlen
+    elen = 64
+    vlen = 256
+    with open("xvpermi_d.svg", "w") as f:
+        init(f, 2, 1)
+        add_row(f)
+        add_box(
+            f,
+            "a",
+            "data",
+            indices=[3, 2, 1, 0],
+        )
+        add_row(f)
+        add_box(f, "ret", "returns")
+
+        # a to returns
+        for i in range(4):
+            for j in range(4):
+                add_line(f, 1, 0, j, 2, 0, i)
+        end(f)
+
+def xvpermi_q():
+    global elen, vlen
+    elen = 128
+    vlen = 256
+    with open("xvpermi_q.svg", "w") as f:
+        init(f, 2, 2)
+        add_row(f)
+        add_box(
+            f,
+            "b",
+            "data",
+            indices=[1, 0],
+        )
+        add_box(
+            f,
+            "a",
+            "data",
+            indices=[3, 2],
+        )
+        add_row(f)
+        add_box(f, "ret", "returns")
+
+        add_line(f, 1, 0, 0, 2, 0, 0)
+        add_line(f, 1, 0, 1, 2, 0, 0)
+        add_line(f, 1, 1, 0, 2, 0, 0)
+        add_line(f, 1, 1, 1, 2, 0, 0)
+        add_line(f, 1, 0, 0, 2, 0, 1)
+        add_line(f, 1, 0, 1, 2, 0, 1)
+        add_line(f, 1, 1, 0, 2, 0, 1)
+        add_line(f, 1, 1, 1, 2, 0, 1)
+        end(f)
+
+
 if __name__ == "__main__":
     xvshuf()
     xvshuf4i_bhw()
     xvshuf4i_d()
     vshuf()
     vshuf4i_d()
+    xvpermi_w()
+    xvpermi_d()
+    xvpermi_q()
