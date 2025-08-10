@@ -11,8 +11,8 @@ cur_simd = "lsx"
 cur_vlen = 128
 
 # read latency & throughput
-cpus = ["3C5000", "3A6000", "3C6000"]
-measure = {"3A6000": {}, "3C5000": {}, "3C6000": {}}
+cpus = ["3C5000", "3A6000", "3C6000", "2K3000"]
+measure = {"3A6000": {}, "3C5000": {}, "3C6000": {}, "2K3000": {}}
 for cpu in cpus:
     with open(f"code/measure-{cpu}.csv", newline="") as csvfile:
         reader = csv.DictReader(csvfile)

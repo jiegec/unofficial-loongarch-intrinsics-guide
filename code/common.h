@@ -21,9 +21,8 @@ typedef unsigned __int128 u128;
 typedef float f32;
 typedef double f64;
 
-#ifndef MACHINE_3C5000
-#define MACHINE_3C5000 0
-#endif
+#include "common-machine.h"
+
 
 template <typename T> u8 clo(T num) {
   for (int i = sizeof(T) * 8 - 1; i >= 0; i--) {
