@@ -25,6 +25,15 @@ typedef double f64;
 #define MACHINE_3C5000 0
 #endif
 
+#ifndef MACHINE_HAS_LSX
+#define MACHINE_HAS_LSX 1
+#endif
+
+#ifndef MACHINE_HAS_LASX
+#define MACHINE_HAS_LASX 1
+#endif
+
+
 template <typename T> u8 clo(T num) {
   for (int i = sizeof(T) * 8 - 1; i >= 0; i--) {
     if ((num & ((T)1 << i)) == 0) {
