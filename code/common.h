@@ -25,12 +25,18 @@ typedef double f64;
 #define MACHINE_3C5000 0
 #endif
 
+#ifndef MACHINE_2K3000
+#define MACHINE_2K3000 0
+#endif
+
 #ifndef MACHINE_HAS_LSX
 #define MACHINE_HAS_LSX 1
 #endif
 
 #ifndef MACHINE_HAS_LASX
+#if !defined(MACHINE_2K3000)
 #define MACHINE_HAS_LASX 1
+#endif
 #endif
 
 

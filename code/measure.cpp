@@ -14,6 +14,14 @@
 #include <utility>
 #include <vector>
 
+#if defined(MACHINE_3C5000)
+#define OUTPUT_FILENAME "measure-3C5000.csv"
+#elif defined(MACHINE_2K3000)
+#define OUTPUT_FILENAME "measure-2K3000.csv"
+#else
+#define OUTPUT_FILENAME "measure-3A6000.csv"
+#endif
+
 // learned from lmbench lat_mem_rd
 #define FIVE(X) X X X X X
 #define TEN(X) FIVE(X) FIVE(X)
@@ -252,11 +260,7 @@ int main(int argc, char *argv[]) {
     }
   }
 
-#ifdef MACHINE_3C5000
-  FILE *fp = fopen("measure-3C5000.csv", "w");
-#else
-  FILE *fp = fopen("measure-3A6000.csv", "w");
-#endif
+  FILE *fp = fopen(OUTPUT_FILENAME, "w");
   assert(fp);
   fprintf(fp, "name,latency,throughput(ipc),throughput(cpi)\n");
   for (auto pair : info) {
@@ -273,5 +277,5 @@ int main(int argc, char *argv[]) {
     fprintf(fp, "%s,%s,%.2lf,%.2lf\n", pair.first.c_str(), latency.c_str(),
             entry.throughput_ipc, entry.throughput_cpi);
   }
-  printf("Result written to measure.csv\n");
+  printf("Result written to " OUTPUT_FILENAME "\n");
 }
