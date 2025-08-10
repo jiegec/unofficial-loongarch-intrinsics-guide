@@ -21,23 +21,7 @@ typedef unsigned __int128 u128;
 typedef float f32;
 typedef double f64;
 
-#ifndef MACHINE_3C5000
-#define MACHINE_3C5000 0
-#endif
-
-#ifndef MACHINE_2K3000
-#define MACHINE_2K3000 0
-#endif
-
-#ifndef MACHINE_HAS_LSX
-#define MACHINE_HAS_LSX 1
-#endif
-
-#ifndef MACHINE_HAS_LASX
-#if !defined(MACHINE_2K3000)
-#define MACHINE_HAS_LASX 1
-#endif
-#endif
+#include "common-machine.h"
 
 
 template <typename T> u8 clo(T num) {

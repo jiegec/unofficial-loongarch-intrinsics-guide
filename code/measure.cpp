@@ -59,6 +59,7 @@ int N = 50000;
 #define INSTR_TEST8(NAME, INST, ...)                                           \
   INSTR_TEST(NAME, INST __VA_OPT__(, ) __VA_ARGS__)
 
+#include "common-machine.h"
 #include "measure.h"
 
 #undef INSTR_TEST
