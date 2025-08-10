@@ -1,6 +1,6 @@
 # Unofficial LoongArch Intrinsics Guide
 
-[![DOI](https://zenodo.org/badge/730251036.svg)](https://doi.org/10.5281/zenodo.14169508)
+[![DOI](https://zenodo.org/badge/730251036.svg)](https://doi.org/10.5281/zenodo.15820456)
 
 Visit <http://jia.je/unofficial-loongarch-intrinsics-guide/>.
 

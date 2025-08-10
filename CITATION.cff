@@ -5,12 +5,14 @@ authors:
   given-names: Chen
 - family-names: Chenguang
   given-names: Wang
+- family-names: Xuerui
+  given-names: Wang
 title: "Unofficial LoongArch Intrinsics Guide"
-version: v20241115.1
+version: v20250706.1
 identifiers:
   - type: doi
-    value: 10.5281/zenodo.14169508
-date-released: 2024-11-15
+    value: 10.5281/zenodo.15820456
+date-released: 2025-07-06
 repository-code: >-
   https://github.com/jiegec/unofficial-loongarch-intrinsics-guide
 url: 'https://jia.je/unofficial-loongarch-intrinsics-guide/'
