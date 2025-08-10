@@ -21,4 +21,4 @@
 #endif
 #endif
 
-#endif  /* _COMMON_MACHINE_H_ */
+#endif /* _COMMON_MACHINE_H_ */

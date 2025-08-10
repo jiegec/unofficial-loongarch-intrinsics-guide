@@ -23,7 +23,6 @@ typedef double f64;
 
 #include "common-machine.h"
 
-
 template <typename T> u8 clo(T num) {
   for (int i = sizeof(T) * 8 - 1; i >= 0; i--) {
     if ((num & ((T)1 << i)) == 0) {
