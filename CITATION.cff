@@ -7,6 +7,8 @@ authors:
   given-names: Wang
 - family-names: Xuerui
   given-names: Wang
+- family-names: Binbin
+  given-names: Zhou
 title: "Unofficial LoongArch Intrinsics Guide"
 version: v20250706.1
 identifiers:

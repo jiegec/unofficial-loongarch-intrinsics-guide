@@ -5,6 +5,10 @@
 #define MACHINE_3C5000 0
 #endif
 
+#ifndef MACHINE_2K1000LA
+#define MACHINE_2K1000LA 0
+#endif
+
 #ifndef MACHINE_2K3000
 #define MACHINE_2K3000 0
 #endif
@@ -16,7 +20,7 @@
 #endif
 
 #ifndef MACHINE_HAS_LASX
-#if !defined(MACHINE_2K3000)
+#if (!MACHINE_2K1000LA) && (!MACHINE_2K3000)
 #define MACHINE_HAS_LASX 1
 #endif
 #endif
