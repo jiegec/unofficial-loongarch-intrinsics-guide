@@ -3,6 +3,8 @@
 #include <map>
 #include <sched.h>
 #include <set>
+#include <setjmp.h>
+#include <signal.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -191,6 +193,14 @@ void bind_to_core() {
   }
 }
 
+sigjmp_buf resume_point;
+void sigill_action_handler(int sig, siginfo_t *info, void *ucontext)
+{
+  // the current test is not supported by the CPU running the
+  // test
+  siglongjmp(resume_point, 1);
+}
+
 int main(int argc, char *argv[]) {
   bool perf = false;
 
@@ -221,6 +231,13 @@ int main(int argc, char *argv[]) {
 
   std::map<std::string, InstrInfo> info;
 
+  struct sigaction sigill_action = { 0 };
+  sigill_action.sa_flags = SA_SIGINFO;
+  sigill_action.sa_sigaction = sigill_action_handler;
+  if (sigaction(SIGILL, &sigill_action, NULL) == -1) {
+    fprintf(stderr, "error: failed to setup SIGILL handler, unsupported insns will crash the program\n");
+  }
+
   for (auto it : tests) {
     std::string name = it.name;
     if (name == "unit") {
@@ -228,17 +245,27 @@ int main(int argc, char *argv[]) {
     }
 
     begin = get_time_or_cycles();
-    it.test(N);
-    uint64_t elapsed = get_time_or_cycles() - begin;
-    double cycles = (double)elapsed / unit_elapsed;
-    cycles /= it.repeat; // in some tests, instructions are repeated
+    double cycles = 0.0;
+    if (sigsetjmp(resume_point, 1)) {
+      // the test resulted in SIGILL, mark it as such
+      cycles = -1.0;
+    } else {
+      it.test(N);
+      uint64_t elapsed = get_time_or_cycles() - begin;
+      cycles = (double)elapsed / unit_elapsed;
+      cycles /= it.repeat; // in some tests, instructions are repeated
+    }
 
     std::string base_name;
     size_t tp_index = name.find("_tp");
     if (tp_index != std::string::npos) {
       base_name = name.substr(0, tp_index);
-      printf("%s: throughput 1/%.2lf=%.2lf instructions\n", it.name, cycles,
-             1.0 / cycles);
+      if (cycles < 0.0) {
+        printf("%s: unsupported on current CPU\n", it.name);
+      } else {
+        printf("%s: throughput 1/%.2lf=%.2lf instructions\n", it.name, cycles,
+               1.0 / cycles);
+      }
       info[base_name].throughput_ipc = 1.0 / cycles;
       info[base_name].throughput_cpi = cycles;
     } else {
@@ -257,8 +284,12 @@ int main(int argc, char *argv[]) {
       }
 
       // round to 0.01
-      cycles = (double)(long)(cycles * 100 + 0.5) / 100.0;
-      printf("%s: latency %.2lf cycles\n", it.name, cycles);
+      if (cycles > 0) {
+        cycles = (double)(long)(cycles * 100 + 0.5) / 100.0;
+        printf("%s: latency %.2lf cycles\n", it.name, cycles);
+      } else {
+        printf("%s: unsupported on current CPU\n", it.name);
+      }
       info[base_name].latency.insert(cycles);
     }
   }
