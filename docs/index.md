@@ -6,7 +6,7 @@ This is the Unofficial LoongArch Intrinsics Guide by Jiajie Chen et, al. The doc
 
 - QEMU
 - GCC
-- Observations from real hardware incl. 3C5000(LA464), 3A6000(LA664), 3C6000(LA664), 2K1000LA and 2K3000(LA364E)
+- Observations from real hardware incl. 3C5000(LA464), 3A6000(LA664), 3C6000(LA664), 2K1000LA(LA264) and 2K3000(LA364E)
 
 The guide provides pseudo code for the SIMD intrinsics. The code assumes that the elements of the LSX/LASX vector registers can be accessed via members of a `union`:
 

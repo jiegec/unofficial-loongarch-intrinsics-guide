@@ -12,6 +12,7 @@ cur_vlen = 128
 
 # read latency & throughput
 cpus = ["3C5000", "3A6000", "3C6000", "2K1000LA", "2K3000"]
+uarchs = ["LA464", "LA664", "LA664", "LA264", "LA364E"]
 measure = {x: {} for x in cpus}
 for cpu in cpus:
     with open(f"code/measure-{cpu}.csv", newline="") as csvfile:
@@ -1956,8 +1957,8 @@ Initialize `dst` using predefined patterns:
     @env.macro
     def latency_throughput_table():
         result = "<table><thead><tr><th rowspan=2>Instruction</th>"
-        for cpu in cpus:
-            result += f"<th colspan=2>{cpu}</th>"
+        for cpu, uarch in zip(cpus, uarchs):
+            result += f"<th colspan=2>{cpu} ({uarch})</th>"
         result += f"</tr><tr>"
         for cpu in cpus:
             result += f"<th>Latency</th><th>Throughput (IPC)</th>"
