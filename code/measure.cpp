@@ -18,15 +18,15 @@
 
 #include "common-machine.h"
 
-#if defined(MACHINE_3C5000)
+#if MACHINE_3C5000
 #define OUTPUT_FILENAME "measure-3C5000.csv"
-#elif defined(MACHINE_3A6000)
+#elif MACHINE_3A6000
 #define OUTPUT_FILENAME "measure-3A6000.csv"
-#elif defined(MACHINE_3C6000)
+#elif MACHINE_3C6000
 #define OUTPUT_FILENAME "measure-3C6000.csv"
-#elif defined(MACHINE_2K1000LA)
+#elif MACHINE_2K1000LA
 #define OUTPUT_FILENAME "measure-2K1000LA.csv"
-#elif defined(MACHINE_2K3000)
+#elif MACHINE_2K3000
 #define OUTPUT_FILENAME "measure-2K3000.csv"
 #else
 #error Please define a new machine type in common-machine.h
