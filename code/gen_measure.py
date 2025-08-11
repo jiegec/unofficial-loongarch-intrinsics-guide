@@ -53,7 +53,7 @@ class TestsCollector:
     def _emit_kind(self, kind: str, val: list[list[str]]) -> Iterator[str]:
         gate_macro = f'MACHINE_HAS_{kind.upper()}' if kind else ''
         if gate_macro:
-            yield f'#ifdef {gate_macro}'
+            yield f'#if {gate_macro}'
 
         for l in val:
             macro, name = l[:2]
