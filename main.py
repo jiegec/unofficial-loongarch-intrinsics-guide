@@ -12,7 +12,14 @@ cur_vlen = 128
 
 # read latency & throughput
 cpus = ["3C5000", "3A6000", "3C6000", "2K1000LA", "2K3000"]
-uarchs = ["LA464", "LA664", "LA664", "LA264", "LA364E"]
+uarches = {
+    "2K1000LA": "LA264",
+    "2K3000": "LA364E",
+    "3C5000": "LA464",
+    "3A6000": "LA664",
+    "3C6000": "LA664",
+}
+
 measure = {x: {} for x in cpus}
 for cpu in cpus:
     with open(f"code/measure-{cpu}.csv", newline="") as csvfile:
@@ -149,11 +156,13 @@ def define_env(env):
         global cpus
         instr_name = instr.split(" ")[0].replace(".", "_")
         show_cpus = []
+        show_uarches = []
         latencies = []
         throughputs = []
         for cpu in cpus:
             if instr_name in measure[cpu]:
                 show_cpus.append(cpu)
+                show_uarches.append(uarches[cpu])
                 latencies.append(measure[cpu][instr_name]["latency"])
                 throughputs.append(measure[cpu][instr_name]["throughput(ipc)"])
 
@@ -161,12 +170,12 @@ def define_env(env):
             latency_throughput = f"""
 ### Latency and Throughput
 
-| CPU | Latency | Throughput (IPC) |
-|-----|---------|------------------|
+| CPU | µarch | Latency | Throughput (IPC) |
+|-----|-------|---------|------------------|
 """
             for i in range(len(show_cpus)):
                 latency_throughput += (
-                    f"| {show_cpus[i]} | {latencies[i]} | {throughputs[i]} |\n"
+                    f"| {show_cpus[i]} | {show_uarches[i]} | {latencies[i]} | {throughputs[i]} |\n"
                 )
         else:
             latency_throughput = ""
@@ -1957,8 +1966,8 @@ Initialize `dst` using predefined patterns:
     @env.macro
     def latency_throughput_table():
         result = "<table><thead><tr><th rowspan=2>Instruction</th>"
-        for cpu, uarch in zip(cpus, uarchs):
-            result += f"<th colspan=2>{cpu} ({uarch})</th>"
+        for cpu in cpus:
+            result += f"<th colspan=2>{cpu} ({uarches[cpu]})</th>"
         result += f"</tr><tr>"
         for cpu in cpus:
             result += f"<th>Latency</th><th>Throughput (IPC)</th>"
