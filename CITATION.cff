@@ -1,14 +1,14 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
 authors:
-- family-names: Jiajie
-  given-names: Chen
-- family-names: Chenguang
-  given-names: Wang
-- family-names: Xuerui
-  given-names: Wang
-- family-names: Binbin
-  given-names: Zhou
+- given-names: Jiajie
+  family-names: Chen
+- given-names: Chenguang
+  family-names: Wang
+- given-names: Xuerui
+  family-names: Wang
+- given-names: Binbin
+  family-names: Zhou
 title: "Unofficial LoongArch Intrinsics Guide"
 version: v20250706.1
 identifiers:
