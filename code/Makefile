@@ -15,7 +15,7 @@ clean:
 	rm -rf $(EXES)
 
 %: %.cpp %.h common.h
-	$(CXX) -Wno-narrowing $(CFLAGS) $< -mlsx -mlasx -o $@
+	$(CXX) -std=gnu++17 -Wno-narrowing $(CFLAGS) $< -mlsx -mlasx -o $@
 
 measure: measure.cpp measure.h
 	$(CXX) $(CFLAGS) -O2 $< -o $@
