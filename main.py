@@ -562,7 +562,7 @@ CPU Flags: {cur_simd.upper()}
         fp_type = fp_types[name]
         return instruction(
             intrinsic=f"{fp_type} __lsx_vfmin_{name} ({fp_type} a, {fp_type} b)",
-            instr=f"vfmax.{name} vr, vr, vr",
+            instr=f"vfmin.{name} vr, vr, vr",
             desc=f"Compute minimum of {precision} precision floating point elements in `a` and `b`.",
         )
 
@@ -875,7 +875,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
         return instruction(
             intrinsic=f"__m128i __lsx_vslti_{name} (__m128i a, {imm_range} imm)",
             instr=f"vslti.{name} vr, vr, imm",
-            desc=f"Compare the {signedness} {width}-bit elements in `a` and `imm`, store all-ones to `dst` if corresponding element in `a` is less than `b`, zero otherwise.",
+            desc=f"Compare the {signedness} {width}-bit elements in `a` and `imm`, store all-ones to `dst` if corresponding element in `a` is less than `imm`, zero otherwise.",
         )
 
     @my_macro(env)
@@ -885,7 +885,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
         return instruction(
             intrinsic=f"__m128i __lsx_vsle_{name} (__m128i a, __m128i b)",
             instr=f"vsle.{name} vr, vr, vr",
-            desc=f"Compare the {signedness} {width}-bit elements in `a` and `b`, store all-ones to `dst` if corresponding element in `a` is less than or equal `b`, zero otherwise.",
+            desc=f"Compare the {signedness} {width}-bit elements in `a` and `b`, store all-ones to `dst` if corresponding element in `a` is less than or equal to `b`, zero otherwise.",
         )
 
     @my_macro(env)
@@ -899,7 +899,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
         return instruction(
             intrinsic=f"__m128i __lsx_vslei_{name} (__m128i a, {imm_range} imm)",
             instr=f"vslei.{name} vr, vr, imm",
-            desc=f"Compare the {signedness} {width}-bit elements in `a` and `b`, store all-ones to `dst` if corresponding element in `a` is less than or equal `b`, zero otherwise.",
+            desc=f"Compare the {signedness} {width}-bit elements in `a` and `imm`, store all-ones to `dst` if corresponding element in `a` is less than or equal to `imm`, zero otherwise.",
         )
 
     @my_macro(env)
@@ -909,7 +909,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
         return instruction(
             intrinsic=f"__m128i __lsx_vsadd_{name} (__m128i a, __m128i b)",
             instr=f"vsadd.{name} vr, vr, vr",
-            desc=f"Saturing add the {signedness} {width}-bit elements in `a` and `b`, store the result to `dst`.",
+            desc=f"Saturating add the {signedness} {width}-bit elements in `a` and `b`, store the result to `dst`.",
         )
 
     @my_macro(env)
@@ -919,7 +919,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
         return instruction(
             intrinsic=f"__m128i __lsx_vssub_{name} (__m128i a, __m128i b)",
             instr=f"vssub.{name} vr, vr, vr",
-            desc=f"Saturing subtract the {signedness} {width}-bit elements in `a` and `b`, store the result to `dst`.",
+            desc=f"Saturating subtract the {signedness} {width}-bit elements in `a` and `b`, store the result to `dst`.",
         )
 
     @my_macro(env)
