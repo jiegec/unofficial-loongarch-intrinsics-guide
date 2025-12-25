@@ -1,0 +1,56 @@
+<svg version="1.1"
+     width="700" height="450"
+     xmlns="http://www.w3.org/2000/svg">
+<text x="20" y="100">(1)</text>
+<text x="100" y="100" text-anchor="end" font-style="italic">b</text>
+<text x="100" y="115" text-anchor="end">data</text>
+<rect x="110" y="90" width="128" height="26" fill="white" stroke="blue" />
+<text x="174" y="103" text-anchor="middle" dominant-baseline="middle">3</text>
+<rect x="238" y="90" width="128" height="26" fill="white" stroke="blue" />
+<text x="302" y="103" text-anchor="middle" dominant-baseline="middle">2</text>
+<text x="110" y="80" text-anchor="begin">upper</text>
+<text x="366" y="80" text-anchor="end">lower</text>
+<text x="400" y="100" text-anchor="end" font-style="italic">c</text>
+<text x="400" y="115" text-anchor="end">data</text>
+<rect x="410" y="90" width="128" height="26" fill="white" stroke="blue" />
+<text x="474" y="103" text-anchor="middle" dominant-baseline="middle">1</text>
+<rect x="538" y="90" width="128" height="26" fill="white" stroke="blue" />
+<text x="602" y="103" text-anchor="middle" dominant-baseline="middle">0</text>
+<text x="410" y="80" text-anchor="begin">upper</text>
+<text x="666" y="80" text-anchor="end">lower</text>
+<text x="20" y="200">(2)</text>
+<text x="100" y="200" text-anchor="end" font-style="italic">temp</text>
+<text x="100" y="215" text-anchor="end">merged</text>
+<rect x="110" y="190" width="128" height="26" fill="white" stroke="blue" />
+<text x="174" y="203" text-anchor="middle" dominant-baseline="middle">3</text>
+<rect x="238" y="190" width="128" height="26" fill="white" stroke="blue" />
+<text x="302" y="203" text-anchor="middle" dominant-baseline="middle">2</text>
+<rect x="366" y="190" width="128" height="26" fill="white" stroke="blue" />
+<text x="430" y="203" text-anchor="middle" dominant-baseline="middle">1</text>
+<rect x="494" y="190" width="128" height="26" fill="white" stroke="blue" />
+<text x="558" y="203" text-anchor="middle" dominant-baseline="middle">0</text>
+<text x="20" y="300">(3)</text>
+<text x="100" y="300" text-anchor="end" font-style="italic">a</text>
+<text x="100" y="315" text-anchor="end">indices</text>
+<rect x="110" y="290" width="128" height="26" fill="white" stroke="blue" />
+<rect x="238" y="290" width="128" height="26" fill="white" stroke="blue" />
+<text x="20" y="400">(4)</text>
+<text x="100" y="400" text-anchor="end" font-style="italic">ret</text>
+<text x="100" y="415" text-anchor="end">returns</text>
+<rect x="110" y="390" width="128" height="26" fill="white" stroke="blue" />
+<rect x="238" y="390" width="128" height="26" fill="white" stroke="blue" />
+<line x1="174" y1="116" x2="174" y2="190" stroke="black" />
+<line x1="474" y1="116" x2="430" y2="190" stroke="black" />
+<line x1="302" y1="116" x2="302" y2="190" stroke="black" />
+<line x1="602" y1="116" x2="558" y2="190" stroke="black" />
+<line x1="174" y1="216" x2="174" y2="290" stroke="black" />
+<line x1="174" y1="216" x2="302" y2="290" stroke="black" />
+<line x1="302" y1="216" x2="174" y2="290" stroke="black" />
+<line x1="302" y1="216" x2="302" y2="290" stroke="black" />
+<line x1="430" y1="216" x2="174" y2="290" stroke="black" />
+<line x1="430" y1="216" x2="302" y2="290" stroke="black" />
+<line x1="558" y1="216" x2="174" y2="290" stroke="black" />
+<line x1="558" y1="216" x2="302" y2="290" stroke="black" />
+<line x1="174" y1="316" x2="174" y2="390" stroke="black" />
+<line x1="302" y1="316" x2="302" y2="390" stroke="black" />
+</svg>
