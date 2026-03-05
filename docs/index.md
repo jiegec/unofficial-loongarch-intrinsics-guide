@@ -2,7 +2,7 @@
 
 [![DOI](https://zenodo.org/badge/730251036.svg)](https://doi.org/10.5281/zenodo.14169508)
 
-This is the Unofficial LoongArch Intrinsics Guide by Jiajie Chen et, al. The documentation is arranged from the following sources:
+This is the Unofficial LoongArch Intrinsics Guide by Jiajie Chen et al. The documentation is arranged from the following sources:
 
 - QEMU
 - GCC
