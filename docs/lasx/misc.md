@@ -1,5 +1,29 @@
 # Misc
 
+{{ lasx_cast_128() }}
+{{ lasx_cast_128_d() }}
+{{ lasx_cast_128_s() }}
+
+{{ lasx_concat_128() }}
+{{ lasx_concat_128_d() }}
+{{ lasx_concat_128_s() }}
+
+{{ lasx_extract_128_hi() }}
+{{ lasx_extract_128_hi_d() }}
+{{ lasx_extract_128_hi_s() }}
+
+{{ lasx_extract_128_lo() }}
+{{ lasx_extract_128_lo_d() }}
+{{ lasx_extract_128_lo_s() }}
+
+{{ lasx_insert_128_hi() }}
+{{ lasx_insert_128_hi_d() }}
+{{ lasx_insert_128_hi_s() }}
+
+{{ lasx_insert_128_lo() }}
+{{ lasx_insert_128_lo_d() }}
+{{ lasx_insert_128_lo_s() }}
+
 {{ xvexth('h', 'b') }}
 {{ xvexth('hu', 'bu') }}
 {{ xvexth('w', 'h') }}

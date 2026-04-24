@@ -1883,6 +1883,204 @@ Initialize `dst` using predefined patterns:
             desc=f"Select double words from `a` with indices recorded in `imm` and store into `dst`.",
         )
 
+    lasx_128_lane_entries = {
+        "lasx_cast_128": (
+            "__m256i",
+            "__lasx_cast_128",
+            "__m128i a",
+            "Return a 256-bit integer vector whose low 128-bit half contains `a`. The high 128-bit half is unspecified.",
+            "for (int i = 0;i < 2;i++) {\n  dst.dword[i] = a.dword[i];\n}\nfor (int i = 2;i < 4;i++) {\n  dst.dword[i] = unspecified;\n}",
+            '  __m256i r;\n  __asm__("" : "=f"(r) : "0"(a));\n  return r;',
+        ),
+        "lasx_cast_128_d": (
+            "__m256d",
+            "__lasx_cast_128_d",
+            "__m128d a",
+            "Return a 256-bit double precision vector whose low 128-bit half contains `a`. The high 128-bit half is unspecified.",
+            "for (int i = 0;i < 2;i++) {\n  dst.fp64[i] = a.fp64[i];\n}\nfor (int i = 2;i < 4;i++) {\n  dst.fp64[i] = unspecified;\n}",
+            '  __m256d r;\n  __asm__("" : "=f"(r) : "0"(a));\n  return r;',
+        ),
+        "lasx_cast_128_s": (
+            "__m256",
+            "__lasx_cast_128_s",
+            "__m128 a",
+            "Return a 256-bit single precision vector whose low 128-bit half contains `a`. The high 128-bit half is unspecified.",
+            "for (int i = 0;i < 4;i++) {\n  dst.fp32[i] = a.fp32[i];\n}\nfor (int i = 4;i < 8;i++) {\n  dst.fp32[i] = unspecified;\n}",
+            '  __m256 r;\n  __asm__("" : "=f"(r) : "0"(a));\n  return r;',
+        ),
+        "lasx_concat_128": (
+            "__m256i",
+            "__lasx_concat_128",
+            "__m128i lo, __m128i hi",
+            "Concatenate two 128-bit integer vectors. `lo` becomes the low 128-bit half and `hi` becomes the high 128-bit half.",
+            "for (int i = 0;i < 2;i++) {\n  dst.dword[i] = lo.dword[i];\n  dst.dword[i + 2] = hi.dword[i];\n}",
+            '  __m256i l;\n  __m256i h;\n  __asm__("" : "=f"(l) : "0"(lo));\n  __asm__("" : "=f"(h) : "0"(hi));\n  return __lasx_xvpermi_q(l, h, 0x02);',
+        ),
+        "lasx_concat_128_d": (
+            "__m256d",
+            "__lasx_concat_128_d",
+            "__m128d lo, __m128d hi",
+            "Concatenate two 128-bit double precision vectors. `lo` becomes the low 128-bit half and `hi` becomes the high 128-bit half.",
+            "for (int i = 0;i < 2;i++) {\n  dst.fp64[i] = lo.fp64[i];\n  dst.fp64[i + 2] = hi.fp64[i];\n}",
+            '  __m256d l;\n  __m256d h;\n  __asm__("" : "=f"(l) : "0"(lo));\n  __asm__("" : "=f"(h) : "0"(hi));\n  return (__m256d)__lasx_xvpermi_q((__m256i)l, (__m256i)h, 0x02);',
+        ),
+        "lasx_concat_128_s": (
+            "__m256",
+            "__lasx_concat_128_s",
+            "__m128 lo, __m128 hi",
+            "Concatenate two 128-bit single precision vectors. `lo` becomes the low 128-bit half and `hi` becomes the high 128-bit half.",
+            "for (int i = 0;i < 4;i++) {\n  dst.fp32[i] = lo.fp32[i];\n  dst.fp32[i + 4] = hi.fp32[i];\n}",
+            '  __m256 l;\n  __m256 h;\n  __asm__("" : "=f"(l) : "0"(lo));\n  __asm__("" : "=f"(h) : "0"(hi));\n  return (__m256)__lasx_xvpermi_q((__m256i)l, (__m256i)h, 0x02);',
+        ),
+        "lasx_extract_128_hi": (
+            "__m128i",
+            "__lasx_extract_128_hi",
+            "__m256i a",
+            "Extract the high 128-bit half of `a` as an integer vector.",
+            "for (int i = 0;i < 2;i++) {\n  dst.dword[i] = a.dword[i + 2];\n}",
+            '  __m256i t = __lasx_xvpermi_d(a, 0x0e);\n  __m128i r;\n  __asm__("" : "=f"(r) : "0"(t));\n  return r;',
+        ),
+        "lasx_extract_128_hi_d": (
+            "__m128d",
+            "__lasx_extract_128_hi_d",
+            "__m256d a",
+            "Extract the high 128-bit half of `a` as a double precision vector.",
+            "for (int i = 0;i < 2;i++) {\n  dst.fp64[i] = a.fp64[i + 2];\n}",
+            '  __m256i t = __lasx_xvpermi_d((__m256i)a, 0x0e);\n  __m128d r;\n  __asm__("" : "=f"(r) : "0"(t));\n  return r;',
+        ),
+        "lasx_extract_128_hi_s": (
+            "__m128",
+            "__lasx_extract_128_hi_s",
+            "__m256 a",
+            "Extract the high 128-bit half of `a` as a single precision vector.",
+            "for (int i = 0;i < 4;i++) {\n  dst.fp32[i] = a.fp32[i + 4];\n}",
+            '  __m256i t = __lasx_xvpermi_d((__m256i)a, 0x0e);\n  __m128 r;\n  __asm__("" : "=f"(r) : "0"(t));\n  return r;',
+        ),
+        "lasx_extract_128_lo": (
+            "__m128i",
+            "__lasx_extract_128_lo",
+            "__m256i a",
+            "Extract the low 128-bit half of `a` as an integer vector.",
+            "for (int i = 0;i < 2;i++) {\n  dst.dword[i] = a.dword[i];\n}",
+            '  __m128i r;\n  __asm__("" : "=f"(r) : "0"(a));\n  return r;',
+        ),
+        "lasx_extract_128_lo_d": (
+            "__m128d",
+            "__lasx_extract_128_lo_d",
+            "__m256d a",
+            "Extract the low 128-bit half of `a` as a double precision vector.",
+            "for (int i = 0;i < 2;i++) {\n  dst.fp64[i] = a.fp64[i];\n}",
+            '  __m128d r;\n  __asm__("" : "=f"(r) : "0"(a));\n  return r;',
+        ),
+        "lasx_extract_128_lo_s": (
+            "__m128",
+            "__lasx_extract_128_lo_s",
+            "__m256 a",
+            "Extract the low 128-bit half of `a` as a single precision vector.",
+            "for (int i = 0;i < 4;i++) {\n  dst.fp32[i] = a.fp32[i];\n}",
+            '  __m128 r;\n  __asm__("" : "=f"(r) : "0"(a));\n  return r;',
+        ),
+        "lasx_insert_128_hi": (
+            "__m256i",
+            "__lasx_insert_128_hi",
+            "__m256i a, __m128i b",
+            "Replace the high 128-bit half of `a` with the integer vector `b`.",
+            "for (int i = 0;i < 2;i++) {\n  dst.dword[i] = a.dword[i];\n  dst.dword[i + 2] = b.dword[i];\n}",
+            '  __m256i bb;\n  __asm__("" : "=f"(bb) : "0"(b));\n  return __lasx_xvpermi_q(a, bb, 0x02);',
+        ),
+        "lasx_insert_128_hi_d": (
+            "__m256d",
+            "__lasx_insert_128_hi_d",
+            "__m256d a, __m128d b",
+            "Replace the high 128-bit half of `a` with the double precision vector `b`.",
+            "for (int i = 0;i < 2;i++) {\n  dst.fp64[i] = a.fp64[i];\n  dst.fp64[i + 2] = b.fp64[i];\n}",
+            '  __m256d bb;\n  __asm__("" : "=f"(bb) : "0"(b));\n  return (__m256d)__lasx_xvpermi_q((__m256i)a, (__m256i)bb, 0x02);',
+        ),
+        "lasx_insert_128_hi_s": (
+            "__m256",
+            "__lasx_insert_128_hi_s",
+            "__m256 a, __m128 b",
+            "Replace the high 128-bit half of `a` with the single precision vector `b`.",
+            "for (int i = 0;i < 4;i++) {\n  dst.fp32[i] = a.fp32[i];\n  dst.fp32[i + 4] = b.fp32[i];\n}",
+            '  __m256 bb;\n  __asm__("" : "=f"(bb) : "0"(b));\n  return (__m256)__lasx_xvpermi_q((__m256i)a, (__m256i)bb, 0x02);',
+        ),
+        "lasx_insert_128_lo": (
+            "__m256i",
+            "__lasx_insert_128_lo",
+            "__m256i a, __m128i b",
+            "Replace the low 128-bit half of `a` with the integer vector `b`.",
+            "for (int i = 0;i < 2;i++) {\n  dst.dword[i] = b.dword[i];\n  dst.dword[i + 2] = a.dword[i + 2];\n}",
+            '  __m256i bb;\n  __asm__("" : "=f"(bb) : "0"(b));\n  return __lasx_xvpermi_q(bb, a, 0x12);',
+        ),
+        "lasx_insert_128_lo_d": (
+            "__m256d",
+            "__lasx_insert_128_lo_d",
+            "__m256d a, __m128d b",
+            "Replace the low 128-bit half of `a` with the double precision vector `b`.",
+            "for (int i = 0;i < 2;i++) {\n  dst.fp64[i] = b.fp64[i];\n  dst.fp64[i + 2] = a.fp64[i + 2];\n}",
+            '  __m256d bb;\n  __asm__("" : "=f"(bb) : "0"(b));\n  return (__m256d)__lasx_xvpermi_q((__m256i)bb, (__m256i)a, 0x12);',
+        ),
+        "lasx_insert_128_lo_s": (
+            "__m256",
+            "__lasx_insert_128_lo_s",
+            "__m256 a, __m128 b",
+            "Replace the low 128-bit half of `a` with the single precision vector `b`.",
+            "for (int i = 0;i < 4;i++) {\n  dst.fp32[i] = b.fp32[i];\n  dst.fp32[i + 4] = a.fp32[i + 4];\n}",
+            '  __m256 bb;\n  __asm__("" : "=f"(bb) : "0"(b));\n  return (__m256)__lasx_xvpermi_q((__m256i)bb, (__m256i)a, 0x12);',
+        ),
+    }
+
+    def lasx_128_lane_doc(entry):
+        ret, name, args, desc, operation, body = entry
+        return f"""
+## {ret} {name} ({args})
+
+### Synopsis
+
+```c++
+{ret} {name} ({args})
+#include <lsxintrin.h>
+#include <lasxintrin.h>
+CPU Flags: LASX
+```
+
+### Description
+
+{desc}
+
+This helper intrinsic does not name a distinct LASX instruction. Depending on the operation and optimization, it may lower to a no-op, a register move, or an existing LASX permutation instruction such as `xvpermi.q`.
+
+### Operation
+
+```c++
+{operation}
+```
+
+### GCC Compatibility
+
+Supported by GCC 16 and later.
+
+GCC 14 and GCC 15 do not provide this intrinsic. The fallback below uses a non-volatile GNU inline assembly register alias where the older compiler has no 128/256-bit cast operator, and otherwise uses regular LASX intrinsics. It is intended for source compatibility; the native GCC 16 intrinsic may still generate better code.
+
+```c++
+#if defined(__loongarch_asx) && !defined(__loongarch_asx_sx_conv)
+static inline {ret} {name} ({args}) {{
+{body}
+}}
+#endif
+```
+
+"""
+
+    def make_lasx_128_lane_macro(entry):
+        def render():
+            return lasx_128_lane_doc(entry)
+
+        return render
+
+    for macro_name, entry in lasx_128_lane_entries.items():
+        env.macros[macro_name] = make_lasx_128_lane_macro(entry)
+
     @env.macro
     def all_intrinsics(render=True):
         result = []
