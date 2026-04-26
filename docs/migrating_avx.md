@@ -10,6 +10,8 @@ Thankfully, LASX intrinsics adopt the same type as AVX: you can use the followin
 
 Here is a table of a mapping from AVX intrinsics to their LASX counterpart (WIP):
 
+For `__lasx_concat_128*`, pass the low 128-bit half first and the high 128-bit half second. The `__lasx_cast_128*` helpers define the low 128-bit half; do not depend on the high 128-bit half unless it is set later.
+
 | AVX                         | LASX               |
 |-----------------------------|--------------------|
 | _mm256_abs_epi16            | __lasx_xvsigncov_h |
@@ -58,18 +60,18 @@ Here is a table of a mapping from AVX intrinsics to their LASX counterpart (WIP)
 | _mm256_broadcastw_epi16     |                    |
 | _mm256_bslli_epi128         |                    |
 | _mm256_bsrli_epi128         |                    |
-| _mm256_castpd128_pd256      |                    |
-| _mm256_castpd256_pd128      |                    |
+| _mm256_castpd128_pd256      | __lasx_cast_128_d |
+| _mm256_castpd256_pd128      | __lasx_extract_128_lo_d |
 | _mm256_castpd_ps            |                    |
 | _mm256_castpd_si256         |                    |
-| _mm256_castps128_ps256      |                    |
-| _mm256_castps256_ps128      |                    |
+| _mm256_castps128_ps256      | __lasx_cast_128_s |
+| _mm256_castps256_ps128      | __lasx_extract_128_lo_s |
 | _mm256_castps_pd            |                    |
 | _mm256_castps_si256         |                    |
-| _mm256_castsi128_si256      |                    |
+| _mm256_castsi128_si256      | __lasx_cast_128 |
 | _mm256_castsi256_pd         |                    |
 | _mm256_castsi256_ps         |                    |
-| _mm256_castsi256_si128      |                    |
+| _mm256_castsi256_si128      | __lasx_extract_128_lo |
 | _mm256_ceil_pd              |                    |
 | _mm256_ceil_ps              |                    |
 | _mm256_cmp_pd               |                    |
@@ -140,10 +142,10 @@ Here is a table of a mapping from AVX intrinsics to their LASX counterpart (WIP)
 | _mm256_extract_epi32        |                    |
 | _mm256_extract_epi64        |                    |
 | _mm256_extract_epi8         |                    |
-| _mm256_extractf128_pd       |                    |
-| _mm256_extractf128_ps       |                    |
-| _mm256_extractf128_si256    |                    |
-| _mm256_extracti128_si256    |                    |
+| _mm256_extractf128_pd       | __lasx_extract_128_lo_d / __lasx_extract_128_hi_d |
+| _mm256_extractf128_ps       | __lasx_extract_128_lo_s / __lasx_extract_128_hi_s |
+| _mm256_extractf128_si256    | __lasx_extract_128_lo / __lasx_extract_128_hi |
+| _mm256_extracti128_si256    | __lasx_extract_128_lo / __lasx_extract_128_hi |
 | _mm256_floor_pd             |                    |
 | _mm256_floor_ps             |                    |
 | _mm256_fmadd_pd             |                    |
@@ -180,10 +182,10 @@ Here is a table of a mapping from AVX intrinsics to their LASX counterpart (WIP)
 | _mm256_insert_epi32         |                    |
 | _mm256_insert_epi64         |                    |
 | _mm256_insert_epi8          |                    |
-| _mm256_insertf128_pd        |                    |
-| _mm256_insertf128_ps        |                    |
-| _mm256_insertf128_si256     |                    |
-| _mm256_inserti128_si256     |                    |
+| _mm256_insertf128_pd        | __lasx_insert_128_lo_d / __lasx_insert_128_hi_d |
+| _mm256_insertf128_ps        | __lasx_insert_128_lo_s / __lasx_insert_128_hi_s |
+| _mm256_insertf128_si256     | __lasx_insert_128_lo / __lasx_insert_128_hi |
+| _mm256_inserti128_si256     | __lasx_insert_128_lo / __lasx_insert_128_hi |
 | _mm256_lddqu_si256          |                    |
 | _mm256_load_pd              |                    |
 | _mm256_load_ps              |                    |
@@ -282,18 +284,18 @@ Here is a table of a mapping from AVX intrinsics to their LASX counterpart (WIP)
 | _mm256_set_epi32            |                    |
 | _mm256_set_epi64x           |                    |
 | _mm256_set_epi8             |                    |
-| _mm256_set_m128d            |                    |
-| _mm256_set_m128i            |                    |
-| _mm256_set_m128             |                    |
+| _mm256_set_m128d            | __lasx_concat_128_d |
+| _mm256_set_m128i            | __lasx_concat_128 |
+| _mm256_set_m128             | __lasx_concat_128_s |
 | _mm256_set_pd               |                    |
 | _mm256_set_ps               |                    |
 | _mm256_setr_epi16           |                    |
 | _mm256_setr_epi32           |                    |
 | _mm256_setr_epi64x          |                    |
 | _mm256_setr_epi8            |                    |
-| _mm256_setr_m128d           |                    |
-| _mm256_setr_m128i           |                    |
-| _mm256_setr_m128            |                    |
+| _mm256_setr_m128d           | __lasx_concat_128_d |
+| _mm256_setr_m128i           | __lasx_concat_128 |
+| _mm256_setr_m128            | __lasx_concat_128_s |
 | _mm256_setr_pd              |                    |
 | _mm256_setr_ps              |                    |
 | _mm256_setzero_pd           |                    |
