@@ -171,6 +171,15 @@ tb = {
     "vsubwod": (widths_vsubw, "v128 a, v128 b"),
     "vxor": (["v"], "v128 a, v128 b"),
     "vxori": (["b"], "v128 a, int imm", [0, 31]),
+    # Float binary
+    "vfadd": (widths_fp, "v128 a, v128 b"),
+    "vfsub": (widths_fp, "v128 a, v128 b"),
+    "vfdiv": (widths_fp, "v128 a, v128 b"),
+    "vfmul": (widths_fp, "v128 a, v128 b"),
+    # Float conversions (unary)
+    "vffint": (["d_l", "d_lu", "s_w", "s_wu"], "v128 a"),
+    "vffinth": (["d_w"], "v128 a"),
+    "vffintl": (["d_w"], "v128 a"),
 }
 
 for name in tb:
