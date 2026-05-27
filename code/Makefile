@@ -7,6 +7,8 @@ all: $(EXES)
 
 run: $(patsubst %,run-%,$(EXES))
 
+test: $(filter-out run-measure,$(patsubst %,run-%,$(EXES)))
+
 run-%: %
 	echo "Running $<"
 	./$<
