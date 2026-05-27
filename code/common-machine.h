@@ -29,7 +29,7 @@
 
 /* capabilities */
 
-#define MACHINE_HAS_LSX 1  /* all currently documented uarches have LSX */
+#define MACHINE_HAS_LSX 1 /* all currently documented uarches have LSX */
 #define MACHINE_HAS_LASX (!UARCH_LA264) && (!UARCH_LA364E)
 
 #endif /* _COMMON_MACHINE_H_ */

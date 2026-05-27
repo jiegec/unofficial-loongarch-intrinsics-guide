@@ -1,12 +1,12 @@
 for (int i = 0; i < 4; i++) {
-  dst.fp32[i] = (i < 2)
-                    ? (f32)(s64)b.dword[i]
-                    : (f32)(s64)a.dword[i - 2]; // rounding mode is not expressed in C
+  dst.fp32[i] =
+      (i < 2) ? (f32)(s64)b.dword[i]
+              : (f32)(s64)a.dword[i - 2]; // rounding mode is not expressed in C
 }
 for (int i = 4; i < 8; i++) {
-  dst.fp32[i] = (i < 6)
-                    ? (f32)(s64)b.dword[i - 2]
-                    : (f32)(s64)a.dword[i - 4]; // rounding mode is not expressed in C
+  dst.fp32[i] =
+      (i < 6) ? (f32)(s64)b.dword[i - 2]
+              : (f32)(s64)a.dword[i - 4]; // rounding mode is not expressed in C
 }
 
 // Expands to:

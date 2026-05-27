@@ -199,8 +199,7 @@ void bind_to_core() {
 }
 
 sigjmp_buf resume_point;
-void sigill_action_handler(int sig, siginfo_t *info, void *ucontext)
-{
+void sigill_action_handler(int sig, siginfo_t *info, void *ucontext) {
   // the current test is not supported by the CPU running the
   // test
   siglongjmp(resume_point, 1);
@@ -236,11 +235,12 @@ int main(int argc, char *argv[]) {
 
   std::map<std::string, InstrInfo> info;
 
-  struct sigaction sigill_action = { 0 };
+  struct sigaction sigill_action = {0};
   sigill_action.sa_flags = SA_SIGINFO;
   sigill_action.sa_sigaction = sigill_action_handler;
   if (sigaction(SIGILL, &sigill_action, NULL) == -1) {
-    fprintf(stderr, "error: failed to setup SIGILL handler, unsupported insns will crash the program\n");
+    fprintf(stderr, "error: failed to setup SIGILL handler, unsupported insns "
+                    "will crash the program\n");
   }
 
   for (auto it : tests) {
