@@ -1669,7 +1669,8 @@ for vlen, prefix in [(128, "v"), (256, "xv")]:
                 )
                 print(f"}}", file=f)
             else:
-                print(f"for (int i = 0;i < {vlen // w // 2};i++) {{", file=f)
+                print("int i;", file=f)
+                print(f"for (i = 0;i < {vlen // w // 2};i++) {{", file=f)
                 print(
                     f"  dst.{dest_m}[i] = b.{m}[i];",
                     file=f,
