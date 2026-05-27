@@ -13,12 +13,3 @@ if (0) {
   dst.fp64[2] = (f64)((s32)a.word[4]);
   dst.fp64[3] = (f64)((s32)a.word[5]);
 }
-
-// Expands to:
-
-if (0) {
-  dst.fp64[0] = (f64)((s32)a.word[0]);
-  dst.fp64[1] = (f64)((s32)a.word[1]);
-  dst.fp64[2] = (f64)((s32)a.word[4]);
-  dst.fp64[3] = (f64)((s32)a.word[5]);
-}

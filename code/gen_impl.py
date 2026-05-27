@@ -1717,7 +1717,8 @@ for vlen, prefix in [(128, "v"), (256, "xv")]:
                         )
                     print(f"}}", file=f)
                 else:
-                    print(f"for (int i = 0;i < {vlen // w // 2};i++) {{", file=f)
+                    print(f"int i;", file=f)
+                    print(f"for (i = 0;i < {vlen // w // 2};i++) {{", file=f)
                     if half == "h":
                         print(
                             f"  dst.{m}[i] = a.{src_m}[i + {vlen // w // 2}];",
@@ -1926,6 +1927,9 @@ for file in glob.glob("*.h"):
         continue
     expanded = []
     output_content = orig
+    # strip existing expanded code
+    if "// Expands to:" in output_content:
+        output_content = output_content[:output_content.find("// Expands to:")]
     for item in parsed.ext[-1].body:
         if isinstance(item, pycparser.c_ast.For):
             # print("Got For", item)
