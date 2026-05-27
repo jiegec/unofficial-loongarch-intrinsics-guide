@@ -1611,7 +1611,7 @@ for vlen, prefix in [(128, "v"), (256, "xv")]:
             with open(f"{prefix}frint{rounding}_{width}.h", "w") as f:
                 print(f"for (int i = 0;i < {vlen // w};i++) {{", file=f)
                 print(
-                    f"  dst.{m}[i] = ({m})(s{int_w})a.{m}[i]; // rounding mode is not expressed in C",
+                    f"  dst.{m}[i] = (f{w})(s{int_w})a.{m}[i]; // rounding mode is not expressed in C",
                     file=f,
                 )
                 print(f"}}", file=f)
@@ -1655,7 +1655,8 @@ for vlen, prefix in [(128, "v"), (256, "xv")]:
         }[width]
         with open(f"{prefix}fcvt_{dest_width}_{width}.h", "w") as f:
             if prefix == "v":
-                print(f"for (int i = 0;i < {vlen // w};i++) {{", file=f)
+                print("int i;", file=f)
+                print(f"for (i = 0;i < {vlen // w};i++) {{", file=f)
                 print(
                     f"  dst.{dest_m}[i] = b.{m}[i];",
                     file=f,

@@ -1,4 +1,5 @@
-for (int i = 0; i < 4; i++) {
+int i;
+for (i = 0; i < 4; i++) {
   dst.fp16[i] = b.fp32[i];
 }
 for (; i < 8; i++) {
