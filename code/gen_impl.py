@@ -1551,6 +1551,20 @@ for vlen, prefix in [(128, "v"), (256, "xv")]:
                     file=f,
                 )
                 print(f"}}", file=f)
+        with open(f"{prefix}fmax_{width}.h", "w") as f:
+            print(f"for (int i = 0;i < {vlen // w};i++) {{", file=f)
+            print(
+                f"  dst.{m}[i] = fmax(a.{m}[i], b.{m}[i]);",
+                file=f,
+            )
+            print(f"}}", file=f)
+        with open(f"{prefix}fmin_{width}.h", "w") as f:
+            print(f"for (int i = 0;i < {vlen // w};i++) {{", file=f)
+            print(
+                f"  dst.{m}[i] = fmin(a.{m}[i], b.{m}[i]);",
+                file=f,
+            )
+            print(f"}}", file=f)
         with open(f"{prefix}fmaxa_{width}.h", "w") as f:
             print(f"for (int i = 0;i < {vlen // w};i++) {{", file=f)
             print(

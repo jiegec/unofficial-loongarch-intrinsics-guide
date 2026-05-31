@@ -3,6 +3,7 @@
 #include <lasxintrin.h>
 #include <limits>
 #include <lsxintrin.h>
+#include <math.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>

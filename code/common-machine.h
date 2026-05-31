@@ -2,7 +2,7 @@
 #define _COMMON_MACHINE_H_
 
 #ifndef MACHINE_3C5000
-#define MACHINE_3C5000 0
+#define MACHINE_3C5000 1
 #endif
 
 #ifndef MACHINE_3A6000
