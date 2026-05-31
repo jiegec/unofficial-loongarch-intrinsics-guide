@@ -178,6 +178,8 @@ tb = {
     "vfmul": (widths_fp, "v128 a, v128 b"),
     "vfmax": (widths_fp, "v128 a, v128 b"),
     "vfmin": (widths_fp, "v128 a, v128 b"),
+    "vfmaxa": (widths_fp, "v128 a, v128 b"),
+    "vfmina": (widths_fp, "v128 a, v128 b"),
     # Float conversions (unary)
     "vffint": (["d_l", "d_lu", "s_w", "s_wu"], "v128 a"),
     "vffinth": (["d_w"], "v128 a"),

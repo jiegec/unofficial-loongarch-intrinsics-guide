@@ -1568,16 +1568,58 @@ for vlen, prefix in [(128, "v"), (256, "xv")]:
         with open(f"{prefix}fmaxa_{width}.h", "w") as f:
             print(f"for (int i = 0;i < {vlen // w};i++) {{", file=f)
             print(
-                f"  dst.{m}[i] = (abs(a.{m}[i]) > abs(b.{m}[i])) ? a.{m}[i] : b.{m}[i];",
+                f"  if (abs(a.{m}[i]) > abs(b.{m}[i])) {{",
                 file=f,
             )
+            print(
+                f"    dst.{m}[i] = a.{m}[i];",
+                file=f,
+            )
+            print(
+                f"  }} else if (abs(b.{m}[i]) > abs(a.{m}[i])) {{",
+                file=f,
+            )
+            print(
+                f"    dst.{m}[i] = b.{m}[i];",
+                file=f,
+            )
+            print(
+                f"  }} else {{",
+                file=f,
+            )
+            print(
+                f"    dst.{m}[i] = fmax(a.{m}[i], b.{m}[i]);",
+                file=f,
+            )
+            print(f"  }}", file=f)
             print(f"}}", file=f)
         with open(f"{prefix}fmina_{width}.h", "w") as f:
             print(f"for (int i = 0;i < {vlen // w};i++) {{", file=f)
             print(
-                f"  dst.{m}[i] = (abs(a.{m}[i]) < abs(b.{m}[i])) ? a.{m}[i] : b.{m}[i];",
+                f"  if (abs(a.{m}[i]) < abs(b.{m}[i])) {{",
                 file=f,
             )
+            print(
+                f"    dst.{m}[i] = a.{m}[i];",
+                file=f,
+            )
+            print(
+                f"  }} else if (abs(b.{m}[i]) < abs(a.{m}[i])) {{",
+                file=f,
+            )
+            print(
+                f"    dst.{m}[i] = b.{m}[i];",
+                file=f,
+            )
+            print(
+                f"  }} else {{",
+                file=f,
+            )
+            print(
+                f"    dst.{m}[i] = fmin(a.{m}[i], b.{m}[i]);",
+                file=f,
+            )
+            print(f"  }}", file=f)
             print(f"}}", file=f)
         with open(f"{prefix}flogb_{width}.h", "w") as f:
             print(f"for (int i = 0;i < {vlen // w};i++) {{", file=f)
