@@ -8,3 +8,21 @@
 !*.html
 !*.csv
 !*.md
+!lbt/
+!lbt/Makefile
+!lbt/*.h
+!lbt/*.c
+!lbt/*.yaml
+
+# LBT compiled binaries
+/lbt/lbt_verify
+/lbt/lbt_probe
+/lbt/lbt_verify_x86
+/lbt/_lbt_probe_build
+/lbt/lbt_verify_probe.o
+/lbt/gen_verify
+/lbt/gen_verify.c
+/lbt/gen_verify_x86.c
+/lbt/gen_probe_lbt.c
+/lbt/gen_probe_lbt_chunks/
+/lbt/reports/

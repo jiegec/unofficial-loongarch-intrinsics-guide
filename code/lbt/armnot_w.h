@@ -1,0 +1,24 @@
+// armnot.w
+// @meta category: arm
+// @meta synopsis: armnot.w rj, cond
+// @meta desc: Compute ARM flags from 32-bit NOT of rj. Updates N,Z if cond holds. C,V preserved.
+//
+// @reg read: GPR[rj], ARMFLAGS (condition)
+// @reg write: ARMFLAGS[N,Z]
+// @reg preserve: GPR[rj], all other GPR, SCRATCH, x87, FPR
+//
+// @flag N: COMPUTE          sign
+// @flag Z: COMPUTE          zero
+// @flag C: PRESERVE         preserved
+// @flag V: PRESERVE         preserved
+// @cond: cond false => all writes suppressed and state preserved
+//
+{
+    if (!arm_cond_holds(ARMFLAGS, cond))
+        return;
+    uint32_t r = ~(uint32_t)GPR[rj];
+    ARMFLAGS.N = (r >> 31) & 1;
+    ARMFLAGS.Z = r == 0;
+    // C, V preserved
+    // GPR operands unchanged.
+}

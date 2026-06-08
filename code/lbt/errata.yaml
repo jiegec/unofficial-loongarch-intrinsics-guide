@@ -1,0 +1,42 @@
+entries:
+  x86sbc-af-without-cf:
+    title: x86 SBC AF does not incorporate CF input
+    status: Verified on Loongson-3C6000/S LA664; confirmed on Intel G1610T and AMD Zen3 5950X
+    instructions:
+      - x86sbc.b
+      - x86sbc.h
+      - x86sbc.w
+      - x86sbc.d
+    condition: CF == 1 and (lhs & 0xf) >= (rhs & 0xf).
+    intel_behavior: "Intel-defined x86 SBB AF is 1 when a borrow from bit 3 occurs, which depends on the full (lhs[3:0] - rhs[3:0] - CF) computation. Equivalently, AF = ((lhs ^ rhs ^ result) & 0x10) != 0."
+    lbt_behavior: "LBT x86sbc helpers compute AF as (lhs & 0xf) < (rhs & 0xf), ignoring the CF input. When CF=1 and the low nibble of lhs is not less than the low nibble of rhs, AF is 0 even though the full x86 SBB computation would borrow from bit 3."
+    impact: "Defined-behavior divergence, not an undefined-flag case. Translators that rely on x86-defined SBB AF semantics must not use the LBT x86sbc AF result when CF=1 and (lhs & 0xf) >= (rhs & 0xf)."
+    workaround: "When CF may be 1 and the low nibbles are equal, do not rely on the LBT x86sbc AF result. Either preserve the original x86 AF from before the SBB, or compute AF separately using x86 SBB semantics: ((lhs ^ rhs ^ result) & 0x10) != 0."
+    evidence: "LBT verify reports show model=0x085 (AF=0) vs hw=0x095 (AF=1) for x86sbc.w with rj=0, rk=0, CF=1 when using the standard x86 AF formula. Direct x86 SBB hardware tests on Intel G1610T and AMD Zen3 5950X confirm AF=1 in this case, while LBT hardware gives AF=0."
+
+  x86rot-count-zero:
+    title: x86 rotate count-zero flag behavior
+    status: Verified on Loongson-3C6000/S LA664
+    instructions:
+      - x86rotl.b
+      - x86rotl.h
+      - x86rotl.w
+      - x86rotl.d
+      - x86rotli.b
+      - x86rotli.h
+      - x86rotli.w
+      - x86rotli.d
+      - x86rotr.b
+      - x86rotr.h
+      - x86rotr.w
+      - x86rotr.d
+      - x86rotri.b
+      - x86rotri.h
+      - x86rotri.w
+      - x86rotri.d
+    condition: masked rotate count is 0.
+    intel_behavior: Intel-defined x86 behavior preserves all flags when the masked rotate count is 0.
+    lbt_behavior: LA464/LA664 LBT rotate flag helpers still update CF in this case. ROL forms set CF from the operand MSB; ROR forms clear CF. Other tested flags are preserved.
+    impact: Defined-behavior divergence, not an undefined-flag case. Translators must not emit these LBT rotate flag helpers when the masked count may be 0 and the original x86 flags must be preserved.
+    workaround: Check the masked count first. If it is 0, skip the LBT rotate flag helper and preserve EFLAGS. If it is nonzero, the helper may be used for CF and count-1 OF behavior, while OF for larger counts remains undefined by x86.
+    evidence: Native x86 verify reports fail only on the rotate count-zero/count-width cases; LBT probe reports show CF changes for x86rotl/x86rotr count 0. LATX/Box64 avoids the helper on the count-zero path.

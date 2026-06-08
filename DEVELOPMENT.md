@@ -9,3 +9,4 @@
 - `code/untest.py`: list untested intrinsics.
 - `code/gen_measure.py`: generate `measure.h` to measure latency and throughput of instructions.
 - `code/Makefile`: use `make run` to validate C implementations against hardware, use `make run-measure` to measure latency and throughput.
+- `code/lbt/Makefile`: use `make -C code/lbt run-verify` to validate LBT instruction semantics against hardware

@@ -1,0 +1,382 @@
+legend:
+  M: mixed/data-dependent
+  '0': force 0
+  '1': force 1
+  P: preserve input flag
+  C: count-dependent
+  P0: 'count effective 0 preserves; nonzero counts force 0'
+  P1: 'count effective 0 preserves; nonzero counts force 1'
+  PM: 'count effective 0 preserves; nonzero counts are mixed/data-dependent'
+  '?': not measured
+columns:
+  - key: LBT_LA664
+    title: LBT LA664
+    report: code/lbt/reports/lbt-local-loongarch64.txt
+  - key: Intel_G1610T
+    title: Intel G1610T
+    report: code/lbt/reports/x86-intel-g1610t.txt
+  - key: AMD_Zen3_5950X
+    title: AMD Zen3 5950X
+    report: code/lbt/reports/x86-amd-zen3-5950x.txt
+instructions:
+  x86and:
+    AF:
+      x86_manual: undefined
+      LBT_LA664: '0'
+      Intel_G1610T: '0'
+      AMD_Zen3_5950X: '0'
+      note: Logical instructions define CF/OF as 0; only AF is undefined in this table.
+  x86or:
+    AF:
+      x86_manual: undefined
+      LBT_LA664: '0'
+      Intel_G1610T: '0'
+      AMD_Zen3_5950X: '0'
+      note: Logical instructions define CF/OF as 0; only AF is undefined in this table.
+  x86xor:
+    AF:
+      x86_manual: undefined
+      LBT_LA664: '0'
+      Intel_G1610T: '0'
+      AMD_Zen3_5950X: '0'
+      note: Logical instructions define CF/OF as 0; only AF is undefined in this table.
+  x86test:
+    AF:
+      x86_manual: undefined
+      LBT_LA664: '?'
+      Intel_G1610T: '0'
+      AMD_Zen3_5950X: '0'
+      note: Native-only probe. LBT has no TEST helper in this header set; TEST is included for binary-translation reference.
+  x86mul:
+    PF:
+      x86_manual: undefined
+      LBT_LA664: '0'
+      Intel_G1610T: M
+      AMD_Zen3_5950X: P
+      note: Intel and AMD differ here; software relying on MUL PF is CPU-sensitive.
+    AF:
+      x86_manual: undefined
+      LBT_LA664: '0'
+      Intel_G1610T: '0'
+      AMD_Zen3_5950X: P
+      note: ''
+    ZF:
+      x86_manual: undefined
+      LBT_LA664: '0'
+      Intel_G1610T: '0'
+      AMD_Zen3_5950X: P
+      note: ''
+    SF:
+      x86_manual: undefined
+      LBT_LA664: '0'
+      Intel_G1610T: M
+      AMD_Zen3_5950X: P
+      note: Intel and AMD differ here; software relying on MUL SF is CPU-sensitive.
+  x86div:
+    CF:
+      x86_manual: undefined
+      LBT_LA664: '?'
+      Intel_G1610T: P
+      AMD_Zen3_5950X: P
+      note: Native-only probe. DIV/IDIV are not LBT helpers in this header set.
+    PF:
+      x86_manual: undefined
+      LBT_LA664: '?'
+      Intel_G1610T: P
+      AMD_Zen3_5950X: '0'
+      note: AMD Zen3 clears PF after tested DIV forms; Intel G1610T preserves it.
+    AF:
+      x86_manual: undefined
+      LBT_LA664: '?'
+      Intel_G1610T: P
+      AMD_Zen3_5950X: '1'
+      note: AMD Zen3 sets AF after tested DIV forms; Intel G1610T preserves it.
+    ZF:
+      x86_manual: undefined
+      LBT_LA664: '?'
+      Intel_G1610T: P
+      AMD_Zen3_5950X: '0'
+      note: ''
+    SF:
+      x86_manual: undefined
+      LBT_LA664: '?'
+      Intel_G1610T: P
+      AMD_Zen3_5950X: '0'
+      note: ''
+    OF:
+      x86_manual: undefined
+      LBT_LA664: '?'
+      Intel_G1610T: P
+      AMD_Zen3_5950X: P
+      note: ''
+  x86idiv:
+    CF:
+      x86_manual: undefined
+      LBT_LA664: '?'
+      Intel_G1610T: P
+      AMD_Zen3_5950X: P
+      note: Native-only probe. IDIV matches DIV on the tested Intel G1610T and AMD Zen3 hosts.
+    PF:
+      x86_manual: undefined
+      LBT_LA664: '?'
+      Intel_G1610T: P
+      AMD_Zen3_5950X: '0'
+      note: ''
+    AF:
+      x86_manual: undefined
+      LBT_LA664: '?'
+      Intel_G1610T: P
+      AMD_Zen3_5950X: '1'
+      note: ''
+    ZF:
+      x86_manual: undefined
+      LBT_LA664: '?'
+      Intel_G1610T: P
+      AMD_Zen3_5950X: '0'
+      note: ''
+    SF:
+      x86_manual: undefined
+      LBT_LA664: '?'
+      Intel_G1610T: P
+      AMD_Zen3_5950X: '0'
+      note: ''
+    OF:
+      x86_manual: undefined
+      LBT_LA664: '?'
+      Intel_G1610T: P
+      AMD_Zen3_5950X: P
+      note: ''
+  x86bt:
+    PF:
+      x86_manual: undefined
+      LBT_LA664: '?'
+      Intel_G1610T: P
+      AMD_Zen3_5950X: P
+      note: Native-only probe. BTC/BTR/BTS are grouped with BT here; all tested forms preserve these undefined flags.
+    AF:
+      x86_manual: undefined
+      LBT_LA664: '?'
+      Intel_G1610T: P
+      AMD_Zen3_5950X: P
+      note: ''
+    ZF:
+      x86_manual: undefined
+      LBT_LA664: '?'
+      Intel_G1610T: P
+      AMD_Zen3_5950X: P
+      note: ''
+    SF:
+      x86_manual: undefined
+      LBT_LA664: '?'
+      Intel_G1610T: P
+      AMD_Zen3_5950X: P
+      note: ''
+    OF:
+      x86_manual: undefined
+      LBT_LA664: '?'
+      Intel_G1610T: P
+      AMD_Zen3_5950X: P
+      note: ''
+  x86bsf:
+    CF:
+      x86_manual: undefined
+      LBT_LA664: '?'
+      Intel_G1610T: '0'
+      AMD_Zen3_5950X: P
+      note: Native-only probe. Intel and AMD differ on all undefined BSF flags in this sample.
+    PF:
+      x86_manual: undefined
+      LBT_LA664: '?'
+      Intel_G1610T: M
+      AMD_Zen3_5950X: P
+      note: ''
+    AF:
+      x86_manual: undefined
+      LBT_LA664: '?'
+      Intel_G1610T: '0'
+      AMD_Zen3_5950X: P
+      note: ''
+    SF:
+      x86_manual: undefined
+      LBT_LA664: '?'
+      Intel_G1610T: '0'
+      AMD_Zen3_5950X: P
+      note: ''
+    OF:
+      x86_manual: undefined
+      LBT_LA664: '?'
+      Intel_G1610T: '0'
+      AMD_Zen3_5950X: P
+      note: ''
+  x86bsr:
+    CF:
+      x86_manual: undefined
+      LBT_LA664: '?'
+      Intel_G1610T: '0'
+      AMD_Zen3_5950X: P
+      note: Native-only probe. BSR is kept separate from BSF so source-zero behavior is not hidden by grouping.
+    PF:
+      x86_manual: undefined
+      LBT_LA664: '?'
+      Intel_G1610T: M
+      AMD_Zen3_5950X: P
+      note: ''
+    AF:
+      x86_manual: undefined
+      LBT_LA664: '?'
+      Intel_G1610T: '0'
+      AMD_Zen3_5950X: P
+      note: ''
+    SF:
+      x86_manual: undefined
+      LBT_LA664: '?'
+      Intel_G1610T: '0'
+      AMD_Zen3_5950X: P
+      note: ''
+    OF:
+      x86_manual: undefined
+      LBT_LA664: '?'
+      Intel_G1610T: '0'
+      AMD_Zen3_5950X: P
+      note: ''
+  x86shld:
+    CF:
+      x86_manual: undefined for counts greater than operand width
+      LBT_LA664: '?'
+      Intel_G1610T: PM
+      AMD_Zen3_5950X: C
+      note: Native-only probe. Counts include zero, one, width boundaries, and masked aliases.
+    PF:
+      x86_manual: undefined when count is zero; otherwise result-dependent
+      LBT_LA664: '?'
+      Intel_G1610T: C
+      AMD_Zen3_5950X: C
+      note: ''
+    AF:
+      x86_manual: undefined
+      LBT_LA664: '?'
+      Intel_G1610T: P0
+      AMD_Zen3_5950X: P1
+      note: Intel clears AF for nonzero counts; AMD Zen3 sets AF for nonzero counts.
+    ZF:
+      x86_manual: undefined when count is zero; otherwise result-dependent
+      LBT_LA664: '?'
+      Intel_G1610T: PM
+      AMD_Zen3_5950X: PM
+      note: ''
+    SF:
+      x86_manual: undefined when count is zero; otherwise result-dependent
+      LBT_LA664: '?'
+      Intel_G1610T: PM
+      AMD_Zen3_5950X: PM
+      note: ''
+    OF:
+      x86_manual: undefined for counts other than 1
+      LBT_LA664: '?'
+      Intel_G1610T: PM
+      AMD_Zen3_5950X: C
+      note: ''
+  x86shrd:
+    CF:
+      x86_manual: undefined for counts greater than operand width
+      LBT_LA664: '?'
+      Intel_G1610T: PM
+      AMD_Zen3_5950X: C
+      note: Native-only probe. SHRD matches SHLD on the tested Intel G1610T and AMD Zen3 hosts.
+    PF:
+      x86_manual: undefined when count is zero; otherwise result-dependent
+      LBT_LA664: '?'
+      Intel_G1610T: C
+      AMD_Zen3_5950X: C
+      note: ''
+    AF:
+      x86_manual: undefined
+      LBT_LA664: '?'
+      Intel_G1610T: P0
+      AMD_Zen3_5950X: P1
+      note: ''
+    ZF:
+      x86_manual: undefined when count is zero; otherwise result-dependent
+      LBT_LA664: '?'
+      Intel_G1610T: PM
+      AMD_Zen3_5950X: PM
+      note: ''
+    SF:
+      x86_manual: undefined when count is zero; otherwise result-dependent
+      LBT_LA664: '?'
+      Intel_G1610T: PM
+      AMD_Zen3_5950X: PM
+      note: ''
+    OF:
+      x86_manual: undefined for counts other than 1
+      LBT_LA664: '?'
+      Intel_G1610T: PM
+      AMD_Zen3_5950X: C
+      note: ''
+  x86sll:
+    AF:
+      x86_manual: undefined
+      LBT_LA664: P
+      Intel_G1610T: P0
+      AMD_Zen3_5950X: P1
+      note: Intel clears AF for nonzero counts; this AMD Zen3 run sets AF for nonzero counts.
+    OF:
+      x86_manual: undefined for counts other than 1
+      LBT_LA664: C
+      Intel_G1610T: PM
+      AMD_Zen3_5950X: C
+      note: OF is architecturally defined for effective count 1 and undefined for larger nonzero counts.
+  x86srl:
+    AF:
+      x86_manual: undefined
+      LBT_LA664: P
+      Intel_G1610T: P0
+      AMD_Zen3_5950X: P1
+      note: Intel clears AF for nonzero counts; this AMD Zen3 run sets AF for nonzero counts.
+    OF:
+      x86_manual: undefined for counts other than 1
+      LBT_LA664: C
+      Intel_G1610T: PM
+      AMD_Zen3_5950X: C
+      note: OF is architecturally defined for effective count 1 and undefined for larger nonzero counts.
+  x86sra:
+    AF:
+      x86_manual: undefined
+      LBT_LA664: P
+      Intel_G1610T: P0
+      AMD_Zen3_5950X: P1
+      note: Intel clears AF for nonzero counts; this AMD Zen3 run sets AF for nonzero counts.
+    OF:
+      x86_manual: undefined for counts other than 1
+      LBT_LA664: C
+      Intel_G1610T: P0
+      AMD_Zen3_5950X: P0
+      note: SAR defines OF as 0 for effective count 1; larger nonzero counts are undefined but measured as 0 here.
+  x86rotl:
+    OF:
+      x86_manual: undefined for counts other than 1
+      LBT_LA664: C
+      Intel_G1610T: M
+      AMD_Zen3_5950X: C
+      note: Native CHECK failures in reports are defined-behavior LBT/x86 differences, not probe failures.
+  x86rotr:
+    OF:
+      x86_manual: undefined for counts other than 1
+      LBT_LA664: C
+      Intel_G1610T: M
+      AMD_Zen3_5950X: C
+      note: Native CHECK failures in reports are defined-behavior LBT/x86 differences, not probe failures.
+  x86rcl:
+    OF:
+      x86_manual: undefined for counts other than 1
+      LBT_LA664: C
+      Intel_G1610T: PM
+      AMD_Zen3_5950X: C
+      note: OF is defined only for count 1; larger effective counts are CPU/LBT behavior.
+  x86rcr:
+    OF:
+      x86_manual: undefined for counts other than 1
+      LBT_LA664: C
+      Intel_G1610T: PM
+      AMD_Zen3_5950X: C
+      note: OF is defined only for count 1; larger effective counts are CPU/LBT behavior.

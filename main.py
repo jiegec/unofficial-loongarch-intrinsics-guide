@@ -5,6 +5,9 @@ import json
 import markdown
 import re
 import csv
+import sys
+
+sys.path.insert(0, os.path.dirname(__file__))
 
 # dirty way to reduce code
 cur_simd = "lsx"
@@ -19,6 +22,8 @@ uarches = {
     "3A6000": "LA664",
     "3C6000": "LA664",
 }
+
+import yaml
 
 measure = {x: {} for x in cpus}
 for cpu in cpus:
@@ -89,6 +94,7 @@ def my_macro(env):
 
 
 def define_env(env):
+
     widths = {
         "b": 8,
         "bu": 8,
@@ -118,29 +124,49 @@ def define_env(env):
 
     fp_types = {"s": "__m128", "d": "__m128d"}
 
-    def instruction(intrinsic, instr, desc):
+    def instruction(intrinsic, instr, desc, extra="", code=None, is_lbt=False):
         global cur_simd
-        # try to be smart
-        file_name = None
-        intrinsic_name = ""
-        for part in intrinsic.split(" "):
-            if part.startswith("__lsx_"):
-                file_name = part[6:]
-                intrinsic_name = part
-            elif part.startswith("__lasx_"):
-                file_name = part[7:]
-                intrinsic_name = part
-        if cur_simd == "lasx" and file_name[0] != "x":
-            file_name = "x" + file_name
-            instr = "x" + instr
-            intrinsic = intrinsic.replace("m128", "m256").replace("_lsx_", "_lasx_x")
-            # replace vr to xr in instr
-            instr = re.sub("\\bvr\\b", "xr", instr)
-            intrinsic_name = intrinsic_name.replace("__lsx_", "__lasx_x")
-        if not os.path.exists(f"code/{file_name}.h"):
-            file_name = instr.split(" ")[0].replace(".", "_")
 
-        code = open(f"code/{file_name}.h").read().strip()
+        # ── LBT path: all metadata from .h files ──
+        if is_lbt:
+            code = _lbt_code(intrinsic)
+            instr = _lbt_instr(intrinsic)
+            flags, rd, wr, h_desc = _lbt_parse(intrinsic)
+            if not h_desc: h_desc = _lbt_desc_fallback(intrinsic)
+            if not desc: desc = h_desc
+            extra_parts = []
+            if flags:
+                extra_parts.append("### Flags\n\n" + _lbt_flag_table(flags))
+            if rd or wr:
+                extra_parts.append(_lbt_reg_table(rd, wr))
+            errata = _lbt_errata_for_instruction(intrinsic)
+            if errata:
+                extra_parts.append("### Errata\n\n" + errata)
+            extra = "\n\n".join(extra_parts)
+            file_name = intrinsic.replace(".", "_")
+            intrinsic_name = ""  # LBT has no C++ intrinsic
+
+        # ── LSX/LASX path ──
+        else:
+            file_name = None
+            intrinsic_name = ""
+            for part in intrinsic.split(" "):
+                if part.startswith("__lsx_"):
+                    file_name = part[6:]
+                    intrinsic_name = part
+                elif part.startswith("__lasx_"):
+                    file_name = part[7:]
+                    intrinsic_name = part
+            if cur_simd == "lasx" and file_name[0] != "x":
+                file_name = "x" + file_name
+                instr = "x" + instr
+                intrinsic = intrinsic.replace("m128", "m256").replace("_lsx_", "_lasx_x")
+                instr = re.sub("\\bvr\\b", "xr", instr)
+                intrinsic_name = intrinsic_name.replace("__lsx_", "__lasx_x")
+            if not os.path.exists(f"code/{file_name}.h"):
+                file_name = instr.split(" ")[0].replace(".", "_")
+            code = open(f"code/{file_name}.h").read().strip()
+
         code = code.strip()
         if os.path.exists(f"code/{file_name}.cpp"):
             tested = "Tested on real machine."
@@ -220,6 +246,7 @@ CPU Flags: {cur_simd.upper()}
 
 {tested}
 
+{extra}
 {latency_throughput}
 
 """
@@ -2106,7 +2133,9 @@ static inline {ret} {name} ({args}) {{
                             if line.startswith("##"):
                                 body = "\n".join(lines[i + 1 :])
                                 intrinsic = line[2:].strip()
-                                if "_lsx_" in intrinsic:
+                                if "CPU Flags: LBT" in body:
+                                    extension = "LBT"
+                                elif "_lsx_" in intrinsic:
                                     extension = "LSX"
                                 else:
                                     extension = "LASX"
@@ -2197,6 +2226,216 @@ static inline {ret} {name} ({args}) {{
         result += "</tbody>"
         return result
 
+    # ── LBT macros ──
+
+    @my_macro(env)
+    def lbt_page(page):
+        names = LBT_PAGES[page]
+        return "".join(instruction(name, "", "", is_lbt=True) for name in names)
+
+    @my_macro(env)
+    def lbt_undef_table():
+        path = os.path.join(os.path.dirname(__file__), "code", "lbt", "undef_behaviors.yaml")
+        if not os.path.exists(path): return "(data not available)"
+        data = yaml.safe_load(open(path))
+        instructions = data.get("instructions", {})
+        fl = ["CF","PF","AF","ZF","SF","OF"]
+        columns = data.get("columns", [])
+        cols = ["Instruction", "Flag", "x86 Manual"] + [c.get("title", c.get("key", "?")) for c in columns] + ["Note"]
+        rows = ["| " + " | ".join(cols) + " |", "|" + "|".join(["------"] * len(cols)) + "|"]
+        for st, entry in instructions.items():
+            for fn in fl:
+                if fn not in entry: continue
+                e = entry[fn]
+                vals = [f'`{e.get(col.get("key"), "?")}`' for col in columns]
+                rows.append(f'| `{st}` | {fn} | {e.get("x86_manual","undefined")} | ' + " | ".join(vals) + f' | {e.get("note","")} |')
+        return "\n".join(rows)
+
+    @my_macro(env)
+    def lbt_errata_table():
+        data = _lbt_errata_data()
+        entries = data.get("entries", {})
+        if not entries: return "(data not available)"
+        rows = [
+            "| Erratum | Instructions | Condition | Intel-defined behavior | Observed LBT behavior | Workaround |",
+            "|---------|--------------|-----------|------------------------|-----------------------|------------|",
+        ]
+        for key, entry in entries.items():
+            title = entry.get("title", key)
+            instrs = ", ".join(f"`{i}`" for i in entry.get("instructions", []))
+            rows.append(
+                f"| {title} | {instrs} | {entry.get('condition', '')} | "
+                f"{entry.get('intel_behavior', '')} | {entry.get('lbt_behavior', '')} | "
+                f"{entry.get('workaround', '')} |"
+            )
+        return "\n".join(rows)
+
+    @my_macro(env)
+    def legend_table():
+        path = os.path.join(os.path.dirname(__file__), "code", "lbt", "undef_behaviors.yaml")
+        if not os.path.exists(path): return ""
+        data = yaml.safe_load(open(path))
+        rows = ["| Code | Meaning |", "|------|---------|"]
+        for code, desc in data.get("legend", {}).items():
+            rows.append(f"| `{code}` | {desc} |")
+        return "\n".join(rows)
+
+
+
+# ═══════════════════════════════════════════════════════════════
+# LBT data — instruction lists, format tables, helpers
+# ═══════════════════════════════════════════════════════════════
+
+WIDTHS = {"b":8,"h":16,"w":32,"d":64,"wu":32,"du":64,"bu":8,"hu":16}
+
+FORMAT_OVERRIDES = {
+    "movgr2scr":"crd, rj","movscr2gr":"rd, crj","jiscr0":"offs","jiscr1":"offs",
+    "addu12i.w":"rd, rj, simm5","addu12i.d":"rd, rj, simm5",
+    "fcvt.ud.d":"fd, fj","fcvt.ld.d":"fd, fj","fcvt.d.ld":"fd, fj, fk",
+    "setx86j":"rd, cond","setx86loope":"rd, rj","setx86loopne":"rd, rj",
+    "x86mfflag":"rd, mask","x86mtflag":"rj, mask","x86mftop":"rd",
+    "x86mttop":"top","x86inctop":"","x86dectop":"","x86settm":"","x86clrtm":"",
+    "x86settag":"rd, op, bit","armmove":"rd, rj, cond",
+    "armmfflag":"rd, mask","armmtflag":"rj, mask","setarmj":"rd, cond",
+}
+
+LBT_PAGES = {
+    "state_transfer":["movgr2scr","movscr2gr","jiscr0","jiscr1","x86mfflag","x86mtflag","armmfflag","armmtflag"],
+    "base_integer":["addu12i.w","addu12i.d","adc.b","adc.h","adc.w","adc.d","sbc.b","sbc.h","sbc.w","sbc.d","rotr.b","rotr.h","rotr.w","rotr.d","rotri.b","rotri.h","rotri.w","rotri.d","rcr.b","rcr.h","rcr.w","rcr.d","rcri.b","rcri.h","rcri.w","rcri.d"],
+    "mips_memory":["ldl.d","ldl.w","ldr.w","ldr.d","stl.w","stl.d","str.w","str.d"],
+    "x87_fpu":["x86mftop","x86mttop","x86inctop","x86dectop","x86settm","x86clrtm","x86settag","fcvt.ud.d","fcvt.ld.d","fcvt.d.ld"],
+    "x86_arithmetic":["x86adc.b","x86adc.h","x86adc.w","x86adc.d","x86add.b","x86add.h","x86add.w","x86add.d","x86add.wu","x86add.du","x86inc.b","x86inc.h","x86inc.w","x86inc.d","x86sbc.b","x86sbc.h","x86sbc.w","x86sbc.d","x86sub.b","x86sub.h","x86sub.w","x86sub.d","x86sub.wu","x86sub.du","x86dec.b","x86dec.h","x86dec.w","x86dec.d","x86mul.b","x86mul.h","x86mul.w","x86mul.d","x86mul.bu","x86mul.hu","x86mul.wu","x86mul.du"],
+    "x86_logic":["x86and.b","x86and.h","x86and.w","x86and.d","x86or.b","x86or.h","x86or.w","x86or.d","x86xor.b","x86xor.h","x86xor.w","x86xor.d"],
+    "x86_shift_rotate":["x86rcl.b","x86rcl.h","x86rcl.w","x86rcl.d","x86rcli.b","x86rcli.h","x86rcli.w","x86rcli.d","x86rcr.b","x86rcr.h","x86rcr.w","x86rcr.d","x86rcri.b","x86rcri.h","x86rcri.w","x86rcri.d","x86rotl.b","x86rotl.h","x86rotl.w","x86rotl.d","x86rotli.b","x86rotli.h","x86rotli.w","x86rotli.d","x86rotr.b","x86rotr.h","x86rotr.w","x86rotr.d","x86rotri.b","x86rotri.h","x86rotri.w","x86rotri.d","x86sll.b","x86sll.h","x86sll.w","x86sll.d","x86slli.b","x86slli.h","x86slli.w","x86slli.d","x86srl.b","x86srl.h","x86srl.w","x86srl.d","x86srli.b","x86srli.h","x86srli.w","x86srli.d","x86sra.b","x86sra.h","x86sra.w","x86sra.d","x86srai.b","x86srai.h","x86srai.w","x86srai.d"],
+    "x86_extended":["setx86j","setx86loope","setx86loopne"],
+    "arm":["armadd.w","armsub.w","armadc.w","armsbc.w","armand.w","armor.w","armxor.w","armnot.w","armsll.w","armsrl.w","armsra.w","armrotr.w","armslli.w","armsrli.w","armsrai.w","armrotri.w","armrrx.w","armmove","armmov.w","armmov.d","setarmj"],
+}
+
+def _lbt_h_path(name):
+    return os.path.join(os.path.dirname(__file__), "code", "lbt", f"{name.replace('.','_')}.h")
+
+def _lbt_errata_data():
+    path = os.path.join(os.path.dirname(__file__), "code", "lbt", "errata.yaml")
+    if not os.path.exists(path): return {}
+    return yaml.safe_load(open(path)) or {}
+
+def _lbt_errata_for_instruction(name):
+    rows = []
+    for key, entry in _lbt_errata_data().get("entries", {}).items():
+        if name not in entry.get("instructions", []):
+            continue
+        rows.append(
+            f"**{entry.get('title', key)}.** {entry.get('impact', '')}\n\n"
+            f"- Condition: {entry.get('condition', '')}\n"
+            f"- Intel-defined behavior: {entry.get('intel_behavior', '')}\n"
+            f"- Observed LBT behavior: {entry.get('lbt_behavior', '')}\n"
+            f"- Workaround: {entry.get('workaround', '')}\n"
+            f"- Evidence: {entry.get('evidence', '')}"
+        )
+    return "\n\n".join(rows)
+
+def _lbt_parse(name):
+    path = _lbt_h_path(name)
+    if not os.path.exists(path): return {}, "", "", ""
+    flags = {}; reg_read = reg_write = ""; desc = ""
+    for line in open(path):
+        s = line.strip()
+        if s.startswith("// @meta desc:"): desc = s.split(":", 1)[1].strip()
+        elif s.startswith("// @flag "):
+            fn = s.split(":")[0].split()[-1]
+            bd = s.split(":", 1)[1].strip()
+            parts = bd.split(None, 1) if bd else ["", ""]
+            kind = parts[0]; note = parts[1] if len(parts) > 1 else ""
+            cond = ""
+            if "[when " in note:
+                note, cond = note.split("[when ", 1)
+                cond = cond.rstrip("]").strip(); note = note.strip()
+            flags[fn] = (kind, note, cond)
+        elif s.startswith("// @reg read:"): reg_read = s.split(":", 1)[1].strip()
+        elif s.startswith("// @reg write:"): reg_write = s.split(":", 1)[1].strip()
+    return flags, reg_read, reg_write, desc
+
+def _lbt_flag_table(flags):
+    if not flags: return ""
+    x86_o = ["CF","PF","AF","ZF","SF","OF"]; arm_o = ["N","Z","C","V"]
+    order = arm_o if any(f in flags for f in arm_o) else x86_o
+    lines = ["| Bit | Read | Written | Description |\n|-----|------|---------|-------------|"]
+    for f in order:
+        if f not in flags: continue
+        kind, note, condition = flags[f]
+        read = "Yes" if kind == "READ_COMPUTE" else ("cond" if kind == "CONDITIONAL" else ("Yes" if kind == "PRESERVE" else "No"))
+        if kind == "PRESERVE": write = "No (preserved)"
+        elif kind == "FORCE_0": write = "0"
+        elif kind == "FORCE_1": write = "1"
+        elif kind == "CONDITIONAL": write = f"Result (if {condition})" if condition else "Result (conditional)"
+        elif kind in ("COMPUTE","READ_COMPUTE"): write = "Result"
+        else: write = kind
+        desc = note
+        if condition and kind != "CONDITIONAL": desc += f" [when {condition}]"
+        lines.append(f"| {f} | {read} | {write} | {desc} |")
+    return "\n".join(lines)
+
+def _lbt_reg_table(rd, wr):
+    if not rd and not wr: return ""
+    lines = ["### Register Effects\n\n| Register | Role | Detail |\n|----------|------|--------|"]
+    if rd and rd != "none": lines.append(f"| {rd} | read | |")
+    if wr and wr not in ("none","none (flags unchanged)"): lines.append(f"| {wr} | write | |")
+    return "\n".join(lines)
+
+def _lbt_code(name):
+    path = _lbt_h_path(name)
+    if not os.path.exists(path): return "// .h file not found"
+    lines = open(path).read().split("\n")
+    in_block = False; code_lines = []
+    for line in lines:
+        s = line.strip()
+        if not in_block:
+            if s == "{": in_block = True
+            continue
+        if s == "}": break
+        code_lines.append(line)
+    if not code_lines: return "// empty"
+    return "\n".join(l[4:] if l.startswith("    ") else l for l in code_lines)
+
+def _lbt_desc_fallback(name):
+    """Descriptions for instructions without .h files — sourced from suyu/LBT.md."""
+    st = name.split(".")[0]
+    if st == "jiscr0":
+        return "`PC = SCR[0] + (sign_extend(imm16) << 2)`. Indirect branch dispatch."
+    if st == "jiscr1":
+        return "`SCR[0] = PC; PC = SCR[1] + (sign_extend(imm16) << 2)`. Call instruction emulation."
+    if st == "x86settag":
+        return "Set x87 FPU tag word entry using `rd`, imm5, and imm8. May raise BTE on inconsistency."
+    if st == "fcvt.ld.d":
+        return "Convert double in `fj` to low 64 bits of x87 80-bit extended value. Used with `fcvt.ud.d`."
+    if st == "fcvt.ud.d":
+        return "Convert double in `fj` to high 16 bits (exp+sign) of x87 80-bit extended value. Used with `fcvt.ld.d`."
+    if st == "fcvt.d.ld":
+        return "Recompose double in `fd` from x87 80-bit value split across `fj` (low 64) and `fk` (high 16)."
+    if st.startswith("ldl"):
+        return f"MIPS LWL: load high bytes of {32 if st.endswith('w') else 64}-bit word from `rj + simm12` into high bytes of `rd`, low bytes kept from prior LDR."
+    if st.startswith("ldr"):
+        return f"MIPS LWR: load low bytes of {32 if st.endswith('w') else 64}-bit word from `rj + simm12` into low bytes of `rd`, high bytes kept from prior LDL."
+    if st.startswith("stl"):
+        return f"MIPS SWL: store high bytes of {32 if st.endswith('w') else 64}-bit `rd` to `rj + simm12`. Used with STR."
+    if st.startswith("str"):
+        return f"MIPS SWR: store low bytes of {32 if st.endswith('w') else 64}-bit `rd` to `rj + simm12`. Used with STL."
+    return f"LBT instruction {name}."
+
+
+def _lbt_instr(name):
+    if name in FORMAT_OVERRIDES: fmt = FORMAT_OVERRIDES[name]
+    elif name.startswith(("ldl.","ldr.","stl.","str.")): fmt = "rd, rj, simm12" if name.startswith(("ldl.","ldr.")) else "rj, rd, simm12"
+    elif name.startswith("x86") and name.split(".")[0] in {"x86inc","x86dec"}: fmt = "rj"
+    elif name.startswith("x86") and name.split(".")[0] in {"x86slli","x86srli","x86srai","x86rotli","x86rotri","x86rcli","x86rcri"}: fmt = "rj, imm"
+    elif name.startswith("x86"): fmt = "rj, rk"
+    elif name.startswith("arm") and name.split(".")[0] in {"armslli","armsrli","armsrai","armrotri"}: fmt = "rj, imm, cond"
+    elif name.startswith("arm") and name.split(".")[0] in {"armnot","armrrx","armmov"}: fmt = "rj, cond"
+    elif name.startswith("arm"): fmt = "rj, rk, cond"
+    elif name.split(".")[0] in {"adc","sbc","rotr","rcr"}: fmt = "rd, rj, rk"
+    elif name.split(".")[0] in {"rotri","rcri"}: fmt = "rd, rj, imm"
+    else: fmt = "rd, rj"
+    return f"{name} {fmt}".strip()
 
 if __name__ == "__main__":
     # Fake an env

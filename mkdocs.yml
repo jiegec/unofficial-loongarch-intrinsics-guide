@@ -4,6 +4,58 @@ site_description: Unofficial LoongArch Intrinsics Guide
 theme:
   name: readthedocs
 copyright: Copyright &copy; 2023-2025 Jiajie Chen
+nav:
+  - Home: index.md
+  - Browse All Intrinsics: viewer.md
+  - LoongArch SIMD Basics: loongarch_simd_basics.md
+  - Migrating from SSE to LSX: migrating_sse.md
+  - Migrating from AVX to LASX: migrating_avx.md
+  - LASX:
+      - Bitwise Operations: lasx/bitwise_operations.md
+      - Branch: lasx/branch.md
+      - Floating Point Comparison: lasx/float_comparison.md
+      - Floating Point Computation: lasx/float_computation.md
+      - Floating Point Conversion: lasx/float_conversion.md
+      - Floating Point Misc: lasx/float_misc.md
+      - Fused Multiply-Add: lasx/fma.md
+      - Integer Comparison: lasx/integer_comparison.md
+      - Integer Computation: lasx/integer_computation.md
+      - Logical: lasx/logical.md
+      - Memory Load & Store: lasx/memory.md
+      - Misc: lasx/misc.md
+      - Permutation: lasx/permutation.md
+      - Shift: lasx/shift.md
+      - Shuffling: lasx/shuffling.md
+      - Undocumented Intrinsics: lasx/undocumented.md
+  - LSX:
+      - Bitwise Operations: lsx/bitwise_operations.md
+      - Branch: lsx/branch.md
+      - Floating Point Comparison: lsx/float_comparison.md
+      - Floating Point Computation: lsx/float_computation.md
+      - Floating Point Conversion: lsx/float_conversion.md
+      - Floating Point Misc: lsx/float_misc.md
+      - Fused Multiply-Add: lsx/fma.md
+      - Integer Comparison: lsx/integer_comparison.md
+      - Integer Computation: lsx/integer_computation.md
+      - Logical: lsx/logical.md
+      - Memory Load & Store: lsx/memory.md
+      - Misc: lsx/misc.md
+      - Permutation: lsx/permutation.md
+      - Shift: lsx/shift.md
+      - Shuffling: lsx/shuffling.md
+      - Undocumented Intrinsics: lsx/undocumented.md
+  - LBT:
+      - State Transfer: lbt/state_transfer.md
+      - Base Integer: lbt/base_integer.md
+      - x86 Arithmetic: lbt/x86_arithmetic.md
+      - x86 Logic: lbt/x86_logic.md
+      - x86 Shift & Rotate: lbt/x86_shift_rotate.md
+      - x86 Extended: lbt/x86_extended.md
+      - x87 FPU: lbt/x87_fpu.md
+      - ARM: lbt/arm.md
+      - MIPS Memory: lbt/mips_memory.md
+      - Undefined Flags: lbt/undef_behavior.md
+  - Latency and Throughput of Instructions: latency_throughput.md
 plugins:
   # we use our own search
   # - search:
