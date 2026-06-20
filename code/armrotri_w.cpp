@@ -1,0 +1,28 @@
+#include "common.h"
+
+uint64_t armrotri_w(eflags &ARMFLAGS, uint64_t a, int imm, int cond) {
+  uint64_t dst = 0;
+#include "armrotri_w.h"
+  return dst;
+}
+
+#define ref_armrotri_w(eflags, a, imm, cond)                                   \
+  ({                                                                           \
+    uint16_t flags = eflags.raw;                                               \
+    asm volatile(                                                              \
+        "x86mtflag %0, 0x3f\narmrotri.w %1, %2, %3\nx86mfflag %0, 0x3f"        \
+        : "+r"(flags)                                                          \
+        : "r"(a), "n"(imm), "n"(cond)                                          \
+        : "memory");                                                           \
+    eflags.raw = flags;                                                        \
+    0;                                                                         \
+  })
+
+void test() {
+  IFUZZ1(armrotri_w, 0, 7);
+  IFUZZ1(armrotri_w, 0, 7);
+  IFUZZ1(armrotri_w, 15, 14);
+  IFUZZ1(armrotri_w, 15, 15);
+  IFUZZ1(armrotri_w, 31, 15);
+  IFUZZ1(armrotri_w, 31, 15);
+}
