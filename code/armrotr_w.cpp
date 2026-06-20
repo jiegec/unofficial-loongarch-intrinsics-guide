@@ -6,13 +6,14 @@ uint64_t armrotr_w(eflags &ARMFLAGS, uint64_t a, uint64_t b, int cond) {
   return dst;
 }
 
-#define ref_armrotr_w(eflags, a, b, cond)                                       \
+#define ref_armrotr_w(eflags, a, b, cond)                                      \
   ({                                                                           \
     uint16_t flags = eflags.raw;                                               \
-    asm volatile("x86mtflag %0, 0x3f\narmrotr.w %1, %2, %3\nx86mfflag %0, 0x3f" \
-                 : "+r"(flags)                                                 \
-                 : "r"(a), "r"(b), "n"(cond)                                   \
-                 : "memory");                                                  \
+    asm volatile(                                                              \
+        "x86mtflag %0, 0x3f\narmrotr.w %1, %2, %3\nx86mfflag %0, 0x3f"         \
+        : "+r"(flags)                                                          \
+        : "r"(a), "r"(b), "n"(cond)                                            \
+        : "memory");                                                           \
     eflags.raw = flags;                                                        \
     0;                                                                         \
   })
