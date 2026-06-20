@@ -1,7 +1,7 @@
-import os
 import glob
 import pycparser
 import subprocess
+from concurrent.futures import ThreadPoolExecutor
 from pycparser import c_generator
 
 widths = {
@@ -2076,4 +2076,7 @@ for file in glob.glob("*.h"):
 
     open(file, "w", encoding="utf-8").write(output_content)
 
-os.system("clang-format -i *.cpp *.h")
+files = glob.glob("*.cpp") + glob.glob("*.h")
+with ThreadPoolExecutor() as pool:
+    for f in files:
+        pool.submit(subprocess.run, ["clang-format", "-i", f])

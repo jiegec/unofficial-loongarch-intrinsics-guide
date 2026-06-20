@@ -1,4 +1,6 @@
-import os
+import glob
+import subprocess
+from concurrent.futures import ThreadPoolExecutor
 
 widths_signed = ["b", "h", "w", "d"]
 widths_unsigned = ["bu", "hu", "wu", "du"]
@@ -341,4 +343,7 @@ for width_name in ["d", "w"]:
         print("}", file=f)
         print("", file=f)
 
-os.system("clang-format -i *.cpp *.h")
+files = glob.glob("*.cpp") + glob.glob("*.h")
+with ThreadPoolExecutor() as pool:
+    for f in files:
+        pool.submit(subprocess.run, ["clang-format", "-i", f])
