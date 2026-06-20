@@ -45,12 +45,75 @@ union eflags {
     // 0x800
     uint64_t OF : 1;
   };
+  struct {
+    // 0x01
+    uint64_t C : 1;
+    uint64_t __pad7 : 1;
+    uint64_t __pad8 : 1;
+    uint64_t __pad9 : 1;
+    uint64_t __pad10 : 1;
+    uint64_t __pad11 : 1;
+    // 0x40
+    uint64_t Z : 1;
+    // 0x80
+    uint64_t N : 1;
+    uint64_t __pad12 : 1;
+    uint64_t __pad13 : 1;
+    uint64_t __pad14 : 1;
+    // 0x800
+    uint64_t V : 1;
+  };
   uint16_t raw;
 
   bool operator==(const eflags &other) const { return raw == other.raw; }
   bool operator!=(const eflags &other) const { return raw != other.raw; }
   eflags() { raw = rand() & 0x8d5; }
 };
+
+// ARM condition code evaluation from ARMFLAGS (= eflags).
+// cond values 0-15 match the standard ARM condition encoding.
+static inline bool arm_cond_holds(eflags &EFLAGS, int cond) {
+  bool Z = EFLAGS.Z;
+  bool C = EFLAGS.C;
+  bool N = EFLAGS.N;
+  bool V = EFLAGS.V;
+  switch (cond) {
+  case 0:
+    return Z == 1; // EQ
+  case 1:
+    return Z == 0; // NE
+  case 2:
+    return C == 1; // CS/HS
+  case 3:
+    return C == 0; // CC/LO
+  case 4:
+    return N == 1; // MI
+  case 5:
+    return N == 0; // PL
+  case 6:
+    return V == 1; // VS
+  case 7:
+    return V == 0; // VC
+  case 8:
+    return C == 1 && Z == 0; // HI
+  case 9:
+    return C == 0 || Z == 1; // LS
+  case 10:
+    return N == V; // GE
+  case 11:
+    return N != V; // LT
+  case 12:
+    return Z == 0 && N == V; // GT
+  case 13:
+    return Z == 1 || N != V; // LE
+  case 14:
+    return true; // AL
+  case 15:
+    return true; // AL (NV, deprecated)
+  default:
+    return true;
+  }
+}
 
 static inline uint64_t sext(uint64_t v, unsigned w) {
   if (w >= 64)
