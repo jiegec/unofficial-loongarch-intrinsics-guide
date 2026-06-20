@@ -26,9 +26,24 @@ typedef double f64;
 
 union eflags {
   struct {
+    // 0x01
     uint64_t CF : 1;
     uint64_t __pad1 : 1;
+    // 0x04
     uint64_t PF : 1;
+    uint64_t __pad2 : 1;
+    // 0x10
+    uint64_t AF : 1;
+    uint64_t __pad3 : 1;
+    // 0x40
+    uint64_t ZF : 1;
+    // 0x80
+    uint64_t SF : 1;
+    uint64_t __pad4 : 1;
+    uint64_t __pad5 : 1;
+    uint64_t __pad6 : 1;
+    // 0x800
+    uint64_t OF : 1;
   };
   uint16_t raw;
 
@@ -375,12 +390,32 @@ void print(const char *s, int num) { printf("int %s: %d\n", s, num); }
       uint64_t a = rand(), b = rand();                                         \
       eflags in_flags;                                                         \
       eflags flags1 = in_flags;                                                \
-      uint64_t dst1 = func(a, b, flags1 __VA_OPT__(, ) __VA_ARGS__);           \
+      uint64_t dst1 = func(flags1, a, b __VA_OPT__(, ) __VA_ARGS__);           \
       eflags flags2 = in_flags;                                                \
-      uint64_t dst2 = ref_##func(a, b, flags2 __VA_OPT__(, ) __VA_ARGS__);     \
+      uint64_t dst2 = ref_##func(flags2, a, b __VA_OPT__(, ) __VA_ARGS__);     \
       if (dst1 != dst2 || flags1 != flags2) {                                  \
         PRINT(a);                                                              \
         PRINT(b);                                                              \
+        PRINT(dst1);                                                           \
+        PRINT(flags1.raw);                                                     \
+        PRINT(dst2);                                                           \
+        PRINT(flags2.raw);                                                     \
+        assert(dst1 == dst2 && flags1 == flags2);                              \
+      }                                                                        \
+    }                                                                          \
+  } while (0);
+
+#define IFUZZ1(func, ...)                                                      \
+  do {                                                                         \
+    for (int i = 0; i < FUZZ_N; i++) {                                         \
+      uint64_t a = rand();                                                     \
+      eflags in_flags;                                                         \
+      eflags flags1 = in_flags;                                                \
+      uint64_t dst1 = func(flags1, a __VA_OPT__(, ) __VA_ARGS__);              \
+      eflags flags2 = in_flags;                                                \
+      uint64_t dst2 = ref_##func(flags2, a __VA_OPT__(, ) __VA_ARGS__);        \
+      if (dst1 != dst2 || flags1 != flags2) {                                  \
+        PRINT(a);                                                              \
         PRINT(dst1);                                                           \
         PRINT(flags1.raw);                                                     \
         PRINT(dst2);                                                           \

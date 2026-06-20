@@ -1859,6 +1859,17 @@ for width_name, (bits, uint_type) in adc_widths.items():
         else:
             print(f"dst = sext(r, {bits});", file=f)
 
+# Scalar addu12i instructions (GPR, not SIMD)
+for width_name in ["d", "w"]:
+    with open(f"addu12i_{width_name}.h", "w") as f:
+        if width_name == "d":
+            print(f"int64_t offset = (int64_t)sext(imm & 0x1f, 5) << 12;", file=f)
+            print(f"dst = a + (uint64_t)offset;", file=f)
+        else:
+            print(f"int64_t offset = (int64_t)sext(imm & 0x1f, 5) << 12;", file=f)
+            print(f"dst = sext((uint32_t)a + (uint32_t)offset, 32);", file=f)
+
+
 # expand i to known value
 def evaluate(ast, i):
     if isinstance(ast, pycparser.c_ast.Assignment):

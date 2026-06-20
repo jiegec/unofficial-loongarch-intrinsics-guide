@@ -246,16 +246,24 @@ for width in ["b", "h", "w", "d"]:
     with open(f"{inst_name}.cpp", "w") as f:
         print('#include "common.h"', file=f)
         print("", file=f)
-        print(f"uint64_t {inst_name}(uint64_t a, uint64_t b, eflags &EFLAGS) {{", file=f)
+        print(
+            f"uint64_t {inst_name}(eflags &EFLAGS, uint64_t a, uint64_t b) {{", file=f
+        )
         print(f"  uint64_t dst;", file=f)
         print(f'#include "{inst_name}.h"', file=f)
         print(f"  return dst;", file=f)
         print("}", file=f)
         print("", file=f)
-        print(f"uint64_t ref_{inst_name}(uint64_t a, uint64_t b, eflags &EFLAGS) {{", file=f)
+        print(
+            f"uint64_t ref_{inst_name}(eflags &EFLAGS, uint64_t a, uint64_t b) {{",
+            file=f,
+        )
         print(f"  uint16_t eflags = EFLAGS.raw;", file=f)
         print(f"  uint64_t dst;", file=f)
-        print(f'  asm volatile("x86mtflag %1, 0x3f\\nadc.{width} %0, %2, %3\\nx86mfflag %1, 0x3f"', file=f)
+        print(
+            f'  asm volatile("x86mtflag %1, 0x3f\\nadc.{width} %0, %2, %3\\nx86mfflag %1, 0x3f"',
+            file=f,
+        )
         print(f'               : "=r"(dst), "+r"(eflags)', file=f)
         print(f'               : "r"(a), "r"(b)', file=f)
         print(f'               : "memory");', file=f)
@@ -264,6 +272,36 @@ for width in ["b", "h", "w", "d"]:
         print("}", file=f)
         print("", file=f)
         print(f"void test() {{ IFUZZ2({inst_name}); }}", file=f)
+        print("", file=f)
+
+# Scalar addu12i instructions (GPR, not SIMD)
+for width_name in ["d", "w"]:
+    inst_name = f"addu12i_{width_name}"
+    print(f"Saving {inst_name}.cpp")
+    with open(f"{inst_name}.cpp", "w") as f:
+        print('#include "common.h"', file=f)
+        print("", file=f)
+        print(f"uint64_t {inst_name}(eflags &EFLAGS, uint64_t a, int imm) {{", file=f)
+        print(f"  uint64_t dst;", file=f)
+        print(f'#include "{inst_name}.h"', file=f)
+        print(f"  return dst;", file=f)
+        print("}", file=f)
+        print("", file=f)
+        print(f"#define ref_{inst_name}(eflags, a, imm) \\", file=f)
+        print(f"  ({{uint64_t _result; \\", file=f)
+        print(f'     asm volatile("addu12i.{width_name} %0, %1, %2" \\', file=f)
+        print(
+            f'                  : "=r"(_result) : "r"(a), "n"((((imm) & 0x1f) ^ 16) - 16) \\',
+            file=f,
+        )
+        print(f'                  : "memory"); \\', file=f)
+        print(f"     _result; }})", file=f)
+        print("", file=f)
+        print(f"void test() {{", file=f)
+        print(f"  IFUZZ1({inst_name}, 0);", file=f)
+        print(f"  IFUZZ1({inst_name}, 1);", file=f)
+        print(f"  IFUZZ1({inst_name}, 31);", file=f)
+        print("}", file=f)
         print("", file=f)
 
 os.system("clang-format -i *.cpp *.h")
