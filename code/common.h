@@ -447,18 +447,15 @@ void print(const char *s, int num) { printf("int %s: %d\n", s, num); }
     }                                                                          \
   } while (0);
 
-#define IFUZZ2(func, ...)                                                      \
+#define IFUZZ0(func, ...)                                                      \
   do {                                                                         \
     for (int i = 0; i < FUZZ_N; i++) {                                         \
-      uint64_t a = rand(), b = rand();                                         \
       eflags in_flags;                                                         \
       eflags flags1 = in_flags;                                                \
-      uint64_t dst1 = func(flags1, a, b __VA_OPT__(, ) __VA_ARGS__);           \
+      uint64_t dst1 = func(flags1 __VA_OPT__(, ) __VA_ARGS__);                 \
       eflags flags2 = in_flags;                                                \
-      uint64_t dst2 = ref_##func(flags2, a, b __VA_OPT__(, ) __VA_ARGS__);     \
+      uint64_t dst2 = ref_##func(flags2 __VA_OPT__(, ) __VA_ARGS__);           \
       if (dst1 != dst2 || flags1 != flags2) {                                  \
-        PRINT(a);                                                              \
-        PRINT(b);                                                              \
         PRINT(dst1);                                                           \
         PRINT(flags1.raw);                                                     \
         PRINT(dst2);                                                           \
@@ -479,6 +476,27 @@ void print(const char *s, int num) { printf("int %s: %d\n", s, num); }
       uint64_t dst2 = ref_##func(flags2, a __VA_OPT__(, ) __VA_ARGS__);        \
       if (dst1 != dst2 || flags1 != flags2) {                                  \
         PRINT(a);                                                              \
+        PRINT(dst1);                                                           \
+        PRINT(flags1.raw);                                                     \
+        PRINT(dst2);                                                           \
+        PRINT(flags2.raw);                                                     \
+        assert(dst1 == dst2 && flags1 == flags2);                              \
+      }                                                                        \
+    }                                                                          \
+  } while (0);
+
+#define IFUZZ2(func, ...)                                                      \
+  do {                                                                         \
+    for (int i = 0; i < FUZZ_N; i++) {                                         \
+      uint64_t a = rand(), b = rand();                                         \
+      eflags in_flags;                                                         \
+      eflags flags1 = in_flags;                                                \
+      uint64_t dst1 = func(flags1, a, b __VA_OPT__(, ) __VA_ARGS__);           \
+      eflags flags2 = in_flags;                                                \
+      uint64_t dst2 = ref_##func(flags2, a, b __VA_OPT__(, ) __VA_ARGS__);     \
+      if (dst1 != dst2 || flags1 != flags2) {                                  \
+        PRINT(a);                                                              \
+        PRINT(b);                                                              \
         PRINT(dst1);                                                           \
         PRINT(flags1.raw);                                                     \
         PRINT(dst2);                                                           \
