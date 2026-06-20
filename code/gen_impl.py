@@ -1859,6 +1859,37 @@ for width_name, (bits, uint_type) in adc_widths.items():
         else:
             print(f"dst = sext(r, {bits});", file=f)
 
+# Scalar armadc/armadd instructions (GPR, not SIMD)
+arm_instructions = [
+    "armadc_w",
+    "armadd_w",
+    "armand_w",
+]
+for inst_name in arm_instructions:
+    with open(f"{inst_name}.h", "w") as f:
+        print(f"if (arm_cond_holds(ARMFLAGS, cond)) {{", file=f)
+        print(f"  uint32_t lhs = (uint32_t)a;", file=f)
+        print(f"  uint32_t rhs = (uint32_t)b;", file=f)
+        if inst_name in ["armadc_w", "armadd_w"]:
+            if inst_name == "armadc_w":
+                print(f"  uint32_t carry_in = ARMFLAGS.C;", file=f)
+                print(f"  uint64_t wide = (uint64_t)lhs + rhs + carry_in;", file=f)
+            elif inst_name == "armadd_w":
+                print(f"  uint64_t wide = (uint64_t)lhs + rhs;", file=f)
+            print(f"  uint32_t r = (uint32_t)wide;", file=f)
+            print(f"  ARMFLAGS.C = (wide >> 32) & 1;", file=f)
+            print(
+                f"  ARMFLAGS.V = ((~(lhs ^ rhs)) & (lhs ^ r) & 0x80000000) != 0;",
+                file=f,
+            )
+            print(f"  ARMFLAGS.N = (r >> 31) & 1;", file=f)
+            print(f"  ARMFLAGS.Z = r == 0;", file=f)
+        elif inst_name == "armand_w":
+            print(f"  uint32_t r = lhs & rhs;", file=f)
+            print(f"  ARMFLAGS.N = (r >> 31) & 1;", file=f)
+            print(f"  ARMFLAGS.Z = r == 0;", file=f)
+        print(f"}}", file=f)
+
 # Scalar addu12i instructions (GPR, not SIMD)
 for width_name in ["d", "w"]:
     with open(f"addu12i_{width_name}.h", "w") as f:

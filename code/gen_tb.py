@@ -274,6 +274,43 @@ for width in ["b", "h", "w", "d"]:
         print(f"void test() {{ IFUZZ2({inst_name}); }}", file=f)
         print("", file=f)
 
+# Scalar armadc/armadd instructions (GPR, not SIMD)
+# Use same inst_name list as gen_impl.py
+for inst_name in ["armadc_w", "armadd_w", "armand_w"]:
+    stem = inst_name[:-2]
+    print(f"Saving {inst_name}.cpp")
+    with open(f"{inst_name}.cpp", "w") as f:
+        print('#include "common.h"', file=f)
+        print("", file=f)
+        print(
+            f"uint64_t {inst_name}(eflags &ARMFLAGS, uint64_t a, uint64_t b, int cond) {{",
+            file=f,
+        )
+        print(f"  uint64_t dst = 0;", file=f)
+        print(f'#include "{inst_name}.h"', file=f)
+        print(f"  return dst;", file=f)
+        print("}", file=f)
+        print("", file=f)
+        print(f"#define ref_{inst_name}(eflags, a, b, cond) \\", file=f)
+        print(f"  ({{uint16_t flags = eflags.raw; \\", file=f)
+        print(
+            f'     asm volatile("x86mtflag %0, 0x3f\\n{stem}.w %1, %2, %3\\nx86mfflag %0, 0x3f" \\',
+            file=f,
+        )
+        print(f'                  : "+r"(flags) \\', file=f)
+        print(f'                  : "r"(a), "r"(b), "n"(cond) \\', file=f)
+        print(f'                  : "memory"); \\', file=f)
+        print(f"     eflags.raw = flags; \\", file=f)
+        print(f"     0; }})", file=f)
+        print("", file=f)
+        print(f"void test() {{", file=f)
+        print(f"  IFUZZ2({inst_name}, 0);", file=f)
+        print(f"  IFUZZ2({inst_name}, 7);", file=f)
+        print(f"  IFUZZ2({inst_name}, 14);", file=f)
+        print(f"  IFUZZ2({inst_name}, 15);", file=f)
+        print("}", file=f)
+        print("", file=f)
+
 # Scalar addu12i instructions (GPR, not SIMD)
 for width_name in ["d", "w"]:
     inst_name = f"addu12i_{width_name}"
