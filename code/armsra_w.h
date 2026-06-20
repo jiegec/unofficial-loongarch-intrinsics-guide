@@ -5,7 +5,6 @@ if (arm_cond_holds(ARMFLAGS, cond)) {
   uint32_t c = rhs & 0xff;
   if (c == 0) {
     r = lhs;
-    // C preserved
   } else if (c < 32) {
     r = (uint32_t)((int32_t)lhs >> c);
     ARMFLAGS.C = (lhs >> (c - 1)) & 1;

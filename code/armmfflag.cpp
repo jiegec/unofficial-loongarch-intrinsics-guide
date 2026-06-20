@@ -23,5 +23,5 @@ void test() {
   IFUZZ0(armmfflag, 7);
   IFUZZ0(armmfflag, 14);
   IFUZZ0(armmfflag, 15);
-  IFUZZ0(armmfflag, 0x3f);
+  IFUZZ0(armmfflag, 63);
 }

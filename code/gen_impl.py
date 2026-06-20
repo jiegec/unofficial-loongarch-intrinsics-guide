@@ -1860,39 +1860,217 @@ for width_name, (bits, uint_type) in adc_widths.items():
             print(f"dst = sext(r, {bits});", file=f)
 
 # Scalar arm instructions (GPR, not SIMD)
-arm_instructions = [
-    "armadc_w",
-    "armadd_w",
-    "armand_w",
-    "armor_w",
-]
-for inst_name in arm_instructions:
+arm_insts = {
+    "armadd_w": """if (arm_cond_holds(ARMFLAGS, cond)) {
+  uint32_t lhs = (uint32_t)a;
+  uint32_t rhs = (uint32_t)b;
+  uint64_t wide = (uint64_t)lhs + rhs;
+  uint32_t r = (uint32_t)wide;
+  ARMFLAGS.C = (wide >> 32) & 1;
+  ARMFLAGS.V = ((~(lhs ^ rhs)) & (lhs ^ r) & 0x80000000) != 0;
+  ARMFLAGS.N = (r >> 31) & 1;
+  ARMFLAGS.Z = r == 0;
+}""",
+    "armadc_w": """if (arm_cond_holds(ARMFLAGS, cond)) {
+  uint32_t lhs = (uint32_t)a;
+  uint32_t rhs = (uint32_t)b;
+  uint32_t carry_in = ARMFLAGS.C;
+  uint64_t wide = (uint64_t)lhs + rhs + carry_in;
+  uint32_t r = (uint32_t)wide;
+  ARMFLAGS.C = (wide >> 32) & 1;
+  ARMFLAGS.V = ((~(lhs ^ rhs)) & (lhs ^ r) & 0x80000000) != 0;
+  ARMFLAGS.N = (r >> 31) & 1;
+  ARMFLAGS.Z = r == 0;
+}""",
+    "armsub_w": """if (arm_cond_holds(ARMFLAGS, cond)) {
+  uint32_t lhs = (uint32_t)a;
+  uint32_t rhs = (uint32_t)b;
+  uint64_t subtrahend = (uint64_t)rhs;
+  uint32_t r = (uint32_t)(lhs - subtrahend);
+  ARMFLAGS.C = lhs < subtrahend;
+  ARMFLAGS.V = ((lhs ^ rhs) & (lhs ^ r) & 0x80000000) != 0;
+  ARMFLAGS.N = (r >> 31) & 1;
+  ARMFLAGS.Z = r == 0;
+}""",
+    "armsbc_w": """if (arm_cond_holds(ARMFLAGS, cond)) {
+  uint32_t lhs = (uint32_t)a;
+  uint32_t rhs = (uint32_t)b;
+  uint32_t borrow_in = ARMFLAGS.C ? 0 : 1;
+  uint64_t subtrahend = (uint64_t)rhs + borrow_in;
+  uint32_t r = (uint32_t)(lhs - subtrahend);
+  ARMFLAGS.C = lhs < subtrahend;
+  ARMFLAGS.V = ((lhs ^ (uint32_t)subtrahend) & (lhs ^ r) & 0x80000000) != 0;
+  ARMFLAGS.N = (r >> 31) & 1;
+  ARMFLAGS.Z = r == 0;
+}""",
+    "armand_w": """if (arm_cond_holds(ARMFLAGS, cond)) {
+  uint32_t lhs = (uint32_t)a;
+  uint32_t rhs = (uint32_t)b;
+  uint32_t r = lhs & rhs;
+  ARMFLAGS.N = (r >> 31) & 1;
+  ARMFLAGS.Z = r == 0;
+}""",
+    "armor_w": """if (arm_cond_holds(ARMFLAGS, cond)) {
+  uint32_t lhs = (uint32_t)a;
+  uint32_t rhs = (uint32_t)b;
+  uint32_t r = lhs | rhs;
+  ARMFLAGS.N = (r >> 31) & 1;
+  ARMFLAGS.Z = r == 0;
+}""",
+    "armxor_w": """if (arm_cond_holds(ARMFLAGS, cond)) {
+  uint32_t lhs = (uint32_t)a;
+  uint32_t rhs = (uint32_t)b;
+  uint32_t r = lhs ^ rhs;
+  ARMFLAGS.N = (r >> 31) & 1;
+  ARMFLAGS.Z = r == 0;
+}""",
+    "armnot_w": """if (arm_cond_holds(ARMFLAGS, cond)) {
+  uint32_t r = ~(uint32_t)a;
+  ARMFLAGS.N = (r >> 31) & 1;
+  ARMFLAGS.Z = r == 0;
+}""",
+    "armmov_w": """if (arm_cond_holds(ARMFLAGS, cond)) {
+  uint32_t r = a;
+  ARMFLAGS.N = (r >> 31) & 1;
+  ARMFLAGS.Z = r == 0;
+}""",
+    "armmov_d": """if (arm_cond_holds(ARMFLAGS, cond)) {
+  uint64_t r = a;
+  ARMFLAGS.N = (r >> 63) & 1;
+  ARMFLAGS.Z = r == 0;
+}""",
+    "armmove": """if (arm_cond_holds(ARMFLAGS, cond)) {
+  dst = a;
+}""",
+    "armrrx_w": """if (arm_cond_holds(ARMFLAGS, cond)) {
+  uint32_t r = ((uint32_t)a >> 1) | (ARMFLAGS.C ? 0x80000000 : 0);
+  ARMFLAGS.C = a & 1;
+  ARMFLAGS.N = (r >> 31) & 1;
+  ARMFLAGS.Z = r == 0;
+}""",
+    "armrotr_w": """if (arm_cond_holds(ARMFLAGS, cond)) {
+  uint32_t lhs = (uint32_t)a;
+  uint32_t rhs = (uint32_t)b;
+  uint32_t raw_count = rhs & 0xff;
+  uint32_t c = rhs & 0x1f;
+  unsigned n = c % 32;
+  uint32_t r = n == 0 ? lhs : (lhs >> n) | (lhs << (32 - n));
+  if (raw_count != 0) {
+    ARMFLAGS.C = n == 0 ? ((lhs >> 31) & 1) : ((lhs >> (n - 1)) & 1);
+  }
+  ARMFLAGS.N = (r >> 31) & 1;
+  ARMFLAGS.Z = r == 0;
+}""",
+    "armrotri_w": """if (arm_cond_holds(ARMFLAGS, cond)) {
+  uint32_t v = (uint32_t)a;
+  uint32_t r = imm == 0 ? v : (v >> imm) | (v << (32 - imm));
+  if (imm != 0) {
+    ARMFLAGS.C = (v >> (imm - 1)) & 1;
+  }
+  ARMFLAGS.N = (r >> 31) & 1;
+  ARMFLAGS.Z = r == 0;
+}""",
+    "armsll_w": """if (arm_cond_holds(ARMFLAGS, cond)) {
+  uint32_t lhs = (uint32_t)a;
+  uint32_t c = (uint32_t)b & 0xff;
+  uint32_t r;
+  if (c == 0) {
+    r = lhs;
+  } else if (c < 32) {
+    ARMFLAGS.C = (lhs >> (32 - c)) & 1;
+    r = lhs << c;
+  } else if (c == 32) {
+    ARMFLAGS.C = lhs & 1;
+    r = 0;
+  } else {
+    ARMFLAGS.C = 0;
+    r = 0;
+  }
+  ARMFLAGS.N = (r >> 31) & 1;
+  ARMFLAGS.Z = r == 0;
+}""",
+    "armslli_w": """if (arm_cond_holds(ARMFLAGS, cond)) {
+  uint32_t v = (uint32_t)a;
+  uint32_t r = v << imm;
+  ARMFLAGS.C = imm == 0 ? ARMFLAGS.C : (imm > 32 ? 0 : ((v >> (32 - imm)) & 1));
+  ARMFLAGS.N = (r >> 31) & 1;
+  ARMFLAGS.Z = r == 0;
+}""",
+    "armsra_w": """if (arm_cond_holds(ARMFLAGS, cond)) {
+  uint32_t lhs = (uint32_t)a;
+  uint32_t rhs = (uint32_t)b;
+  uint32_t r;
+  uint32_t c = rhs & 0xff;
+  if (c == 0) {
+    r = lhs;
+  } else if (c < 32) {
+    r = (uint32_t)((int32_t)lhs >> c);
+    ARMFLAGS.C = (lhs >> (c - 1)) & 1;
+  } else {
+    ARMFLAGS.C = (lhs >> 31) & 1;
+    r = ARMFLAGS.C ? UINT32_MAX : 0;
+  }
+  ARMFLAGS.N = (r >> 31) & 1;
+  ARMFLAGS.Z = r == 0;
+}""",
+    "armsrai_w": """if (arm_cond_holds(ARMFLAGS, cond)) {
+  uint32_t v = (uint32_t)a;
+  uint32_t r = (uint32_t)((int32_t)v >> imm);
+  ARMFLAGS.C = imm == 0 ? ARMFLAGS.C : (imm > 32 ? 0 : ((v >> (imm - 1)) & 1));
+  ARMFLAGS.N = (r >> 31) & 1;
+  ARMFLAGS.Z = r == 0;
+}""",
+    "armsrl_w": """if (arm_cond_holds(ARMFLAGS, cond)) {
+  uint32_t lhs = (uint32_t)a;
+  uint32_t rhs = (uint32_t)b;
+  uint32_t r;
+  uint32_t c = rhs & 0xff;
+  if (c == 0) {
+    r = lhs;
+  } else if (c < 32) {
+    r = lhs >> c;
+    ARMFLAGS.C = (lhs >> (c - 1)) & 1;
+  } else if (c == 32) {
+    r = 0;
+    ARMFLAGS.C = (lhs >> 31) & 1;
+  } else {
+    r = 0;
+    ARMFLAGS.C = 0;
+  }
+  ARMFLAGS.N = (r >> 31) & 1;
+  ARMFLAGS.Z = r == 0;
+}""",
+    "armsrli_w": """if (arm_cond_holds(ARMFLAGS, cond)) {
+  uint32_t v = (uint32_t)a;
+  uint32_t r = v >> imm;
+  ARMFLAGS.C = imm == 0 ? ARMFLAGS.C : (imm > 32 ? 0 : ((v >> (imm - 1)) & 1));
+  ARMFLAGS.N = (r >> 31) & 1;
+  ARMFLAGS.Z = r == 0;
+}""",
+    "armmfflag": """dst = 0;
+if (mask & (1 << 4))
+  dst |= (uint64_t)ARMFLAGS.N << 31;
+if (mask & (1 << 3))
+  dst |= (uint64_t)ARMFLAGS.Z << 30;
+if (mask & (1 << 0))
+  dst |= (uint64_t)ARMFLAGS.C << 29;
+if (mask & (1 << 5))
+  dst |= (uint64_t)ARMFLAGS.V << 28;
+dst = sext(dst, 32);""",
+    "armmtflag": """uint64_t v = a;
+if (mask & (1 << 4))
+  ARMFLAGS.N = (v >> 31) & 1;
+if (mask & (1 << 3))
+  ARMFLAGS.Z = (v >> 30) & 1;
+if (mask & (1 << 0))
+  ARMFLAGS.C = (v >> 29) & 1;
+if (mask & (1 << 5))
+  ARMFLAGS.V = (v >> 28) & 1;""",
+}
+for inst_name, body in arm_insts.items():
     with open(f"{inst_name}.h", "w") as f:
-        print(f"if (arm_cond_holds(ARMFLAGS, cond)) {{", file=f)
-        print(f"  uint32_t lhs = (uint32_t)a;", file=f)
-        print(f"  uint32_t rhs = (uint32_t)b;", file=f)
-        if inst_name in ["armadc_w", "armadd_w"]:
-            if inst_name == "armadc_w":
-                print(f"  uint32_t carry_in = ARMFLAGS.C;", file=f)
-                print(f"  uint64_t wide = (uint64_t)lhs + rhs + carry_in;", file=f)
-            elif inst_name == "armadd_w":
-                print(f"  uint64_t wide = (uint64_t)lhs + rhs;", file=f)
-            print(f"  uint32_t r = (uint32_t)wide;", file=f)
-            print(f"  ARMFLAGS.C = (wide >> 32) & 1;", file=f)
-            print(
-                f"  ARMFLAGS.V = ((~(lhs ^ rhs)) & (lhs ^ r) & 0x80000000) != 0;",
-                file=f,
-            )
-            print(f"  ARMFLAGS.N = (r >> 31) & 1;", file=f)
-            print(f"  ARMFLAGS.Z = r == 0;", file=f)
-        if inst_name in ["armand_w", "armor_w"]:
-            if inst_name == "armand_w":
-                print(f"  uint32_t r = lhs & rhs;", file=f)
-            elif inst_name == "armor_w":
-                print(f"  uint32_t r = lhs | rhs;", file=f)
-            print(f"  ARMFLAGS.N = (r >> 31) & 1;", file=f)
-            print(f"  ARMFLAGS.Z = r == 0;", file=f)
-        print(f"}}", file=f)
+        f.write(body)
+        f.write("\n")
 
 # Scalar addu12i instructions (GPR, not SIMD)
 for width_name in ["d", "w"]:

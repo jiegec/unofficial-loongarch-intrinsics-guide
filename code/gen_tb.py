@@ -277,39 +277,191 @@ for width in ["b", "h", "w", "d"]:
         print("", file=f)
 
 # Scalar arm instructions (GPR, not SIMD)
-# Use same inst_name list as gen_impl.py
-for inst_name in ["armadc_w", "armadd_w", "armand_w", "armor_w"]:
-    stem = inst_name[:-2]
+# Each entry: (name, mnemonic, cpp_args, asm_inputs, fuzz_level, extra_args_list [, template_suffix])
+#   template_suffix: "" (default), "mfflag", "mtflag", "move" - selects ref macro template
+
+arm_tb_entries = [
+    # --- two inputs + cond ---
+    ("armadd_w", "armadd.w", "uint64_t a, uint64_t b, int cond",
+     '"r"(a), "r"(b), "n"(cond)', 2, [0, 7, 14, 15]),
+    ("armadc_w", "armadc.w", "uint64_t a, uint64_t b, int cond",
+     '"r"(a), "r"(b), "n"(cond)', 2, [0, 7, 14, 15]),
+    ("armsub_w", "armsub.w", "uint64_t a, uint64_t b, int cond",
+     '"r"(a), "r"(b), "n"(cond)', 2, [0, 7, 14, 15]),
+    ("armsbc_w", "armsbc.w", "uint64_t a, uint64_t b, int cond",
+     '"r"(a), "r"(b), "n"(cond)', 2, [0, 7, 14, 15]),
+    ("armand_w", "armand.w", "uint64_t a, uint64_t b, int cond",
+     '"r"(a), "r"(b), "n"(cond)', 2, [0, 7, 14, 15]),
+    ("armor_w", "armor.w", "uint64_t a, uint64_t b, int cond",
+     '"r"(a), "r"(b), "n"(cond)', 2, [0, 7, 14, 15]),
+    ("armxor_w", "armxor.w", "uint64_t a, uint64_t b, int cond",
+     '"r"(a), "r"(b), "n"(cond)', 2, [0, 7, 14, 15]),
+    ("armrotr_w", "armrotr.w", "uint64_t a, uint64_t b, int cond",
+     '"r"(a), "r"(b), "n"(cond)', 2, [0, 7, 14, 15]),
+    ("armsll_w", "armsll.w", "uint64_t a, uint64_t b, int cond",
+     '"r"(a), "r"(b), "n"(cond)', 2, [0, 7, 14, 15]),
+    ("armsra_w", "armsra.w", "uint64_t a, uint64_t b, int cond",
+     '"r"(a), "r"(b), "n"(cond)', 2, [0, 7, 14, 15]),
+    ("armsrl_w", "armsrl.w", "uint64_t a, uint64_t b, int cond",
+     '"r"(a), "r"(b), "n"(cond)', 2, [0, 7, 14, 15]),
+    # --- one input + cond ---
+    ("armmov_w", "armmov.w", "uint64_t a, int cond",
+     '"r"(a), "n"(cond)', 1, [0, 7, 14, 15]),
+    ("armmov_d", "armmov.d", "uint64_t a, int cond",
+     '"r"(a), "n"(cond)', 1, [0, 7, 14, 15]),
+    ("armnot_w", "armnot.w", "uint64_t a, int cond",
+     '"r"(a), "n"(cond)', 1, [0, 7, 14, 15]),
+    ("armrrx_w", "armrrx.w", "uint64_t a, int cond",
+     '"r"(a), "n"(cond)', 1, [0, 7, 14, 15]),
+    # --- one input + imm + cond ---
+    ("armrotri_w", "armrotri.w", "uint64_t a, int imm, int cond",
+     '"r"(a), "n"(imm), "n"(cond)', 1,
+     [(0, 7), (0, 7), (15, 14), (15, 15), (31, 15), (31, 15)]),
+    ("armslli_w", "armslli.w", "uint64_t a, int imm, int cond",
+     '"r"(a), "n"(imm), "n"(cond)', 1,
+     [(0, 7), (0, 7), (15, 14), (15, 15), (31, 15), (31, 15)]),
+    ("armsrai_w", "armsrai.w", "uint64_t a, int imm, int cond",
+     '"r"(a), "n"(imm), "n"(cond)', 1,
+     [(0, 7), (0, 7), (15, 14), (15, 15), (31, 15), (31, 15)]),
+    ("armsrli_w", "armsrli.w", "uint64_t a, int imm, int cond",
+     '"r"(a), "n"(imm), "n"(cond)', 1,
+     [(0, 7), (0, 7), (15, 14), (15, 15), (31, 15), (31, 15)]),
+    # --- special: flag transfer ---
+    ("armmfflag", "armmfflag", "uint64_t mask",
+     '"n"(mask)', 0, [0, 7, 14, 15, 0x3f], "mfflag"),
+    ("armmtflag", "armmtflag", "uint64_t a, uint64_t mask",
+     '"r"(a), "n"(mask)', 1, [0, 7, 14, 15, 0x3f], "mtflag"),
+    # --- special: move (dst is in/out) ---
+    ("armmove", "armmove", "uint64_t dst, uint64_t a, int cond",
+     '"r"(a), "n"(cond)', 2, [0, 7, 14, 15], "move"),
+]
+
+for entry in arm_tb_entries:
+    inst_name = entry[0]
+    mnemonic = entry[1]
+    cpp_args = entry[2]
+    asm_inputs = entry[3]
+    fuzz_level = entry[4]
+    extra_args_list = entry[5]
+    template = entry[6] if len(entry) > 6 else "default"
+
     print(f"Saving {inst_name}.cpp")
     with open(f"{inst_name}.cpp", "w") as f:
         print('#include "common.h"', file=f)
         print("", file=f)
-        print(
-            f"uint64_t {inst_name}(eflags &ARMFLAGS, uint64_t a, uint64_t b, int cond) {{",
-            file=f,
-        )
-        print(f"  uint64_t dst = 0;", file=f)
-        print(f'#include "{inst_name}.h"', file=f)
-        print(f"  return dst;", file=f)
+        if template == "move":
+            print(
+                f"uint64_t {inst_name}(eflags &ARMFLAGS, {cpp_args}) {{",
+                file=f,
+            )
+            print(f'#include "{inst_name}.h"', file=f)
+            print(f"  return dst;", file=f)
+        else:
+            print(
+                f"uint64_t {inst_name}(eflags &ARMFLAGS, {cpp_args}) {{",
+                file=f,
+            )
+            print(f"  uint64_t dst = 0;", file=f)
+            print(f'#include "{inst_name}.h"', file=f)
+            print(f"  return dst;", file=f)
         print("}", file=f)
         print("", file=f)
-        print(f"#define ref_{inst_name}(eflags, a, b, cond) \\", file=f)
-        print(f"  ({{uint16_t flags = eflags.raw; \\", file=f)
-        print(
-            f'     asm volatile("x86mtflag %0, 0x3f\\n{stem}.w %1, %2, %3\\nx86mfflag %0, 0x3f" \\',
-            file=f,
-        )
-        print(f'                  : "+r"(flags) \\', file=f)
-        print(f'                  : "r"(a), "r"(b), "n"(cond) \\', file=f)
-        print(f'                  : "memory"); \\', file=f)
-        print(f"     eflags.raw = flags; \\", file=f)
-        print(f"     0; }})", file=f)
+
+        if template == "mfflag":
+            print(f"#define ref_{inst_name}(eflags, mask) \\", file=f)
+            print(f"  ({{uint16_t flags = eflags.raw; \\", file=f)
+            print(f"    uint64_t dst = 0; \\", file=f)
+            print(
+                f'     asm volatile("x86mtflag %0, 0x3f\\n{mnemonic} %1, %2\\nx86mfflag %0, 0x3f" \\',
+                file=f,
+            )
+            print(f'                  : "+r"(flags), "=r"(dst) \\', file=f)
+            print(f'                  : {asm_inputs} \\', file=f)
+            print(f'                  : "memory"); \\', file=f)
+            print(f"     eflags.raw = flags; \\", file=f)
+            print(f"     dst; }})", file=f)
+        elif template == "mtflag":
+            print(f"#define ref_{inst_name}(eflags, a, mask) \\", file=f)
+            print(f"  ({{uint16_t flags = eflags.raw; \\", file=f)
+            print(f"    uint64_t dst = 0; \\", file=f)
+            print(
+                f'     asm volatile("x86mtflag %0, 0x3f\\n{mnemonic} %1, %2\\nx86mfflag %0, 0x3f" \\',
+                file=f,
+            )
+            print(f'                  : "+r"(flags) \\', file=f)
+            print(f'                  : {asm_inputs} \\', file=f)
+            print(f'                  : "memory"); \\', file=f)
+            print(f"     eflags.raw = flags; \\", file=f)
+            print(f"     dst; }})", file=f)
+        elif template == "move":
+            print(f"#define ref_{inst_name}(eflags, dst, a, cond) \\", file=f)
+            print(f"  ({{uint16_t flags = eflags.raw; \\", file=f)
+            print(f"    uint64_t temp_dst = dst; \\", file=f)
+            print(
+                f'     asm volatile("x86mtflag %0, 0x3f\\n{mnemonic} %1, %2, %3\\nx86mfflag %0, 0x3f" \\',
+                file=f,
+            )
+            print(f'                  : "+r"(flags), "+r"(temp_dst) \\', file=f)
+            print(f'                  : {asm_inputs} \\', file=f)
+            print(f'                  : "memory"); \\', file=f)
+            print(f"     eflags.raw = flags; \\", file=f)
+            print(f"     temp_dst; }})", file=f)
+        else:  # default
+            # Build ref macro param list: 'eflags' + all param names from cpp_args
+            ref_params = ["eflags"] + [p.split()[-1] for p in cpp_args.split(", ")]
+            is_imm = "imm" in cpp_args
+            if is_imm:
+                # shift/rotate with imm: separate imm and cond params
+                print(f"#define ref_{inst_name}({', '.join(ref_params)}) \\", file=f)
+                print(f"  ({{uint16_t flags = eflags.raw; \\", file=f)
+                print(
+                    f'     asm volatile("x86mtflag %0, 0x3f\\n{mnemonic} %1, %2, %3\\nx86mfflag %0, 0x3f" \\',
+                    file=f,
+                )
+                print(f'                  : "+r"(flags) \\', file=f)
+                print(f'                  : {asm_inputs} \\', file=f)
+                print(f'                  : "memory"); \\', file=f)
+                print(f"     eflags.raw = flags; \\", file=f)
+                print(f"     0; }})", file=f)
+            elif fuzz_level == 2:
+                print(f"#define ref_{inst_name}({', '.join(ref_params)}) \\", file=f)
+                print(f"  ({{uint16_t flags = eflags.raw; \\", file=f)
+                print(
+                    f'     asm volatile("x86mtflag %0, 0x3f\\n{mnemonic} %1, %2, %3\\nx86mfflag %0, 0x3f" \\',
+                    file=f,
+                )
+                print(f'                  : "+r"(flags) \\', file=f)
+                print(f'                  : {asm_inputs} \\', file=f)
+                print(f'                  : "memory"); \\', file=f)
+                print(f"     eflags.raw = flags; \\", file=f)
+                print(f"     0; }})", file=f)
+            else:  # fuzz_level == 1, no imm
+                print(f"#define ref_{inst_name}({', '.join(ref_params)}) \\", file=f)
+                print(f"  ({{uint16_t flags = eflags.raw; \\", file=f)
+                print(
+                    f'     asm volatile("x86mtflag %0, 0x3f\\n{mnemonic} %1, %2\\nx86mfflag %0, 0x3f" \\',
+                    file=f,
+                )
+                print(f'                  : "+r"(flags) \\', file=f)
+                print(f'                  : {asm_inputs} \\', file=f)
+                print(f'                  : "memory"); \\', file=f)
+                print(f"     eflags.raw = flags; \\", file=f)
+                print(f"     0; }})", file=f)
         print("", file=f)
         print(f"void test() {{", file=f)
-        print(f"  IFUZZ2({inst_name}, 0);", file=f)
-        print(f"  IFUZZ2({inst_name}, 7);", file=f)
-        print(f"  IFUZZ2({inst_name}, 14);", file=f)
-        print(f"  IFUZZ2({inst_name}, 15);", file=f)
+        if fuzz_level == 0:
+            for val in extra_args_list:
+                print(f"  IFUZZ0({inst_name}, {val});", file=f)
+        elif fuzz_level == 1 and isinstance(extra_args_list[0], tuple):
+            # one-input + imm + cond: extra arg is a pair (imm, cond)
+            for imm_val, cond_val in extra_args_list:
+                print(f"  IFUZZ1({inst_name}, {imm_val}, {cond_val});", file=f)
+        elif fuzz_level == 1:
+            for val in extra_args_list:
+                print(f"  IFUZZ1({inst_name}, {val});", file=f)
+        else:  # fuzz_level == 2
+            for val in extra_args_list:
+                print(f"  IFUZZ2({inst_name}, {val});", file=f)
         print("}", file=f)
         print("", file=f)
 
