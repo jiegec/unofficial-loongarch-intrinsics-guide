@@ -276,9 +276,9 @@ for width in ["b", "h", "w", "d"]:
         print(f"void test() {{ IFUZZ2({inst_name}); }}", file=f)
         print("", file=f)
 
-# Scalar armadc/armadd instructions (GPR, not SIMD)
+# Scalar arm instructions (GPR, not SIMD)
 # Use same inst_name list as gen_impl.py
-for inst_name in ["armadc_w", "armadd_w", "armand_w"]:
+for inst_name in ["armadc_w", "armadd_w", "armand_w", "armor_w"]:
     stem = inst_name[:-2]
     print(f"Saving {inst_name}.cpp")
     with open(f"{inst_name}.cpp", "w") as f:

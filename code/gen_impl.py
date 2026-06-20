@@ -1859,11 +1859,12 @@ for width_name, (bits, uint_type) in adc_widths.items():
         else:
             print(f"dst = sext(r, {bits});", file=f)
 
-# Scalar armadc/armadd instructions (GPR, not SIMD)
+# Scalar arm instructions (GPR, not SIMD)
 arm_instructions = [
     "armadc_w",
     "armadd_w",
     "armand_w",
+    "armor_w",
 ]
 for inst_name in arm_instructions:
     with open(f"{inst_name}.h", "w") as f:
@@ -1884,8 +1885,11 @@ for inst_name in arm_instructions:
             )
             print(f"  ARMFLAGS.N = (r >> 31) & 1;", file=f)
             print(f"  ARMFLAGS.Z = r == 0;", file=f)
-        elif inst_name == "armand_w":
-            print(f"  uint32_t r = lhs & rhs;", file=f)
+        if inst_name in ["armand_w", "armor_w"]:
+            if inst_name == "armand_w":
+                print(f"  uint32_t r = lhs & rhs;", file=f)
+            elif inst_name == "armor_w":
+                print(f"  uint32_t r = lhs | rhs;", file=f)
             print(f"  ARMFLAGS.N = (r >> 31) & 1;", file=f)
             print(f"  ARMFLAGS.Z = r == 0;", file=f)
         print(f"}}", file=f)
