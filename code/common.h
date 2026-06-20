@@ -24,6 +24,26 @@ typedef double f64;
 
 #include "common-machine.h"
 
+union eflags {
+  struct {
+    uint64_t CF : 1;
+    uint64_t __pad1 : 1;
+    uint64_t PF : 1;
+  };
+  uint16_t raw;
+
+  bool operator==(const eflags &other) const { return raw == other.raw; }
+  bool operator!=(const eflags &other) const { return raw != other.raw; }
+  eflags() { raw = rand() & 0x8d5; }
+};
+
+static inline uint64_t sext(uint64_t v, unsigned w) {
+  if (w >= 64)
+    return v;
+  uint64_t sign = UINT64_C(1) << (w - 1);
+  return ((v & ((sign << 1) - 1)) ^ sign) - sign;
+}
+
 template <typename T> u8 clo(T num) {
   for (int i = sizeof(T) * 8 - 1; i >= 0; i--) {
     if ((num & ((T)1 << i)) == 0) {
@@ -345,6 +365,27 @@ void print(const char *s, int num) { printf("int %s: %d\n", s, num); }
         PRINT(__lasx_##func(a, b, c));                                         \
         PRINT(func(a, b, c));                                                  \
         assert(func(a, b, c) == __lasx_##func(a, b, c));                       \
+      }                                                                        \
+    }                                                                          \
+  } while (0);
+
+#define IFUZZ2(func, ...)                                                      \
+  do {                                                                         \
+    for (int i = 0; i < FUZZ_N; i++) {                                         \
+      uint64_t a = rand(), b = rand();                                         \
+      eflags in_flags;                                                         \
+      eflags flags1 = in_flags;                                                \
+      uint64_t dst1 = func(a, b, flags1 __VA_OPT__(, ) __VA_ARGS__);           \
+      eflags flags2 = in_flags;                                                \
+      uint64_t dst2 = ref_##func(a, b, flags2 __VA_OPT__(, ) __VA_ARGS__);     \
+      if (dst1 != dst2 || flags1 != flags2) {                                  \
+        PRINT(a);                                                              \
+        PRINT(b);                                                              \
+        PRINT(dst1);                                                           \
+        PRINT(flags1.raw);                                                     \
+        PRINT(dst2);                                                           \
+        PRINT(flags2.raw);                                                     \
+        assert(dst1 == dst2 && flags1 == flags2);                              \
       }                                                                        \
     }                                                                          \
   } while (0);

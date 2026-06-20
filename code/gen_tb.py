@@ -239,4 +239,31 @@ for name in tb:
                     print(f"  {fuzz}{fuzz_args}({inst_name});", file=f)
                 print("}", file=f)
 
+# Scalar adc instructions (GPR, not SIMD)
+for width in ["b", "h", "w", "d"]:
+    inst_name = f"adc_{width}"
+    print(f"Saving {inst_name}.cpp")
+    with open(f"{inst_name}.cpp", "w") as f:
+        print('#include "common.h"', file=f)
+        print("", file=f)
+        print(f"uint64_t {inst_name}(uint64_t a, uint64_t b, eflags &EFLAGS) {{", file=f)
+        print(f"  uint64_t dst;", file=f)
+        print(f'#include "{inst_name}.h"', file=f)
+        print(f"  return dst;", file=f)
+        print("}", file=f)
+        print("", file=f)
+        print(f"uint64_t ref_{inst_name}(uint64_t a, uint64_t b, eflags &EFLAGS) {{", file=f)
+        print(f"  uint16_t eflags = EFLAGS.raw;", file=f)
+        print(f"  uint64_t dst;", file=f)
+        print(f'  asm volatile("x86mtflag %1, 0x3f\\nadc.{width} %0, %2, %3\\nx86mfflag %1, 0x3f"', file=f)
+        print(f'               : "=r"(dst), "+r"(eflags)', file=f)
+        print(f'               : "r"(a), "r"(b)', file=f)
+        print(f'               : "memory");', file=f)
+        print(f"  EFLAGS.raw = eflags;", file=f)
+        print(f"  return dst;", file=f)
+        print("}", file=f)
+        print("", file=f)
+        print(f"void test() {{ IFUZZ2({inst_name}); }}", file=f)
+        print("", file=f)
+
 os.system("clang-format -i *.cpp *.h")

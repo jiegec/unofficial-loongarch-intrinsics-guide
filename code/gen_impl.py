@@ -1841,6 +1841,23 @@ for vlen, prefix in [(128, "v"), (256, "xv")]:
                 )
                 print(f"}}", file=f)
 
+# Scalar adc instructions (GPR, not SIMD)
+adc_widths = {
+    "b": (8, "uint8_t"),
+    "h": (16, "uint16_t"),
+    "w": (32, "uint32_t"),
+    "d": (64, "uint64_t"),
+}
+for width_name, (bits, uint_type) in adc_widths.items():
+    with open(f"adc_{width_name}.h", "w") as f:
+        print(f"{uint_type} lhs = a;", file=f)
+        print(f"{uint_type} rhs = b;", file=f)
+        print(f"uint8_t cf = EFLAGS.CF;", file=f)
+        print(f"{uint_type} r = lhs + rhs + cf;", file=f)
+        if width_name == "d":
+            print(f"dst = r;", file=f)
+        else:
+            print(f"dst = sext(r, {bits});", file=f)
 
 # expand i to known value
 def evaluate(ast, i):
