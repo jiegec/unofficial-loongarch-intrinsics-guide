@@ -4,11 +4,11 @@
 #include <limits>
 #include <lsxintrin.h>
 #include <math.h>
+#include <random>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <random>
 
 typedef int8_t s8;
 typedef uint8_t u8;
