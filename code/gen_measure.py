@@ -3,26 +3,43 @@ import re
 import os
 from typing import Iterator
 
+
 def detect_kind(name: str) -> str:
-    if name.startswith('xv') or name.startswith('vext2xv'):
-        return 'lasx'
-    if name.startswith('v'):
-        return 'lsx'
-    return ''
+    if name.startswith("xv") or name.startswith("vext2xv"):
+        return "lasx"
+    if name.startswith("v"):
+        return "lsx"
+    return ""
 
 
 # ── LBT detection ──────────────────────────────────────────────────────────
 
 # Instructions that start with these prefixes are LBT
 _LBT_PREFIXES = (
-    "x86", "arm",
-    "setx86j", "setx86loope", "setx86loopne", "setarmj",
-    "adc.", "sbc.", "rotr.", "rotri.", "rcr.", "rcri.",
-    "ldl.", "ldr.", "stl.", "str.",
+    "x86",
+    "arm",
+    "setx86j",
+    "setx86loope",
+    "setx86loopne",
+    "setarmj",
+    "adc.",
+    "sbc.",
+    "rotr.",
+    "rotri.",
+    "rcr.",
+    "rcri.",
+    "ldl.",
+    "ldr.",
+    "stl.",
+    "str.",
     "addu12i.",
-    "fcvt.ud.d", "fcvt.ld.d", "fcvt.d.ld",
-    "movgr2scr", "movscr2gr",
-    "jiscr0", "jiscr1",
+    "fcvt.ud.d",
+    "fcvt.ld.d",
+    "fcvt.d.ld",
+    "movgr2scr",
+    "movscr2gr",
+    "jiscr0",
+    "jiscr1",
 )
 
 
@@ -85,37 +102,77 @@ def _lbt_fmt_parts(stem: str, fmt: str):
 # ── LBT register allocation (ABI-aware) ───────────────────────────────────
 # Latency chain: use $r12 (t0) as the single chained destination.
 
-_LAT = "$r12"                       # latency chain register
-_TP_DST = [f"$r{i}" for i in range(12, 20)]   # t0..t7 (8 lanes)
-_TP_SRC = [f"$r{i}" for i in range(4, 12)]    # a0..a7 (8 lanes)
+_LAT = "$r12"  # latency chain register
+_TP_DST = [f"$r{i}" for i in range(12, 20)]  # t0..t7 (8 lanes)
+_TP_SRC = [f"$r{i}" for i in range(4, 12)]  # a0..a7 (8 lanes)
 
 # GPR direct latency chain.
 _LBT_LATENCY_STEMS = {
-    "rotr", "rotri", "addu12i", "adc", "sbc", "rcr", "rcri",
-    "x86add", "x86sub", "x86and", "x86or", "x86xor", "x86mul",
-    "armadd", "armsub",
+    "rotr",
+    "rotri",
+    "addu12i",
+    "adc",
+    "sbc",
+    "rcr",
+    "rcri",
+    "x86add",
+    "x86sub",
+    "x86and",
+    "x86or",
+    "x86xor",
+    "x86mul",
+    "armadd",
+    "armsub",
     "armmove",
 }
 # flag latency chain, need setup before the measured loop.
 _LBT_SETUP_LATENCY_STEMS = {"x86adc", "x86sbc", "armadc", "armsbc"}
 
 _LBT_THROUGHPUT_STEMS = {
-    "rotr", "rotri", "movgr2scr", "movscr2gr",
-    "addu12i", "adc", "sbc", "rcr", "rcri", "fcvt",
-    "x86add", "x86sub", "x86and", "x86or", "x86xor", "x86mul",
-    "x86adc", "x86sbc",
-    "setx86j", "x86mfflag", "x86mtflag", "x86mftop", "x86mttop",
-    "x86inctop", "x86dectop", "x86settm", "x86clrtm",
-    "armadd", "armsub", "armadc", "armsbc", "armmove", "armmfflag", "armmtflag",
+    "rotr",
+    "rotri",
+    "movgr2scr",
+    "movscr2gr",
+    "addu12i",
+    "adc",
+    "sbc",
+    "rcr",
+    "rcri",
+    "fcvt",
+    "x86add",
+    "x86sub",
+    "x86and",
+    "x86or",
+    "x86xor",
+    "x86mul",
+    "x86adc",
+    "x86sbc",
+    "setx86j",
+    "x86mfflag",
+    "x86mtflag",
+    "x86mftop",
+    "x86mttop",
+    "x86inctop",
+    "x86dectop",
+    "x86settm",
+    "x86clrtm",
+    "armadd",
+    "armsub",
+    "armadc",
+    "armsbc",
+    "armmove",
+    "armmfflag",
+    "armmtflag",
     "setarmj",
 }
+
 
 def _lbt_cond_val(stem: str) -> str:
     """Return the condition field value for ARM/x86 helpers."""
     arm = stem.startswith("arm") or stem == "setarmj"
     if arm:
-        return "14"                           # AL: avoid condition-flag deps
-    return "4"                                   # ZF for x86 helpers
+        return "14"  # AL: avoid condition-flag deps
+    return "4"  # ZF for x86 helpers
 
 
 def _lbt_imm_val(name, stem):
@@ -155,18 +212,20 @@ def _lbt_emit_asm(name, stem, parts, reg_alloc, lane=0):
 
 def _lbt_lat_reg(chained_indices):
     """Return a reg_alloc that chains $r12 through given GPR indices, $r13 otherwise."""
+
     def _reg(gpr_idx, _lane):
         return _LAT if gpr_idx in chained_indices else "$r13"
+
     return _reg
 
 
 class TestsCollector:
     def __init__(self) -> None:
         self._data: dict[str, list[list[str]]] = {
-            '': [],
-            'lsx': [],
-            'lasx': [],
-            'lbt': [],
+            "": [],
+            "lsx": [],
+            "lasx": [],
+            "lbt": [],
         }
 
     def instr_test(
@@ -175,7 +234,7 @@ class TestsCollector:
         name: str,
         *params: str,
     ) -> None:
-        self._instr_test(kind, 'INSTR_TEST', name, *params)
+        self._instr_test(kind, "INSTR_TEST", name, *params)
 
     def instr_test8(
         self,
@@ -183,7 +242,7 @@ class TestsCollector:
         name: str,
         *params: str,
     ) -> None:
-        self._instr_test(kind, 'INSTR_TEST8', name, *params)
+        self._instr_test(kind, "INSTR_TEST8", name, *params)
 
     def instr_test_setup(
         self,
@@ -191,7 +250,7 @@ class TestsCollector:
         name: str,
         *params: str,
     ) -> None:
-        self._instr_test(kind, 'INSTR_TEST_SETUP', name, *params)
+        self._instr_test(kind, "INSTR_TEST_SETUP", name, *params)
 
     def _instr_test(
         self,
@@ -209,17 +268,17 @@ class TestsCollector:
             yield from self._emit_kind(kind, val)
 
     def _emit_kind(self, kind: str, val: list[list[str]]) -> Iterator[str]:
-        gate_macro = f'MACHINE_HAS_{kind.upper()}' if kind else ''
+        gate_macro = f"MACHINE_HAS_{kind.upper()}" if kind else ""
         if gate_macro:
-            yield f'#if {gate_macro}'
+            yield f"#if {gate_macro}"
 
         for l in val:
             macro, name = l[:2]
-            params = ', '.join(l[2:])
-            yield f'{macro}({name}, {params})'
+            params = ", ".join(l[2:])
+            yield f"{macro}({name}, {params})"
 
         if gate_macro:
-            yield f'#endif  /* {gate_macro} */'
+            yield f"#endif  /* {gate_macro} */"
 
 
 # find known insts from binutils-gdb
@@ -229,7 +288,7 @@ with open("measure.h", "w") as f:
     col = TestsCollector()
 
     # measure unit time
-    col.instr_test('', 'unit', '"add.w $r12, $r1, $r12\\n"', '"r12"')
+    col.instr_test("", "unit", '"add.w $r12, $r1, $r12\\n"', '"r12"')
 
     for line in open("../../binutils-gdb/opcodes/loongarch-opc.c"):
         line = line.strip()
@@ -373,8 +432,15 @@ with open("measure.h", "w") as f:
                     # Skip control-flow instructions (can't microbench)
                     # Skip MIPS unaligned memory helpers (ldl/ldr/stl/str)
                     # Skip x87 tag helper (needs x87 state init)
-                    if stem in {"jiscr0", "jiscr1", "ldl", "ldr", "stl", "str",
-                                "x86settag"}:
+                    if stem in {
+                        "jiscr0",
+                        "jiscr1",
+                        "ldl",
+                        "ldr",
+                        "stl",
+                        "str",
+                        "x86settag",
+                    }:
                         continue
 
                     print("Processing LBT", name, fmt)
@@ -401,8 +467,11 @@ with open("measure.h", "w") as f:
                             rj_setup = f"addi.d {_LAT}, $r0, 0\\n"
                         setup = f"{rj_setup}addi.d $r13, $r0, 0\\n{flag_setup}"
                         asm = _lbt_emit_asm(
-                            name, stem, lbt_parts,
-                            _lbt_lat_reg({0}), lane=-1,
+                            name,
+                            stem,
+                            lbt_parts,
+                            _lbt_lat_reg({0}),
+                            lane=-1,
                         )
                         col.instr_test_setup(
                             "lbt",
@@ -413,8 +482,11 @@ with open("measure.h", "w") as f:
                         )
                         # Also test both GPRs chained (_1: all=$r12)
                         asm_all = _lbt_emit_asm(
-                            name, stem, lbt_parts,
-                            _lbt_lat_reg({0, 1}), lane=-1,
+                            name,
+                            stem,
+                            lbt_parts,
+                            _lbt_lat_reg({0, 1}),
+                            lane=-1,
                         )
                         col.instr_test_setup(
                             "lbt",
@@ -430,24 +502,32 @@ with open("measure.h", "w") as f:
                         source_indices = list(range(1, gpr_count))
                         for src_i in source_indices:
                             asm = _lbt_emit_asm(
-                                name, stem, lbt_parts,
+                                name,
+                                stem,
+                                lbt_parts,
                                 _lbt_lat_reg({0, src_i}),
                             )
                             clob = '"r12", "r13"'
                             col.instr_test(
-                                "lbt", f"{safe_name}_{src_i}",
-                                f'"{asm}\\n"', clob,
+                                "lbt",
+                                f"{safe_name}_{src_i}",
+                                f'"{asm}\\n"',
+                                clob,
                             )
 
                         # Also test all sources chained (when >1 source GPR)
                         if len(source_indices) > 1:
                             asm = _lbt_emit_asm(
-                                name, stem, lbt_parts,
+                                name,
+                                stem,
+                                lbt_parts,
                                 _lbt_lat_reg(set(range(gpr_count))),
                             )
                             col.instr_test(
-                                "lbt", f"{safe_name}_3",
-                                f'"{asm}\\n"', '"r12"',
+                                "lbt",
+                                f"{safe_name}_3",
+                                f'"{asm}\\n"',
+                                '"r12"',
                             )
 
                     # Latency tests for FPR/GPR cross-domain instructions
@@ -455,26 +535,31 @@ with open("measure.h", "w") as f:
                         # fd=FPR, fj=FPR — chain through FPR $f13
                         asm = f"{name} $f13, $f13"
                         col.instr_test(
-                            "lbt", f"{safe_name}_1",
-                            f'"{asm}\\n"', '"f13"',
+                            "lbt",
+                            f"{safe_name}_1",
+                            f'"{asm}\\n"',
+                            '"f13"',
                         )
                     elif name == "fcvt.d.ld":
                         # format f0:5,f5:5,f10:5 — all FPRs (fd, fj, fk)
                         # Chain through fj ($f12 same as fd → RAW)
                         col.instr_test(
-                            "lbt", f"{safe_name}_1",
+                            "lbt",
+                            f"{safe_name}_1",
                             f'"fcvt.d.ld $f12, $f12, $f13\\n"',
                             '"f12", "f13"',
                         )
                         # Chain through fk
                         col.instr_test(
-                            "lbt", f"{safe_name}_2",
+                            "lbt",
+                            f"{safe_name}_2",
                             f'"fcvt.d.ld $f12, $f13, $f12\\n"',
                             '"f12", "f13"',
                         )
                         # Both sources chained
                         col.instr_test(
-                            "lbt", f"{safe_name}_3",
+                            "lbt",
+                            f"{safe_name}_3",
                             f'"fcvt.d.ld $f12, $f12, $f12\\n"',
                             '"f12"',
                         )
@@ -485,14 +570,24 @@ with open("measure.h", "w") as f:
                         if not fmt.strip():
                             tp_asms = [name] * 8
                         elif lbt_parts and lbt_parts[0][0] == "f":
-                            tp_asms = [_lbt_emit_asm(
-                                name, stem, lbt_parts, lambda _gpr_idx, _lane: "$r0")]
+                            tp_asms = [
+                                _lbt_emit_asm(
+                                    name, stem, lbt_parts, lambda _gpr_idx, _lane: "$r0"
+                                )
+                            ]
                         elif lbt_parts and lbt_parts[0][0] == "cr":
-                            tp_asms = [_lbt_emit_asm(
-                                name, stem, lbt_parts, lambda _gpr_idx, _lane: "$r12")]
+                            tp_asms = [
+                                _lbt_emit_asm(
+                                    name,
+                                    stem,
+                                    lbt_parts,
+                                    lambda _gpr_idx, _lane: "$r12",
+                                )
+                            ]
                         elif all(k == "imm" for k, _ in lbt_parts):
                             tp_asms = [f"{name} 0"]
                         else:
+
                             def _tp_reg(gpr_idx, lane):
                                 if gpr_idx == 0:
                                     return _TP_DST[lane]
@@ -543,21 +638,21 @@ with open("measure.h", "w") as f:
         # inst vr0, vr0, vr1
         col.instr_test(
             kind,
-            f'{name}_1',
+            f"{name}_1",
             f'".word {opcode} + 0 + (0 << 5) + (1 << 10)\\n"',
         )
 
         # inst vr0, vr1, vr0
         col.instr_test(
             kind,
-            f'{name}_2',
+            f"{name}_2",
             f'".word {opcode} + 0 + (1 << 5) + (0 << 10)\\n"',
         )
 
         # inst vr0, vr1, vr2
         col.instr_test(
             kind,
-            f'{name}_tp',
+            f"{name}_tp",
             f'".word {opcode} + 0 + (1 << 5) + (2 << 10)\\n"',
         )
 
@@ -570,7 +665,7 @@ with open("measure.h", "w") as f:
         # inst xr0, 0, 0
         col.instr_test(
             kind,
-            f'{name}_tp',
+            f"{name}_tp",
             f'".word {opcode} + 0 + (0 << 5) + (0 << 10)\\n"',
         )
 
