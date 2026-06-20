@@ -4726,3 +4726,541 @@ INSTR_TEST(xvfscaleb_d_2, ".word 0x75450000 + 0 + (1 << 5) + (0 << 10)\n")
 INSTR_TEST(xvfscaleb_d_tp, ".word 0x75450000 + 0 + (1 << 5) + (2 << 10)\n")
 INSTR_TEST(xvmepatmsk_v_tp, ".word 0x769b8000 + 0 + (0 << 5) + (0 << 10)\n")
 #endif /* MACHINE_HAS_LASX */
+#if MACHINE_HAS_LBT
+INSTR_TEST(rotr_w_1, "rotr.w $r12, $r12, $r13\n", "r12", "r13")
+INSTR_TEST(rotr_w_2, "rotr.w $r12, $r13, $r12\n", "r12", "r13")
+INSTR_TEST(rotr_w_3, "rotr.w $r12, $r12, $r12\n", "r12")
+INSTR_TEST8(rotr_w_tp,
+            "rotr.w $r12, $r4, $r4\nrotr.w $r13, $r5, $r5\nrotr.w $r14, $r6, "
+            "$r6\nrotr.w $r15, $r7, $r7\nrotr.w $r16, $r8, $r8\nrotr.w $r17, "
+            "$r9, $r9\nrotr.w $r18, $r10, $r10\nrotr.w $r19, $r11, $r11\n",
+            "r12", "r13", "r14", "r15", "r16", "r17", "r18", "r19")
+INSTR_TEST(rotr_d_1, "rotr.d $r12, $r12, $r13\n", "r12", "r13")
+INSTR_TEST(rotr_d_2, "rotr.d $r12, $r13, $r12\n", "r12", "r13")
+INSTR_TEST(rotr_d_3, "rotr.d $r12, $r12, $r12\n", "r12")
+INSTR_TEST8(rotr_d_tp,
+            "rotr.d $r12, $r4, $r4\nrotr.d $r13, $r5, $r5\nrotr.d $r14, $r6, "
+            "$r6\nrotr.d $r15, $r7, $r7\nrotr.d $r16, $r8, $r8\nrotr.d $r17, "
+            "$r9, $r9\nrotr.d $r18, $r10, $r10\nrotr.d $r19, $r11, $r11\n",
+            "r12", "r13", "r14", "r15", "r16", "r17", "r18", "r19")
+INSTR_TEST(rotri_w_1, "rotri.w $r12, $r12, 1\n", "r12", "r13")
+INSTR_TEST8(rotri_w_tp,
+            "rotri.w $r12, $r4, 1\nrotri.w $r13, $r5, 1\nrotri.w $r14, $r6, "
+            "1\nrotri.w $r15, $r7, 1\nrotri.w $r16, $r8, 1\nrotri.w $r17, $r9, "
+            "1\nrotri.w $r18, $r10, 1\nrotri.w $r19, $r11, 1\n",
+            "r12", "r13", "r14", "r15", "r16", "r17", "r18", "r19")
+INSTR_TEST(rotri_d_1, "rotri.d $r12, $r12, 1\n", "r12", "r13")
+INSTR_TEST8(rotri_d_tp,
+            "rotri.d $r12, $r4, 1\nrotri.d $r13, $r5, 1\nrotri.d $r14, $r6, "
+            "1\nrotri.d $r15, $r7, 1\nrotri.d $r16, $r8, 1\nrotri.d $r17, $r9, "
+            "1\nrotri.d $r18, $r10, 1\nrotri.d $r19, $r11, 1\n",
+            "r12", "r13", "r14", "r15", "r16", "r17", "r18", "r19")
+INSTR_TEST(movgr2scr_tp, "movgr2scr $scr0, $r12\n")
+INSTR_TEST8(movscr2gr_tp,
+            "movscr2gr $r12, $scr0\nmovscr2gr $r13, $scr0\nmovscr2gr $r14, "
+            "$scr0\nmovscr2gr $r15, $scr0\nmovscr2gr $r16, $scr0\nmovscr2gr "
+            "$r17, $scr0\nmovscr2gr $r18, $scr0\nmovscr2gr $r19, $scr0\n",
+            "r12", "r13", "r14", "r15", "r16", "r17", "r18", "r19")
+INSTR_TEST(addu12i_w_1, "addu12i.w $r12, $r12, 1\n", "r12", "r13")
+INSTR_TEST8(addu12i_w_tp,
+            "addu12i.w $r12, $r4, 1\naddu12i.w $r13, $r5, 1\naddu12i.w $r14, "
+            "$r6, 1\naddu12i.w $r15, $r7, 1\naddu12i.w $r16, $r8, 1\naddu12i.w "
+            "$r17, $r9, 1\naddu12i.w $r18, $r10, 1\naddu12i.w $r19, $r11, 1\n",
+            "r12", "r13", "r14", "r15", "r16", "r17", "r18", "r19")
+INSTR_TEST(addu12i_d_1, "addu12i.d $r12, $r12, 1\n", "r12", "r13")
+INSTR_TEST8(addu12i_d_tp,
+            "addu12i.d $r12, $r4, 1\naddu12i.d $r13, $r5, 1\naddu12i.d $r14, "
+            "$r6, 1\naddu12i.d $r15, $r7, 1\naddu12i.d $r16, $r8, 1\naddu12i.d "
+            "$r17, $r9, 1\naddu12i.d $r18, $r10, 1\naddu12i.d $r19, $r11, 1\n",
+            "r12", "r13", "r14", "r15", "r16", "r17", "r18", "r19")
+INSTR_TEST(adc_b_1, "adc.b $r12, $r12, $r13\n", "r12", "r13")
+INSTR_TEST(adc_b_2, "adc.b $r12, $r13, $r12\n", "r12", "r13")
+INSTR_TEST(adc_b_3, "adc.b $r12, $r12, $r12\n", "r12")
+INSTR_TEST8(adc_b_tp,
+            "adc.b $r12, $r4, $r4\nadc.b $r13, $r5, $r5\nadc.b $r14, $r6, "
+            "$r6\nadc.b $r15, $r7, $r7\nadc.b $r16, $r8, $r8\nadc.b $r17, $r9, "
+            "$r9\nadc.b $r18, $r10, $r10\nadc.b $r19, $r11, $r11\n",
+            "r12", "r13", "r14", "r15", "r16", "r17", "r18", "r19")
+INSTR_TEST(adc_h_1, "adc.h $r12, $r12, $r13\n", "r12", "r13")
+INSTR_TEST(adc_h_2, "adc.h $r12, $r13, $r12\n", "r12", "r13")
+INSTR_TEST(adc_h_3, "adc.h $r12, $r12, $r12\n", "r12")
+INSTR_TEST8(adc_h_tp,
+            "adc.h $r12, $r4, $r4\nadc.h $r13, $r5, $r5\nadc.h $r14, $r6, "
+            "$r6\nadc.h $r15, $r7, $r7\nadc.h $r16, $r8, $r8\nadc.h $r17, $r9, "
+            "$r9\nadc.h $r18, $r10, $r10\nadc.h $r19, $r11, $r11\n",
+            "r12", "r13", "r14", "r15", "r16", "r17", "r18", "r19")
+INSTR_TEST(adc_w_1, "adc.w $r12, $r12, $r13\n", "r12", "r13")
+INSTR_TEST(adc_w_2, "adc.w $r12, $r13, $r12\n", "r12", "r13")
+INSTR_TEST(adc_w_3, "adc.w $r12, $r12, $r12\n", "r12")
+INSTR_TEST8(adc_w_tp,
+            "adc.w $r12, $r4, $r4\nadc.w $r13, $r5, $r5\nadc.w $r14, $r6, "
+            "$r6\nadc.w $r15, $r7, $r7\nadc.w $r16, $r8, $r8\nadc.w $r17, $r9, "
+            "$r9\nadc.w $r18, $r10, $r10\nadc.w $r19, $r11, $r11\n",
+            "r12", "r13", "r14", "r15", "r16", "r17", "r18", "r19")
+INSTR_TEST(adc_d_1, "adc.d $r12, $r12, $r13\n", "r12", "r13")
+INSTR_TEST(adc_d_2, "adc.d $r12, $r13, $r12\n", "r12", "r13")
+INSTR_TEST(adc_d_3, "adc.d $r12, $r12, $r12\n", "r12")
+INSTR_TEST8(adc_d_tp,
+            "adc.d $r12, $r4, $r4\nadc.d $r13, $r5, $r5\nadc.d $r14, $r6, "
+            "$r6\nadc.d $r15, $r7, $r7\nadc.d $r16, $r8, $r8\nadc.d $r17, $r9, "
+            "$r9\nadc.d $r18, $r10, $r10\nadc.d $r19, $r11, $r11\n",
+            "r12", "r13", "r14", "r15", "r16", "r17", "r18", "r19")
+INSTR_TEST(sbc_b_1, "sbc.b $r12, $r12, $r13\n", "r12", "r13")
+INSTR_TEST(sbc_b_2, "sbc.b $r12, $r13, $r12\n", "r12", "r13")
+INSTR_TEST(sbc_b_3, "sbc.b $r12, $r12, $r12\n", "r12")
+INSTR_TEST8(sbc_b_tp,
+            "sbc.b $r12, $r4, $r4\nsbc.b $r13, $r5, $r5\nsbc.b $r14, $r6, "
+            "$r6\nsbc.b $r15, $r7, $r7\nsbc.b $r16, $r8, $r8\nsbc.b $r17, $r9, "
+            "$r9\nsbc.b $r18, $r10, $r10\nsbc.b $r19, $r11, $r11\n",
+            "r12", "r13", "r14", "r15", "r16", "r17", "r18", "r19")
+INSTR_TEST(sbc_h_1, "sbc.h $r12, $r12, $r13\n", "r12", "r13")
+INSTR_TEST(sbc_h_2, "sbc.h $r12, $r13, $r12\n", "r12", "r13")
+INSTR_TEST(sbc_h_3, "sbc.h $r12, $r12, $r12\n", "r12")
+INSTR_TEST8(sbc_h_tp,
+            "sbc.h $r12, $r4, $r4\nsbc.h $r13, $r5, $r5\nsbc.h $r14, $r6, "
+            "$r6\nsbc.h $r15, $r7, $r7\nsbc.h $r16, $r8, $r8\nsbc.h $r17, $r9, "
+            "$r9\nsbc.h $r18, $r10, $r10\nsbc.h $r19, $r11, $r11\n",
+            "r12", "r13", "r14", "r15", "r16", "r17", "r18", "r19")
+INSTR_TEST(sbc_w_1, "sbc.w $r12, $r12, $r13\n", "r12", "r13")
+INSTR_TEST(sbc_w_2, "sbc.w $r12, $r13, $r12\n", "r12", "r13")
+INSTR_TEST(sbc_w_3, "sbc.w $r12, $r12, $r12\n", "r12")
+INSTR_TEST8(sbc_w_tp,
+            "sbc.w $r12, $r4, $r4\nsbc.w $r13, $r5, $r5\nsbc.w $r14, $r6, "
+            "$r6\nsbc.w $r15, $r7, $r7\nsbc.w $r16, $r8, $r8\nsbc.w $r17, $r9, "
+            "$r9\nsbc.w $r18, $r10, $r10\nsbc.w $r19, $r11, $r11\n",
+            "r12", "r13", "r14", "r15", "r16", "r17", "r18", "r19")
+INSTR_TEST(sbc_d_1, "sbc.d $r12, $r12, $r13\n", "r12", "r13")
+INSTR_TEST(sbc_d_2, "sbc.d $r12, $r13, $r12\n", "r12", "r13")
+INSTR_TEST(sbc_d_3, "sbc.d $r12, $r12, $r12\n", "r12")
+INSTR_TEST8(sbc_d_tp,
+            "sbc.d $r12, $r4, $r4\nsbc.d $r13, $r5, $r5\nsbc.d $r14, $r6, "
+            "$r6\nsbc.d $r15, $r7, $r7\nsbc.d $r16, $r8, $r8\nsbc.d $r17, $r9, "
+            "$r9\nsbc.d $r18, $r10, $r10\nsbc.d $r19, $r11, $r11\n",
+            "r12", "r13", "r14", "r15", "r16", "r17", "r18", "r19")
+INSTR_TEST(rotr_b_1, "rotr.b $r12, $r12, $r13\n", "r12", "r13")
+INSTR_TEST(rotr_b_2, "rotr.b $r12, $r13, $r12\n", "r12", "r13")
+INSTR_TEST(rotr_b_3, "rotr.b $r12, $r12, $r12\n", "r12")
+INSTR_TEST8(rotr_b_tp,
+            "rotr.b $r12, $r4, $r4\nrotr.b $r13, $r5, $r5\nrotr.b $r14, $r6, "
+            "$r6\nrotr.b $r15, $r7, $r7\nrotr.b $r16, $r8, $r8\nrotr.b $r17, "
+            "$r9, $r9\nrotr.b $r18, $r10, $r10\nrotr.b $r19, $r11, $r11\n",
+            "r12", "r13", "r14", "r15", "r16", "r17", "r18", "r19")
+INSTR_TEST(rotr_h_1, "rotr.h $r12, $r12, $r13\n", "r12", "r13")
+INSTR_TEST(rotr_h_2, "rotr.h $r12, $r13, $r12\n", "r12", "r13")
+INSTR_TEST(rotr_h_3, "rotr.h $r12, $r12, $r12\n", "r12")
+INSTR_TEST8(rotr_h_tp,
+            "rotr.h $r12, $r4, $r4\nrotr.h $r13, $r5, $r5\nrotr.h $r14, $r6, "
+            "$r6\nrotr.h $r15, $r7, $r7\nrotr.h $r16, $r8, $r8\nrotr.h $r17, "
+            "$r9, $r9\nrotr.h $r18, $r10, $r10\nrotr.h $r19, $r11, $r11\n",
+            "r12", "r13", "r14", "r15", "r16", "r17", "r18", "r19")
+INSTR_TEST(rotri_b_1, "rotri.b $r12, $r12, 1\n", "r12", "r13")
+INSTR_TEST8(rotri_b_tp,
+            "rotri.b $r12, $r4, 1\nrotri.b $r13, $r5, 1\nrotri.b $r14, $r6, "
+            "1\nrotri.b $r15, $r7, 1\nrotri.b $r16, $r8, 1\nrotri.b $r17, $r9, "
+            "1\nrotri.b $r18, $r10, 1\nrotri.b $r19, $r11, 1\n",
+            "r12", "r13", "r14", "r15", "r16", "r17", "r18", "r19")
+INSTR_TEST(rotri_h_1, "rotri.h $r12, $r12, 1\n", "r12", "r13")
+INSTR_TEST8(rotri_h_tp,
+            "rotri.h $r12, $r4, 1\nrotri.h $r13, $r5, 1\nrotri.h $r14, $r6, "
+            "1\nrotri.h $r15, $r7, 1\nrotri.h $r16, $r8, 1\nrotri.h $r17, $r9, "
+            "1\nrotri.h $r18, $r10, 1\nrotri.h $r19, $r11, 1\n",
+            "r12", "r13", "r14", "r15", "r16", "r17", "r18", "r19")
+INSTR_TEST(rcr_b_1, "rcr.b $r12, $r12, $r13\n", "r12", "r13")
+INSTR_TEST(rcr_b_2, "rcr.b $r12, $r13, $r12\n", "r12", "r13")
+INSTR_TEST(rcr_b_3, "rcr.b $r12, $r12, $r12\n", "r12")
+INSTR_TEST8(rcr_b_tp,
+            "rcr.b $r12, $r4, $r4\nrcr.b $r13, $r5, $r5\nrcr.b $r14, $r6, "
+            "$r6\nrcr.b $r15, $r7, $r7\nrcr.b $r16, $r8, $r8\nrcr.b $r17, $r9, "
+            "$r9\nrcr.b $r18, $r10, $r10\nrcr.b $r19, $r11, $r11\n",
+            "r12", "r13", "r14", "r15", "r16", "r17", "r18", "r19")
+INSTR_TEST(rcr_h_1, "rcr.h $r12, $r12, $r13\n", "r12", "r13")
+INSTR_TEST(rcr_h_2, "rcr.h $r12, $r13, $r12\n", "r12", "r13")
+INSTR_TEST(rcr_h_3, "rcr.h $r12, $r12, $r12\n", "r12")
+INSTR_TEST8(rcr_h_tp,
+            "rcr.h $r12, $r4, $r4\nrcr.h $r13, $r5, $r5\nrcr.h $r14, $r6, "
+            "$r6\nrcr.h $r15, $r7, $r7\nrcr.h $r16, $r8, $r8\nrcr.h $r17, $r9, "
+            "$r9\nrcr.h $r18, $r10, $r10\nrcr.h $r19, $r11, $r11\n",
+            "r12", "r13", "r14", "r15", "r16", "r17", "r18", "r19")
+INSTR_TEST(rcr_w_1, "rcr.w $r12, $r12, $r13\n", "r12", "r13")
+INSTR_TEST(rcr_w_2, "rcr.w $r12, $r13, $r12\n", "r12", "r13")
+INSTR_TEST(rcr_w_3, "rcr.w $r12, $r12, $r12\n", "r12")
+INSTR_TEST8(rcr_w_tp,
+            "rcr.w $r12, $r4, $r4\nrcr.w $r13, $r5, $r5\nrcr.w $r14, $r6, "
+            "$r6\nrcr.w $r15, $r7, $r7\nrcr.w $r16, $r8, $r8\nrcr.w $r17, $r9, "
+            "$r9\nrcr.w $r18, $r10, $r10\nrcr.w $r19, $r11, $r11\n",
+            "r12", "r13", "r14", "r15", "r16", "r17", "r18", "r19")
+INSTR_TEST(rcr_d_1, "rcr.d $r12, $r12, $r13\n", "r12", "r13")
+INSTR_TEST(rcr_d_2, "rcr.d $r12, $r13, $r12\n", "r12", "r13")
+INSTR_TEST(rcr_d_3, "rcr.d $r12, $r12, $r12\n", "r12")
+INSTR_TEST8(rcr_d_tp,
+            "rcr.d $r12, $r4, $r4\nrcr.d $r13, $r5, $r5\nrcr.d $r14, $r6, "
+            "$r6\nrcr.d $r15, $r7, $r7\nrcr.d $r16, $r8, $r8\nrcr.d $r17, $r9, "
+            "$r9\nrcr.d $r18, $r10, $r10\nrcr.d $r19, $r11, $r11\n",
+            "r12", "r13", "r14", "r15", "r16", "r17", "r18", "r19")
+INSTR_TEST(rcri_b_1, "rcri.b $r12, $r12, 1\n", "r12", "r13")
+INSTR_TEST8(rcri_b_tp,
+            "rcri.b $r12, $r4, 1\nrcri.b $r13, $r5, 1\nrcri.b $r14, $r6, "
+            "1\nrcri.b $r15, $r7, 1\nrcri.b $r16, $r8, 1\nrcri.b $r17, $r9, "
+            "1\nrcri.b $r18, $r10, 1\nrcri.b $r19, $r11, 1\n",
+            "r12", "r13", "r14", "r15", "r16", "r17", "r18", "r19")
+INSTR_TEST(rcri_h_1, "rcri.h $r12, $r12, 1\n", "r12", "r13")
+INSTR_TEST8(rcri_h_tp,
+            "rcri.h $r12, $r4, 1\nrcri.h $r13, $r5, 1\nrcri.h $r14, $r6, "
+            "1\nrcri.h $r15, $r7, 1\nrcri.h $r16, $r8, 1\nrcri.h $r17, $r9, "
+            "1\nrcri.h $r18, $r10, 1\nrcri.h $r19, $r11, 1\n",
+            "r12", "r13", "r14", "r15", "r16", "r17", "r18", "r19")
+INSTR_TEST(rcri_w_1, "rcri.w $r12, $r12, 1\n", "r12", "r13")
+INSTR_TEST8(rcri_w_tp,
+            "rcri.w $r12, $r4, 1\nrcri.w $r13, $r5, 1\nrcri.w $r14, $r6, "
+            "1\nrcri.w $r15, $r7, 1\nrcri.w $r16, $r8, 1\nrcri.w $r17, $r9, "
+            "1\nrcri.w $r18, $r10, 1\nrcri.w $r19, $r11, 1\n",
+            "r12", "r13", "r14", "r15", "r16", "r17", "r18", "r19")
+INSTR_TEST(rcri_d_1, "rcri.d $r12, $r12, 1\n", "r12", "r13")
+INSTR_TEST8(rcri_d_tp,
+            "rcri.d $r12, $r4, 1\nrcri.d $r13, $r5, 1\nrcri.d $r14, $r6, "
+            "1\nrcri.d $r15, $r7, 1\nrcri.d $r16, $r8, 1\nrcri.d $r17, $r9, "
+            "1\nrcri.d $r18, $r10, 1\nrcri.d $r19, $r11, 1\n",
+            "r12", "r13", "r14", "r15", "r16", "r17", "r18", "r19")
+INSTR_TEST(fcvt_ud_d_1, "fcvt.ud.d $f13, $f13\n", "f13")
+INSTR_TEST(fcvt_ud_d_tp, "fcvt.ud.d $f0, $f5\n")
+INSTR_TEST(fcvt_ld_d_1, "fcvt.ld.d $f13, $f13\n", "f13")
+INSTR_TEST(fcvt_ld_d_tp, "fcvt.ld.d $f0, $f5\n")
+INSTR_TEST(fcvt_d_ld_1, "fcvt.d.ld $f12, $f12, $f13\n", "f12", "f13")
+INSTR_TEST(fcvt_d_ld_2, "fcvt.d.ld $f12, $f13, $f12\n", "f12", "f13")
+INSTR_TEST(fcvt_d_ld_3, "fcvt.d.ld $f12, $f12, $f12\n", "f12")
+INSTR_TEST(fcvt_d_ld_tp, "fcvt.d.ld $f0, $f5, $f10\n")
+INSTR_TEST_SETUP(
+    x86adc_b_0,
+    "addi.d $r12, $r0, -1\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86adc.b $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86adc_b_1,
+    "addi.d $r12, $r0, -1\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86adc.b $r12, $r12\n", "r12", "r13", "memory")
+INSTR_TEST8(x86adc_b_tp,
+            "x86adc.b $r12, $r4\nx86adc.b $r13, $r5\nx86adc.b $r14, "
+            "$r6\nx86adc.b $r15, $r7\nx86adc.b $r16, $r8\nx86adc.b $r17, "
+            "$r9\nx86adc.b $r18, $r10\nx86adc.b $r19, $r11\n")
+INSTR_TEST_SETUP(
+    x86adc_h_0,
+    "addi.d $r12, $r0, -1\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86adc.h $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86adc_h_1,
+    "addi.d $r12, $r0, -1\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86adc.h $r12, $r12\n", "r12", "r13", "memory")
+INSTR_TEST8(x86adc_h_tp,
+            "x86adc.h $r12, $r4\nx86adc.h $r13, $r5\nx86adc.h $r14, "
+            "$r6\nx86adc.h $r15, $r7\nx86adc.h $r16, $r8\nx86adc.h $r17, "
+            "$r9\nx86adc.h $r18, $r10\nx86adc.h $r19, $r11\n")
+INSTR_TEST_SETUP(
+    x86adc_w_0,
+    "addi.d $r12, $r0, -1\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86adc.w $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86adc_w_1,
+    "addi.d $r12, $r0, -1\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86adc.w $r12, $r12\n", "r12", "r13", "memory")
+INSTR_TEST8(x86adc_w_tp,
+            "x86adc.w $r12, $r4\nx86adc.w $r13, $r5\nx86adc.w $r14, "
+            "$r6\nx86adc.w $r15, $r7\nx86adc.w $r16, $r8\nx86adc.w $r17, "
+            "$r9\nx86adc.w $r18, $r10\nx86adc.w $r19, $r11\n")
+INSTR_TEST_SETUP(
+    x86adc_d_0,
+    "addi.d $r12, $r0, -1\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86adc.d $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86adc_d_1,
+    "addi.d $r12, $r0, -1\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86adc.d $r12, $r12\n", "r12", "r13", "memory")
+INSTR_TEST8(x86adc_d_tp,
+            "x86adc.d $r12, $r4\nx86adc.d $r13, $r5\nx86adc.d $r14, "
+            "$r6\nx86adc.d $r15, $r7\nx86adc.d $r16, $r8\nx86adc.d $r17, "
+            "$r9\nx86adc.d $r18, $r10\nx86adc.d $r19, $r11\n")
+INSTR_TEST(x86add_b_1, "x86add.b $r12, $r12\n", "r12", "r13")
+INSTR_TEST8(x86add_b_tp,
+            "x86add.b $r12, $r4\nx86add.b $r13, $r5\nx86add.b $r14, "
+            "$r6\nx86add.b $r15, $r7\nx86add.b $r16, $r8\nx86add.b $r17, "
+            "$r9\nx86add.b $r18, $r10\nx86add.b $r19, $r11\n")
+INSTR_TEST(x86add_h_1, "x86add.h $r12, $r12\n", "r12", "r13")
+INSTR_TEST8(x86add_h_tp,
+            "x86add.h $r12, $r4\nx86add.h $r13, $r5\nx86add.h $r14, "
+            "$r6\nx86add.h $r15, $r7\nx86add.h $r16, $r8\nx86add.h $r17, "
+            "$r9\nx86add.h $r18, $r10\nx86add.h $r19, $r11\n")
+INSTR_TEST(x86add_w_1, "x86add.w $r12, $r12\n", "r12", "r13")
+INSTR_TEST8(x86add_w_tp,
+            "x86add.w $r12, $r4\nx86add.w $r13, $r5\nx86add.w $r14, "
+            "$r6\nx86add.w $r15, $r7\nx86add.w $r16, $r8\nx86add.w $r17, "
+            "$r9\nx86add.w $r18, $r10\nx86add.w $r19, $r11\n")
+INSTR_TEST(x86add_d_1, "x86add.d $r12, $r12\n", "r12", "r13")
+INSTR_TEST8(x86add_d_tp,
+            "x86add.d $r12, $r4\nx86add.d $r13, $r5\nx86add.d $r14, "
+            "$r6\nx86add.d $r15, $r7\nx86add.d $r16, $r8\nx86add.d $r17, "
+            "$r9\nx86add.d $r18, $r10\nx86add.d $r19, $r11\n")
+INSTR_TEST(x86add_wu_1, "x86add.wu $r12, $r12\n", "r12", "r13")
+INSTR_TEST8(x86add_wu_tp,
+            "x86add.wu $r12, $r4\nx86add.wu $r13, $r5\nx86add.wu $r14, "
+            "$r6\nx86add.wu $r15, $r7\nx86add.wu $r16, $r8\nx86add.wu $r17, "
+            "$r9\nx86add.wu $r18, $r10\nx86add.wu $r19, $r11\n")
+INSTR_TEST(x86add_du_1, "x86add.du $r12, $r12\n", "r12", "r13")
+INSTR_TEST8(x86add_du_tp,
+            "x86add.du $r12, $r4\nx86add.du $r13, $r5\nx86add.du $r14, "
+            "$r6\nx86add.du $r15, $r7\nx86add.du $r16, $r8\nx86add.du $r17, "
+            "$r9\nx86add.du $r18, $r10\nx86add.du $r19, $r11\n")
+INSTR_TEST_SETUP(
+    x86sbc_b_0,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86sbc.b $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86sbc_b_1,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86sbc.b $r12, $r12\n", "r12", "r13", "memory")
+INSTR_TEST8(x86sbc_b_tp,
+            "x86sbc.b $r12, $r4\nx86sbc.b $r13, $r5\nx86sbc.b $r14, "
+            "$r6\nx86sbc.b $r15, $r7\nx86sbc.b $r16, $r8\nx86sbc.b $r17, "
+            "$r9\nx86sbc.b $r18, $r10\nx86sbc.b $r19, $r11\n")
+INSTR_TEST_SETUP(
+    x86sbc_h_0,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86sbc.h $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86sbc_h_1,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86sbc.h $r12, $r12\n", "r12", "r13", "memory")
+INSTR_TEST8(x86sbc_h_tp,
+            "x86sbc.h $r12, $r4\nx86sbc.h $r13, $r5\nx86sbc.h $r14, "
+            "$r6\nx86sbc.h $r15, $r7\nx86sbc.h $r16, $r8\nx86sbc.h $r17, "
+            "$r9\nx86sbc.h $r18, $r10\nx86sbc.h $r19, $r11\n")
+INSTR_TEST_SETUP(
+    x86sbc_w_0,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86sbc.w $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86sbc_w_1,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86sbc.w $r12, $r12\n", "r12", "r13", "memory")
+INSTR_TEST8(x86sbc_w_tp,
+            "x86sbc.w $r12, $r4\nx86sbc.w $r13, $r5\nx86sbc.w $r14, "
+            "$r6\nx86sbc.w $r15, $r7\nx86sbc.w $r16, $r8\nx86sbc.w $r17, "
+            "$r9\nx86sbc.w $r18, $r10\nx86sbc.w $r19, $r11\n")
+INSTR_TEST_SETUP(
+    x86sbc_d_0,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86sbc.d $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86sbc_d_1,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86sbc.d $r12, $r12\n", "r12", "r13", "memory")
+INSTR_TEST8(x86sbc_d_tp,
+            "x86sbc.d $r12, $r4\nx86sbc.d $r13, $r5\nx86sbc.d $r14, "
+            "$r6\nx86sbc.d $r15, $r7\nx86sbc.d $r16, $r8\nx86sbc.d $r17, "
+            "$r9\nx86sbc.d $r18, $r10\nx86sbc.d $r19, $r11\n")
+INSTR_TEST(x86sub_b_1, "x86sub.b $r12, $r12\n", "r12", "r13")
+INSTR_TEST8(x86sub_b_tp,
+            "x86sub.b $r12, $r4\nx86sub.b $r13, $r5\nx86sub.b $r14, "
+            "$r6\nx86sub.b $r15, $r7\nx86sub.b $r16, $r8\nx86sub.b $r17, "
+            "$r9\nx86sub.b $r18, $r10\nx86sub.b $r19, $r11\n")
+INSTR_TEST(x86sub_h_1, "x86sub.h $r12, $r12\n", "r12", "r13")
+INSTR_TEST8(x86sub_h_tp,
+            "x86sub.h $r12, $r4\nx86sub.h $r13, $r5\nx86sub.h $r14, "
+            "$r6\nx86sub.h $r15, $r7\nx86sub.h $r16, $r8\nx86sub.h $r17, "
+            "$r9\nx86sub.h $r18, $r10\nx86sub.h $r19, $r11\n")
+INSTR_TEST(x86sub_w_1, "x86sub.w $r12, $r12\n", "r12", "r13")
+INSTR_TEST8(x86sub_w_tp,
+            "x86sub.w $r12, $r4\nx86sub.w $r13, $r5\nx86sub.w $r14, "
+            "$r6\nx86sub.w $r15, $r7\nx86sub.w $r16, $r8\nx86sub.w $r17, "
+            "$r9\nx86sub.w $r18, $r10\nx86sub.w $r19, $r11\n")
+INSTR_TEST(x86sub_d_1, "x86sub.d $r12, $r12\n", "r12", "r13")
+INSTR_TEST8(x86sub_d_tp,
+            "x86sub.d $r12, $r4\nx86sub.d $r13, $r5\nx86sub.d $r14, "
+            "$r6\nx86sub.d $r15, $r7\nx86sub.d $r16, $r8\nx86sub.d $r17, "
+            "$r9\nx86sub.d $r18, $r10\nx86sub.d $r19, $r11\n")
+INSTR_TEST(x86sub_wu_1, "x86sub.wu $r12, $r12\n", "r12", "r13")
+INSTR_TEST8(x86sub_wu_tp,
+            "x86sub.wu $r12, $r4\nx86sub.wu $r13, $r5\nx86sub.wu $r14, "
+            "$r6\nx86sub.wu $r15, $r7\nx86sub.wu $r16, $r8\nx86sub.wu $r17, "
+            "$r9\nx86sub.wu $r18, $r10\nx86sub.wu $r19, $r11\n")
+INSTR_TEST(x86sub_du_1, "x86sub.du $r12, $r12\n", "r12", "r13")
+INSTR_TEST8(x86sub_du_tp,
+            "x86sub.du $r12, $r4\nx86sub.du $r13, $r5\nx86sub.du $r14, "
+            "$r6\nx86sub.du $r15, $r7\nx86sub.du $r16, $r8\nx86sub.du $r17, "
+            "$r9\nx86sub.du $r18, $r10\nx86sub.du $r19, $r11\n")
+INSTR_TEST(x86and_b_1, "x86and.b $r12, $r12\n", "r12", "r13")
+INSTR_TEST8(x86and_b_tp,
+            "x86and.b $r12, $r4\nx86and.b $r13, $r5\nx86and.b $r14, "
+            "$r6\nx86and.b $r15, $r7\nx86and.b $r16, $r8\nx86and.b $r17, "
+            "$r9\nx86and.b $r18, $r10\nx86and.b $r19, $r11\n")
+INSTR_TEST(x86and_h_1, "x86and.h $r12, $r12\n", "r12", "r13")
+INSTR_TEST8(x86and_h_tp,
+            "x86and.h $r12, $r4\nx86and.h $r13, $r5\nx86and.h $r14, "
+            "$r6\nx86and.h $r15, $r7\nx86and.h $r16, $r8\nx86and.h $r17, "
+            "$r9\nx86and.h $r18, $r10\nx86and.h $r19, $r11\n")
+INSTR_TEST(x86and_w_1, "x86and.w $r12, $r12\n", "r12", "r13")
+INSTR_TEST8(x86and_w_tp,
+            "x86and.w $r12, $r4\nx86and.w $r13, $r5\nx86and.w $r14, "
+            "$r6\nx86and.w $r15, $r7\nx86and.w $r16, $r8\nx86and.w $r17, "
+            "$r9\nx86and.w $r18, $r10\nx86and.w $r19, $r11\n")
+INSTR_TEST(x86and_d_1, "x86and.d $r12, $r12\n", "r12", "r13")
+INSTR_TEST8(x86and_d_tp,
+            "x86and.d $r12, $r4\nx86and.d $r13, $r5\nx86and.d $r14, "
+            "$r6\nx86and.d $r15, $r7\nx86and.d $r16, $r8\nx86and.d $r17, "
+            "$r9\nx86and.d $r18, $r10\nx86and.d $r19, $r11\n")
+INSTR_TEST(x86or_b_1, "x86or.b $r12, $r12\n", "r12", "r13")
+INSTR_TEST8(x86or_b_tp, "x86or.b $r12, $r4\nx86or.b $r13, $r5\nx86or.b $r14, "
+                        "$r6\nx86or.b $r15, $r7\nx86or.b $r16, $r8\nx86or.b "
+                        "$r17, $r9\nx86or.b $r18, $r10\nx86or.b $r19, $r11\n")
+INSTR_TEST(x86or_h_1, "x86or.h $r12, $r12\n", "r12", "r13")
+INSTR_TEST8(x86or_h_tp, "x86or.h $r12, $r4\nx86or.h $r13, $r5\nx86or.h $r14, "
+                        "$r6\nx86or.h $r15, $r7\nx86or.h $r16, $r8\nx86or.h "
+                        "$r17, $r9\nx86or.h $r18, $r10\nx86or.h $r19, $r11\n")
+INSTR_TEST(x86or_w_1, "x86or.w $r12, $r12\n", "r12", "r13")
+INSTR_TEST8(x86or_w_tp, "x86or.w $r12, $r4\nx86or.w $r13, $r5\nx86or.w $r14, "
+                        "$r6\nx86or.w $r15, $r7\nx86or.w $r16, $r8\nx86or.w "
+                        "$r17, $r9\nx86or.w $r18, $r10\nx86or.w $r19, $r11\n")
+INSTR_TEST(x86or_d_1, "x86or.d $r12, $r12\n", "r12", "r13")
+INSTR_TEST8(x86or_d_tp, "x86or.d $r12, $r4\nx86or.d $r13, $r5\nx86or.d $r14, "
+                        "$r6\nx86or.d $r15, $r7\nx86or.d $r16, $r8\nx86or.d "
+                        "$r17, $r9\nx86or.d $r18, $r10\nx86or.d $r19, $r11\n")
+INSTR_TEST(x86xor_b_1, "x86xor.b $r12, $r12\n", "r12", "r13")
+INSTR_TEST8(x86xor_b_tp,
+            "x86xor.b $r12, $r4\nx86xor.b $r13, $r5\nx86xor.b $r14, "
+            "$r6\nx86xor.b $r15, $r7\nx86xor.b $r16, $r8\nx86xor.b $r17, "
+            "$r9\nx86xor.b $r18, $r10\nx86xor.b $r19, $r11\n")
+INSTR_TEST(x86xor_h_1, "x86xor.h $r12, $r12\n", "r12", "r13")
+INSTR_TEST8(x86xor_h_tp,
+            "x86xor.h $r12, $r4\nx86xor.h $r13, $r5\nx86xor.h $r14, "
+            "$r6\nx86xor.h $r15, $r7\nx86xor.h $r16, $r8\nx86xor.h $r17, "
+            "$r9\nx86xor.h $r18, $r10\nx86xor.h $r19, $r11\n")
+INSTR_TEST(x86xor_w_1, "x86xor.w $r12, $r12\n", "r12", "r13")
+INSTR_TEST8(x86xor_w_tp,
+            "x86xor.w $r12, $r4\nx86xor.w $r13, $r5\nx86xor.w $r14, "
+            "$r6\nx86xor.w $r15, $r7\nx86xor.w $r16, $r8\nx86xor.w $r17, "
+            "$r9\nx86xor.w $r18, $r10\nx86xor.w $r19, $r11\n")
+INSTR_TEST(x86xor_d_1, "x86xor.d $r12, $r12\n", "r12", "r13")
+INSTR_TEST8(x86xor_d_tp,
+            "x86xor.d $r12, $r4\nx86xor.d $r13, $r5\nx86xor.d $r14, "
+            "$r6\nx86xor.d $r15, $r7\nx86xor.d $r16, $r8\nx86xor.d $r17, "
+            "$r9\nx86xor.d $r18, $r10\nx86xor.d $r19, $r11\n")
+INSTR_TEST(x86mul_b_1, "x86mul.b $r12, $r12\n", "r12", "r13")
+INSTR_TEST8(x86mul_b_tp,
+            "x86mul.b $r12, $r4\nx86mul.b $r13, $r5\nx86mul.b $r14, "
+            "$r6\nx86mul.b $r15, $r7\nx86mul.b $r16, $r8\nx86mul.b $r17, "
+            "$r9\nx86mul.b $r18, $r10\nx86mul.b $r19, $r11\n")
+INSTR_TEST(x86mul_h_1, "x86mul.h $r12, $r12\n", "r12", "r13")
+INSTR_TEST8(x86mul_h_tp,
+            "x86mul.h $r12, $r4\nx86mul.h $r13, $r5\nx86mul.h $r14, "
+            "$r6\nx86mul.h $r15, $r7\nx86mul.h $r16, $r8\nx86mul.h $r17, "
+            "$r9\nx86mul.h $r18, $r10\nx86mul.h $r19, $r11\n")
+INSTR_TEST(x86mul_w_1, "x86mul.w $r12, $r12\n", "r12", "r13")
+INSTR_TEST8(x86mul_w_tp,
+            "x86mul.w $r12, $r4\nx86mul.w $r13, $r5\nx86mul.w $r14, "
+            "$r6\nx86mul.w $r15, $r7\nx86mul.w $r16, $r8\nx86mul.w $r17, "
+            "$r9\nx86mul.w $r18, $r10\nx86mul.w $r19, $r11\n")
+INSTR_TEST(x86mul_d_1, "x86mul.d $r12, $r12\n", "r12", "r13")
+INSTR_TEST8(x86mul_d_tp,
+            "x86mul.d $r12, $r4\nx86mul.d $r13, $r5\nx86mul.d $r14, "
+            "$r6\nx86mul.d $r15, $r7\nx86mul.d $r16, $r8\nx86mul.d $r17, "
+            "$r9\nx86mul.d $r18, $r10\nx86mul.d $r19, $r11\n")
+INSTR_TEST(x86mul_bu_1, "x86mul.bu $r12, $r12\n", "r12", "r13")
+INSTR_TEST8(x86mul_bu_tp,
+            "x86mul.bu $r12, $r4\nx86mul.bu $r13, $r5\nx86mul.bu $r14, "
+            "$r6\nx86mul.bu $r15, $r7\nx86mul.bu $r16, $r8\nx86mul.bu $r17, "
+            "$r9\nx86mul.bu $r18, $r10\nx86mul.bu $r19, $r11\n")
+INSTR_TEST(x86mul_hu_1, "x86mul.hu $r12, $r12\n", "r12", "r13")
+INSTR_TEST8(x86mul_hu_tp,
+            "x86mul.hu $r12, $r4\nx86mul.hu $r13, $r5\nx86mul.hu $r14, "
+            "$r6\nx86mul.hu $r15, $r7\nx86mul.hu $r16, $r8\nx86mul.hu $r17, "
+            "$r9\nx86mul.hu $r18, $r10\nx86mul.hu $r19, $r11\n")
+INSTR_TEST(x86mul_wu_1, "x86mul.wu $r12, $r12\n", "r12", "r13")
+INSTR_TEST8(x86mul_wu_tp,
+            "x86mul.wu $r12, $r4\nx86mul.wu $r13, $r5\nx86mul.wu $r14, "
+            "$r6\nx86mul.wu $r15, $r7\nx86mul.wu $r16, $r8\nx86mul.wu $r17, "
+            "$r9\nx86mul.wu $r18, $r10\nx86mul.wu $r19, $r11\n")
+INSTR_TEST(x86mul_du_1, "x86mul.du $r12, $r12\n", "r12", "r13")
+INSTR_TEST8(x86mul_du_tp,
+            "x86mul.du $r12, $r4\nx86mul.du $r13, $r5\nx86mul.du $r14, "
+            "$r6\nx86mul.du $r15, $r7\nx86mul.du $r16, $r8\nx86mul.du $r17, "
+            "$r9\nx86mul.du $r18, $r10\nx86mul.du $r19, $r11\n")
+INSTR_TEST8(
+    setx86j_tp,
+    "setx86j $r12, 4\nsetx86j $r13, 4\nsetx86j $r14, 4\nsetx86j $r15, "
+    "4\nsetx86j $r16, 4\nsetx86j $r17, 4\nsetx86j $r18, 4\nsetx86j $r19, 4\n",
+    "r12", "r13", "r14", "r15", "r16", "r17", "r18", "r19")
+INSTR_TEST8(x86mfflag_tp,
+            "x86mfflag $r12, 0x3f\nx86mfflag $r13, 0x3f\nx86mfflag $r14, "
+            "0x3f\nx86mfflag $r15, 0x3f\nx86mfflag $r16, 0x3f\nx86mfflag $r17, "
+            "0x3f\nx86mfflag $r18, 0x3f\nx86mfflag $r19, 0x3f\n",
+            "r12", "r13", "r14", "r15", "r16", "r17", "r18", "r19")
+INSTR_TEST8(x86mtflag_tp,
+            "x86mtflag $r12, 0x3f\nx86mtflag $r13, 0x3f\nx86mtflag $r14, "
+            "0x3f\nx86mtflag $r15, 0x3f\nx86mtflag $r16, 0x3f\nx86mtflag $r17, "
+            "0x3f\nx86mtflag $r18, 0x3f\nx86mtflag $r19, 0x3f\n")
+INSTR_TEST8(
+    x86mftop_tp,
+    "x86mftop $r12\nx86mftop $r13\nx86mftop $r14\nx86mftop $r15\nx86mftop "
+    "$r16\nx86mftop $r17\nx86mftop $r18\nx86mftop $r19\n",
+    "r12", "r13", "r14", "r15", "r16", "r17", "r18", "r19")
+INSTR_TEST(x86mttop_tp, "x86mttop 0\n")
+INSTR_TEST8(x86inctop_tp, "x86inctop\nx86inctop\nx86inctop\nx86inctop\nx86incto"
+                          "p\nx86inctop\nx86inctop\nx86inctop\n")
+INSTR_TEST8(x86dectop_tp, "x86dectop\nx86dectop\nx86dectop\nx86dectop\nx86decto"
+                          "p\nx86dectop\nx86dectop\nx86dectop\n")
+INSTR_TEST8(x86settm_tp, "x86settm\nx86settm\nx86settm\nx86settm\nx86settm\nx86"
+                         "settm\nx86settm\nx86settm\n")
+INSTR_TEST8(x86clrtm_tp, "x86clrtm\nx86clrtm\nx86clrtm\nx86clrtm\nx86clrtm\nx86"
+                         "clrtm\nx86clrtm\nx86clrtm\n")
+INSTR_TEST(armadd_w_1, "armadd.w $r12, $r12, 14\n", "r12", "r13")
+INSTR_TEST8(armadd_w_tp,
+            "armadd.w $r12, $r4, 14\narmadd.w $r13, $r5, 14\narmadd.w $r14, "
+            "$r6, 14\narmadd.w $r15, $r7, 14\narmadd.w $r16, $r8, 14\narmadd.w "
+            "$r17, $r9, 14\narmadd.w $r18, $r10, 14\narmadd.w $r19, $r11, 14\n")
+INSTR_TEST(armsub_w_1, "armsub.w $r12, $r12, 14\n", "r12", "r13")
+INSTR_TEST8(armsub_w_tp,
+            "armsub.w $r12, $r4, 14\narmsub.w $r13, $r5, 14\narmsub.w $r14, "
+            "$r6, 14\narmsub.w $r15, $r7, 14\narmsub.w $r16, $r8, 14\narmsub.w "
+            "$r17, $r9, 14\narmsub.w $r18, $r10, 14\narmsub.w $r19, $r11, 14\n")
+INSTR_TEST_SETUP(
+    armadc_w_0,
+    "addi.d $r12, $r0, -1\naddi.d $r13, $r0, 0\narmmtflag $r0, 0x1\n",
+    "armadc.w $r12, $r13, 14\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    armadc_w_1,
+    "addi.d $r12, $r0, -1\naddi.d $r13, $r0, 0\narmmtflag $r0, 0x1\n",
+    "armadc.w $r12, $r12, 14\n", "r12", "r13", "memory")
+INSTR_TEST8(armadc_w_tp,
+            "armadc.w $r12, $r4, 14\narmadc.w $r13, $r5, 14\narmadc.w $r14, "
+            "$r6, 14\narmadc.w $r15, $r7, 14\narmadc.w $r16, $r8, 14\narmadc.w "
+            "$r17, $r9, 14\narmadc.w $r18, $r10, 14\narmadc.w $r19, $r11, 14\n")
+INSTR_TEST_SETUP(
+    armsbc_w_0,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\narmmtflag $r0, 0x1\n",
+    "armsbc.w $r12, $r13, 14\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    armsbc_w_1,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\narmmtflag $r0, 0x1\n",
+    "armsbc.w $r12, $r12, 14\n", "r12", "r13", "memory")
+INSTR_TEST8(armsbc_w_tp,
+            "armsbc.w $r12, $r4, 14\narmsbc.w $r13, $r5, 14\narmsbc.w $r14, "
+            "$r6, 14\narmsbc.w $r15, $r7, 14\narmsbc.w $r16, $r8, 14\narmsbc.w "
+            "$r17, $r9, 14\narmsbc.w $r18, $r10, 14\narmsbc.w $r19, $r11, 14\n")
+INSTR_TEST(armmove_1, "armmove $r12, $r12, 14\n", "r12", "r13")
+INSTR_TEST8(armmove_tp,
+            "armmove $r12, $r4, 14\narmmove $r13, $r5, 14\narmmove $r14, $r6, "
+            "14\narmmove $r15, $r7, 14\narmmove $r16, $r8, 14\narmmove $r17, "
+            "$r9, 14\narmmove $r18, $r10, 14\narmmove $r19, $r11, 14\n",
+            "r12", "r13", "r14", "r15", "r16", "r17", "r18", "r19")
+INSTR_TEST8(armmfflag_tp,
+            "armmfflag $r12, 0x39\narmmfflag $r13, 0x39\narmmfflag $r14, "
+            "0x39\narmmfflag $r15, 0x39\narmmfflag $r16, 0x39\narmmfflag $r17, "
+            "0x39\narmmfflag $r18, 0x39\narmmfflag $r19, 0x39\n",
+            "r12", "r13", "r14", "r15", "r16", "r17", "r18", "r19")
+INSTR_TEST8(armmtflag_tp,
+            "armmtflag $r12, 0x39\narmmtflag $r13, 0x39\narmmtflag $r14, "
+            "0x39\narmmtflag $r15, 0x39\narmmtflag $r16, 0x39\narmmtflag $r17, "
+            "0x39\narmmtflag $r18, 0x39\narmmtflag $r19, 0x39\n")
+INSTR_TEST8(setarmj_tp,
+            "setarmj $r12, 14\nsetarmj $r13, 14\nsetarmj $r14, 14\nsetarmj "
+            "$r15, 14\nsetarmj $r16, 14\nsetarmj $r17, 14\nsetarmj $r18, "
+            "14\nsetarmj $r19, 14\n",
+            "r12", "r13", "r14", "r15", "r16", "r17", "r18", "r19")
+#endif /* MACHINE_HAS_LBT */

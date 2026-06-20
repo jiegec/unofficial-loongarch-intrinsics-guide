@@ -31,5 +31,8 @@
 
 #define MACHINE_HAS_LSX 1 /* all currently documented uarches have LSX */
 #define MACHINE_HAS_LASX (!UARCH_LA264) && (!UARCH_LA364E)
+#define MACHINE_HAS_LBT                                                        \
+  (UARCH_LA664 || UARCH_LA464 ||                                               \
+   UARCH_LA364E) /* LBT present on LA664/LA464/LA364E */
 
 #endif /* _COMMON_MACHINE_H_ */

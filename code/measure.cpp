@@ -68,11 +68,19 @@ int N = 50000;
   }
 #define INSTR_TEST8(NAME, INST, ...)                                           \
   INSTR_TEST(NAME, INST __VA_OPT__(, ) __VA_ARGS__)
+#define INSTR_TEST_SETUP(NAME, SETUP, INST, ...)                               \
+  void test_##NAME(int n) {                                                    \
+    asm volatile(SETUP : : : __VA_ARGS__);                                     \
+    for (int i = 0; i < n; i++) {                                              \
+      asm volatile(".align 4\n" THOUSAND(INST) : : : __VA_ARGS__);             \
+    }                                                                          \
+  }
 
 #include "measure.h"
 
 #undef INSTR_TEST
 #undef INSTR_TEST8
+#undef INSTR_TEST_SETUP
 
 struct InstrTest {
   const char *name;
@@ -85,12 +93,16 @@ struct InstrTest {
   InstrTest{.name = #NAME, .inst = #INST, .test = test_##NAME, .repeat = 1},
 #define INSTR_TEST8(NAME, INST, ...)                                           \
   InstrTest{.name = #NAME, .inst = #INST, .test = test_##NAME, .repeat = 8},
+#define INSTR_TEST_SETUP(NAME, SETUP, INST, ...)                               \
+  InstrTest{.name = #NAME, .inst = #INST, .test = test_##NAME, .repeat = 1},
 
 std::vector<InstrTest> tests = {
 #include "measure.h"
 };
 
 #undef INSTR_TEST
+#undef INSTR_TEST8
+#undef INSTR_TEST_SETUP
 
 struct InstrInfo {
   std::set<double> latency;
