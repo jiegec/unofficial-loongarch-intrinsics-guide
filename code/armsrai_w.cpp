@@ -6,11 +6,11 @@ uint64_t armsrai_w(eflags &ARMFLAGS, uint64_t a, int imm, int cond) {
   return dst;
 }
 
-#define ref_armsrai_w(eflags, a, imm, cond)                                   \
+#define ref_armsrai_w(eflags, a, imm, cond)                                    \
   ({                                                                           \
     uint16_t flags = eflags.raw;                                               \
     asm volatile(                                                              \
-        "x86mtflag %0, 0x3f\narmsrai.w %1, %2, %3\nx86mfflag %0, 0x3f"        \
+        "x86mtflag %0, 0x3f\narmsrai.w %1, %2, %3\nx86mfflag %0, 0x3f"         \
         : "+r"(flags)                                                          \
         : "r"(a), "n"(imm), "n"(cond)                                          \
         : "memory");                                                           \
