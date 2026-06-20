@@ -1701,14 +1701,8 @@ for vlen, prefix in [(128, "v"), (256, "xv")]:
                     )
                     print(f"}}", file=f)
 
-        dest_width = {
-            "s": "h",
-            "d": "s"
-        }[width]
-        dest_m = {
-            "s": "fp16",
-            "d": "fp32"
-        }[width]
+        dest_width = {"s": "h", "d": "s"}[width]
+        dest_m = {"s": "fp16", "d": "fp32"}[width]
         with open(f"{prefix}fcvt_{dest_width}_{width}.h", "w") as f:
             if prefix == "v":
                 print("int i;", file=f)
@@ -1751,14 +1745,8 @@ for vlen, prefix in [(128, "v"), (256, "xv")]:
                 )
                 print(f"}}", file=f)
 
-        src_width = {
-            "s": "h",
-            "d": "s"
-        }[width]
-        src_m = {
-            "s": "fp16",
-            "d": "fp32"
-        }[width]
+        src_width = {"s": "h", "d": "s"}[width]
+        src_m = {"s": "fp16", "d": "fp32"}[width]
         for half in ["h", "l"]:
             with open(f"{prefix}fcvt{half}_{width}_{src_width}.h", "w") as f:
                 if prefix == "v":
@@ -1971,8 +1959,8 @@ for file in glob.glob("*.h"):
         typedef unsigned __int128 u128;
         typedef float f32;
         typedef double f64;
-        """ +
-        "void test() {"
+        """
+        + "void test() {"
         + subprocess.check_output(
             ["cpp", "-"], stdin=open(file, "r", encoding="utf-8"), encoding="utf-8"
         )
@@ -1987,7 +1975,7 @@ for file in glob.glob("*.h"):
     output_content = orig
     # strip existing expanded code
     if "// Expands to:" in output_content:
-        output_content = output_content[:output_content.find("// Expands to:")]
+        output_content = output_content[: output_content.find("// Expands to:")]
     for item in parsed.ext[-1].body:
         if isinstance(item, pycparser.c_ast.For):
             # print("Got For", item)

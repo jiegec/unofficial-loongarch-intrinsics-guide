@@ -25,9 +25,13 @@ for ext in ["lsx", "lasx"]:
                 intrinsics = line.split(">")[1].split("<")[0]
                 arg_count = len(intrinsics.split(","))
                 if "__lsx_" in intrinsics:
-                    intr_name = intrinsics[intrinsics.find("__lsx_") + 6 :].split(" ")[0]
+                    intr_name = intrinsics[intrinsics.find("__lsx_") + 6 :].split(" ")[
+                        0
+                    ]
                 else:
-                    intr_name = intrinsics[intrinsics.find("__lasx_") + 7 :].split(" ")[0]
+                    intr_name = intrinsics[intrinsics.find("__lasx_") + 7 :].split(" ")[
+                        0
+                    ]
 
                 name = intr_name.replace("_", ".")
 
