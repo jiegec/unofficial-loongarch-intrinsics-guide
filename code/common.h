@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <random>
 
 typedef int8_t s8;
 typedef uint8_t u8;
@@ -23,6 +24,12 @@ typedef float f32;
 typedef double f64;
 
 #include "common-machine.h"
+
+uint64_t rand64() {
+  static std::random_device rd;
+  static std::mt19937_64 gen(rd());
+  return gen();
+}
 
 union eflags {
   struct {
@@ -468,7 +475,7 @@ void print(const char *s, int num) { printf("int %s: %d\n", s, num); }
 #define IFUZZ1(func, ...)                                                      \
   do {                                                                         \
     for (int i = 0; i < FUZZ_N; i++) {                                         \
-      uint64_t a = rand();                                                     \
+      uint64_t a = rand64();                                                   \
       eflags in_flags;                                                         \
       eflags flags1 = in_flags;                                                \
       uint64_t dst1 = func(flags1, a __VA_OPT__(, ) __VA_ARGS__);              \
@@ -488,7 +495,7 @@ void print(const char *s, int num) { printf("int %s: %d\n", s, num); }
 #define IFUZZ2(func, ...)                                                      \
   do {                                                                         \
     for (int i = 0; i < FUZZ_N; i++) {                                         \
-      uint64_t a = rand(), b = rand();                                         \
+      uint64_t a = rand64(), b = rand64();                                     \
       eflags in_flags;                                                         \
       eflags flags1 = in_flags;                                                \
       uint64_t dst1 = func(flags1, a, b __VA_OPT__(, ) __VA_ARGS__);           \
