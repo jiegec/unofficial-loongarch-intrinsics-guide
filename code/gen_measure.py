@@ -121,6 +121,13 @@ _LBT_LATENCY_STEMS = {
     "x86or",
     "x86xor",
     "x86mul",
+}
+# flag latency chain, need setup before the measured loop.
+_LBT_SETUP_LATENCY_STEMS = {
+    "x86adc",
+    "x86sbc",
+    "armadc",
+    "armsbc",
     "armadd",
     "armsub",
     "armand",
@@ -139,8 +146,6 @@ _LBT_LATENCY_STEMS = {
     "armmov",
     "armmove",
 }
-# flag latency chain, need setup before the measured loop.
-_LBT_SETUP_LATENCY_STEMS = {"x86adc", "x86sbc", "armadc", "armsbc"}
 
 _LBT_THROUGHPUT_STEMS = {
     "rotr",
@@ -483,7 +488,7 @@ with open("measure.h", "w") as f:
                     )
 
                     # Flag latency tests with one-time setup before the loop.
-                    if stem in _LBT_SETUP_LATENCY_STEMS and gpr_count == 2:
+                    if stem in _LBT_SETUP_LATENCY_STEMS:
                         flag_setup = (
                             "x86mtflag $r0, 0x1\\n"
                             if stem.startswith("x86")
@@ -493,7 +498,13 @@ with open("measure.h", "w") as f:
                             rj_setup = f"addi.d {_LAT}, $r0, -1\\n"
                         else:
                             rj_setup = f"addi.d {_LAT}, $r0, 0\\n"
-                        setup = f"{rj_setup}addi.d $r13, $r0, 0\\n{flag_setup}"
+                        # Set up GPRs and flags
+                        if gpr_count >= 2:
+                            setup = f"{rj_setup}addi.d $r13, $r0, 0\\n{flag_setup}"
+                            clob = '"r12", "r13", "memory"'
+                        else:
+                            setup = f"{rj_setup}{flag_setup}"
+                            clob = '"r12", "memory"'
                         asm = _lbt_emit_asm(
                             name,
                             stem,
@@ -506,23 +517,24 @@ with open("measure.h", "w") as f:
                             f"{safe_name}_0",
                             f'"{setup}"',
                             f'"{asm}\\n"',
-                            '"r12", "r13", "memory"',
+                            clob,
                         )
-                        # Also test both GPRs chained (_1: all=$r12)
-                        asm_all = _lbt_emit_asm(
-                            name,
-                            stem,
-                            lbt_parts,
-                            _lbt_lat_reg({0, 1}),
-                            lane=-1,
-                        )
-                        col.instr_test_setup(
-                            "lbt",
-                            f"{safe_name}_1",
-                            f'"{setup}"',
-                            f'"{asm_all}\\n"',
-                            '"r12", "r13", "memory"',
-                        )
+                        # Also test all GPRs chained (when >1 source GPR)
+                        if gpr_count >= 2:
+                            asm_all = _lbt_emit_asm(
+                                name,
+                                stem,
+                                lbt_parts,
+                                _lbt_lat_reg({0, 1}),
+                                lane=-1,
+                            )
+                            col.instr_test_setup(
+                                "lbt",
+                                f"{safe_name}_1",
+                                f'"{setup}"',
+                                f'"{asm_all}\\n"',
+                                clob,
+                            )
 
                     # Direct GPR RAW latency tests.
                     if stem in _LBT_LATENCY_STEMS:
