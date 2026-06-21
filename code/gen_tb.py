@@ -1,6 +1,9 @@
 import glob
+import os
 import subprocess
 from concurrent.futures import ThreadPoolExecutor
+
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 widths_signed = ["b", "h", "w", "d"]
 widths_unsigned = ["bu", "hu", "wu", "du"]
@@ -282,58 +285,189 @@ for width in ["b", "h", "w", "d"]:
 
 arm_tb_entries = [
     # --- two inputs + cond ---
-    ("armadd_w", "armadd.w", "uint64_t a, uint64_t b, int cond",
-     '"r"(a), "r"(b), "n"(cond)', 2, [0, 7, 14, 15]),
-    ("armadc_w", "armadc.w", "uint64_t a, uint64_t b, int cond",
-     '"r"(a), "r"(b), "n"(cond)', 2, [0, 7, 14, 15]),
-    ("armsub_w", "armsub.w", "uint64_t a, uint64_t b, int cond",
-     '"r"(a), "r"(b), "n"(cond)', 2, [0, 7, 14, 15]),
-    ("armsbc_w", "armsbc.w", "uint64_t a, uint64_t b, int cond",
-     '"r"(a), "r"(b), "n"(cond)', 2, [0, 7, 14, 15]),
-    ("armand_w", "armand.w", "uint64_t a, uint64_t b, int cond",
-     '"r"(a), "r"(b), "n"(cond)', 2, [0, 7, 14, 15]),
-    ("armor_w", "armor.w", "uint64_t a, uint64_t b, int cond",
-     '"r"(a), "r"(b), "n"(cond)', 2, [0, 7, 14, 15]),
-    ("armxor_w", "armxor.w", "uint64_t a, uint64_t b, int cond",
-     '"r"(a), "r"(b), "n"(cond)', 2, [0, 7, 14, 15]),
-    ("armrotr_w", "armrotr.w", "uint64_t a, uint64_t b, int cond",
-     '"r"(a), "r"(b), "n"(cond)', 2, [0, 7, 14, 15]),
-    ("armsll_w", "armsll.w", "uint64_t a, uint64_t b, int cond",
-     '"r"(a), "r"(b), "n"(cond)', 2, [0, 7, 14, 15]),
-    ("armsra_w", "armsra.w", "uint64_t a, uint64_t b, int cond",
-     '"r"(a), "r"(b), "n"(cond)', 2, [0, 7, 14, 15]),
-    ("armsrl_w", "armsrl.w", "uint64_t a, uint64_t b, int cond",
-     '"r"(a), "r"(b), "n"(cond)', 2, [0, 7, 14, 15]),
+    (
+        "armadd_w",
+        "armadd.w",
+        "uint64_t a, uint64_t b, int cond",
+        '"r"(a), "r"(b), "n"(cond)',
+        2,
+        [0, 7, 14, 15],
+    ),
+    (
+        "armadc_w",
+        "armadc.w",
+        "uint64_t a, uint64_t b, int cond",
+        '"r"(a), "r"(b), "n"(cond)',
+        2,
+        [0, 7, 14, 15],
+    ),
+    (
+        "armsub_w",
+        "armsub.w",
+        "uint64_t a, uint64_t b, int cond",
+        '"r"(a), "r"(b), "n"(cond)',
+        2,
+        [0, 7, 14, 15],
+    ),
+    (
+        "armsbc_w",
+        "armsbc.w",
+        "uint64_t a, uint64_t b, int cond",
+        '"r"(a), "r"(b), "n"(cond)',
+        2,
+        [0, 7, 14, 15],
+    ),
+    (
+        "armand_w",
+        "armand.w",
+        "uint64_t a, uint64_t b, int cond",
+        '"r"(a), "r"(b), "n"(cond)',
+        2,
+        [0, 7, 14, 15],
+    ),
+    (
+        "armor_w",
+        "armor.w",
+        "uint64_t a, uint64_t b, int cond",
+        '"r"(a), "r"(b), "n"(cond)',
+        2,
+        [0, 7, 14, 15],
+    ),
+    (
+        "armxor_w",
+        "armxor.w",
+        "uint64_t a, uint64_t b, int cond",
+        '"r"(a), "r"(b), "n"(cond)',
+        2,
+        [0, 7, 14, 15],
+    ),
+    (
+        "armrotr_w",
+        "armrotr.w",
+        "uint64_t a, uint64_t b, int cond",
+        '"r"(a), "r"(b), "n"(cond)',
+        2,
+        [0, 7, 14, 15],
+    ),
+    (
+        "armsll_w",
+        "armsll.w",
+        "uint64_t a, uint64_t b, int cond",
+        '"r"(a), "r"(b), "n"(cond)',
+        2,
+        [0, 7, 14, 15],
+    ),
+    (
+        "armsra_w",
+        "armsra.w",
+        "uint64_t a, uint64_t b, int cond",
+        '"r"(a), "r"(b), "n"(cond)',
+        2,
+        [0, 7, 14, 15],
+    ),
+    (
+        "armsrl_w",
+        "armsrl.w",
+        "uint64_t a, uint64_t b, int cond",
+        '"r"(a), "r"(b), "n"(cond)',
+        2,
+        [0, 7, 14, 15],
+    ),
     # --- one input + cond ---
-    ("armmov_w", "armmov.w", "uint64_t a, int cond",
-     '"r"(a), "n"(cond)', 1, [0, 7, 14, 15]),
-    ("armmov_d", "armmov.d", "uint64_t a, int cond",
-     '"r"(a), "n"(cond)', 1, [0, 7, 14, 15]),
-    ("armnot_w", "armnot.w", "uint64_t a, int cond",
-     '"r"(a), "n"(cond)', 1, [0, 7, 14, 15]),
-    ("armrrx_w", "armrrx.w", "uint64_t a, int cond",
-     '"r"(a), "n"(cond)', 1, [0, 7, 14, 15]),
+    (
+        "armmov_w",
+        "armmov.w",
+        "uint64_t a, int cond",
+        '"r"(a), "n"(cond)',
+        1,
+        [0, 7, 14, 15],
+    ),
+    (
+        "armmov_d",
+        "armmov.d",
+        "uint64_t a, int cond",
+        '"r"(a), "n"(cond)',
+        1,
+        [0, 7, 14, 15],
+    ),
+    (
+        "armnot_w",
+        "armnot.w",
+        "uint64_t a, int cond",
+        '"r"(a), "n"(cond)',
+        1,
+        [0, 7, 14, 15],
+    ),
+    (
+        "armrrx_w",
+        "armrrx.w",
+        "uint64_t a, int cond",
+        '"r"(a), "n"(cond)',
+        1,
+        [0, 7, 14, 15],
+    ),
     # --- one input + imm + cond ---
-    ("armrotri_w", "armrotri.w", "uint64_t a, int imm, int cond",
-     '"r"(a), "n"(imm), "n"(cond)', 1,
-     [(0, 7), (0, 7), (15, 14), (15, 15), (31, 15), (31, 15)]),
-    ("armslli_w", "armslli.w", "uint64_t a, int imm, int cond",
-     '"r"(a), "n"(imm), "n"(cond)', 1,
-     [(0, 7), (0, 7), (15, 14), (15, 15), (31, 15), (31, 15)]),
-    ("armsrai_w", "armsrai.w", "uint64_t a, int imm, int cond",
-     '"r"(a), "n"(imm), "n"(cond)', 1,
-     [(0, 7), (0, 7), (15, 14), (15, 15), (31, 15), (31, 15)]),
-    ("armsrli_w", "armsrli.w", "uint64_t a, int imm, int cond",
-     '"r"(a), "n"(imm), "n"(cond)', 1,
-     [(0, 7), (0, 7), (15, 14), (15, 15), (31, 15), (31, 15)]),
+    (
+        "armrotri_w",
+        "armrotri.w",
+        "uint64_t a, int imm, int cond",
+        '"r"(a), "n"(imm), "n"(cond)',
+        1,
+        [(0, 7), (0, 7), (15, 14), (15, 15), (31, 15), (31, 15)],
+    ),
+    (
+        "armslli_w",
+        "armslli.w",
+        "uint64_t a, int imm, int cond",
+        '"r"(a), "n"(imm), "n"(cond)',
+        1,
+        [(0, 7), (0, 7), (15, 14), (15, 15), (31, 15), (31, 15)],
+    ),
+    (
+        "armsrai_w",
+        "armsrai.w",
+        "uint64_t a, int imm, int cond",
+        '"r"(a), "n"(imm), "n"(cond)',
+        1,
+        [(0, 7), (0, 7), (15, 14), (15, 15), (31, 15), (31, 15)],
+    ),
+    (
+        "armsrli_w",
+        "armsrli.w",
+        "uint64_t a, int imm, int cond",
+        '"r"(a), "n"(imm), "n"(cond)',
+        1,
+        [(0, 7), (0, 7), (15, 14), (15, 15), (31, 15), (31, 15)],
+    ),
     # --- special: flag transfer ---
-    ("armmfflag", "armmfflag", "uint64_t mask",
-     '"n"(mask)', 0, [0, 7, 14, 15, 0x3f], "mfflag"),
-    ("armmtflag", "armmtflag", "uint64_t a, uint64_t mask",
-     '"r"(a), "n"(mask)', 1, [0, 7, 14, 15, 0x3f], "mtflag"),
+    (
+        "armmfflag",
+        "armmfflag",
+        "uint64_t mask",
+        '"n"(mask)',
+        0,
+        [0, 7, 14, 15, 63],
+        "mfflag",
+    ),
+    (
+        "armmtflag",
+        "armmtflag",
+        "uint64_t a, uint64_t mask",
+        '"r"(a), "n"(mask)',
+        1,
+        [0, 7, 14, 15, 63],
+        "mtflag",
+    ),
     # --- special: move (dst is in/out) ---
-    ("armmove", "armmove", "uint64_t dst, uint64_t a, int cond",
-     '"r"(a), "n"(cond)', 2, [0, 7, 14, 15], "move"),
+    (
+        "armmove",
+        "armmove",
+        "uint64_t dst, uint64_t a, int cond",
+        '"r"(a), "n"(cond)',
+        2,
+        [0, 7, 14, 15],
+        "move",
+    ),
 ]
 
 for entry in arm_tb_entries:
@@ -376,7 +510,7 @@ for entry in arm_tb_entries:
                 file=f,
             )
             print(f'                  : "+r"(flags), "=r"(dst) \\', file=f)
-            print(f'                  : {asm_inputs} \\', file=f)
+            print(f"                  : {asm_inputs} \\", file=f)
             print(f'                  : "memory"); \\', file=f)
             print(f"     eflags.raw = flags; \\", file=f)
             print(f"     dst; }})", file=f)
@@ -389,7 +523,7 @@ for entry in arm_tb_entries:
                 file=f,
             )
             print(f'                  : "+r"(flags) \\', file=f)
-            print(f'                  : {asm_inputs} \\', file=f)
+            print(f"                  : {asm_inputs} \\", file=f)
             print(f'                  : "memory"); \\', file=f)
             print(f"     eflags.raw = flags; \\", file=f)
             print(f"     dst; }})", file=f)
@@ -402,7 +536,7 @@ for entry in arm_tb_entries:
                 file=f,
             )
             print(f'                  : "+r"(flags), "+r"(temp_dst) \\', file=f)
-            print(f'                  : {asm_inputs} \\', file=f)
+            print(f"                  : {asm_inputs} \\", file=f)
             print(f'                  : "memory"); \\', file=f)
             print(f"     eflags.raw = flags; \\", file=f)
             print(f"     temp_dst; }})", file=f)
@@ -419,7 +553,7 @@ for entry in arm_tb_entries:
                     file=f,
                 )
                 print(f'                  : "+r"(flags) \\', file=f)
-                print(f'                  : {asm_inputs} \\', file=f)
+                print(f"                  : {asm_inputs} \\", file=f)
                 print(f'                  : "memory"); \\', file=f)
                 print(f"     eflags.raw = flags; \\", file=f)
                 print(f"     0; }})", file=f)
@@ -431,7 +565,7 @@ for entry in arm_tb_entries:
                     file=f,
                 )
                 print(f'                  : "+r"(flags) \\', file=f)
-                print(f'                  : {asm_inputs} \\', file=f)
+                print(f"                  : {asm_inputs} \\", file=f)
                 print(f'                  : "memory"); \\', file=f)
                 print(f"     eflags.raw = flags; \\", file=f)
                 print(f"     0; }})", file=f)
@@ -443,7 +577,7 @@ for entry in arm_tb_entries:
                     file=f,
                 )
                 print(f'                  : "+r"(flags) \\', file=f)
-                print(f'                  : {asm_inputs} \\', file=f)
+                print(f"                  : {asm_inputs} \\", file=f)
                 print(f'                  : "memory"); \\', file=f)
                 print(f"     eflags.raw = flags; \\", file=f)
                 print(f"     0; }})", file=f)
@@ -465,6 +599,135 @@ for entry in arm_tb_entries:
         print("}", file=f)
         print("", file=f)
 
+# Scalar x86 instructions (GPR, not SIMD)
+x86_two_input = {
+    "add": ["b", "h", "w", "d", "wu", "du"],
+    "adc": ["b", "h", "w", "d"],
+    "and": ["b", "h", "w", "d"],
+    "mul": ["b", "bu", "h", "hu", "w", "wu", "d", "du"],
+}
+for base, suffixes in x86_two_input.items():
+    for suffix in suffixes:
+        inst_name = f"x86{base}_{suffix}"
+        print(f"Saving {inst_name}.cpp")
+        with open(f"{inst_name}.cpp", "w") as f:
+            print('#include "common.h"', file=f)
+            print("", file=f)
+            print(
+                f"uint64_t {inst_name}(eflags &EFLAGS, uint64_t a, uint64_t b) {{",
+                file=f,
+            )
+            print(f"  uint64_t dst = 0;", file=f)
+            print(f'#include "{inst_name}.h"', file=f)
+            print(f"  return dst;", file=f)
+            print("}", file=f)
+            print("", file=f)
+            print(f"#define ref_{inst_name}(eflags, a, b) \\", file=f)
+            print(f"  ({{uint16_t flags = eflags.raw; \\", file=f)
+            print(
+                f'     asm volatile("x86mtflag %0, 0x3f\\nx86{base}.{suffix} %1, %2\\nx86mfflag %0, 0x3f" \\',
+                file=f,
+            )
+            print(f'                  : "+r"(flags) \\', file=f)
+            print(f'                  : "r"(a), "r"(b) \\', file=f)
+            print(f'                  : "memory"); \\', file=f)
+            print(f"     eflags.raw = flags; \\", file=f)
+            print(f"     0; }})", file=f)
+            print("", file=f)
+            print(f"void test() {{", file=f)
+            for _ in range(4):
+                print(f"  IFUZZ2({inst_name});", file=f)
+            print("}", file=f)
+            print("", file=f)
+
+x86_one_input = {
+    "dec": ["b", "h", "w", "d"],
+    "inc": ["b", "h", "w", "d"],
+}
+for base, suffixes in x86_one_input.items():
+    for suffix in suffixes:
+        inst_name = f"x86{base}_{suffix}"
+        print(f"Saving {inst_name}.cpp")
+        with open(f"{inst_name}.cpp", "w") as f:
+            print('#include "common.h"', file=f)
+            print("", file=f)
+            print(
+                f"uint64_t {inst_name}(eflags &EFLAGS, uint64_t a) {{",
+                file=f,
+            )
+            print(f"  uint64_t dst = 0;", file=f)
+            print(f'#include "{inst_name}.h"', file=f)
+            print(f"  return dst;", file=f)
+            print("}", file=f)
+            print("", file=f)
+            print(f"#define ref_{inst_name}(eflags, a) \\", file=f)
+            print(f"  ({{uint16_t flags = eflags.raw; \\", file=f)
+            print(f"    uint64_t dst = 0; \\", file=f)
+            print(
+                f'     asm volatile("x86mtflag %0, 0x3f\\nx86{base}.{suffix} %1\\nx86mfflag %0, 0x3f" \\',
+                file=f,
+            )
+            print(f'                  : "+r"(flags) \\', file=f)
+            print(f'                  : "r"(a) \\', file=f)
+            print(f'                  : "memory"); \\', file=f)
+            print(f"     eflags.raw = flags; \\", file=f)
+            print(f"     dst; }})", file=f)
+            print("", file=f)
+            print(f"void test() {{", file=f)
+            for _ in range(6):
+                print(f"  IFUZZ1({inst_name});", file=f)
+            print("}", file=f)
+            print("", file=f)
+
+# Scalar x86 mfflag/mtflag
+for inst_name, mnemonic, asm_outputs, ref_params, extra_args, fuzz_level in [
+    ("x86mfflag", "x86mfflag", '"+r"(flags), "=r"(dst)', "mask", [0, 7, 14, 15, 63], 0),
+    ("x86mtflag", "x86mtflag", '"+r"(flags)', "a, mask", [0, 7, 14, 15, 63], 1),
+]:
+    print(f"Saving {inst_name}.cpp")
+    with open(f"{inst_name}.cpp", "w") as f:
+        print('#include "common.h"', file=f)
+        print("", file=f)
+        if fuzz_level == 0:
+            print(
+                f"uint64_t {inst_name}(eflags &EFLAGS, uint64_t mask) {{",
+                file=f,
+            )
+        else:
+            print(
+                f"uint64_t {inst_name}(eflags &EFLAGS, uint64_t a, uint64_t mask) {{",
+                file=f,
+            )
+        print(f"  uint64_t dst = 0;", file=f)
+        print(f'#include "{inst_name}.h"', file=f)
+        print(f"  return dst;", file=f)
+        print("}", file=f)
+        print("", file=f)
+        print(f"#define ref_{inst_name}(eflags, {ref_params}) \\", file=f)
+        print(f"  ({{uint16_t flags = eflags.raw; \\", file=f)
+        print(f"    uint64_t dst = 0; \\", file=f)
+        print(
+            f'     asm volatile("x86mtflag %0, 0x3f\\n{mnemonic} %1, %2\\nx86mfflag %0, 0x3f" \\',
+            file=f,
+        )
+        print(f"                  : {asm_outputs} \\", file=f)
+        if fuzz_level == 0:
+            print(f'                  : "n"(mask) \\', file=f)
+        else:
+            print(f'                  : "r"(a), "n"(mask) \\', file=f)
+        print(f'                  : "memory"); \\', file=f)
+        print(f"     eflags.raw = flags; \\", file=f)
+        print(f"     dst; }})", file=f)
+        print("", file=f)
+        print(f"void test() {{", file=f)
+        for val in extra_args:
+            if fuzz_level == 0:
+                print(f"  IFUZZ0({inst_name}, {val});", file=f)
+            else:
+                print(f"  IFUZZ1({inst_name}, {val});", file=f)
+        print("}", file=f)
+        print("", file=f)
+
 # Scalar addu12i instructions (GPR, not SIMD)
 for width_name in ["d", "w"]:
     inst_name = f"addu12i_{width_name}"
@@ -482,7 +745,7 @@ for width_name in ["d", "w"]:
         print(f"  ({{uint64_t _result; \\", file=f)
         print(f'     asm volatile("addu12i.{width_name} %0, %1, %2" \\', file=f)
         print(
-            f'                  : "=r"(_result) : "r"(a), "n"((((imm) & 0x1f) ^ 16) - 16) \\',
+            f'                  : "=r"(_result) : "r"(a), "n"(imm) \\',
             file=f,
         )
         print(f'                  : "memory"); \\', file=f)
@@ -491,7 +754,7 @@ for width_name in ["d", "w"]:
         print(f"void test() {{", file=f)
         print(f"  IFUZZ1({inst_name}, 0);", file=f)
         print(f"  IFUZZ1({inst_name}, 1);", file=f)
-        print(f"  IFUZZ1({inst_name}, 31);", file=f)
+        print(f"  IFUZZ1({inst_name}, 15);", file=f)
         print("}", file=f)
         print("", file=f)
 

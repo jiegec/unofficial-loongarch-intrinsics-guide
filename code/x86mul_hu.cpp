@@ -6,10 +6,10 @@ uint64_t x86mul_hu(eflags &EFLAGS, uint64_t a, uint64_t b) {
   return dst;
 }
 
-#define ref_x86mul_hu(eflags, a, b)                                             \
+#define ref_x86mul_hu(eflags, a, b)                                            \
   ({                                                                           \
     uint16_t flags = eflags.raw;                                               \
-    asm volatile("x86mtflag %0, 0x3f\nx86mul.hu %1, %2\nx86mfflag %0, 0x3f"     \
+    asm volatile("x86mtflag %0, 0x3f\nx86mul.hu %1, %2\nx86mfflag %0, 0x3f"    \
                  : "+r"(flags)                                                 \
                  : "r"(a), "r"(b)                                              \
                  : "memory");                                                  \

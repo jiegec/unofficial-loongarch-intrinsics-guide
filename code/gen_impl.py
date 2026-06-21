@@ -1,8 +1,11 @@
 import glob
+import os
 import pycparser
 import subprocess
 from concurrent.futures import ThreadPoolExecutor
 from pycparser import c_generator
+
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 widths = {
     "b": 8,
@@ -2068,6 +2071,184 @@ if (mask & (1 << 5))
   ARMFLAGS.V = (v >> 28) & 1;""",
 }
 for inst_name, body in arm_insts.items():
+    with open(f"{inst_name}.h", "w") as f:
+        f.write(body)
+        f.write("\n")
+
+# Scalar x86 instructions (GPR, not SIMD)
+x86_w = {
+    "b": (8, "uint8_t", "int8_t", "UINT8_MAX", "INT8_MIN", "INT8_MAX", "0x80"),
+    "h": (16, "uint16_t", "int16_t", "UINT16_MAX", "INT16_MIN", "INT16_MAX", "0x8000"),
+    "w": (
+        32,
+        "uint32_t",
+        "int32_t",
+        "UINT32_MAX",
+        "INT32_MIN",
+        "INT32_MAX",
+        "0x80000000",
+    ),
+    "d": (
+        64,
+        "uint64_t",
+        "int64_t",
+        "UINT64_MAX",
+        "INT64_MIN",
+        "INT64_MAX",
+        "0x8000000000000000ULL",
+    ),
+}
+
+for width, (bits, utype, stype, umax, smin, smax, msb) in x86_w.items():
+    for base, cf_line_d, cf_line_rest in [
+        (
+            "add",
+            "EFLAGS.CF = lhs > UINT64_MAX - rhs;",
+            "EFLAGS.CF = (uint64_t)lhs + (uint64_t)rhs > %s;",
+        ),
+        (
+            "adc",
+            "EFLAGS.CF = lhs > UINT64_MAX - rhs - carry_in;",
+            "EFLAGS.CF = (uint64_t)lhs + rhs + carry_in > %s;",
+        ),
+    ]:
+        with open(f"x86{base}_{width}.h", "w") as f:
+            print(f"{utype} lhs = ({utype})a;", file=f)
+            print(f"{utype} rhs = ({utype})b;", file=f)
+            if base == "adc":
+                print(f"uint8_t carry_in = EFLAGS.CF;", file=f)
+            print(
+                f"{utype} result = lhs + rhs{ ' + carry_in' if base == 'adc' else ''};",
+                file=f,
+            )
+            if width == "d":
+                print(cf_line_d, file=f)
+            else:
+                print((cf_line_rest % umax), file=f)
+            print(f"EFLAGS.AF = ((lhs ^ rhs ^ result) & 0x10) != 0;", file=f)
+            print(
+                f"EFLAGS.OF = ((~(lhs ^ rhs)) & (lhs ^ result) & {msb}) != 0;", file=f
+            )
+            print(f"EFLAGS.PF = parity_even((uint8_t)result);", file=f)
+            print(f"EFLAGS.ZF = result == 0;", file=f)
+            print(f"EFLAGS.SF = ({stype})result < 0;", file=f)
+
+    # x86add_wu/du (unsigned add, OF=0)
+    if width in ("w", "d"):
+        with open(f"x86add_{width}u.h", "w") as f:
+            print(f"{utype} lhs = ({utype})a;", file=f)
+            print(f"{utype} rhs = ({utype})b;", file=f)
+            print(f"{utype} result = lhs + rhs;", file=f)
+            if width == "d":
+                print("EFLAGS.CF = lhs > UINT64_MAX - rhs;", file=f)
+            else:
+                print(f"EFLAGS.CF = (uint64_t)lhs + (uint64_t)rhs > {umax};", file=f)
+            print(f"EFLAGS.AF = ((lhs ^ rhs ^ result) & 0x10) != 0;", file=f)
+            print(f"EFLAGS.OF = 0;", file=f)
+            print(f"EFLAGS.PF = parity_even((uint8_t)result);", file=f)
+            print(f"EFLAGS.ZF = result == 0;", file=f)
+            print(f"EFLAGS.SF = ({stype})result < 0;", file=f)
+
+    # x86and
+    with open(f"x86and_{width}.h", "w") as f:
+        print(f"{utype} lhs = ({utype})a;", file=f)
+        print(f"{utype} rhs = ({utype})b;", file=f)
+        print(f"{utype} result = lhs & rhs;", file=f)
+        print(f"EFLAGS.CF = 0;", file=f)
+        print(f"EFLAGS.OF = 0;", file=f)
+        print(f"EFLAGS.AF = 0;", file=f)
+        print(f"EFLAGS.PF = parity_even((uint8_t)result);", file=f)
+        print(f"EFLAGS.ZF = result == 0;", file=f)
+        print(f"EFLAGS.SF = ({stype})result < 0;", file=f)
+
+    # x86dec
+    with open(f"x86dec_{width}.h", "w") as f:
+        print(f"{utype} v = ({utype})a;", file=f)
+        print(f"{utype} r = v - 1;", file=f)
+        print(f"// CF preserved from input EFLAGS.CF", file=f)
+        print(f"EFLAGS.PF = parity_even((uint8_t)r);", file=f)
+        print(f"EFLAGS.AF = ((v ^ 1 ^ r) & 0x10) != 0;", file=f)
+        print(f"EFLAGS.ZF = r == 0;", file=f)
+        print(f"EFLAGS.SF = ({stype})r < 0;", file=f)
+        print(f"EFLAGS.OF = v == ({utype}){smin};", file=f)
+
+    # x86inc
+    with open(f"x86inc_{width}.h", "w") as f:
+        print(f"{utype} v = ({utype})a;", file=f)
+        print(f"{utype} r = v + 1;", file=f)
+        print(f"// CF preserved from input EFLAGS.CF", file=f)
+        print(f"EFLAGS.PF = parity_even((uint8_t)r);", file=f)
+        print(f"EFLAGS.AF = ((v ^ 1 ^ r) & 0x10) != 0;", file=f)
+        print(f"EFLAGS.ZF = r == 0;", file=f)
+        print(f"EFLAGS.SF = ({stype})r < 0;", file=f)
+        print(f"EFLAGS.OF = v == ({utype}){smax};", file=f)
+
+    # x86mul (signed)
+    with open(f"x86mul_{width}.h", "w") as f:
+        print(f"{utype} lhs = ({utype})a;", file=f)
+        print(f"{utype} rhs = ({utype})b;", file=f)
+        print(
+            f"__int128 product = (__int128)({stype})lhs * (__int128)({stype})rhs;",
+            file=f,
+        )
+        print(
+            f"bool overflow = product < (__int128){smin} || product > (__int128){smax};",
+            file=f,
+        )
+        print(f"EFLAGS.CF = overflow;", file=f)
+        print(f"EFLAGS.OF = overflow;", file=f)
+        print(f"EFLAGS.SF = 0;", file=f)
+        print(f"EFLAGS.ZF = 0;", file=f)
+        print(f"EFLAGS.AF = 0;", file=f)
+        print(f"EFLAGS.PF = 0;", file=f)
+
+    # x86mul_{width}u (unsigned)
+    with open(f"x86mul_{width}u.h", "w") as f:
+        print(f"{utype} lhs = ({utype})a;", file=f)
+        print(f"{utype} rhs = ({utype})b;", file=f)
+        print(f"unsigned __int128 product =", file=f)
+        print(
+            f"    (unsigned __int128)({utype})lhs * (unsigned __int128)({utype})rhs;",
+            file=f,
+        )
+        print(f"bool overflow = (product >> {bits}) != 0;", file=f)
+        print(f"EFLAGS.CF = overflow;", file=f)
+        print(f"EFLAGS.OF = overflow;", file=f)
+        print(f"EFLAGS.SF = 0;", file=f)
+        print(f"EFLAGS.ZF = 0;", file=f)
+        print(f"EFLAGS.AF = 0;", file=f)
+        print(f"EFLAGS.PF = 0;", file=f)
+
+# Scalar x86 mfflag/mtflag (GPR, not SIMD)
+x86_insts_special = {
+    "x86mfflag": """dst = 0;
+if (mask & (1 << 0))
+  dst |= (uint64_t)EFLAGS.CF << 0;
+if (mask & (1 << 1))
+  dst |= (uint64_t)EFLAGS.PF << 2;
+if (mask & (1 << 2))
+  dst |= (uint64_t)EFLAGS.AF << 4;
+if (mask & (1 << 3))
+  dst |= (uint64_t)EFLAGS.ZF << 6;
+if (mask & (1 << 4))
+  dst |= (uint64_t)EFLAGS.SF << 7;
+if (mask & (1 << 5))
+  dst |= (uint64_t)EFLAGS.OF << 11;""",
+    "x86mtflag": """uint64_t v = a;
+if (mask & (1 << 0))
+  EFLAGS.CF = (v >> 0) & 1;
+if (mask & (1 << 1))
+  EFLAGS.PF = (v >> 2) & 1;
+if (mask & (1 << 2))
+  EFLAGS.AF = (v >> 4) & 1;
+if (mask & (1 << 3))
+  EFLAGS.ZF = (v >> 6) & 1;
+if (mask & (1 << 4))
+  EFLAGS.SF = (v >> 7) & 1;
+if (mask & (1 << 5))
+  EFLAGS.OF = (v >> 11) & 1;""",
+}
+for inst_name, body in x86_insts_special.items():
     with open(f"{inst_name}.h", "w") as f:
         f.write(body)
         f.write("\n")
