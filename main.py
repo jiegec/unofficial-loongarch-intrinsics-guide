@@ -2404,7 +2404,7 @@ static inline {ret} {name} ({args}) {{
         return instruction(
             intrinsic=f"setx86loope",
             instr=f"setx86loope rd, rj",
-            desc=f"x86-style loop while equal: decrement the counter value in `rj`. Store 1 in `rd` if the decremented counter is non-zero and ZF (in EFLAGS) is set, 0 otherwise.",
+            desc=f"x86-style loop while equal: the value in `rj` is the counter after decrement. Store 1 in `rd` if the counter is non-zero and ZF (in EFLAGS) is set, 0 otherwise.",
         )
 
     @env.macro
@@ -2412,7 +2412,7 @@ static inline {ret} {name} ({args}) {{
         return instruction(
             intrinsic=f"setx86loopne",
             instr=f"setx86loopne rd, rj",
-            desc=f"x86-style loop while not equal: decrement the counter value in `rj`. Store 1 in `rd` if the decremented counter is non-zero and ZF (in EFLAGS) is clear, 0 otherwise.",
+            desc=f"x86-style loop while not equal: the value in `rj` is the counter after decrement. Store 1 in `rd` if the counter is non-zero and ZF (in EFLAGS) is clear, 0 otherwise.",
         )
 
     # ── ARM LBT helpers ───────────────────────────────────────────
