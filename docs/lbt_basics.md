@@ -60,6 +60,12 @@ EFLAGS bits are stored in the low 32 bits of LBT4:
 
 All flags set: `0x8d5`
 
+PF (Parity Flag) is set when the least significant byte of the result has an even number of 1 bits:
+
+```c
+bool PF = parity_even((uint8_t)result);
+```
+
 ## ARMFLAGS
 
 ARM condition flags (N, Z, C, V) are mapped to the corresponding x86 EFLAGS bits in LBT4:
