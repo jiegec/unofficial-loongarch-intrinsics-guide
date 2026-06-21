@@ -2199,6 +2199,20 @@ for width, (bits, utype, stype, umax, smin, smax, msb) in x86_w.items():
         print(f"    }}", file=f)
         print(f"}}", file=f)
 
+    # x86rcli (same as rcl but with immediate)
+    with open(f"x86rcli_{width}.h", "w") as f:
+        print(f"{utype} v = ({utype})a;", file=f)
+        print(f"unsigned c = (unsigned)imm;", file=f)
+        print(f"unsigned n = c{rcl_mod};", file=f)
+        print(f"if (n != 0) {{", file=f)
+        print(f"    unsigned carry_out = ((v >> ({bits} - n)) & 1);", file=f)
+        print(f"    EFLAGS.CF = carry_out;", file=f)
+        print(f"    if (c == 1) {{", file=f)
+        print(f"        {utype} r = ({utype})(v << 1);", file=f)
+        print(f"        EFLAGS.OF = ((r & {msb}) != 0) != carry_out;", file=f)
+        print(f"    }}", file=f)
+        print(f"}}", file=f)
+
     # x86mul (signed)
     with open(f"x86mul_{width}.h", "w") as f:
         print(f"{utype} lhs = ({utype})a;", file=f)

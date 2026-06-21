@@ -681,6 +681,41 @@ for base, suffixes in x86_one_input.items():
             print("}", file=f)
             print("", file=f)
 
+# Scalar x86 rcli (a, imm)
+for base, suffixes in [("rcli", ["b", "h", "w", "d"])]:
+    for suffix in suffixes:
+        inst_name = f"x86{base}_{suffix}"
+        print(f"Saving {inst_name}.cpp")
+        with open(f"{inst_name}.cpp", "w") as f:
+            print('#include "common.h"', file=f)
+            print("", file=f)
+            print(
+                f"uint64_t {inst_name}(eflags &EFLAGS, uint64_t a, int imm) {{",
+                file=f,
+            )
+            print(f"  uint64_t dst = 0;", file=f)
+            print(f'#include "{inst_name}.h"', file=f)
+            print(f"  return dst;", file=f)
+            print("}", file=f)
+            print("", file=f)
+            print(f"#define ref_{inst_name}(eflags, a, imm) \\", file=f)
+            print(f"  ({{uint16_t flags = eflags.raw; \\", file=f)
+            print(
+                f'     asm volatile("x86mtflag %0, 0x3f\\nx86{base}.{suffix} %1, %2\\nx86mfflag %0, 0x3f" \\',
+                file=f,
+            )
+            print(f'                  : "+r"(flags) \\', file=f)
+            print(f'                  : "r"(a), "n"(imm) \\', file=f)
+            print(f'                  : "memory"); \\', file=f)
+            print(f"     eflags.raw = flags; \\", file=f)
+            print(f"     0; }})", file=f)
+            print("", file=f)
+            print(f"void test() {{", file=f)
+            for imm_val in [0, 1, 7, 31]:
+                print(f"  IFUZZ1({inst_name}, {imm_val});", file=f)
+            print("}", file=f)
+            print("", file=f)
+
 # Scalar x86 mfflag/mtflag
 for inst_name, mnemonic, asm_outputs, ref_params, extra_args, fuzz_level in [
     ("x86mfflag", "x86mfflag", '"+r"(flags), "=r"(dst)', "mask", [0, 7, 14, 15, 63], 0),
