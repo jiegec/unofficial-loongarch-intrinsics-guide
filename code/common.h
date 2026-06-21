@@ -384,6 +384,8 @@ void print(const char *s, __m256d num) {
 }
 
 void print(const char *s, int num) { printf("int %s: %d\n", s, num); }
+void print(const char *s, unsigned int num) { printf("int %s: %d\n", s, num); }
+void print(const char *s, long int num) { printf("int %s: %d\n", s, num); }
 
 void print(const char *s, uint64_t num) {
   printf("uint64_t %s: %ld 0x%016lx\n", s, num, num);

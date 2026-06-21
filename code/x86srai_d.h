@@ -1,7 +1,7 @@
 uint64_t v = (uint64_t)a;
 unsigned c = (unsigned)imm;
 if (c != 0) {
-  uint8_t carry_out = c > 64 ? 0 : ((v >> (c - 1)) & 1);
+  uint8_t carry_out = c > 64 ? ((int64_t)v < 0) : ((v >> (c - 1)) & 1);
   uint64_t r = c >= 64 ? (uint64_t)((int64_t)v >> (64 - 1))
                        : (uint64_t)((int64_t)v >> c);
   EFLAGS.CF = carry_out;

@@ -1,7 +1,7 @@
 uint16_t v = (uint16_t)a;
 unsigned c = (unsigned)imm;
 if (c != 0) {
-  uint8_t carry_out = c > 16 ? 0 : ((v >> (c - 1)) & 1);
+  uint8_t carry_out = c > 16 ? ((int16_t)v < 0) : ((v >> (c - 1)) & 1);
   uint16_t r = c >= 16 ? (uint16_t)((int16_t)v >> (16 - 1))
                        : (uint16_t)((int16_t)v >> c);
   EFLAGS.CF = carry_out;

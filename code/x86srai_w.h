@@ -1,7 +1,7 @@
 uint32_t v = (uint32_t)a;
 unsigned c = (unsigned)imm;
 if (c != 0) {
-  uint8_t carry_out = c > 32 ? 0 : ((v >> (c - 1)) & 1);
+  uint8_t carry_out = c > 32 ? ((int32_t)v < 0) : ((v >> (c - 1)) & 1);
   uint32_t r = c >= 32 ? (uint32_t)((int32_t)v >> (32 - 1))
                        : (uint32_t)((int32_t)v >> c);
   EFLAGS.CF = carry_out;
