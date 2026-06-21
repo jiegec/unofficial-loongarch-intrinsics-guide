@@ -2612,6 +2612,16 @@ static inline {ret} {name} ({args}) {{
             "Move to ARMFLAGS: write selected ARM flags (N, Z, C, V) in ARMFLAGS from the corresponding bit positions in `rd`, as determined by `mask`.")
 
     @env.macro
+    def lbt_jiscr0():
+        return instruction("jiscr0", "jiscr0 imm",
+            "Jump via scratch register 0: add `imm` to the value in SCR[0] and jump to the resulting address.")
+
+    @env.macro
+    def lbt_jiscr1():
+        return instruction("jiscr1", "jiscr1 imm",
+            "Jump via scratch register 1: save the current PC to SCR[0], then add `imm` to the value in SCR[1] and jump to the resulting address.")
+
+    @env.macro
     def all_intrinsics(render=True):
         result = []
         for file in glob.glob("docs/*/*.md"):
