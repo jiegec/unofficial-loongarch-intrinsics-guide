@@ -2421,92 +2421,92 @@ static inline {ret} {name} ({args}) {{
 
     @env.macro
     def lbt_armadd():
-        return _arm_inst("armadd.w", "armadd.w rj, rk",
+        return _arm_inst("armadd.w", "armadd.w rj, rk, cond",
             "ARM-style add (32-bit): conditionally add values in `rj` and `rk`. Update ARMFLAGS (C, V, N, Z). Only ARMFLAGS (LBT4) is updated; the GPR is not modified.")
 
     @env.macro
     def lbt_armsub():
-        return _arm_inst("armsub.w", "armsub.w rj, rk",
+        return _arm_inst("armsub.w", "armsub.w rj, rk, cond",
             "ARM-style subtract (32-bit): conditionally subtract value in `rk` from `rj`. Update ARMFLAGS (C, V, N, Z). Only ARMFLAGS (LBT4) is updated; the GPR is not modified.")
 
     @env.macro
     def lbt_armadc():
-        return _arm_inst("armadc.w", "armadc.w rj, rk",
+        return _arm_inst("armadc.w", "armadc.w rj, rk, cond",
             "ARM-style add with carry (32-bit): conditionally add values in `rj` and `rk` with carry (C in ARMFLAGS). Update ARMFLAGS (C, V, N, Z). Only ARMFLAGS (LBT4) is updated; the GPR is not modified.")
 
     @env.macro
     def lbt_armsbc():
-        return _arm_inst("armsbc.w", "armsbc.w rj, rk",
+        return _arm_inst("armsbc.w", "armsbc.w rj, rk, cond",
             "ARM-style subtract with borrow (32-bit): conditionally subtract value in `rk` from `rj` with borrow (C in ARMFLAGS). Update ARMFLAGS (C, V, N, Z). Only ARMFLAGS (LBT4) is updated; the GPR is not modified.")
 
     @env.macro
     def lbt_armand():
-        return _arm_inst("armand.w", "armand.w rj, rk",
+        return _arm_inst("armand.w", "armand.w rj, rk, cond",
             "ARM-style bitwise AND (32-bit): conditionally AND values in `rj` and `rk`. Update ARMFLAGS (N, Z). Only ARMFLAGS (LBT4) is updated; the GPR is not modified.")
 
     @env.macro
     def lbt_armor():
-        return _arm_inst("armor.w", "armor.w rj, rk",
+        return _arm_inst("armor.w", "armor.w rj, rk, cond",
             "ARM-style bitwise OR (32-bit): conditionally OR values in `rj` and `rk`. Update ARMFLAGS (N, Z). Only ARMFLAGS (LBT4) is updated; the GPR is not modified.")
 
     @env.macro
     def lbt_armxor():
-        return _arm_inst("armxor.w", "armxor.w rj, rk",
+        return _arm_inst("armxor.w", "armxor.w rj, rk, cond",
             "ARM-style bitwise XOR (32-bit): conditionally XOR values in `rj` and `rk`. Update ARMFLAGS (N, Z). Only ARMFLAGS (LBT4) is updated; the GPR is not modified.")
 
     @env.macro
     def lbt_armnot():
-        return _arm_inst("armnot.w", "armnot.w rj",
+        return _arm_inst("armnot.w", "armnot.w rj, cond",
             "ARM-style bitwise NOT (32-bit): conditionally bitwise NOT the value in `rj`. Update ARMFLAGS (N, Z). Only ARMFLAGS (LBT4) is updated; the GPR is not modified.")
 
     @env.macro
     def lbt_armsll():
-        return _arm_inst("armsll.w", "armsll.w rj, rk",
+        return _arm_inst("armsll.w", "armsll.w rj, rk, cond",
             "ARM-style logical shift left (32-bit): conditionally shift value in `rj` left by amount in `rk` (masked to 8 bits). Update ARMFLAGS (C, N, Z). Only ARMFLAGS (LBT4) is updated; the GPR is not modified.")
 
     @env.macro
     def lbt_armsrl():
-        return _arm_inst("armsrl.w", "armsrl.w rj, rk",
+        return _arm_inst("armsrl.w", "armsrl.w rj, rk, cond",
             "ARM-style logical shift right (32-bit): conditionally shift value in `rj` right logically by amount in `rk` (masked to 8 bits). Update ARMFLAGS (C, N, Z). Only ARMFLAGS (LBT4) is updated; the GPR is not modified.")
 
     @env.macro
     def lbt_armsra():
-        return _arm_inst("armsra.w", "armsra.w rj, rk",
+        return _arm_inst("armsra.w", "armsra.w rj, rk, cond",
             "ARM-style arithmetic shift right (32-bit): conditionally shift value in `rj` right arithmetically by amount in `rk` (masked to 8 bits). Update ARMFLAGS (C, N, Z). Only ARMFLAGS (LBT4) is updated; the GPR is not modified.")
 
     @env.macro
     def lbt_armrotr():
-        return _arm_inst("armrotr.w", "armrotr.w rj, rk",
+        return _arm_inst("armrotr.w", "armrotr.w rj, rk, cond",
             "ARM-style rotate right (32-bit): conditionally rotate value in `rj` right by amount in `rk` (masked to 8 bits, rotate modulo 32). Update ARMFLAGS (C, N, Z). Only ARMFLAGS (LBT4) is updated; the GPR is not modified.")
 
     @env.macro
     def lbt_armslli():
-        return _arm_inst("armslli.w", "armslli.w rj, imm",
+        return _arm_inst("armslli.w", "armslli.w rj, imm, cond",
             "ARM-style logical shift left immediate (32-bit): conditionally shift value in `rj` left by `imm`. Update ARMFLAGS (C, N, Z). Only ARMFLAGS (LBT4) is updated; the GPR is not modified.")
 
     @env.macro
     def lbt_armsrli():
-        return _arm_inst("armsrli.w", "armsrli.w rj, imm",
+        return _arm_inst("armsrli.w", "armsrli.w rj, imm, cond",
             "ARM-style logical shift right immediate (32-bit): conditionally shift value in `rj` right logically by `imm`. Update ARMFLAGS (C, N, Z). Only ARMFLAGS (LBT4) is updated; the GPR is not modified.")
 
     @env.macro
     def lbt_armsrai():
-        return _arm_inst("armsrai.w", "armsrai.w rj, imm",
+        return _arm_inst("armsrai.w", "armsrai.w rj, imm, cond",
             "ARM-style arithmetic shift right immediate (32-bit): conditionally shift value in `rj` right arithmetically by `imm`. Update ARMFLAGS (C, N, Z). Only ARMFLAGS (LBT4) is updated; the GPR is not modified.")
 
     @env.macro
     def lbt_armrotri():
-        return _arm_inst("armrotri.w", "armrotri.w rj, imm",
+        return _arm_inst("armrotri.w", "armrotri.w rj, imm, cond",
             "ARM-style rotate right immediate (32-bit): conditionally rotate value in `rj` right by `imm`. Update ARMFLAGS (C, N, Z). Only ARMFLAGS (LBT4) is updated; the GPR is not modified.")
 
     @env.macro
     def lbt_armrrx():
-        return _arm_inst("armrrx.w", "armrrx.w rj",
+        return _arm_inst("armrrx.w", "armrrx.w rj, cond",
             "ARM-style rotate right extended (32-bit): conditionally rotate the value in `rj` and C (in ARMFLAGS) together as a 33-bit ring right by 1. Update ARMFLAGS (C, N, Z). Only ARMFLAGS (LBT4) is updated; the GPR is not modified.")
 
     @env.macro
     def lbt_armmove():
-        return _arm_inst("armmove", "armmove rd, rj",
+        return _arm_inst("armmove", "armmove rd, rj, cond",
             "ARM-style conditional move: if the ARM condition holds, copy the value in `rj` to `rd`. ARMFLAGS are not updated.")
 
     @env.macro
