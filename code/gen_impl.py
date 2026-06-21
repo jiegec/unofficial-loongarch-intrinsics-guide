@@ -2200,301 +2200,61 @@ for width, (bits, utype, stype, umax, smin, smax, msb) in x86_w.items():
         print(f"EFLAGS.ZF = result == 0;", file=f)
         print(f"EFLAGS.SF = ({stype})result < 0;", file=f)
 
-    # x86dec
-    with open(f"x86dec_{width}.h", "w") as f:
-        print(f"{utype} v = ({utype})a;", file=f)
-        print(f"{utype} r = v - 1;", file=f)
-        print(f"// CF preserved from input EFLAGS.CF", file=f)
-        print(f"EFLAGS.PF = parity_even((uint8_t)r);", file=f)
-        print(f"EFLAGS.AF = ((v ^ 1 ^ r) & 0x10) != 0;", file=f)
-        print(f"EFLAGS.ZF = r == 0;", file=f)
-        print(f"EFLAGS.SF = ({stype})r < 0;", file=f)
-        print(f"EFLAGS.OF = v == ({utype}){smin};", file=f)
+    # x86dec / x86inc
+    for base, op, limit in [("dec", -1, smin), ("inc", 1, smax)]:
+        with open(f"x86{base}_{width}.h", "w") as f:
+            print(f"{utype} v = ({utype})a;", file=f)
+            print(f"{utype} r = v {op:+d};", file=f)
+            print(f"// CF preserved from input EFLAGS.CF", file=f)
+            print(f"EFLAGS.PF = parity_even((uint8_t)r);", file=f)
+            print(f"EFLAGS.AF = ((v ^ 1 ^ r) & 0x10) != 0;", file=f)
+            print(f"EFLAGS.ZF = r == 0;", file=f)
+            print(f"EFLAGS.SF = ({stype})r < 0;", file=f)
+            print(f"EFLAGS.OF = v == ({utype}){limit};", file=f)
 
-    # x86inc
-    with open(f"x86inc_{width}.h", "w") as f:
-        print(f"{utype} v = ({utype})a;", file=f)
-        print(f"{utype} r = v + 1;", file=f)
-        print(f"// CF preserved from input EFLAGS.CF", file=f)
-        print(f"EFLAGS.PF = parity_even((uint8_t)r);", file=f)
-        print(f"EFLAGS.AF = ((v ^ 1 ^ r) & 0x10) != 0;", file=f)
-        print(f"EFLAGS.ZF = r == 0;", file=f)
-        print(f"EFLAGS.SF = ({stype})r < 0;", file=f)
-        print(f"EFLAGS.OF = v == ({utype}){smax};", file=f)
-
-    # x86rcl
+    # x86 shift/rotate ops (register + immediate variants)
     rcl_mask = "0x3f" if width == "d" else "0x1f"
     rcl_mod = {"b": " % 9", "h": " % 17"}.get(width, "")
-    with open(f"x86rcl_{width}.h", "w") as f:
-        print(f"{utype} v = ({utype})a;", file=f)
-        print(f"unsigned c = (unsigned)(b & {rcl_mask});", file=f)
-        print(f"unsigned n = c{rcl_mod};", file=f)
-        print(f"if (n != 0) {{", file=f)
-        print(f"    unsigned carry_out = ((v >> ({bits} - n)) & 1);", file=f)
-        print(f"    EFLAGS.CF = carry_out;", file=f)
-        print(f"    if (c == 1) {{", file=f)
-        print(f"        {utype} r = ({utype})(v << 1);", file=f)
-        print(f"        EFLAGS.OF = ((r & {msb}) != 0) != carry_out;", file=f)
-        print(f"    }}", file=f)
-        print(f"}}", file=f)
+    carry_shift_expr = f"((uint{bits}_t)carry_in << {bits - 1})" if bits == 64 else f"(carry_in << {bits - 1})"
+    _bodies = {
+        "rcl": ("{utype} v = ({utype})a;\nunsigned c = {c};\nunsigned n = c{rcl_mod};\nif (n != 0) {{\n    unsigned carry_out = ((v >> ({bits} - n)) & 1);\n    EFLAGS.CF = carry_out;\n    if (c == 1) {{\n        {utype} r = ({utype})(v << 1);\n        EFLAGS.OF = ((r & {msb}) != 0) != carry_out;\n    }}\n}}",
+         [("", f"(unsigned)(b & {rcl_mask})"), ("i", f"(unsigned)(imm & {rcl_mask})")]),
+        "rcr": ("{utype} v = ({utype})a;\nunsigned c = {c};\nunsigned n = c{rcl_mod};\nif (n != 0) {{\n    unsigned carry_in = EFLAGS.CF;\n    unsigned carry_out = ((v >> ((n - 1) % ({bits} + 1))) & 1);\n    EFLAGS.CF = carry_out;\n    if (c == 1) {{\n        {utype} r = ({utype})((v >> 1) | {carry_shift_expr});\n        EFLAGS.OF = (((r >> {bm1}) ^ (r >> {bm2})) & 1) != 0;\n    }}\n}}",
+         [("", f"(unsigned)(b & {rcl_mask})"), ("i", f"(unsigned)(imm & {rcl_mask})")]),
+        "rotl": ("{utype} v = ({utype})a;\nunsigned c = {c};\nunsigned n = c % {bits};\n{utype} r = ({utype})((v << n) | (v >> ({bits} - n)));\nEFLAGS.CF = ((v >> (({bits} - n) % {bits})) & 1);\nif (c == 1) {{\n    EFLAGS.OF = ((v ^ r) & {msb}) != 0;\n}}",
+         [("", f"(unsigned)(b & {rcl_mask})"), ("i", f"(unsigned)imm")]),
+        "rotr": ("{utype} v = ({utype})a;\nunsigned c = {c};\nunsigned n = c % {bits};\n{utype} r = ({utype})((v >> n) | (v << ({bits} - n)));\nEFLAGS.CF = ((v >> ((n - 1 + {bits}) % {bits})) & 1);\nif (c == 1) {{\n    EFLAGS.OF = (((v ^ r) & {msb}) != 0);\n}}",
+         [("", f"(unsigned)(b & {rcl_mask})"), ("i", f"(unsigned)imm")]),
+        "sll": ("{utype} v = ({utype})a;\nunsigned c = {c};\nif (c != 0) {{\n    uint8_t carry_out = c > {bits} ? 0 : ((v >> ({bits} - c)) & 1);\n    {utype} r = c >= {bits} ? 0 : ({utype})(v << c);\n    EFLAGS.CF = carry_out;\n    EFLAGS.PF = parity_even((uint8_t)r);\n    EFLAGS.ZF = r == 0;\n    EFLAGS.SF = ({stype})r < 0;\n    if (c == 1) {{\n        EFLAGS.OF = ((v ^ r) & {msb}) != 0;\n    }}\n}}",
+         [("", f"(unsigned)(b & {rcl_mask})"), ("i", f"(unsigned)imm")]),
+        "sra": ("{utype} v = ({utype})a;\nunsigned c = {c};\nif (c != 0) {{\n    uint8_t carry_out = c > {bits} ? (({stype})v < 0) : ((v >> (c - 1)) & 1);\n    {utype} r = c >= {bits} ? ({utype})(({stype})v >> ({bits} - 1)) : ({utype})(({stype})v >> c);\n    EFLAGS.CF = carry_out;\n    EFLAGS.PF = parity_even((uint8_t)r);\n    EFLAGS.ZF = r == 0;\n    EFLAGS.SF = ({stype})r < 0;\n    if (c == 1) {{\n        EFLAGS.OF = 0;\n    }}\n}}",
+         [("", f"(unsigned)(b & {rcl_mask})"), ("i", f"(unsigned)imm")]),
+        "srl": ("{utype} v = ({utype})a;\nunsigned c = {c};\nif (c != 0) {{\n    uint8_t carry_out = c > {bits} ? 0 : ((v >> (c - 1)) & 1);\n    {utype} r = c >= {bits} ? 0 : (v >> c);\n    EFLAGS.CF = carry_out;\n    EFLAGS.PF = parity_even((uint8_t)r);\n    EFLAGS.ZF = r == 0;\n    EFLAGS.SF = ({stype})r < 0;\n    if (c == 1) {{\n        EFLAGS.OF = ((v ^ r) & {msb}) != 0;\n    }}\n}}",
+         [("", f"(unsigned)(b & {rcl_mask})"), ("i", f"(unsigned)imm")]),
+    }
+    for base, (body_tmpl, variants) in _bodies.items():
+        for suffix, c_src in variants:
+            with open(f"x86{base}{suffix}_{width}.h", "w") as f:
+                fmt = dict(bits=bits, utype=utype, stype=stype, msb=msb, carry_shift_expr=carry_shift_expr, c=c_src, rcl_mod=rcl_mod, bm1=bits-1, bm2=bits-2)
+                f.write(body_tmpl.format(**fmt) + "\n")
 
-    # x86rcli (same as rcl but with immediate)
-    with open(f"x86rcli_{width}.h", "w") as f:
-        print(f"{utype} v = ({utype})a;", file=f)
-        print(f"unsigned c = (unsigned)(imm & {rcl_mask});", file=f)
-        print(f"unsigned n = c{rcl_mod};", file=f)
-        print(f"if (n != 0) {{", file=f)
-        print(f"    unsigned carry_out = ((v >> ({bits} - n)) & 1);", file=f)
-        print(f"    EFLAGS.CF = carry_out;", file=f)
-        print(f"    if (c == 1) {{", file=f)
-        print(f"        {utype} r = ({utype})(v << 1);", file=f)
-        print(f"        EFLAGS.OF = ((r & {msb}) != 0) != carry_out;", file=f)
-        print(f"    }}", file=f)
-        print(f"}}", file=f)
-
-    # x86rcr (rotate right through CF)
-    with open(f"x86rcr_{width}.h", "w") as f:
-        print(f"{utype} v = ({utype})a;", file=f)
-        print(f"unsigned c = (unsigned)(b & {rcl_mask});", file=f)
-        print(f"unsigned n = c{rcl_mod};", file=f)
-        print(f"if (n != 0) {{", file=f)
-        print(f"    unsigned carry_in = EFLAGS.CF;", file=f)
-        print(
-            f"    unsigned carry_out = ((v >> ((n - 1) % ({bits} + 1))) & 1);", file=f
-        )
-        print(f"    EFLAGS.CF = carry_out;", file=f)
-        print(f"    if (c == 1) {{", file=f)
-        carry_shift = (
-            f"((uint{bits}_t)carry_in << {bits - 1})"
-            if bits == 64
-            else f"(carry_in << {bits - 1})"
-        )
-        print(f"        {utype} r = ({utype})((v >> 1) | {carry_shift});", file=f)
-        print(
-            f"        EFLAGS.OF = (((r >> {bits - 1}) ^ (r >> {bits - 2})) & 1) != 0;",
-            file=f,
-        )
-        print(f"    }}", file=f)
-        print(f"}}", file=f)
-
-    # x86rcri (same as rcr but with immediate)
-    with open(f"x86rcri_{width}.h", "w") as f:
-        print(f"{utype} v = ({utype})a;", file=f)
-        print(f"unsigned c = (unsigned)(imm & {rcl_mask});", file=f)
-        print(f"unsigned n = c{rcl_mod};", file=f)
-        print(f"if (n != 0) {{", file=f)
-        print(f"    unsigned carry_in = EFLAGS.CF;", file=f)
-        print(
-            f"    unsigned carry_out = ((v >> ((n - 1) % ({bits} + 1))) & 1);", file=f
-        )
-        print(f"    EFLAGS.CF = carry_out;", file=f)
-        print(f"    if (c == 1) {{", file=f)
-        carry_shift = (
-            f"((uint{bits}_t)carry_in << {bits - 1})"
-            if bits == 64
-            else f"(carry_in << {bits - 1})"
-        )
-        print(f"        {utype} r = ({utype})((v >> 1) | {carry_shift});", file=f)
-        print(
-            f"        EFLAGS.OF = (((r >> {bits - 1}) ^ (r >> {bits - 2})) & 1) != 0;",
-            file=f,
-        )
-        print(f"    }}", file=f)
-        print(f"}}", file=f)
-
-    # x86rotl (rotate left, no CF involvement)
-    with open(f"x86rotl_{width}.h", "w") as f:
-        print(f"{utype} v = ({utype})a;", file=f)
-        print(f"unsigned c = (unsigned)(b & {rcl_mask});", file=f)
-        print(f"unsigned n = c % {bits};", file=f)
-        print(f"{utype} r = ({utype})((v << n) | (v >> ({bits} - n)));", file=f)
-        print(f"EFLAGS.CF = ((v >> (({bits} - n) % {bits})) & 1);", file=f)
-        print(f"if (c == 1) {{", file=f)
-        print(f"    EFLAGS.OF = ((v ^ r) & {msb}) != 0;", file=f)
-        print(f"}}", file=f)
-
-    # x86rotli (rotate left immediate, no CF involvement)
-    with open(f"x86rotli_{width}.h", "w") as f:
-        print(f"{utype} v = ({utype})a;", file=f)
-        print(f"unsigned c = (unsigned)imm;", file=f)
-        print(f"unsigned n = c % {bits};", file=f)
-        print(f"{utype} r = ({utype})((v << n) | (v >> ({bits} - n)));", file=f)
-        print(f"EFLAGS.CF = ((v >> (({bits} - n) % {bits})) & 1);", file=f)
-        print(f"if (c == 1) {{", file=f)
-        print(f"    EFLAGS.OF = ((v ^ r) & {msb}) != 0;", file=f)
-        print(f"}}", file=f)
-
-    # x86rotr (rotate right, no CF involvement)
-    with open(f"x86rotr_{width}.h", "w") as f:
-        print(f"{utype} v = ({utype})a;", file=f)
-        print(f"unsigned c = (unsigned)(b & {rcl_mask});", file=f)
-        print(f"unsigned n = c % {bits};", file=f)
-        print(f"{utype} r = ({utype})((v >> n) | (v << ({bits} - n)));", file=f)
-        print(f"EFLAGS.CF = ((v >> ((n - 1 + {bits}) % {bits})) & 1);", file=f)
-        print(f"if (c == 1) {{", file=f)
-        print(f"    EFLAGS.OF = (((v ^ r) & {msb}) != 0);", file=f)
-        print(f"}}", file=f)
-
-    # x86sll (shift left logical)
-    with open(f"x86sll_{width}.h", "w") as f:
-        print(f"{utype} v = ({utype})a;", file=f)
-        print(f"unsigned c = (unsigned)(b & {rcl_mask});", file=f)
-        print(f"if (c != 0) {{", file=f)
-        print(
-            f"    uint8_t carry_out = c > {bits} ? 0 : ((v >> ({bits} - c)) & 1);",
-            file=f,
-        )
-        print(f"    {utype} r = c >= {bits} ? 0 : ({utype})(v << c);", file=f)
-        print(f"    EFLAGS.CF = carry_out;", file=f)
-        print(f"    EFLAGS.PF = parity_even((uint8_t)r);", file=f)
-        print(f"    EFLAGS.ZF = r == 0;", file=f)
-        print(f"    EFLAGS.SF = ({stype})r < 0;", file=f)
-        print(f"    if (c == 1) {{", file=f)
-        print(f"        EFLAGS.OF = ((v ^ r) & {msb}) != 0;", file=f)
-        print(f"    }}", file=f)
-        print(f"}}", file=f)
-
-    # x86slli (shift left logical immediate)
-    with open(f"x86slli_{width}.h", "w") as f:
-        print(f"{utype} v = ({utype})a;", file=f)
-        print(f"unsigned c = (unsigned)imm;", file=f)
-        print(f"if (c != 0) {{", file=f)
-        print(
-            f"    uint8_t carry_out = c > {bits} ? 0 : ((v >> ({bits} - c)) & 1);",
-            file=f,
-        )
-        print(f"    {utype} r = c >= {bits} ? 0 : ({utype})(v << c);", file=f)
-        print(f"    EFLAGS.CF = carry_out;", file=f)
-        print(f"    EFLAGS.PF = parity_even((uint8_t)r);", file=f)
-        print(f"    EFLAGS.ZF = r == 0;", file=f)
-        print(f"    EFLAGS.SF = ({stype})r < 0;", file=f)
-        print(f"    if (c == 1) {{", file=f)
-        print(f"        EFLAGS.OF = ((v ^ r) & {msb}) != 0;", file=f)
-        print(f"    }}", file=f)
-        print(f"}}", file=f)
-
-    # x86sra (shift right arithmetic)
-    with open(f"x86sra_{width}.h", "w") as f:
-        print(f"{utype} v = ({utype})a;", file=f)
-        print(f"unsigned c = (unsigned)(b & {rcl_mask});", file=f)
-        print(f"if (c != 0) {{", file=f)
-        print(
-            f"    uint8_t carry_out = c > {bits} ? (({stype})v < 0) : ((v >> (c - 1)) & 1);",
-            file=f,
-        )
-        print(
-            f"    {utype} r = c >= {bits} ? ({utype})(({stype})v >> ({bits} - 1)) : ({utype})(({stype})v >> c);",
-            file=f,
-        )
-        print(f"    EFLAGS.CF = carry_out;", file=f)
-        print(f"    EFLAGS.PF = parity_even((uint8_t)r);", file=f)
-        print(f"    EFLAGS.ZF = r == 0;", file=f)
-        print(f"    EFLAGS.SF = ({stype})r < 0;", file=f)
-        print(f"    if (c == 1) {{", file=f)
-        print(f"        EFLAGS.OF = 0;", file=f)
-        print(f"    }}", file=f)
-        print(f"}}", file=f)
-
-    # x86srl (shift right logical)
-    with open(f"x86srl_{width}.h", "w") as f:
-        print(f"{utype} v = ({utype})a;", file=f)
-        print(f"unsigned c = (unsigned)(b & {rcl_mask});", file=f)
-        print(f"if (c != 0) {{", file=f)
-        print(f"    uint8_t carry_out = c > {bits} ? 0 : ((v >> (c - 1)) & 1);", file=f)
-        print(f"    {utype} r = c >= {bits} ? 0 : (v >> c);", file=f)
-        print(f"    EFLAGS.CF = carry_out;", file=f)
-        print(f"    EFLAGS.PF = parity_even((uint8_t)r);", file=f)
-        print(f"    EFLAGS.ZF = r == 0;", file=f)
-        print(f"    EFLAGS.SF = ({stype})r < 0;", file=f)
-        print(f"    if (c == 1) {{", file=f)
-        print(f"        EFLAGS.OF = ((v ^ r) & {msb}) != 0;", file=f)
-        print(f"    }}", file=f)
-        print(f"}}", file=f)
-
-    # x86srai (shift right arithmetic immediate)
-    with open(f"x86srai_{width}.h", "w") as f:
-        print(f"{utype} v = ({utype})a;", file=f)
-        print(f"unsigned c = (unsigned)imm;", file=f)
-        print(f"if (c != 0) {{", file=f)
-        print(
-            f"    uint8_t carry_out = c > {bits} ? (({stype})v < 0) : ((v >> (c - 1)) & 1);",
-            file=f,
-        )
-        print(
-            f"    {utype} r = c >= {bits} ? ({utype})(({stype})v >> ({bits} - 1)) : ({utype})(({stype})v >> c);",
-            file=f,
-        )
-        print(f"    EFLAGS.CF = carry_out;", file=f)
-        print(f"    EFLAGS.PF = parity_even((uint8_t)r);", file=f)
-        print(f"    EFLAGS.ZF = r == 0;", file=f)
-        print(f"    EFLAGS.SF = ({stype})r < 0;", file=f)
-        print(f"    if (c == 1) {{", file=f)
-        print(f"        EFLAGS.OF = 0;", file=f)
-        print(f"    }}", file=f)
-        print(f"}}", file=f)
-
-    # x86srli (shift right logical immediate)
-    with open(f"x86srli_{width}.h", "w") as f:
-        print(f"{utype} v = ({utype})a;", file=f)
-        print(f"unsigned c = (unsigned)imm;", file=f)
-        print(f"if (c != 0) {{", file=f)
-        print(f"    uint8_t carry_out = c > {bits} ? 0 : ((v >> (c - 1)) & 1);", file=f)
-        print(f"    {utype} r = c >= {bits} ? 0 : (v >> c);", file=f)
-        print(f"    EFLAGS.CF = carry_out;", file=f)
-        print(f"    EFLAGS.PF = parity_even((uint8_t)r);", file=f)
-        print(f"    EFLAGS.ZF = r == 0;", file=f)
-        print(f"    EFLAGS.SF = ({stype})r < 0;", file=f)
-        print(f"    if (c == 1) {{", file=f)
-        print(f"        EFLAGS.OF = ((v ^ r) & {msb}) != 0;", file=f)
-        print(f"    }}", file=f)
-        print(f"}}", file=f)
-
-    # x86rotri (rotate right immediate, no CF involvement)
-    with open(f"x86rotri_{width}.h", "w") as f:
-        print(f"{utype} v = ({utype})a;", file=f)
-        print(f"unsigned c = (unsigned)imm;", file=f)
-        print(f"unsigned n = c % {bits};", file=f)
-        print(f"{utype} r = ({utype})((v >> n) | (v << ({bits} - n)));", file=f)
-        print(f"EFLAGS.CF = ((v >> ((n - 1 + {bits}) % {bits})) & 1);", file=f)
-        print(f"if (c == 1) {{", file=f)
-        print(f"    EFLAGS.OF = (((v ^ r) & {msb}) != 0);", file=f)
-        print(f"}}", file=f)
-
-    # x86mul (signed)
-    with open(f"x86mul_{width}.h", "w") as f:
-        print(f"{utype} lhs = ({utype})a;", file=f)
-        print(f"{utype} rhs = ({utype})b;", file=f)
-        print(
-            f"__int128 product = (__int128)({stype})lhs * (__int128)({stype})rhs;",
-            file=f,
-        )
-        print(
-            f"bool overflow = product < (__int128){smin} || product > (__int128){smax};",
-            file=f,
-        )
-        print(f"EFLAGS.CF = overflow;", file=f)
-        print(f"EFLAGS.OF = overflow;", file=f)
-        print(f"EFLAGS.SF = 0;", file=f)
-        print(f"EFLAGS.ZF = 0;", file=f)
-        print(f"EFLAGS.AF = 0;", file=f)
-        print(f"EFLAGS.PF = 0;", file=f)
-
-    # x86mul_{width}u (unsigned)
-    with open(f"x86mul_{width}u.h", "w") as f:
-        print(f"{utype} lhs = ({utype})a;", file=f)
-        print(f"{utype} rhs = ({utype})b;", file=f)
-        print(f"unsigned __int128 product =", file=f)
-        print(
-            f"    (unsigned __int128)({utype})lhs * (unsigned __int128)({utype})rhs;",
-            file=f,
-        )
-        print(f"bool overflow = (product >> {bits}) != 0;", file=f)
-        print(f"EFLAGS.CF = overflow;", file=f)
-        print(f"EFLAGS.OF = overflow;", file=f)
-        print(f"EFLAGS.SF = 0;", file=f)
-        print(f"EFLAGS.ZF = 0;", file=f)
-        print(f"EFLAGS.AF = 0;", file=f)
-        print(f"EFLAGS.PF = 0;", file=f)
+    # x86mul (signed + unsigned)
+    for mul_suffix, mul_type, mul_cast, overflow_expr in [
+        ("", "__int128", f"(__int128)({stype})", f"product < (__int128){smin} || product > (__int128){smax}"),
+        ("u", "unsigned __int128", f"(unsigned __int128)({utype})", f"(product >> {bits}) != 0"),
+    ]:
+        with open(f"x86mul_{width}{mul_suffix}.h", "w") as f:
+            print(f"{utype} lhs = ({utype})a;", file=f)
+            print(f"{utype} rhs = ({utype})b;", file=f)
+            print(f"{mul_type} product =", file=f)
+            print(f"    {mul_cast}lhs * {mul_cast}rhs;", file=f)
+            print(f"bool overflow = {overflow_expr};", file=f)
+            print(f"EFLAGS.CF = overflow;", file=f)
+            print(f"EFLAGS.OF = overflow;", file=f)
+            print(f"EFLAGS.SF = 0;", file=f)
+            print(f"EFLAGS.ZF = 0;", file=f)
+            print(f"EFLAGS.AF = 0;", file=f)
+            print(f"EFLAGS.PF = 0;", file=f)
 
 # Scalar x86 mfflag/mtflag (GPR, not SIMD)
 x86_insts_special = {
