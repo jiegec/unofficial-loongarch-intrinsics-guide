@@ -2387,6 +2387,30 @@ static inline {ret} {name} ({args}) {{
             f"x86-style shift right arithmetic: shift {width}-bit value in `rj` right arithmetically by immediate `imm`. If shift count is non-zero, update CF, PF, ZF, SF (OF is set to 0 if count is 1). If shift count is zero, flags are unchanged. Store the {width}-bit result sign-extended to 64-bit in `rd`.", True)
 
     @env.macro
+    def lbt_setx86j():
+        return instruction(
+            intrinsic=f"setx86j",
+            instr=f"setx86j rd, cond",
+            desc=f"x86-style set if condition: evaluate x86 condition code `cond` against EFLAGS. Store 1 in `rd` if the condition holds, 0 otherwise.",
+        )
+
+    @env.macro
+    def lbt_setx86loope():
+        return instruction(
+            intrinsic=f"setx86loope",
+            instr=f"setx86loope rd, rj",
+            desc=f"x86-style loop while equal: decrement the counter value in `rj`. Store 1 in `rd` if the decremented counter is non-zero and ZF (in EFLAGS) is set, 0 otherwise.",
+        )
+
+    @env.macro
+    def lbt_setx86loopne():
+        return instruction(
+            intrinsic=f"setx86loopne",
+            instr=f"setx86loopne rd, rj",
+            desc=f"x86-style loop while not equal: decrement the counter value in `rj`. Store 1 in `rd` if the decremented counter is non-zero and ZF (in EFLAGS) is clear, 0 otherwise.",
+        )
+
+    @env.macro
     def all_intrinsics(render=True):
         result = []
         for file in glob.glob("docs/*/*.md"):
