@@ -2123,7 +2123,7 @@ static inline {ret} {name} ({args}) {{
     for macro_name, entry in lasx_128_lane_entries.items():
         env.macros[macro_name] = make_lasx_128_lane_macro(entry)
 
-    lbt_widths = {"b": 8, "h": 16, "w": 32, "d": 64}
+    lbt_widths = {"b": 8, "bu": 8, "h": 16, "hu": 16, "w": 32, "wu": 32, "d": 64, "du": 64}
 
     @env.macro
     def lbt_addu12i(name):
@@ -2193,6 +2193,82 @@ static inline {ret} {name} ({args}) {{
             intrinsic=f"rcri.{name}",
             instr=f"rcri.{name} rd, rj, imm",
             desc=f"Rotate {width}-bit value in `rj` and CF (in EFLAGS) together as a {width+1}-bit ring right by immediate `imm`. The result is written to `rd`.",
+        )
+
+    @env.macro
+    def lbt_x86adc(name):
+        width = lbt_widths[name]
+        signed = name if name != "d" else ""
+        return instruction(
+            intrinsic=f"x86adc.{name}",
+            instr=f"x86adc.{name} rd, rj, rk",
+            desc=f"x86-style add with carry: add {width}-bit values in `rj` and `rk` with CF (in EFLAGS). Update EFLAGS (CF, AF, OF, PF, ZF, SF) according to the result. Store the {width}-bit result sign-extended to 64-bit in `rd`.",
+        )
+
+    @env.macro
+    def lbt_x86add(name):
+        width = lbt_widths[name]
+        if name in ("wu", "du"):
+            unsigned = "unsigned "
+        else:
+            unsigned = ""
+        return instruction(
+            intrinsic=f"x86add.{name}",
+            instr=f"x86add.{name} rd, rj, rk",
+            desc=f"x86-style add: add {unsigned}{width}-bit values in `rj` and `rk`. Update EFLAGS (CF, AF, OF, PF, ZF, SF) according to the result. Store the {width}-bit result sign-extended to 64-bit in `rd`.",
+        )
+
+    @env.macro
+    def lbt_x86inc(name):
+        width = lbt_widths[name]
+        return instruction(
+            intrinsic=f"x86inc.{name}",
+            instr=f"x86inc.{name} rd, rj",
+            desc=f"x86-style increment: add 1 to the {width}-bit value in `rj`. Update EFLAGS (AF, OF, PF, ZF, SF). Preserve CF. Store the {width}-bit result sign-extended to 64-bit in `rd`.",
+        )
+
+    @env.macro
+    def lbt_x86sbc(name):
+        width = lbt_widths[name]
+        return instruction(
+            intrinsic=f"x86sbc.{name}",
+            instr=f"x86sbc.{name} rd, rj, rk",
+            desc=f"x86-style subtract with borrow: subtract {width}-bit values in `rj` and `rk` with CF (in EFLAGS). Update EFLAGS (CF, AF, OF, PF, ZF, SF) according to the result. Store the {width}-bit result sign-extended to 64-bit in `rd`.",
+        )
+
+    @env.macro
+    def lbt_x86sub(name):
+        width = lbt_widths[name]
+        if name in ("wu", "du"):
+            unsigned = "unsigned "
+        else:
+            unsigned = ""
+        return instruction(
+            intrinsic=f"x86sub.{name}",
+            instr=f"x86sub.{name} rd, rj, rk",
+            desc=f"x86-style subtract: subtract {unsigned}{width}-bit values in `rj` and `rk`. Update EFLAGS (CF, AF, OF, PF, ZF, SF) according to the result. Store the {width}-bit result sign-extended to 64-bit in `rd`.",
+        )
+
+    @env.macro
+    def lbt_x86dec(name):
+        width = lbt_widths[name]
+        return instruction(
+            intrinsic=f"x86dec.{name}",
+            instr=f"x86dec.{name} rd, rj",
+            desc=f"x86-style decrement: subtract 1 from the {width}-bit value in `rj`. Update EFLAGS (AF, OF, PF, ZF, SF). Preserve CF. Store the {width}-bit result sign-extended to 64-bit in `rd`.",
+        )
+
+    @env.macro
+    def lbt_x86mul(name):
+        width = lbt_widths[name]
+        if name in ("bu", "hu", "wu", "du"):
+            signedness = "unsigned"
+        else:
+            signedness = "signed"
+        return instruction(
+            intrinsic=f"x86mul.{name}",
+            instr=f"x86mul.{name} rd, rj, rk",
+            desc=f"x86-style multiply: multiply {signedness} {width}-bit values in `rj` and `rk`. Set CF and OF if overflow (result does not fit in {width}-bits), clear other flags. Store the {width}-bit result sign-extended to 64-bit in `rd`.",
         )
 
     @env.macro
