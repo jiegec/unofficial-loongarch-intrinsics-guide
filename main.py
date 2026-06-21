@@ -2621,6 +2621,30 @@ static inline {ret} {name} ({args}) {{
         return instruction("jiscr1", "jiscr1 imm",
             "Jump via scratch register 1: save the current PC to SCR[0], then add `imm` to the value in SCR[1] and jump to the resulting address.")
 
+    def _lbt_mips_mem(stem, name, desc):
+        return instruction(f"{stem}.{name}", f"{stem}.{name} rd, rj, imm",
+            desc)
+
+    @env.macro
+    def lbt_ldl(name):
+        return _lbt_mips_mem("ldl", name,
+            "MIPS-style load doubleword left: load left part of an unaligned doubleword/word from memory at address `rj + imm`, merge with the existing value in `rd`, store the result in `rd`.")
+
+    @env.macro
+    def lbt_ldr(name):
+        return _lbt_mips_mem("ldr", name,
+            "MIPS-style load doubleword right: load right part of an unaligned doubleword/word from memory at address `rj + imm`, merge with the existing value in `rd`, store the result in `rd`.")
+
+    @env.macro
+    def lbt_stl(name):
+        return _lbt_mips_mem("stl", name,
+            "MIPS-style store doubleword left: store left part of value in `rd` to unaligned memory address `rj + imm`.")
+
+    @env.macro
+    def lbt_str(name):
+        return _lbt_mips_mem("str", name,
+            "MIPS-style store doubleword right: store right part of value in `rd` to unaligned memory address `rj + imm`.")
+
     @env.macro
     def all_intrinsics(render=True):
         result = []
