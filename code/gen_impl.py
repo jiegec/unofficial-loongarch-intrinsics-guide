@@ -2161,6 +2161,20 @@ for width, (bits, utype, stype, umax, smin, smax, msb) in x86_w.items():
             print(f"EFLAGS.ZF = result == 0;", file=f)
             print(f"EFLAGS.SF = ({stype})result < 0;", file=f)
 
+    # x86sbc (subtract with carry/borrow)
+    with open(f"x86sbc_{width}.h", "w") as f:
+        print(f"{utype} lhs = ({utype})a;", file=f)
+        print(f"{utype} rhs = ({utype})b;", file=f)
+        print(f"uint8_t carry_in = EFLAGS.CF;", file=f)
+        print(f"uint64_t subtrahend = (uint64_t)rhs + carry_in;", file=f)
+        print(f"{utype} result = ({utype})(lhs - subtrahend);", file=f)
+        print(f"EFLAGS.CF = lhs < subtrahend;", file=f)
+        print(f"EFLAGS.AF = (lhs & 0xf) < (rhs & 0xf);", file=f)
+        print(f"EFLAGS.OF = ((lhs ^ rhs) & (lhs ^ result) & {msb}) != 0;", file=f)
+        print(f"EFLAGS.PF = parity_even((uint8_t)result);", file=f)
+        print(f"EFLAGS.ZF = result == 0;", file=f)
+        print(f"EFLAGS.SF = ({stype})result < 0;", file=f)
+
     # x86dec
     with open(f"x86dec_{width}.h", "w") as f:
         print(f"{utype} v = ({utype})a;", file=f)
