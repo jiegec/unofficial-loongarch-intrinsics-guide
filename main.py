@@ -2206,8 +2206,8 @@ static inline {ret} {name} ({args}) {{
         signed = name if name != "d" else ""
         return instruction(
             intrinsic=f"x86adc.{name}",
-            instr=f"x86adc.{name} rd, rj, rk",
-            desc=f"x86-style add with carry: add {width}-bit values in `rj` and `rk` with CF (in EFLAGS). Update EFLAGS (CF, AF, OF, PF, ZF, SF) according to the result. Store the {width}-bit result sign-extended to 64-bit in `rd`.",
+            instr=f"x86adc.{name} rj, rk",
+            desc=f"x86-style add with carry: add {width}-bit values in `rj` and `rk` with CF (in EFLAGS). Update EFLAGS (CF, AF, OF, PF, ZF, SF) according to the result. Only EFLAGS (LBT4) is updated; the GPR is not modified.",
         )
 
     @env.macro
@@ -2219,8 +2219,8 @@ static inline {ret} {name} ({args}) {{
             unsigned = ""
         return instruction(
             intrinsic=f"x86add.{name}",
-            instr=f"x86add.{name} rd, rj, rk",
-            desc=f"x86-style add: add {unsigned}{width}-bit values in `rj` and `rk`. Update EFLAGS (CF, AF, OF, PF, ZF, SF) according to the result. Store the {width}-bit result sign-extended to 64-bit in `rd`.",
+            instr=f"x86add.{name} rj, rk",
+            desc=f"x86-style add: add {unsigned}{width}-bit values in `rj` and `rk`. Update EFLAGS (CF, AF, OF, PF, ZF, SF) according to the result. Only EFLAGS (LBT4) is updated; the GPR is not modified.",
         )
 
     @env.macro
@@ -2228,8 +2228,8 @@ static inline {ret} {name} ({args}) {{
         width = lbt_widths[name]
         return instruction(
             intrinsic=f"x86inc.{name}",
-            instr=f"x86inc.{name} rd, rj",
-            desc=f"x86-style increment: add 1 to the {width}-bit value in `rj`. Update EFLAGS (AF, OF, PF, ZF, SF). Preserve CF. Store the {width}-bit result sign-extended to 64-bit in `rd`.",
+            instr=f"x86inc.{name} rj",
+            desc=f"x86-style increment: add 1 to the {width}-bit value in `rj`. Update EFLAGS (AF, OF, PF, ZF, SF). Preserve CF. Only EFLAGS (LBT4) is updated; the GPR is not modified.",
         )
 
     @env.macro
@@ -2237,8 +2237,8 @@ static inline {ret} {name} ({args}) {{
         width = lbt_widths[name]
         return instruction(
             intrinsic=f"x86sbc.{name}",
-            instr=f"x86sbc.{name} rd, rj, rk",
-            desc=f"x86-style subtract with borrow: subtract {width}-bit values in `rj` and `rk` with CF (in EFLAGS). Update EFLAGS (CF, AF, OF, PF, ZF, SF) according to the result. Store the {width}-bit result sign-extended to 64-bit in `rd`.",
+            instr=f"x86sbc.{name} rj, rk",
+            desc=f"x86-style subtract with borrow: subtract {width}-bit values in `rj` and `rk` with CF (in EFLAGS). Update EFLAGS (CF, AF, OF, PF, ZF, SF) according to the result. Only EFLAGS (LBT4) is updated; the GPR is not modified.",
         )
 
     @env.macro
@@ -2250,8 +2250,8 @@ static inline {ret} {name} ({args}) {{
             unsigned = ""
         return instruction(
             intrinsic=f"x86sub.{name}",
-            instr=f"x86sub.{name} rd, rj, rk",
-            desc=f"x86-style subtract: subtract {unsigned}{width}-bit values in `rj` and `rk`. Update EFLAGS (CF, AF, OF, PF, ZF, SF) according to the result. Store the {width}-bit result sign-extended to 64-bit in `rd`.",
+            instr=f"x86sub.{name} rj, rk",
+            desc=f"x86-style subtract: subtract {unsigned}{width}-bit values in `rj` and `rk`. Update EFLAGS (CF, AF, OF, PF, ZF, SF) according to the result. Only EFLAGS (LBT4) is updated; the GPR is not modified.",
         )
 
     @env.macro
@@ -2259,8 +2259,8 @@ static inline {ret} {name} ({args}) {{
         width = lbt_widths[name]
         return instruction(
             intrinsic=f"x86dec.{name}",
-            instr=f"x86dec.{name} rd, rj",
-            desc=f"x86-style decrement: subtract 1 from the {width}-bit value in `rj`. Update EFLAGS (AF, OF, PF, ZF, SF). Preserve CF. Store the {width}-bit result sign-extended to 64-bit in `rd`.",
+            instr=f"x86dec.{name} rj",
+            desc=f"x86-style decrement: subtract 1 from the {width}-bit value in `rj`. Update EFLAGS (AF, OF, PF, ZF, SF). Preserve CF. Only EFLAGS (LBT4) is updated; the GPR is not modified.",
         )
 
     @env.macro
@@ -2272,8 +2272,8 @@ static inline {ret} {name} ({args}) {{
             signedness = "signed"
         return instruction(
             intrinsic=f"x86mul.{name}",
-            instr=f"x86mul.{name} rd, rj, rk",
-            desc=f"x86-style multiply: multiply {signedness} {width}-bit values in `rj` and `rk`. Set CF and OF if overflow (result does not fit in {width}-bits), clear other flags. Store the {width}-bit result sign-extended to 64-bit in `rd`.",
+            instr=f"x86mul.{name} rj, rk",
+            desc=f"x86-style multiply: multiply {signedness} {width}-bit values in `rj` and `rk`. Set CF and OF if overflow (result does not fit in {width}-bits), clear other flags. Only EFLAGS (LBT4) is updated; the GPR is not modified.",
         )
 
     @env.macro
@@ -2281,8 +2281,8 @@ static inline {ret} {name} ({args}) {{
         width = lbt_widths[name]
         return instruction(
             intrinsic=f"x86and.{name}",
-            instr=f"x86and.{name} rd, rj, rk",
-            desc=f"x86-style bitwise AND: compute {width}-bit AND of values in `rj` and `rk`. Clear CF, OF, AF. Update PF, ZF, SF according to the result. Store the {width}-bit result sign-extended to 64-bit in `rd`.",
+            instr=f"x86and.{name} rj, rk",
+            desc=f"x86-style bitwise AND: compute {width}-bit AND of values in `rj` and `rk`. Clear CF, OF, AF. Update PF, ZF, SF according to the result. Only EFLAGS (LBT4) is updated; the GPR is not modified.",
         )
 
     @env.macro
@@ -2290,8 +2290,8 @@ static inline {ret} {name} ({args}) {{
         width = lbt_widths[name]
         return instruction(
             intrinsic=f"x86or.{name}",
-            instr=f"x86or.{name} rd, rj, rk",
-            desc=f"x86-style bitwise OR: compute {width}-bit OR of values in `rj` and `rk`. Clear CF, OF, AF. Update PF, ZF, SF according to the result. Store the {width}-bit result sign-extended to 64-bit in `rd`.",
+            instr=f"x86or.{name} rj, rk",
+            desc=f"x86-style bitwise OR: compute {width}-bit OR of values in `rj` and `rk`. Clear CF, OF, AF. Update PF, ZF, SF according to the result. Only EFLAGS (LBT4) is updated; the GPR is not modified.",
         )
 
     @env.macro
@@ -2299,97 +2299,97 @@ static inline {ret} {name} ({args}) {{
         width = lbt_widths[name]
         return instruction(
             intrinsic=f"x86xor.{name}",
-            instr=f"x86xor.{name} rd, rj, rk",
-            desc=f"x86-style bitwise XOR: compute {width}-bit XOR of values in `rj` and `rk`. Clear CF, OF, AF. Update PF, ZF, SF according to the result. Store the {width}-bit result sign-extended to 64-bit in `rd`.",
+            instr=f"x86xor.{name} rj, rk",
+            desc=f"x86-style bitwise XOR: compute {width}-bit XOR of values in `rj` and `rk`. Clear CF, OF, AF. Update PF, ZF, SF according to the result. Only EFLAGS (LBT4) is updated; the GPR is not modified.",
         )
 
     def _lbt_x86_shift(stem, name, desc, is_imm):
-        instr = f"{stem}.{name} rd, rj, {'imm' if is_imm else 'rk'}"
+        instr = f"{stem}.{name} rj, {'imm' if is_imm else 'rk'}"
         return instruction(intrinsic=f"{stem}.{name}", instr=instr, desc=desc)
 
     @env.macro
     def lbt_x86rcl(name):
         width = lbt_widths[name]
         return _lbt_x86_shift("x86rcl", name,
-            f"x86-style rotate left through carry: rotate {width}-bit value in `rj` and CF together as a {width+1}-bit ring left by the amount specified in `rk`. Update CF, OF (for shift count of 1). Store the {width}-bit result sign-extended to 64-bit in `rd`.", False)
+            f"x86-style rotate left through carry: rotate {width}-bit value in `rj` and CF together as a {width+1}-bit ring left by the amount specified in `rk`. Update CF, OF (for shift count of 1). Only EFLAGS (LBT4) is updated; the GPR is not modified.", False)
 
     @env.macro
     def lbt_x86rcli(name):
         width = lbt_widths[name]
         return _lbt_x86_shift("x86rcli", name,
-            f"x86-style rotate left through carry: rotate {width}-bit value in `rj` and CF together as a {width+1}-bit ring left by immediate `imm`. Update CF, OF (for shift count of 1). Store the {width}-bit result sign-extended to 64-bit in `rd`.", True)
+            f"x86-style rotate left through carry: rotate {width}-bit value in `rj` and CF together as a {width+1}-bit ring left by immediate `imm`. Update CF, OF (for shift count of 1). Only EFLAGS (LBT4) is updated; the GPR is not modified.", True)
 
     @env.macro
     def lbt_x86rcr(name):
         width = lbt_widths[name]
         return _lbt_x86_shift("x86rcr", name,
-            f"x86-style rotate right through carry: rotate {width}-bit value in `rj` and CF together as a {width+1}-bit ring right by the amount specified in `rk`. Update CF, OF (for shift count of 1). Store the {width}-bit result sign-extended to 64-bit in `rd`.", False)
+            f"x86-style rotate right through carry: rotate {width}-bit value in `rj` and CF together as a {width+1}-bit ring right by the amount specified in `rk`. Update CF, OF (for shift count of 1). Only EFLAGS (LBT4) is updated; the GPR is not modified.", False)
 
     @env.macro
     def lbt_x86rcri(name):
         width = lbt_widths[name]
         return _lbt_x86_shift("x86rcri", name,
-            f"x86-style rotate right through carry: rotate {width}-bit value in `rj` and CF together as a {width+1}-bit ring right by immediate `imm`. Update CF, OF (for shift count of 1). Store the {width}-bit result sign-extended to 64-bit in `rd`.", True)
+            f"x86-style rotate right through carry: rotate {width}-bit value in `rj` and CF together as a {width+1}-bit ring right by immediate `imm`. Update CF, OF (for shift count of 1). Only EFLAGS (LBT4) is updated; the GPR is not modified.", True)
 
     @env.macro
     def lbt_x86rotl(name):
         width = lbt_widths[name]
         return _lbt_x86_shift("x86rotl", name,
-            f"x86-style rotate left: rotate {width}-bit value in `rj` left by the amount specified in `rk`. Update CF, OF (for shift count of 1). Store the {width}-bit result sign-extended to 64-bit in `rd`.", False)
+            f"x86-style rotate left: rotate {width}-bit value in `rj` left by the amount specified in `rk`. Update CF, OF (for shift count of 1). Only EFLAGS (LBT4) is updated; the GPR is not modified.", False)
 
     @env.macro
     def lbt_x86rotli(name):
         width = lbt_widths[name]
         return _lbt_x86_shift("x86rotli", name,
-            f"x86-style rotate left: rotate {width}-bit value in `rj` left by immediate `imm`. Update CF, OF (for shift count of 1). Store the {width}-bit result sign-extended to 64-bit in `rd`.", True)
+            f"x86-style rotate left: rotate {width}-bit value in `rj` left by immediate `imm`. Update CF, OF (for shift count of 1). Only EFLAGS (LBT4) is updated; the GPR is not modified.", True)
 
     @env.macro
     def lbt_x86rotr(name):
         width = lbt_widths[name]
         return _lbt_x86_shift("x86rotr", name,
-            f"x86-style rotate right: rotate {width}-bit value in `rj` right by the amount specified in `rk`. Update CF, OF (for shift count of 1). Store the {width}-bit result sign-extended to 64-bit in `rd`.", False)
+            f"x86-style rotate right: rotate {width}-bit value in `rj` right by the amount specified in `rk`. Update CF, OF (for shift count of 1). Only EFLAGS (LBT4) is updated; the GPR is not modified.", False)
 
     @env.macro
     def lbt_x86rotri(name):
         width = lbt_widths[name]
         return _lbt_x86_shift("x86rotri", name,
-            f"x86-style rotate right: rotate {width}-bit value in `rj` right by immediate `imm`. Update CF, OF (for shift count of 1). Store the {width}-bit result sign-extended to 64-bit in `rd`.", True)
+            f"x86-style rotate right: rotate {width}-bit value in `rj` right by immediate `imm`. Update CF, OF (for shift count of 1). Only EFLAGS (LBT4) is updated; the GPR is not modified.", True)
 
     @env.macro
     def lbt_x86sll(name):
         width = lbt_widths[name]
         return _lbt_x86_shift("x86sll", name,
-            f"x86-style shift left logical: shift {width}-bit value in `rj` left by the amount specified in `rk`. If shift count is non-zero, update CF, PF, ZF, SF (and OF if count is 1). If shift count is zero, flags are unchanged. Store the {width}-bit result sign-extended to 64-bit in `rd`.", False)
+            f"x86-style shift left logical: shift {width}-bit value in `rj` left by the amount specified in `rk`. If shift count is non-zero, update CF, PF, ZF, SF (and OF if count is 1). If shift count is zero, flags are unchanged. Only EFLAGS (LBT4) is updated; the GPR is not modified.", False)
 
     @env.macro
     def lbt_x86slli(name):
         width = lbt_widths[name]
         return _lbt_x86_shift("x86slli", name,
-            f"x86-style shift left logical: shift {width}-bit value in `rj` left by immediate `imm`. If shift count is non-zero, update CF, PF, ZF, SF (and OF if count is 1). If shift count is zero, flags are unchanged. Store the {width}-bit result sign-extended to 64-bit in `rd`.", True)
+            f"x86-style shift left logical: shift {width}-bit value in `rj` left by immediate `imm`. If shift count is non-zero, update CF, PF, ZF, SF (and OF if count is 1). If shift count is zero, flags are unchanged. Only EFLAGS (LBT4) is updated; the GPR is not modified.", True)
 
     @env.macro
     def lbt_x86srl(name):
         width = lbt_widths[name]
         return _lbt_x86_shift("x86srl", name,
-            f"x86-style shift right logical: shift {width}-bit value in `rj` right logically by the amount specified in `rk`. If shift count is non-zero, update CF, PF, ZF, SF (and OF if count is 1). If shift count is zero, flags are unchanged. Store the {width}-bit result sign-extended to 64-bit in `rd`.", False)
+            f"x86-style shift right logical: shift {width}-bit value in `rj` right logically by the amount specified in `rk`. If shift count is non-zero, update CF, PF, ZF, SF (and OF if count is 1). If shift count is zero, flags are unchanged. Only EFLAGS (LBT4) is updated; the GPR is not modified.", False)
 
     @env.macro
     def lbt_x86srli(name):
         width = lbt_widths[name]
         return _lbt_x86_shift("x86srli", name,
-            f"x86-style shift right logical: shift {width}-bit value in `rj` right logically by immediate `imm`. If shift count is non-zero, update CF, PF, ZF, SF (and OF if count is 1). If shift count is zero, flags are unchanged. Store the {width}-bit result sign-extended to 64-bit in `rd`.", True)
+            f"x86-style shift right logical: shift {width}-bit value in `rj` right logically by immediate `imm`. If shift count is non-zero, update CF, PF, ZF, SF (and OF if count is 1). If shift count is zero, flags are unchanged. Only EFLAGS (LBT4) is updated; the GPR is not modified.", True)
 
     @env.macro
     def lbt_x86sra(name):
         width = lbt_widths[name]
         return _lbt_x86_shift("x86sra", name,
-            f"x86-style shift right arithmetic: shift {width}-bit value in `rj` right arithmetically by the amount specified in `rk`. If shift count is non-zero, update CF, PF, ZF, SF (OF is set to 0 if count is 1). If shift count is zero, flags are unchanged. Store the {width}-bit result sign-extended to 64-bit in `rd`.", False)
+            f"x86-style shift right arithmetic: shift {width}-bit value in `rj` right arithmetically by the amount specified in `rk`. If shift count is non-zero, update CF, PF, ZF, SF (OF is set to 0 if count is 1). If shift count is zero, flags are unchanged. Only EFLAGS (LBT4) is updated; the GPR is not modified.", False)
 
     @env.macro
     def lbt_x86srai(name):
         width = lbt_widths[name]
         return _lbt_x86_shift("x86srai", name,
-            f"x86-style shift right arithmetic: shift {width}-bit value in `rj` right arithmetically by immediate `imm`. If shift count is non-zero, update CF, PF, ZF, SF (OF is set to 0 if count is 1). If shift count is zero, flags are unchanged. Store the {width}-bit result sign-extended to 64-bit in `rd`.", True)
+            f"x86-style shift right arithmetic: shift {width}-bit value in `rj` right arithmetically by immediate `imm`. If shift count is non-zero, update CF, PF, ZF, SF (OF is set to 0 if count is 1). If shift count is zero, flags are unchanged. Only EFLAGS (LBT4) is updated; the GPR is not modified.", True)
 
     @env.macro
     def lbt_setx86j():
@@ -2419,110 +2419,101 @@ static inline {ret} {name} ({args}) {{
     def _arm_inst(stem, instr, desc):
         return instruction(intrinsic=stem, instr=instr, desc=desc)
 
-    def _arm_inst_2op(stem, desc):
-        return _arm_inst(stem, f"{stem} rd, rj", desc)
-
-    def _arm_inst_3op(stem, desc):
-        return _arm_inst(stem, f"{stem} rd, rj, rk", desc)
-
-    def _arm_inst_shift_imm(stem, desc):
-        return _arm_inst(stem, f"{stem} rd, rj, imm", desc)
-
     @env.macro
     def lbt_armadd():
-        return _arm_inst_3op("armadd.w",
-            "ARM-style add (32-bit): conditionally add values in `rj` and `rk`. Update ARMFLAGS (C, V, N, Z). Store the 32-bit result sign-extended to 64-bit in `rd`.")
+        return _arm_inst("armadd.w", "armadd.w rj, rk",
+            "ARM-style add (32-bit): conditionally add values in `rj` and `rk`. Update ARMFLAGS (C, V, N, Z). Only ARMFLAGS (LBT4) is updated; the GPR is not modified.")
 
     @env.macro
     def lbt_armsub():
-        return _arm_inst_3op("armsub.w",
-            "ARM-style subtract (32-bit): conditionally subtract value in `rk` from `rj`. Update ARMFLAGS (C, V, N, Z). Store the 32-bit result sign-extended to 64-bit in `rd`.")
+        return _arm_inst("armsub.w", "armsub.w rj, rk",
+            "ARM-style subtract (32-bit): conditionally subtract value in `rk` from `rj`. Update ARMFLAGS (C, V, N, Z). Only ARMFLAGS (LBT4) is updated; the GPR is not modified.")
 
     @env.macro
     def lbt_armadc():
-        return _arm_inst_3op("armadc.w",
-            "ARM-style add with carry (32-bit): conditionally add values in `rj` and `rk` with carry (C in ARMFLAGS). Update ARMFLAGS (C, V, N, Z). Store the 32-bit result sign-extended to 64-bit in `rd`.")
+        return _arm_inst("armadc.w", "armadc.w rj, rk",
+            "ARM-style add with carry (32-bit): conditionally add values in `rj` and `rk` with carry (C in ARMFLAGS). Update ARMFLAGS (C, V, N, Z). Only ARMFLAGS (LBT4) is updated; the GPR is not modified.")
 
     @env.macro
     def lbt_armsbc():
-        return _arm_inst_3op("armsbc.w",
-            "ARM-style subtract with borrow (32-bit): conditionally subtract value in `rk` from `rj` with borrow (C in ARMFLAGS). Update ARMFLAGS (C, V, N, Z). Store the 32-bit result sign-extended to 64-bit in `rd`.")
+        return _arm_inst("armsbc.w", "armsbc.w rj, rk",
+            "ARM-style subtract with borrow (32-bit): conditionally subtract value in `rk` from `rj` with borrow (C in ARMFLAGS). Update ARMFLAGS (C, V, N, Z). Only ARMFLAGS (LBT4) is updated; the GPR is not modified.")
 
     @env.macro
     def lbt_armand():
-        return _arm_inst_3op("armand.w",
-            "ARM-style bitwise AND (32-bit): conditionally AND values in `rj` and `rk`. Update ARMFLAGS (N, Z). Store the 32-bit result sign-extended to 64-bit in `rd`.")
+        return _arm_inst("armand.w", "armand.w rj, rk",
+            "ARM-style bitwise AND (32-bit): conditionally AND values in `rj` and `rk`. Update ARMFLAGS (N, Z). Only ARMFLAGS (LBT4) is updated; the GPR is not modified.")
 
     @env.macro
     def lbt_armor():
-        return _arm_inst_3op("armor.w",
-            "ARM-style bitwise OR (32-bit): conditionally OR values in `rj` and `rk`. Update ARMFLAGS (N, Z). Store the 32-bit result sign-extended to 64-bit in `rd`.")
+        return _arm_inst("armor.w", "armor.w rj, rk",
+            "ARM-style bitwise OR (32-bit): conditionally OR values in `rj` and `rk`. Update ARMFLAGS (N, Z). Only ARMFLAGS (LBT4) is updated; the GPR is not modified.")
 
     @env.macro
     def lbt_armxor():
-        return _arm_inst_3op("armxor.w",
-            "ARM-style bitwise XOR (32-bit): conditionally XOR values in `rj` and `rk`. Update ARMFLAGS (N, Z). Store the 32-bit result sign-extended to 64-bit in `rd`.")
+        return _arm_inst("armxor.w", "armxor.w rj, rk",
+            "ARM-style bitwise XOR (32-bit): conditionally XOR values in `rj` and `rk`. Update ARMFLAGS (N, Z). Only ARMFLAGS (LBT4) is updated; the GPR is not modified.")
 
     @env.macro
     def lbt_armnot():
-        return _arm_inst_2op("armnot.w",
-            "ARM-style bitwise NOT (32-bit): conditionally bitwise NOT the value in `rj`. Update ARMFLAGS (N, Z). Store the 32-bit result sign-extended to 64-bit in `rd`.")
+        return _arm_inst("armnot.w", "armnot.w rj",
+            "ARM-style bitwise NOT (32-bit): conditionally bitwise NOT the value in `rj`. Update ARMFLAGS (N, Z). Only ARMFLAGS (LBT4) is updated; the GPR is not modified.")
 
     @env.macro
     def lbt_armsll():
-        return _arm_inst_3op("armsll.w",
-            "ARM-style logical shift left (32-bit): conditionally shift value in `rj` left by amount in `rk` (masked to 8 bits). Update ARMFLAGS (C, N, Z). Store the 32-bit result sign-extended to 64-bit in `rd`.")
+        return _arm_inst("armsll.w", "armsll.w rj, rk",
+            "ARM-style logical shift left (32-bit): conditionally shift value in `rj` left by amount in `rk` (masked to 8 bits). Update ARMFLAGS (C, N, Z). Only ARMFLAGS (LBT4) is updated; the GPR is not modified.")
 
     @env.macro
     def lbt_armsrl():
-        return _arm_inst_3op("armsrl.w",
-            "ARM-style logical shift right (32-bit): conditionally shift value in `rj` right logically by amount in `rk` (masked to 8 bits). Update ARMFLAGS (C, N, Z). Store the 32-bit result sign-extended to 64-bit in `rd`.")
+        return _arm_inst("armsrl.w", "armsrl.w rj, rk",
+            "ARM-style logical shift right (32-bit): conditionally shift value in `rj` right logically by amount in `rk` (masked to 8 bits). Update ARMFLAGS (C, N, Z). Only ARMFLAGS (LBT4) is updated; the GPR is not modified.")
 
     @env.macro
     def lbt_armsra():
-        return _arm_inst_3op("armsra.w",
-            "ARM-style arithmetic shift right (32-bit): conditionally shift value in `rj` right arithmetically by amount in `rk` (masked to 8 bits). Update ARMFLAGS (C, N, Z). Store the 32-bit result sign-extended to 64-bit in `rd`.")
+        return _arm_inst("armsra.w", "armsra.w rj, rk",
+            "ARM-style arithmetic shift right (32-bit): conditionally shift value in `rj` right arithmetically by amount in `rk` (masked to 8 bits). Update ARMFLAGS (C, N, Z). Only ARMFLAGS (LBT4) is updated; the GPR is not modified.")
 
     @env.macro
     def lbt_armrotr():
-        return _arm_inst_3op("armrotr.w",
-            "ARM-style rotate right (32-bit): conditionally rotate value in `rj` right by amount in `rk` (masked to 8 bits, rotate modulo 32). Update ARMFLAGS (C, N, Z). Store the 32-bit result sign-extended to 64-bit in `rd`.")
+        return _arm_inst("armrotr.w", "armrotr.w rj, rk",
+            "ARM-style rotate right (32-bit): conditionally rotate value in `rj` right by amount in `rk` (masked to 8 bits, rotate modulo 32). Update ARMFLAGS (C, N, Z). Only ARMFLAGS (LBT4) is updated; the GPR is not modified.")
 
     @env.macro
     def lbt_armslli():
-        return _arm_inst_shift_imm("armslli.w",
-            "ARM-style logical shift left immediate (32-bit): conditionally shift value in `rj` left by `imm`. Update ARMFLAGS (C, N, Z). Store the 32-bit result sign-extended to 64-bit in `rd`.")
+        return _arm_inst("armslli.w", "armslli.w rj, imm",
+            "ARM-style logical shift left immediate (32-bit): conditionally shift value in `rj` left by `imm`. Update ARMFLAGS (C, N, Z). Only ARMFLAGS (LBT4) is updated; the GPR is not modified.")
 
     @env.macro
     def lbt_armsrli():
-        return _arm_inst_shift_imm("armsrli.w",
-            "ARM-style logical shift right immediate (32-bit): conditionally shift value in `rj` right logically by `imm`. Update ARMFLAGS (C, N, Z). Store the 32-bit result sign-extended to 64-bit in `rd`.")
+        return _arm_inst("armsrli.w", "armsrli.w rj, imm",
+            "ARM-style logical shift right immediate (32-bit): conditionally shift value in `rj` right logically by `imm`. Update ARMFLAGS (C, N, Z). Only ARMFLAGS (LBT4) is updated; the GPR is not modified.")
 
     @env.macro
     def lbt_armsrai():
-        return _arm_inst_shift_imm("armsrai.w",
-            "ARM-style arithmetic shift right immediate (32-bit): conditionally shift value in `rj` right arithmetically by `imm`. Update ARMFLAGS (C, N, Z). Store the 32-bit result sign-extended to 64-bit in `rd`.")
+        return _arm_inst("armsrai.w", "armsrai.w rj, imm",
+            "ARM-style arithmetic shift right immediate (32-bit): conditionally shift value in `rj` right arithmetically by `imm`. Update ARMFLAGS (C, N, Z). Only ARMFLAGS (LBT4) is updated; the GPR is not modified.")
 
     @env.macro
     def lbt_armrotri():
-        return _arm_inst_shift_imm("armrotri.w",
-            "ARM-style rotate right immediate (32-bit): conditionally rotate value in `rj` right by `imm`. Update ARMFLAGS (C, N, Z). Store the 32-bit result sign-extended to 64-bit in `rd`.")
+        return _arm_inst("armrotri.w", "armrotri.w rj, imm",
+            "ARM-style rotate right immediate (32-bit): conditionally rotate value in `rj` right by `imm`. Update ARMFLAGS (C, N, Z). Only ARMFLAGS (LBT4) is updated; the GPR is not modified.")
 
     @env.macro
     def lbt_armrrx():
-        return _arm_inst_2op("armrrx.w",
-            "ARM-style rotate right extended (32-bit): conditionally rotate the value in `rj` and C (in ARMFLAGS) together as a 33-bit ring right by 1. Update ARMFLAGS (C, N, Z). Store the 32-bit result sign-extended to 64-bit in `rd`.")
+        return _arm_inst("armrrx.w", "armrrx.w rj",
+            "ARM-style rotate right extended (32-bit): conditionally rotate the value in `rj` and C (in ARMFLAGS) together as a 33-bit ring right by 1. Update ARMFLAGS (C, N, Z). Only ARMFLAGS (LBT4) is updated; the GPR is not modified.")
 
     @env.macro
     def lbt_armmove():
-        return _arm_inst_2op("armmove",
+        return _arm_inst("armmove", "armmove rd, rj",
             "ARM-style conditional move: if the ARM condition holds, copy the value in `rj` to `rd`. ARMFLAGS are not updated.")
 
     @env.macro
     def lbt_armmov(name):
         width = lbt_widths[name]
-        return _arm_inst(f"armmov.{name}", f"armmov.{name} rd, rj",
-            f"ARM-style move (with flag update): conditionally copy {width}-bit value in `rj` to `rd`. Update ARMFLAGS (N, Z).")
+        return _arm_inst(f"armmov.{name}", f"armmov.{name} rj",
+            f"ARM-style move (with flag update): conditionally test the {width}-bit value in `rj` and update ARMFLAGS (N, Z). Only ARMFLAGS (LBT4) is updated; the GPR is not modified.")
 
     @env.macro
     def lbt_setarmj():

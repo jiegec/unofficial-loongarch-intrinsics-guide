@@ -152,13 +152,16 @@ Conversion instructions:
 
 All LBT instruction groups are documented in the following pages:
 
-- [Integer](lbt/integer.md): `addu12i`, `adc`, `sbc`, `rotr`, `rotri`, `rcr`, `rcri`
+- [LBT Integer](lbt/integer.md): `addu12i`, `adc`, `sbc`, `rotr`, `rotri`, `rcr`, `rcri`
 - [x86 Integer](lbt/x86_integer.md): `x86adc`, `x86add`, `x86inc`, `x86sbc`, `x86sub`, `x86dec`, `x86mul`
 - [x86 Logical](lbt/x86_logical.md): `x86and`, `x86or`, `x86xor`
 - [x86 Shift](lbt/x86_shift.md): `x86rcl`, `x86rcli`, `x86rcr`, `x86rcri`, `x86rotl`, `x86rotli`, `x86rotr`, `x86rotri`, `x86sll`, `x86slli`, `x86srl`, `x86srli`, `x86sra`, `x86srai`
 - [x86 FPU](lbt/x86_fpu.md): `x86mftop`, `x86mttop`, `x86inctop`, `x86dectop`, `x86settm`, `x86clrtm`, `x86settag`, `fcvt.ud.d`, `fcvt.ld.d`, `fcvt.d.ld`
+- [x86 Misc](lbt/x86_misc.md): `setx86j`, `setx86loope`, `setx86loopne`
 - [ARM Integer](lbt/arm_integer.md): `armadd`, `armsub`, `armadc`, `armsbc`
 - [ARM Logical](lbt/arm_logical.md): `armand`, `armor`, `armxor`, `armnot`
 - [ARM Shift](lbt/arm_shift.md): `armsll`, `armsrl`, `armsra`, `armrotr`, `armslli`, `armsrli`, `armsrai`, `armrotri`
 - [ARM Misc](lbt/arm_misc.md): `armrrx`, `armmove`, `armmov`, `setarmj`
-- [State](lbt/state.md): `movgr2scr`, `movscr2gr`, `x86mfflag`, `x86mtflag`, `armmfflag`, `armmtflag`
+- [LBT State Transfer](lbt/state.md): `movgr2scr`, `movscr2gr`, `x86mfflag`, `x86mtflag`, `armmfflag`, `armmtflag`
+- [LBT Jump](lbt/jump.md): `jiscr0`, `jiscr1`
+- [MIPS Memory](lbt/mips_memory.md): `ldl.d`, `ldl.w`, `ldr.w`, `ldr.d`, `stl.w`, `stl.d`, `str.w`, `str.d`
