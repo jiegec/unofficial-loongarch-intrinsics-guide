@@ -26,8 +26,8 @@ typedef double f64;
 #include "common-machine.h"
 
 uint64_t rand64() {
-  static std::random_device rd;
-  static std::mt19937_64 gen(rd());
+  // static std::random_device rd;
+  static std::mt19937_64 gen(0);
   return gen();
 }
 
@@ -335,6 +335,10 @@ void print(const char *s, __m256d num) {
 }
 
 void print(const char *s, int num) { printf("int %s: %d\n", s, num); }
+
+void print(const char *s, uint64_t num) {
+  printf("uint64_t %s: %ld 0x%016lx\n", s, num, num);
+}
 
 #define PRINT(x) print(#x, x)
 
