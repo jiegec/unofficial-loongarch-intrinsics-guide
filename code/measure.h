@@ -4977,36 +4977,102 @@ INSTR_TEST8(x86adc_d_tp,
             "x86adc.d $r12, $r4\nx86adc.d $r13, $r5\nx86adc.d $r14, "
             "$r6\nx86adc.d $r15, $r7\nx86adc.d $r16, $r8\nx86adc.d $r17, "
             "$r9\nx86adc.d $r18, $r10\nx86adc.d $r19, $r11\n")
-INSTR_TEST(x86add_b_1, "x86add.b $r12, $r12\n", "r12", "r13")
+INSTR_TEST_SETUP(
+    x86add_b_0,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86add.b $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86add_b_1,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86add.b $r12, $r12\n", "r12", "r13", "memory")
 INSTR_TEST8(x86add_b_tp,
             "x86add.b $r12, $r4\nx86add.b $r13, $r5\nx86add.b $r14, "
             "$r6\nx86add.b $r15, $r7\nx86add.b $r16, $r8\nx86add.b $r17, "
             "$r9\nx86add.b $r18, $r10\nx86add.b $r19, $r11\n")
-INSTR_TEST(x86add_h_1, "x86add.h $r12, $r12\n", "r12", "r13")
+INSTR_TEST_SETUP(
+    x86add_h_0,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86add.h $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86add_h_1,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86add.h $r12, $r12\n", "r12", "r13", "memory")
 INSTR_TEST8(x86add_h_tp,
             "x86add.h $r12, $r4\nx86add.h $r13, $r5\nx86add.h $r14, "
             "$r6\nx86add.h $r15, $r7\nx86add.h $r16, $r8\nx86add.h $r17, "
             "$r9\nx86add.h $r18, $r10\nx86add.h $r19, $r11\n")
-INSTR_TEST(x86add_w_1, "x86add.w $r12, $r12\n", "r12", "r13")
+INSTR_TEST_SETUP(
+    x86add_w_0,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86add.w $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86add_w_1,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86add.w $r12, $r12\n", "r12", "r13", "memory")
 INSTR_TEST8(x86add_w_tp,
             "x86add.w $r12, $r4\nx86add.w $r13, $r5\nx86add.w $r14, "
             "$r6\nx86add.w $r15, $r7\nx86add.w $r16, $r8\nx86add.w $r17, "
             "$r9\nx86add.w $r18, $r10\nx86add.w $r19, $r11\n")
-INSTR_TEST(x86add_d_1, "x86add.d $r12, $r12\n", "r12", "r13")
+INSTR_TEST_SETUP(
+    x86add_d_0,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86add.d $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86add_d_1,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86add.d $r12, $r12\n", "r12", "r13", "memory")
 INSTR_TEST8(x86add_d_tp,
             "x86add.d $r12, $r4\nx86add.d $r13, $r5\nx86add.d $r14, "
             "$r6\nx86add.d $r15, $r7\nx86add.d $r16, $r8\nx86add.d $r17, "
             "$r9\nx86add.d $r18, $r10\nx86add.d $r19, $r11\n")
-INSTR_TEST(x86add_wu_1, "x86add.wu $r12, $r12\n", "r12", "r13")
+INSTR_TEST_SETUP(
+    x86add_wu_0,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86add.wu $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86add_wu_1,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86add.wu $r12, $r12\n", "r12", "r13", "memory")
 INSTR_TEST8(x86add_wu_tp,
             "x86add.wu $r12, $r4\nx86add.wu $r13, $r5\nx86add.wu $r14, "
             "$r6\nx86add.wu $r15, $r7\nx86add.wu $r16, $r8\nx86add.wu $r17, "
             "$r9\nx86add.wu $r18, $r10\nx86add.wu $r19, $r11\n")
-INSTR_TEST(x86add_du_1, "x86add.du $r12, $r12\n", "r12", "r13")
+INSTR_TEST_SETUP(
+    x86add_du_0,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86add.du $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86add_du_1,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86add.du $r12, $r12\n", "r12", "r13", "memory")
 INSTR_TEST8(x86add_du_tp,
             "x86add.du $r12, $r4\nx86add.du $r13, $r5\nx86add.du $r14, "
             "$r6\nx86add.du $r15, $r7\nx86add.du $r16, $r8\nx86add.du $r17, "
             "$r9\nx86add.du $r18, $r10\nx86add.du $r19, $r11\n")
+INSTR_TEST_SETUP(x86inc_b_0, "addi.d $r12, $r0, 0\nx86mtflag $r0, 0x1\n",
+                 "x86inc.b $r12\n", "r12", "memory")
+INSTR_TEST8(
+    x86inc_b_tp,
+    "x86inc.b $r12\nx86inc.b $r13\nx86inc.b $r14\nx86inc.b $r15\nx86inc.b "
+    "$r16\nx86inc.b $r17\nx86inc.b $r18\nx86inc.b $r19\n")
+INSTR_TEST_SETUP(x86inc_h_0, "addi.d $r12, $r0, 0\nx86mtflag $r0, 0x1\n",
+                 "x86inc.h $r12\n", "r12", "memory")
+INSTR_TEST8(
+    x86inc_h_tp,
+    "x86inc.h $r12\nx86inc.h $r13\nx86inc.h $r14\nx86inc.h $r15\nx86inc.h "
+    "$r16\nx86inc.h $r17\nx86inc.h $r18\nx86inc.h $r19\n")
+INSTR_TEST_SETUP(x86inc_w_0, "addi.d $r12, $r0, 0\nx86mtflag $r0, 0x1\n",
+                 "x86inc.w $r12\n", "r12", "memory")
+INSTR_TEST8(
+    x86inc_w_tp,
+    "x86inc.w $r12\nx86inc.w $r13\nx86inc.w $r14\nx86inc.w $r15\nx86inc.w "
+    "$r16\nx86inc.w $r17\nx86inc.w $r18\nx86inc.w $r19\n")
+INSTR_TEST_SETUP(x86inc_d_0, "addi.d $r12, $r0, 0\nx86mtflag $r0, 0x1\n",
+                 "x86inc.d $r12\n", "r12", "memory")
+INSTR_TEST8(
+    x86inc_d_tp,
+    "x86inc.d $r12\nx86inc.d $r13\nx86inc.d $r14\nx86inc.d $r15\nx86inc.d "
+    "$r16\nx86inc.d $r17\nx86inc.d $r18\nx86inc.d $r19\n")
 INSTR_TEST_SETUP(
     x86sbc_b_0,
     "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
@@ -5055,136 +5121,851 @@ INSTR_TEST8(x86sbc_d_tp,
             "x86sbc.d $r12, $r4\nx86sbc.d $r13, $r5\nx86sbc.d $r14, "
             "$r6\nx86sbc.d $r15, $r7\nx86sbc.d $r16, $r8\nx86sbc.d $r17, "
             "$r9\nx86sbc.d $r18, $r10\nx86sbc.d $r19, $r11\n")
-INSTR_TEST(x86sub_b_1, "x86sub.b $r12, $r12\n", "r12", "r13")
+INSTR_TEST_SETUP(
+    x86sub_b_0,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86sub.b $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86sub_b_1,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86sub.b $r12, $r12\n", "r12", "r13", "memory")
 INSTR_TEST8(x86sub_b_tp,
             "x86sub.b $r12, $r4\nx86sub.b $r13, $r5\nx86sub.b $r14, "
             "$r6\nx86sub.b $r15, $r7\nx86sub.b $r16, $r8\nx86sub.b $r17, "
             "$r9\nx86sub.b $r18, $r10\nx86sub.b $r19, $r11\n")
-INSTR_TEST(x86sub_h_1, "x86sub.h $r12, $r12\n", "r12", "r13")
+INSTR_TEST_SETUP(
+    x86sub_h_0,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86sub.h $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86sub_h_1,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86sub.h $r12, $r12\n", "r12", "r13", "memory")
 INSTR_TEST8(x86sub_h_tp,
             "x86sub.h $r12, $r4\nx86sub.h $r13, $r5\nx86sub.h $r14, "
             "$r6\nx86sub.h $r15, $r7\nx86sub.h $r16, $r8\nx86sub.h $r17, "
             "$r9\nx86sub.h $r18, $r10\nx86sub.h $r19, $r11\n")
-INSTR_TEST(x86sub_w_1, "x86sub.w $r12, $r12\n", "r12", "r13")
+INSTR_TEST_SETUP(
+    x86sub_w_0,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86sub.w $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86sub_w_1,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86sub.w $r12, $r12\n", "r12", "r13", "memory")
 INSTR_TEST8(x86sub_w_tp,
             "x86sub.w $r12, $r4\nx86sub.w $r13, $r5\nx86sub.w $r14, "
             "$r6\nx86sub.w $r15, $r7\nx86sub.w $r16, $r8\nx86sub.w $r17, "
             "$r9\nx86sub.w $r18, $r10\nx86sub.w $r19, $r11\n")
-INSTR_TEST(x86sub_d_1, "x86sub.d $r12, $r12\n", "r12", "r13")
+INSTR_TEST_SETUP(
+    x86sub_d_0,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86sub.d $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86sub_d_1,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86sub.d $r12, $r12\n", "r12", "r13", "memory")
 INSTR_TEST8(x86sub_d_tp,
             "x86sub.d $r12, $r4\nx86sub.d $r13, $r5\nx86sub.d $r14, "
             "$r6\nx86sub.d $r15, $r7\nx86sub.d $r16, $r8\nx86sub.d $r17, "
             "$r9\nx86sub.d $r18, $r10\nx86sub.d $r19, $r11\n")
-INSTR_TEST(x86sub_wu_1, "x86sub.wu $r12, $r12\n", "r12", "r13")
+INSTR_TEST_SETUP(
+    x86sub_wu_0,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86sub.wu $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86sub_wu_1,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86sub.wu $r12, $r12\n", "r12", "r13", "memory")
 INSTR_TEST8(x86sub_wu_tp,
             "x86sub.wu $r12, $r4\nx86sub.wu $r13, $r5\nx86sub.wu $r14, "
             "$r6\nx86sub.wu $r15, $r7\nx86sub.wu $r16, $r8\nx86sub.wu $r17, "
             "$r9\nx86sub.wu $r18, $r10\nx86sub.wu $r19, $r11\n")
-INSTR_TEST(x86sub_du_1, "x86sub.du $r12, $r12\n", "r12", "r13")
+INSTR_TEST_SETUP(
+    x86sub_du_0,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86sub.du $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86sub_du_1,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86sub.du $r12, $r12\n", "r12", "r13", "memory")
 INSTR_TEST8(x86sub_du_tp,
             "x86sub.du $r12, $r4\nx86sub.du $r13, $r5\nx86sub.du $r14, "
             "$r6\nx86sub.du $r15, $r7\nx86sub.du $r16, $r8\nx86sub.du $r17, "
             "$r9\nx86sub.du $r18, $r10\nx86sub.du $r19, $r11\n")
-INSTR_TEST(x86and_b_1, "x86and.b $r12, $r12\n", "r12", "r13")
+INSTR_TEST_SETUP(x86dec_b_0, "addi.d $r12, $r0, 0\nx86mtflag $r0, 0x1\n",
+                 "x86dec.b $r12\n", "r12", "memory")
+INSTR_TEST8(
+    x86dec_b_tp,
+    "x86dec.b $r12\nx86dec.b $r13\nx86dec.b $r14\nx86dec.b $r15\nx86dec.b "
+    "$r16\nx86dec.b $r17\nx86dec.b $r18\nx86dec.b $r19\n")
+INSTR_TEST_SETUP(x86dec_h_0, "addi.d $r12, $r0, 0\nx86mtflag $r0, 0x1\n",
+                 "x86dec.h $r12\n", "r12", "memory")
+INSTR_TEST8(
+    x86dec_h_tp,
+    "x86dec.h $r12\nx86dec.h $r13\nx86dec.h $r14\nx86dec.h $r15\nx86dec.h "
+    "$r16\nx86dec.h $r17\nx86dec.h $r18\nx86dec.h $r19\n")
+INSTR_TEST_SETUP(x86dec_w_0, "addi.d $r12, $r0, 0\nx86mtflag $r0, 0x1\n",
+                 "x86dec.w $r12\n", "r12", "memory")
+INSTR_TEST8(
+    x86dec_w_tp,
+    "x86dec.w $r12\nx86dec.w $r13\nx86dec.w $r14\nx86dec.w $r15\nx86dec.w "
+    "$r16\nx86dec.w $r17\nx86dec.w $r18\nx86dec.w $r19\n")
+INSTR_TEST_SETUP(x86dec_d_0, "addi.d $r12, $r0, 0\nx86mtflag $r0, 0x1\n",
+                 "x86dec.d $r12\n", "r12", "memory")
+INSTR_TEST8(
+    x86dec_d_tp,
+    "x86dec.d $r12\nx86dec.d $r13\nx86dec.d $r14\nx86dec.d $r15\nx86dec.d "
+    "$r16\nx86dec.d $r17\nx86dec.d $r18\nx86dec.d $r19\n")
+INSTR_TEST_SETUP(
+    x86and_b_0,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86and.b $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86and_b_1,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86and.b $r12, $r12\n", "r12", "r13", "memory")
 INSTR_TEST8(x86and_b_tp,
             "x86and.b $r12, $r4\nx86and.b $r13, $r5\nx86and.b $r14, "
             "$r6\nx86and.b $r15, $r7\nx86and.b $r16, $r8\nx86and.b $r17, "
             "$r9\nx86and.b $r18, $r10\nx86and.b $r19, $r11\n")
-INSTR_TEST(x86and_h_1, "x86and.h $r12, $r12\n", "r12", "r13")
+INSTR_TEST_SETUP(
+    x86and_h_0,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86and.h $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86and_h_1,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86and.h $r12, $r12\n", "r12", "r13", "memory")
 INSTR_TEST8(x86and_h_tp,
             "x86and.h $r12, $r4\nx86and.h $r13, $r5\nx86and.h $r14, "
             "$r6\nx86and.h $r15, $r7\nx86and.h $r16, $r8\nx86and.h $r17, "
             "$r9\nx86and.h $r18, $r10\nx86and.h $r19, $r11\n")
-INSTR_TEST(x86and_w_1, "x86and.w $r12, $r12\n", "r12", "r13")
+INSTR_TEST_SETUP(
+    x86and_w_0,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86and.w $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86and_w_1,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86and.w $r12, $r12\n", "r12", "r13", "memory")
 INSTR_TEST8(x86and_w_tp,
             "x86and.w $r12, $r4\nx86and.w $r13, $r5\nx86and.w $r14, "
             "$r6\nx86and.w $r15, $r7\nx86and.w $r16, $r8\nx86and.w $r17, "
             "$r9\nx86and.w $r18, $r10\nx86and.w $r19, $r11\n")
-INSTR_TEST(x86and_d_1, "x86and.d $r12, $r12\n", "r12", "r13")
+INSTR_TEST_SETUP(
+    x86and_d_0,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86and.d $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86and_d_1,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86and.d $r12, $r12\n", "r12", "r13", "memory")
 INSTR_TEST8(x86and_d_tp,
             "x86and.d $r12, $r4\nx86and.d $r13, $r5\nx86and.d $r14, "
             "$r6\nx86and.d $r15, $r7\nx86and.d $r16, $r8\nx86and.d $r17, "
             "$r9\nx86and.d $r18, $r10\nx86and.d $r19, $r11\n")
-INSTR_TEST(x86or_b_1, "x86or.b $r12, $r12\n", "r12", "r13")
+INSTR_TEST_SETUP(
+    x86or_b_0, "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86or.b $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86or_b_1, "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86or.b $r12, $r12\n", "r12", "r13", "memory")
 INSTR_TEST8(x86or_b_tp, "x86or.b $r12, $r4\nx86or.b $r13, $r5\nx86or.b $r14, "
                         "$r6\nx86or.b $r15, $r7\nx86or.b $r16, $r8\nx86or.b "
                         "$r17, $r9\nx86or.b $r18, $r10\nx86or.b $r19, $r11\n")
-INSTR_TEST(x86or_h_1, "x86or.h $r12, $r12\n", "r12", "r13")
+INSTR_TEST_SETUP(
+    x86or_h_0, "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86or.h $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86or_h_1, "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86or.h $r12, $r12\n", "r12", "r13", "memory")
 INSTR_TEST8(x86or_h_tp, "x86or.h $r12, $r4\nx86or.h $r13, $r5\nx86or.h $r14, "
                         "$r6\nx86or.h $r15, $r7\nx86or.h $r16, $r8\nx86or.h "
                         "$r17, $r9\nx86or.h $r18, $r10\nx86or.h $r19, $r11\n")
-INSTR_TEST(x86or_w_1, "x86or.w $r12, $r12\n", "r12", "r13")
+INSTR_TEST_SETUP(
+    x86or_w_0, "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86or.w $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86or_w_1, "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86or.w $r12, $r12\n", "r12", "r13", "memory")
 INSTR_TEST8(x86or_w_tp, "x86or.w $r12, $r4\nx86or.w $r13, $r5\nx86or.w $r14, "
                         "$r6\nx86or.w $r15, $r7\nx86or.w $r16, $r8\nx86or.w "
                         "$r17, $r9\nx86or.w $r18, $r10\nx86or.w $r19, $r11\n")
-INSTR_TEST(x86or_d_1, "x86or.d $r12, $r12\n", "r12", "r13")
+INSTR_TEST_SETUP(
+    x86or_d_0, "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86or.d $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86or_d_1, "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86or.d $r12, $r12\n", "r12", "r13", "memory")
 INSTR_TEST8(x86or_d_tp, "x86or.d $r12, $r4\nx86or.d $r13, $r5\nx86or.d $r14, "
                         "$r6\nx86or.d $r15, $r7\nx86or.d $r16, $r8\nx86or.d "
                         "$r17, $r9\nx86or.d $r18, $r10\nx86or.d $r19, $r11\n")
-INSTR_TEST(x86xor_b_1, "x86xor.b $r12, $r12\n", "r12", "r13")
+INSTR_TEST_SETUP(
+    x86xor_b_0,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86xor.b $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86xor_b_1,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86xor.b $r12, $r12\n", "r12", "r13", "memory")
 INSTR_TEST8(x86xor_b_tp,
             "x86xor.b $r12, $r4\nx86xor.b $r13, $r5\nx86xor.b $r14, "
             "$r6\nx86xor.b $r15, $r7\nx86xor.b $r16, $r8\nx86xor.b $r17, "
             "$r9\nx86xor.b $r18, $r10\nx86xor.b $r19, $r11\n")
-INSTR_TEST(x86xor_h_1, "x86xor.h $r12, $r12\n", "r12", "r13")
+INSTR_TEST_SETUP(
+    x86xor_h_0,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86xor.h $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86xor_h_1,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86xor.h $r12, $r12\n", "r12", "r13", "memory")
 INSTR_TEST8(x86xor_h_tp,
             "x86xor.h $r12, $r4\nx86xor.h $r13, $r5\nx86xor.h $r14, "
             "$r6\nx86xor.h $r15, $r7\nx86xor.h $r16, $r8\nx86xor.h $r17, "
             "$r9\nx86xor.h $r18, $r10\nx86xor.h $r19, $r11\n")
-INSTR_TEST(x86xor_w_1, "x86xor.w $r12, $r12\n", "r12", "r13")
+INSTR_TEST_SETUP(
+    x86xor_w_0,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86xor.w $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86xor_w_1,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86xor.w $r12, $r12\n", "r12", "r13", "memory")
 INSTR_TEST8(x86xor_w_tp,
             "x86xor.w $r12, $r4\nx86xor.w $r13, $r5\nx86xor.w $r14, "
             "$r6\nx86xor.w $r15, $r7\nx86xor.w $r16, $r8\nx86xor.w $r17, "
             "$r9\nx86xor.w $r18, $r10\nx86xor.w $r19, $r11\n")
-INSTR_TEST(x86xor_d_1, "x86xor.d $r12, $r12\n", "r12", "r13")
+INSTR_TEST_SETUP(
+    x86xor_d_0,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86xor.d $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86xor_d_1,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86xor.d $r12, $r12\n", "r12", "r13", "memory")
 INSTR_TEST8(x86xor_d_tp,
             "x86xor.d $r12, $r4\nx86xor.d $r13, $r5\nx86xor.d $r14, "
             "$r6\nx86xor.d $r15, $r7\nx86xor.d $r16, $r8\nx86xor.d $r17, "
             "$r9\nx86xor.d $r18, $r10\nx86xor.d $r19, $r11\n")
-INSTR_TEST(x86mul_b_1, "x86mul.b $r12, $r12\n", "r12", "r13")
+INSTR_TEST_SETUP(
+    x86mul_b_0,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86mul.b $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86mul_b_1,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86mul.b $r12, $r12\n", "r12", "r13", "memory")
 INSTR_TEST8(x86mul_b_tp,
             "x86mul.b $r12, $r4\nx86mul.b $r13, $r5\nx86mul.b $r14, "
             "$r6\nx86mul.b $r15, $r7\nx86mul.b $r16, $r8\nx86mul.b $r17, "
             "$r9\nx86mul.b $r18, $r10\nx86mul.b $r19, $r11\n")
-INSTR_TEST(x86mul_h_1, "x86mul.h $r12, $r12\n", "r12", "r13")
+INSTR_TEST_SETUP(
+    x86mul_h_0,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86mul.h $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86mul_h_1,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86mul.h $r12, $r12\n", "r12", "r13", "memory")
 INSTR_TEST8(x86mul_h_tp,
             "x86mul.h $r12, $r4\nx86mul.h $r13, $r5\nx86mul.h $r14, "
             "$r6\nx86mul.h $r15, $r7\nx86mul.h $r16, $r8\nx86mul.h $r17, "
             "$r9\nx86mul.h $r18, $r10\nx86mul.h $r19, $r11\n")
-INSTR_TEST(x86mul_w_1, "x86mul.w $r12, $r12\n", "r12", "r13")
+INSTR_TEST_SETUP(
+    x86mul_w_0,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86mul.w $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86mul_w_1,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86mul.w $r12, $r12\n", "r12", "r13", "memory")
 INSTR_TEST8(x86mul_w_tp,
             "x86mul.w $r12, $r4\nx86mul.w $r13, $r5\nx86mul.w $r14, "
             "$r6\nx86mul.w $r15, $r7\nx86mul.w $r16, $r8\nx86mul.w $r17, "
             "$r9\nx86mul.w $r18, $r10\nx86mul.w $r19, $r11\n")
-INSTR_TEST(x86mul_d_1, "x86mul.d $r12, $r12\n", "r12", "r13")
+INSTR_TEST_SETUP(
+    x86mul_d_0,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86mul.d $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86mul_d_1,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86mul.d $r12, $r12\n", "r12", "r13", "memory")
 INSTR_TEST8(x86mul_d_tp,
             "x86mul.d $r12, $r4\nx86mul.d $r13, $r5\nx86mul.d $r14, "
             "$r6\nx86mul.d $r15, $r7\nx86mul.d $r16, $r8\nx86mul.d $r17, "
             "$r9\nx86mul.d $r18, $r10\nx86mul.d $r19, $r11\n")
-INSTR_TEST(x86mul_bu_1, "x86mul.bu $r12, $r12\n", "r12", "r13")
+INSTR_TEST_SETUP(
+    x86mul_bu_0,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86mul.bu $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86mul_bu_1,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86mul.bu $r12, $r12\n", "r12", "r13", "memory")
 INSTR_TEST8(x86mul_bu_tp,
             "x86mul.bu $r12, $r4\nx86mul.bu $r13, $r5\nx86mul.bu $r14, "
             "$r6\nx86mul.bu $r15, $r7\nx86mul.bu $r16, $r8\nx86mul.bu $r17, "
             "$r9\nx86mul.bu $r18, $r10\nx86mul.bu $r19, $r11\n")
-INSTR_TEST(x86mul_hu_1, "x86mul.hu $r12, $r12\n", "r12", "r13")
+INSTR_TEST_SETUP(
+    x86mul_hu_0,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86mul.hu $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86mul_hu_1,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86mul.hu $r12, $r12\n", "r12", "r13", "memory")
 INSTR_TEST8(x86mul_hu_tp,
             "x86mul.hu $r12, $r4\nx86mul.hu $r13, $r5\nx86mul.hu $r14, "
             "$r6\nx86mul.hu $r15, $r7\nx86mul.hu $r16, $r8\nx86mul.hu $r17, "
             "$r9\nx86mul.hu $r18, $r10\nx86mul.hu $r19, $r11\n")
-INSTR_TEST(x86mul_wu_1, "x86mul.wu $r12, $r12\n", "r12", "r13")
+INSTR_TEST_SETUP(
+    x86mul_wu_0,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86mul.wu $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86mul_wu_1,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86mul.wu $r12, $r12\n", "r12", "r13", "memory")
 INSTR_TEST8(x86mul_wu_tp,
             "x86mul.wu $r12, $r4\nx86mul.wu $r13, $r5\nx86mul.wu $r14, "
             "$r6\nx86mul.wu $r15, $r7\nx86mul.wu $r16, $r8\nx86mul.wu $r17, "
             "$r9\nx86mul.wu $r18, $r10\nx86mul.wu $r19, $r11\n")
-INSTR_TEST(x86mul_du_1, "x86mul.du $r12, $r12\n", "r12", "r13")
+INSTR_TEST_SETUP(
+    x86mul_du_0,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86mul.du $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86mul_du_1,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86mul.du $r12, $r12\n", "r12", "r13", "memory")
 INSTR_TEST8(x86mul_du_tp,
             "x86mul.du $r12, $r4\nx86mul.du $r13, $r5\nx86mul.du $r14, "
             "$r6\nx86mul.du $r15, $r7\nx86mul.du $r16, $r8\nx86mul.du $r17, "
             "$r9\nx86mul.du $r18, $r10\nx86mul.du $r19, $r11\n")
+INSTR_TEST_SETUP(
+    x86rcl_b_0,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86rcl.b $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86rcl_b_1,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86rcl.b $r12, $r12\n", "r12", "r13", "memory")
+INSTR_TEST8(x86rcl_b_tp,
+            "x86rcl.b $r12, $r4\nx86rcl.b $r13, $r5\nx86rcl.b $r14, "
+            "$r6\nx86rcl.b $r15, $r7\nx86rcl.b $r16, $r8\nx86rcl.b $r17, "
+            "$r9\nx86rcl.b $r18, $r10\nx86rcl.b $r19, $r11\n")
+INSTR_TEST_SETUP(
+    x86rcl_h_0,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86rcl.h $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86rcl_h_1,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86rcl.h $r12, $r12\n", "r12", "r13", "memory")
+INSTR_TEST8(x86rcl_h_tp,
+            "x86rcl.h $r12, $r4\nx86rcl.h $r13, $r5\nx86rcl.h $r14, "
+            "$r6\nx86rcl.h $r15, $r7\nx86rcl.h $r16, $r8\nx86rcl.h $r17, "
+            "$r9\nx86rcl.h $r18, $r10\nx86rcl.h $r19, $r11\n")
+INSTR_TEST_SETUP(
+    x86rcl_w_0,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86rcl.w $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86rcl_w_1,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86rcl.w $r12, $r12\n", "r12", "r13", "memory")
+INSTR_TEST8(x86rcl_w_tp,
+            "x86rcl.w $r12, $r4\nx86rcl.w $r13, $r5\nx86rcl.w $r14, "
+            "$r6\nx86rcl.w $r15, $r7\nx86rcl.w $r16, $r8\nx86rcl.w $r17, "
+            "$r9\nx86rcl.w $r18, $r10\nx86rcl.w $r19, $r11\n")
+INSTR_TEST_SETUP(
+    x86rcl_d_0,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86rcl.d $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86rcl_d_1,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86rcl.d $r12, $r12\n", "r12", "r13", "memory")
+INSTR_TEST8(x86rcl_d_tp,
+            "x86rcl.d $r12, $r4\nx86rcl.d $r13, $r5\nx86rcl.d $r14, "
+            "$r6\nx86rcl.d $r15, $r7\nx86rcl.d $r16, $r8\nx86rcl.d $r17, "
+            "$r9\nx86rcl.d $r18, $r10\nx86rcl.d $r19, $r11\n")
+INSTR_TEST_SETUP(x86rcli_b_0, "addi.d $r12, $r0, 0\nx86mtflag $r0, 0x1\n",
+                 "x86rcli.b $r12, 1\n", "r12", "memory")
+INSTR_TEST8(x86rcli_b_tp,
+            "x86rcli.b $r12, 1\nx86rcli.b $r13, 1\nx86rcli.b $r14, "
+            "1\nx86rcli.b $r15, 1\nx86rcli.b $r16, 1\nx86rcli.b $r17, "
+            "1\nx86rcli.b $r18, 1\nx86rcli.b $r19, 1\n")
+INSTR_TEST_SETUP(x86rcli_h_0, "addi.d $r12, $r0, 0\nx86mtflag $r0, 0x1\n",
+                 "x86rcli.h $r12, 1\n", "r12", "memory")
+INSTR_TEST8(x86rcli_h_tp,
+            "x86rcli.h $r12, 1\nx86rcli.h $r13, 1\nx86rcli.h $r14, "
+            "1\nx86rcli.h $r15, 1\nx86rcli.h $r16, 1\nx86rcli.h $r17, "
+            "1\nx86rcli.h $r18, 1\nx86rcli.h $r19, 1\n")
+INSTR_TEST_SETUP(x86rcli_w_0, "addi.d $r12, $r0, 0\nx86mtflag $r0, 0x1\n",
+                 "x86rcli.w $r12, 1\n", "r12", "memory")
+INSTR_TEST8(x86rcli_w_tp,
+            "x86rcli.w $r12, 1\nx86rcli.w $r13, 1\nx86rcli.w $r14, "
+            "1\nx86rcli.w $r15, 1\nx86rcli.w $r16, 1\nx86rcli.w $r17, "
+            "1\nx86rcli.w $r18, 1\nx86rcli.w $r19, 1\n")
+INSTR_TEST_SETUP(x86rcli_d_0, "addi.d $r12, $r0, 0\nx86mtflag $r0, 0x1\n",
+                 "x86rcli.d $r12, 1\n", "r12", "memory")
+INSTR_TEST8(x86rcli_d_tp,
+            "x86rcli.d $r12, 1\nx86rcli.d $r13, 1\nx86rcli.d $r14, "
+            "1\nx86rcli.d $r15, 1\nx86rcli.d $r16, 1\nx86rcli.d $r17, "
+            "1\nx86rcli.d $r18, 1\nx86rcli.d $r19, 1\n")
+INSTR_TEST_SETUP(
+    x86rcr_b_0,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86rcr.b $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86rcr_b_1,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86rcr.b $r12, $r12\n", "r12", "r13", "memory")
+INSTR_TEST8(x86rcr_b_tp,
+            "x86rcr.b $r12, $r4\nx86rcr.b $r13, $r5\nx86rcr.b $r14, "
+            "$r6\nx86rcr.b $r15, $r7\nx86rcr.b $r16, $r8\nx86rcr.b $r17, "
+            "$r9\nx86rcr.b $r18, $r10\nx86rcr.b $r19, $r11\n")
+INSTR_TEST_SETUP(
+    x86rcr_h_0,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86rcr.h $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86rcr_h_1,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86rcr.h $r12, $r12\n", "r12", "r13", "memory")
+INSTR_TEST8(x86rcr_h_tp,
+            "x86rcr.h $r12, $r4\nx86rcr.h $r13, $r5\nx86rcr.h $r14, "
+            "$r6\nx86rcr.h $r15, $r7\nx86rcr.h $r16, $r8\nx86rcr.h $r17, "
+            "$r9\nx86rcr.h $r18, $r10\nx86rcr.h $r19, $r11\n")
+INSTR_TEST_SETUP(
+    x86rcr_w_0,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86rcr.w $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86rcr_w_1,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86rcr.w $r12, $r12\n", "r12", "r13", "memory")
+INSTR_TEST8(x86rcr_w_tp,
+            "x86rcr.w $r12, $r4\nx86rcr.w $r13, $r5\nx86rcr.w $r14, "
+            "$r6\nx86rcr.w $r15, $r7\nx86rcr.w $r16, $r8\nx86rcr.w $r17, "
+            "$r9\nx86rcr.w $r18, $r10\nx86rcr.w $r19, $r11\n")
+INSTR_TEST_SETUP(
+    x86rcr_d_0,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86rcr.d $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86rcr_d_1,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86rcr.d $r12, $r12\n", "r12", "r13", "memory")
+INSTR_TEST8(x86rcr_d_tp,
+            "x86rcr.d $r12, $r4\nx86rcr.d $r13, $r5\nx86rcr.d $r14, "
+            "$r6\nx86rcr.d $r15, $r7\nx86rcr.d $r16, $r8\nx86rcr.d $r17, "
+            "$r9\nx86rcr.d $r18, $r10\nx86rcr.d $r19, $r11\n")
+INSTR_TEST_SETUP(x86rcri_b_0, "addi.d $r12, $r0, 0\nx86mtflag $r0, 0x1\n",
+                 "x86rcri.b $r12, 1\n", "r12", "memory")
+INSTR_TEST8(x86rcri_b_tp,
+            "x86rcri.b $r12, 1\nx86rcri.b $r13, 1\nx86rcri.b $r14, "
+            "1\nx86rcri.b $r15, 1\nx86rcri.b $r16, 1\nx86rcri.b $r17, "
+            "1\nx86rcri.b $r18, 1\nx86rcri.b $r19, 1\n")
+INSTR_TEST_SETUP(x86rcri_h_0, "addi.d $r12, $r0, 0\nx86mtflag $r0, 0x1\n",
+                 "x86rcri.h $r12, 1\n", "r12", "memory")
+INSTR_TEST8(x86rcri_h_tp,
+            "x86rcri.h $r12, 1\nx86rcri.h $r13, 1\nx86rcri.h $r14, "
+            "1\nx86rcri.h $r15, 1\nx86rcri.h $r16, 1\nx86rcri.h $r17, "
+            "1\nx86rcri.h $r18, 1\nx86rcri.h $r19, 1\n")
+INSTR_TEST_SETUP(x86rcri_w_0, "addi.d $r12, $r0, 0\nx86mtflag $r0, 0x1\n",
+                 "x86rcri.w $r12, 1\n", "r12", "memory")
+INSTR_TEST8(x86rcri_w_tp,
+            "x86rcri.w $r12, 1\nx86rcri.w $r13, 1\nx86rcri.w $r14, "
+            "1\nx86rcri.w $r15, 1\nx86rcri.w $r16, 1\nx86rcri.w $r17, "
+            "1\nx86rcri.w $r18, 1\nx86rcri.w $r19, 1\n")
+INSTR_TEST_SETUP(x86rcri_d_0, "addi.d $r12, $r0, 0\nx86mtflag $r0, 0x1\n",
+                 "x86rcri.d $r12, 1\n", "r12", "memory")
+INSTR_TEST8(x86rcri_d_tp,
+            "x86rcri.d $r12, 1\nx86rcri.d $r13, 1\nx86rcri.d $r14, "
+            "1\nx86rcri.d $r15, 1\nx86rcri.d $r16, 1\nx86rcri.d $r17, "
+            "1\nx86rcri.d $r18, 1\nx86rcri.d $r19, 1\n")
+INSTR_TEST_SETUP(
+    x86rotl_b_0,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86rotl.b $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86rotl_b_1,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86rotl.b $r12, $r12\n", "r12", "r13", "memory")
+INSTR_TEST8(x86rotl_b_tp,
+            "x86rotl.b $r12, $r4\nx86rotl.b $r13, $r5\nx86rotl.b $r14, "
+            "$r6\nx86rotl.b $r15, $r7\nx86rotl.b $r16, $r8\nx86rotl.b $r17, "
+            "$r9\nx86rotl.b $r18, $r10\nx86rotl.b $r19, $r11\n")
+INSTR_TEST_SETUP(
+    x86rotl_h_0,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86rotl.h $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86rotl_h_1,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86rotl.h $r12, $r12\n", "r12", "r13", "memory")
+INSTR_TEST8(x86rotl_h_tp,
+            "x86rotl.h $r12, $r4\nx86rotl.h $r13, $r5\nx86rotl.h $r14, "
+            "$r6\nx86rotl.h $r15, $r7\nx86rotl.h $r16, $r8\nx86rotl.h $r17, "
+            "$r9\nx86rotl.h $r18, $r10\nx86rotl.h $r19, $r11\n")
+INSTR_TEST_SETUP(
+    x86rotl_w_0,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86rotl.w $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86rotl_w_1,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86rotl.w $r12, $r12\n", "r12", "r13", "memory")
+INSTR_TEST8(x86rotl_w_tp,
+            "x86rotl.w $r12, $r4\nx86rotl.w $r13, $r5\nx86rotl.w $r14, "
+            "$r6\nx86rotl.w $r15, $r7\nx86rotl.w $r16, $r8\nx86rotl.w $r17, "
+            "$r9\nx86rotl.w $r18, $r10\nx86rotl.w $r19, $r11\n")
+INSTR_TEST_SETUP(
+    x86rotl_d_0,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86rotl.d $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86rotl_d_1,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86rotl.d $r12, $r12\n", "r12", "r13", "memory")
+INSTR_TEST8(x86rotl_d_tp,
+            "x86rotl.d $r12, $r4\nx86rotl.d $r13, $r5\nx86rotl.d $r14, "
+            "$r6\nx86rotl.d $r15, $r7\nx86rotl.d $r16, $r8\nx86rotl.d $r17, "
+            "$r9\nx86rotl.d $r18, $r10\nx86rotl.d $r19, $r11\n")
+INSTR_TEST_SETUP(x86rotli_b_0, "addi.d $r12, $r0, 0\nx86mtflag $r0, 0x1\n",
+                 "x86rotli.b $r12, 1\n", "r12", "memory")
+INSTR_TEST8(x86rotli_b_tp,
+            "x86rotli.b $r12, 1\nx86rotli.b $r13, 1\nx86rotli.b $r14, "
+            "1\nx86rotli.b $r15, 1\nx86rotli.b $r16, 1\nx86rotli.b $r17, "
+            "1\nx86rotli.b $r18, 1\nx86rotli.b $r19, 1\n")
+INSTR_TEST_SETUP(x86rotli_h_0, "addi.d $r12, $r0, 0\nx86mtflag $r0, 0x1\n",
+                 "x86rotli.h $r12, 1\n", "r12", "memory")
+INSTR_TEST8(x86rotli_h_tp,
+            "x86rotli.h $r12, 1\nx86rotli.h $r13, 1\nx86rotli.h $r14, "
+            "1\nx86rotli.h $r15, 1\nx86rotli.h $r16, 1\nx86rotli.h $r17, "
+            "1\nx86rotli.h $r18, 1\nx86rotli.h $r19, 1\n")
+INSTR_TEST_SETUP(x86rotli_w_0, "addi.d $r12, $r0, 0\nx86mtflag $r0, 0x1\n",
+                 "x86rotli.w $r12, 1\n", "r12", "memory")
+INSTR_TEST8(x86rotli_w_tp,
+            "x86rotli.w $r12, 1\nx86rotli.w $r13, 1\nx86rotli.w $r14, "
+            "1\nx86rotli.w $r15, 1\nx86rotli.w $r16, 1\nx86rotli.w $r17, "
+            "1\nx86rotli.w $r18, 1\nx86rotli.w $r19, 1\n")
+INSTR_TEST_SETUP(x86rotli_d_0, "addi.d $r12, $r0, 0\nx86mtflag $r0, 0x1\n",
+                 "x86rotli.d $r12, 1\n", "r12", "memory")
+INSTR_TEST8(x86rotli_d_tp,
+            "x86rotli.d $r12, 1\nx86rotli.d $r13, 1\nx86rotli.d $r14, "
+            "1\nx86rotli.d $r15, 1\nx86rotli.d $r16, 1\nx86rotli.d $r17, "
+            "1\nx86rotli.d $r18, 1\nx86rotli.d $r19, 1\n")
+INSTR_TEST_SETUP(
+    x86rotr_b_0,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86rotr.b $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86rotr_b_1,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86rotr.b $r12, $r12\n", "r12", "r13", "memory")
+INSTR_TEST8(x86rotr_b_tp,
+            "x86rotr.b $r12, $r4\nx86rotr.b $r13, $r5\nx86rotr.b $r14, "
+            "$r6\nx86rotr.b $r15, $r7\nx86rotr.b $r16, $r8\nx86rotr.b $r17, "
+            "$r9\nx86rotr.b $r18, $r10\nx86rotr.b $r19, $r11\n")
+INSTR_TEST_SETUP(
+    x86rotr_h_0,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86rotr.h $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86rotr_h_1,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86rotr.h $r12, $r12\n", "r12", "r13", "memory")
+INSTR_TEST8(x86rotr_h_tp,
+            "x86rotr.h $r12, $r4\nx86rotr.h $r13, $r5\nx86rotr.h $r14, "
+            "$r6\nx86rotr.h $r15, $r7\nx86rotr.h $r16, $r8\nx86rotr.h $r17, "
+            "$r9\nx86rotr.h $r18, $r10\nx86rotr.h $r19, $r11\n")
+INSTR_TEST_SETUP(
+    x86rotr_d_0,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86rotr.d $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86rotr_d_1,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86rotr.d $r12, $r12\n", "r12", "r13", "memory")
+INSTR_TEST8(x86rotr_d_tp,
+            "x86rotr.d $r12, $r4\nx86rotr.d $r13, $r5\nx86rotr.d $r14, "
+            "$r6\nx86rotr.d $r15, $r7\nx86rotr.d $r16, $r8\nx86rotr.d $r17, "
+            "$r9\nx86rotr.d $r18, $r10\nx86rotr.d $r19, $r11\n")
+INSTR_TEST_SETUP(
+    x86rotr_w_0,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86rotr.w $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86rotr_w_1,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86rotr.w $r12, $r12\n", "r12", "r13", "memory")
+INSTR_TEST8(x86rotr_w_tp,
+            "x86rotr.w $r12, $r4\nx86rotr.w $r13, $r5\nx86rotr.w $r14, "
+            "$r6\nx86rotr.w $r15, $r7\nx86rotr.w $r16, $r8\nx86rotr.w $r17, "
+            "$r9\nx86rotr.w $r18, $r10\nx86rotr.w $r19, $r11\n")
+INSTR_TEST_SETUP(x86rotri_b_0, "addi.d $r12, $r0, 0\nx86mtflag $r0, 0x1\n",
+                 "x86rotri.b $r12, 1\n", "r12", "memory")
+INSTR_TEST8(x86rotri_b_tp,
+            "x86rotri.b $r12, 1\nx86rotri.b $r13, 1\nx86rotri.b $r14, "
+            "1\nx86rotri.b $r15, 1\nx86rotri.b $r16, 1\nx86rotri.b $r17, "
+            "1\nx86rotri.b $r18, 1\nx86rotri.b $r19, 1\n")
+INSTR_TEST_SETUP(x86rotri_h_0, "addi.d $r12, $r0, 0\nx86mtflag $r0, 0x1\n",
+                 "x86rotri.h $r12, 1\n", "r12", "memory")
+INSTR_TEST8(x86rotri_h_tp,
+            "x86rotri.h $r12, 1\nx86rotri.h $r13, 1\nx86rotri.h $r14, "
+            "1\nx86rotri.h $r15, 1\nx86rotri.h $r16, 1\nx86rotri.h $r17, "
+            "1\nx86rotri.h $r18, 1\nx86rotri.h $r19, 1\n")
+INSTR_TEST_SETUP(x86rotri_w_0, "addi.d $r12, $r0, 0\nx86mtflag $r0, 0x1\n",
+                 "x86rotri.w $r12, 1\n", "r12", "memory")
+INSTR_TEST8(x86rotri_w_tp,
+            "x86rotri.w $r12, 1\nx86rotri.w $r13, 1\nx86rotri.w $r14, "
+            "1\nx86rotri.w $r15, 1\nx86rotri.w $r16, 1\nx86rotri.w $r17, "
+            "1\nx86rotri.w $r18, 1\nx86rotri.w $r19, 1\n")
+INSTR_TEST_SETUP(x86rotri_d_0, "addi.d $r12, $r0, 0\nx86mtflag $r0, 0x1\n",
+                 "x86rotri.d $r12, 1\n", "r12", "memory")
+INSTR_TEST8(x86rotri_d_tp,
+            "x86rotri.d $r12, 1\nx86rotri.d $r13, 1\nx86rotri.d $r14, "
+            "1\nx86rotri.d $r15, 1\nx86rotri.d $r16, 1\nx86rotri.d $r17, "
+            "1\nx86rotri.d $r18, 1\nx86rotri.d $r19, 1\n")
+INSTR_TEST_SETUP(
+    x86sll_b_0,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86sll.b $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86sll_b_1,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86sll.b $r12, $r12\n", "r12", "r13", "memory")
+INSTR_TEST8(x86sll_b_tp,
+            "x86sll.b $r12, $r4\nx86sll.b $r13, $r5\nx86sll.b $r14, "
+            "$r6\nx86sll.b $r15, $r7\nx86sll.b $r16, $r8\nx86sll.b $r17, "
+            "$r9\nx86sll.b $r18, $r10\nx86sll.b $r19, $r11\n")
+INSTR_TEST_SETUP(
+    x86sll_h_0,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86sll.h $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86sll_h_1,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86sll.h $r12, $r12\n", "r12", "r13", "memory")
+INSTR_TEST8(x86sll_h_tp,
+            "x86sll.h $r12, $r4\nx86sll.h $r13, $r5\nx86sll.h $r14, "
+            "$r6\nx86sll.h $r15, $r7\nx86sll.h $r16, $r8\nx86sll.h $r17, "
+            "$r9\nx86sll.h $r18, $r10\nx86sll.h $r19, $r11\n")
+INSTR_TEST_SETUP(
+    x86sll_w_0,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86sll.w $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86sll_w_1,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86sll.w $r12, $r12\n", "r12", "r13", "memory")
+INSTR_TEST8(x86sll_w_tp,
+            "x86sll.w $r12, $r4\nx86sll.w $r13, $r5\nx86sll.w $r14, "
+            "$r6\nx86sll.w $r15, $r7\nx86sll.w $r16, $r8\nx86sll.w $r17, "
+            "$r9\nx86sll.w $r18, $r10\nx86sll.w $r19, $r11\n")
+INSTR_TEST_SETUP(
+    x86sll_d_0,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86sll.d $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86sll_d_1,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86sll.d $r12, $r12\n", "r12", "r13", "memory")
+INSTR_TEST8(x86sll_d_tp,
+            "x86sll.d $r12, $r4\nx86sll.d $r13, $r5\nx86sll.d $r14, "
+            "$r6\nx86sll.d $r15, $r7\nx86sll.d $r16, $r8\nx86sll.d $r17, "
+            "$r9\nx86sll.d $r18, $r10\nx86sll.d $r19, $r11\n")
+INSTR_TEST_SETUP(x86slli_b_0, "addi.d $r12, $r0, 0\nx86mtflag $r0, 0x1\n",
+                 "x86slli.b $r12, 1\n", "r12", "memory")
+INSTR_TEST8(x86slli_b_tp,
+            "x86slli.b $r12, 1\nx86slli.b $r13, 1\nx86slli.b $r14, "
+            "1\nx86slli.b $r15, 1\nx86slli.b $r16, 1\nx86slli.b $r17, "
+            "1\nx86slli.b $r18, 1\nx86slli.b $r19, 1\n")
+INSTR_TEST_SETUP(x86slli_h_0, "addi.d $r12, $r0, 0\nx86mtflag $r0, 0x1\n",
+                 "x86slli.h $r12, 1\n", "r12", "memory")
+INSTR_TEST8(x86slli_h_tp,
+            "x86slli.h $r12, 1\nx86slli.h $r13, 1\nx86slli.h $r14, "
+            "1\nx86slli.h $r15, 1\nx86slli.h $r16, 1\nx86slli.h $r17, "
+            "1\nx86slli.h $r18, 1\nx86slli.h $r19, 1\n")
+INSTR_TEST_SETUP(x86slli_w_0, "addi.d $r12, $r0, 0\nx86mtflag $r0, 0x1\n",
+                 "x86slli.w $r12, 1\n", "r12", "memory")
+INSTR_TEST8(x86slli_w_tp,
+            "x86slli.w $r12, 1\nx86slli.w $r13, 1\nx86slli.w $r14, "
+            "1\nx86slli.w $r15, 1\nx86slli.w $r16, 1\nx86slli.w $r17, "
+            "1\nx86slli.w $r18, 1\nx86slli.w $r19, 1\n")
+INSTR_TEST_SETUP(x86slli_d_0, "addi.d $r12, $r0, 0\nx86mtflag $r0, 0x1\n",
+                 "x86slli.d $r12, 1\n", "r12", "memory")
+INSTR_TEST8(x86slli_d_tp,
+            "x86slli.d $r12, 1\nx86slli.d $r13, 1\nx86slli.d $r14, "
+            "1\nx86slli.d $r15, 1\nx86slli.d $r16, 1\nx86slli.d $r17, "
+            "1\nx86slli.d $r18, 1\nx86slli.d $r19, 1\n")
+INSTR_TEST_SETUP(
+    x86srl_b_0,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86srl.b $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86srl_b_1,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86srl.b $r12, $r12\n", "r12", "r13", "memory")
+INSTR_TEST8(x86srl_b_tp,
+            "x86srl.b $r12, $r4\nx86srl.b $r13, $r5\nx86srl.b $r14, "
+            "$r6\nx86srl.b $r15, $r7\nx86srl.b $r16, $r8\nx86srl.b $r17, "
+            "$r9\nx86srl.b $r18, $r10\nx86srl.b $r19, $r11\n")
+INSTR_TEST_SETUP(
+    x86srl_h_0,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86srl.h $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86srl_h_1,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86srl.h $r12, $r12\n", "r12", "r13", "memory")
+INSTR_TEST8(x86srl_h_tp,
+            "x86srl.h $r12, $r4\nx86srl.h $r13, $r5\nx86srl.h $r14, "
+            "$r6\nx86srl.h $r15, $r7\nx86srl.h $r16, $r8\nx86srl.h $r17, "
+            "$r9\nx86srl.h $r18, $r10\nx86srl.h $r19, $r11\n")
+INSTR_TEST_SETUP(
+    x86srl_w_0,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86srl.w $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86srl_w_1,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86srl.w $r12, $r12\n", "r12", "r13", "memory")
+INSTR_TEST8(x86srl_w_tp,
+            "x86srl.w $r12, $r4\nx86srl.w $r13, $r5\nx86srl.w $r14, "
+            "$r6\nx86srl.w $r15, $r7\nx86srl.w $r16, $r8\nx86srl.w $r17, "
+            "$r9\nx86srl.w $r18, $r10\nx86srl.w $r19, $r11\n")
+INSTR_TEST_SETUP(
+    x86srl_d_0,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86srl.d $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86srl_d_1,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86srl.d $r12, $r12\n", "r12", "r13", "memory")
+INSTR_TEST8(x86srl_d_tp,
+            "x86srl.d $r12, $r4\nx86srl.d $r13, $r5\nx86srl.d $r14, "
+            "$r6\nx86srl.d $r15, $r7\nx86srl.d $r16, $r8\nx86srl.d $r17, "
+            "$r9\nx86srl.d $r18, $r10\nx86srl.d $r19, $r11\n")
+INSTR_TEST_SETUP(x86srli_b_0, "addi.d $r12, $r0, 0\nx86mtflag $r0, 0x1\n",
+                 "x86srli.b $r12, 1\n", "r12", "memory")
+INSTR_TEST8(x86srli_b_tp,
+            "x86srli.b $r12, 1\nx86srli.b $r13, 1\nx86srli.b $r14, "
+            "1\nx86srli.b $r15, 1\nx86srli.b $r16, 1\nx86srli.b $r17, "
+            "1\nx86srli.b $r18, 1\nx86srli.b $r19, 1\n")
+INSTR_TEST_SETUP(x86srli_h_0, "addi.d $r12, $r0, 0\nx86mtflag $r0, 0x1\n",
+                 "x86srli.h $r12, 1\n", "r12", "memory")
+INSTR_TEST8(x86srli_h_tp,
+            "x86srli.h $r12, 1\nx86srli.h $r13, 1\nx86srli.h $r14, "
+            "1\nx86srli.h $r15, 1\nx86srli.h $r16, 1\nx86srli.h $r17, "
+            "1\nx86srli.h $r18, 1\nx86srli.h $r19, 1\n")
+INSTR_TEST_SETUP(x86srli_w_0, "addi.d $r12, $r0, 0\nx86mtflag $r0, 0x1\n",
+                 "x86srli.w $r12, 1\n", "r12", "memory")
+INSTR_TEST8(x86srli_w_tp,
+            "x86srli.w $r12, 1\nx86srli.w $r13, 1\nx86srli.w $r14, "
+            "1\nx86srli.w $r15, 1\nx86srli.w $r16, 1\nx86srli.w $r17, "
+            "1\nx86srli.w $r18, 1\nx86srli.w $r19, 1\n")
+INSTR_TEST_SETUP(x86srli_d_0, "addi.d $r12, $r0, 0\nx86mtflag $r0, 0x1\n",
+                 "x86srli.d $r12, 1\n", "r12", "memory")
+INSTR_TEST8(x86srli_d_tp,
+            "x86srli.d $r12, 1\nx86srli.d $r13, 1\nx86srli.d $r14, "
+            "1\nx86srli.d $r15, 1\nx86srli.d $r16, 1\nx86srli.d $r17, "
+            "1\nx86srli.d $r18, 1\nx86srli.d $r19, 1\n")
+INSTR_TEST_SETUP(
+    x86sra_b_0,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86sra.b $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86sra_b_1,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86sra.b $r12, $r12\n", "r12", "r13", "memory")
+INSTR_TEST8(x86sra_b_tp,
+            "x86sra.b $r12, $r4\nx86sra.b $r13, $r5\nx86sra.b $r14, "
+            "$r6\nx86sra.b $r15, $r7\nx86sra.b $r16, $r8\nx86sra.b $r17, "
+            "$r9\nx86sra.b $r18, $r10\nx86sra.b $r19, $r11\n")
+INSTR_TEST_SETUP(
+    x86sra_h_0,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86sra.h $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86sra_h_1,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86sra.h $r12, $r12\n", "r12", "r13", "memory")
+INSTR_TEST8(x86sra_h_tp,
+            "x86sra.h $r12, $r4\nx86sra.h $r13, $r5\nx86sra.h $r14, "
+            "$r6\nx86sra.h $r15, $r7\nx86sra.h $r16, $r8\nx86sra.h $r17, "
+            "$r9\nx86sra.h $r18, $r10\nx86sra.h $r19, $r11\n")
+INSTR_TEST_SETUP(
+    x86sra_w_0,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86sra.w $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86sra_w_1,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86sra.w $r12, $r12\n", "r12", "r13", "memory")
+INSTR_TEST8(x86sra_w_tp,
+            "x86sra.w $r12, $r4\nx86sra.w $r13, $r5\nx86sra.w $r14, "
+            "$r6\nx86sra.w $r15, $r7\nx86sra.w $r16, $r8\nx86sra.w $r17, "
+            "$r9\nx86sra.w $r18, $r10\nx86sra.w $r19, $r11\n")
+INSTR_TEST_SETUP(
+    x86sra_d_0,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86sra.d $r12, $r13\n", "r12", "r13", "memory")
+INSTR_TEST_SETUP(
+    x86sra_d_1,
+    "addi.d $r12, $r0, 0\naddi.d $r13, $r0, 0\nx86mtflag $r0, 0x1\n",
+    "x86sra.d $r12, $r12\n", "r12", "r13", "memory")
+INSTR_TEST8(x86sra_d_tp,
+            "x86sra.d $r12, $r4\nx86sra.d $r13, $r5\nx86sra.d $r14, "
+            "$r6\nx86sra.d $r15, $r7\nx86sra.d $r16, $r8\nx86sra.d $r17, "
+            "$r9\nx86sra.d $r18, $r10\nx86sra.d $r19, $r11\n")
+INSTR_TEST_SETUP(x86srai_b_0, "addi.d $r12, $r0, 0\nx86mtflag $r0, 0x1\n",
+                 "x86srai.b $r12, 1\n", "r12", "memory")
+INSTR_TEST8(x86srai_b_tp,
+            "x86srai.b $r12, 1\nx86srai.b $r13, 1\nx86srai.b $r14, "
+            "1\nx86srai.b $r15, 1\nx86srai.b $r16, 1\nx86srai.b $r17, "
+            "1\nx86srai.b $r18, 1\nx86srai.b $r19, 1\n")
+INSTR_TEST_SETUP(x86srai_h_0, "addi.d $r12, $r0, 0\nx86mtflag $r0, 0x1\n",
+                 "x86srai.h $r12, 1\n", "r12", "memory")
+INSTR_TEST8(x86srai_h_tp,
+            "x86srai.h $r12, 1\nx86srai.h $r13, 1\nx86srai.h $r14, "
+            "1\nx86srai.h $r15, 1\nx86srai.h $r16, 1\nx86srai.h $r17, "
+            "1\nx86srai.h $r18, 1\nx86srai.h $r19, 1\n")
+INSTR_TEST_SETUP(x86srai_w_0, "addi.d $r12, $r0, 0\nx86mtflag $r0, 0x1\n",
+                 "x86srai.w $r12, 1\n", "r12", "memory")
+INSTR_TEST8(x86srai_w_tp,
+            "x86srai.w $r12, 1\nx86srai.w $r13, 1\nx86srai.w $r14, "
+            "1\nx86srai.w $r15, 1\nx86srai.w $r16, 1\nx86srai.w $r17, "
+            "1\nx86srai.w $r18, 1\nx86srai.w $r19, 1\n")
+INSTR_TEST_SETUP(x86srai_d_0, "addi.d $r12, $r0, 0\nx86mtflag $r0, 0x1\n",
+                 "x86srai.d $r12, 1\n", "r12", "memory")
+INSTR_TEST8(x86srai_d_tp,
+            "x86srai.d $r12, 1\nx86srai.d $r13, 1\nx86srai.d $r14, "
+            "1\nx86srai.d $r15, 1\nx86srai.d $r16, 1\nx86srai.d $r17, "
+            "1\nx86srai.d $r18, 1\nx86srai.d $r19, 1\n")
 INSTR_TEST8(
     setx86j_tp,
     "setx86j $r12, 4\nsetx86j $r13, 4\nsetx86j $r14, 4\nsetx86j $r15, "
     "4\nsetx86j $r16, 4\nsetx86j $r17, 4\nsetx86j $r18, 4\nsetx86j $r19, 4\n",
+    "r12", "r13", "r14", "r15", "r16", "r17", "r18", "r19")
+INSTR_TEST(setx86loope_1, "setx86loope $r12, $r12\n", "r12", "r13")
+INSTR_TEST8(setx86loope_tp,
+            "setx86loope $r12, $r4\nsetx86loope $r13, $r5\nsetx86loope $r14, "
+            "$r6\nsetx86loope $r15, $r7\nsetx86loope $r16, $r8\nsetx86loope "
+            "$r17, $r9\nsetx86loope $r18, $r10\nsetx86loope $r19, $r11\n",
+            "r12", "r13", "r14", "r15", "r16", "r17", "r18", "r19")
+INSTR_TEST(setx86loopne_1, "setx86loopne $r12, $r12\n", "r12", "r13")
+INSTR_TEST8(
+    setx86loopne_tp,
+    "setx86loopne $r12, $r4\nsetx86loopne $r13, $r5\nsetx86loopne $r14, "
+    "$r6\nsetx86loopne $r15, $r7\nsetx86loopne $r16, $r8\nsetx86loopne $r17, "
+    "$r9\nsetx86loopne $r18, $r10\nsetx86loopne $r19, $r11\n",
     "r12", "r13", "r14", "r15", "r16", "r17", "r18", "r19")
 INSTR_TEST8(x86mfflag_tp,
             "x86mfflag $r12, 0x3f\nx86mfflag $r13, 0x3f\nx86mfflag $r14, "
