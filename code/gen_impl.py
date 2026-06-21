@@ -2267,6 +2267,18 @@ for width, (bits, utype, stype, umax, smin, smax, msb) in x86_w.items():
         print(f"    EFLAGS.OF = ((v ^ r) & {msb}) != 0;", file=f)
         print(f"}}", file=f)
 
+    # x86rotli (rotate left immediate, no CF involvement)
+    with open(f"x86rotli_{width}.h", "w") as f:
+        print(f"{utype} v = ({utype})a;", file=f)
+        print(f"unsigned c = (unsigned)imm;", file=f)
+        print(f"unsigned n = c % {bits};", file=f)
+        print(f"uint8_t carry_out = n == 0 ? ((v >> ({bits} - 1)) & 1) : ((v >> ({bits} - n)) & 1);", file=f)
+        print(f"{utype} r = n == 0 ? v : ({utype})((v << n) | (v >> ({bits} - n)));", file=f)
+        print(f"EFLAGS.CF = carry_out;", file=f)
+        print(f"if (c == 1) {{", file=f)
+        print(f"    EFLAGS.OF = ((v ^ r) & {msb}) != 0;", file=f)
+        print(f"}}", file=f)
+
     # x86mul (signed)
     with open(f"x86mul_{width}.h", "w") as f:
         print(f"{utype} lhs = ({utype})a;", file=f)
