@@ -2272,6 +2272,33 @@ static inline {ret} {name} ({args}) {{
         )
 
     @env.macro
+    def lbt_x86and(name):
+        width = lbt_widths[name]
+        return instruction(
+            intrinsic=f"x86and.{name}",
+            instr=f"x86and.{name} rd, rj, rk",
+            desc=f"x86-style bitwise AND: compute {width}-bit AND of values in `rj` and `rk`. Clear CF, OF, AF. Update PF, ZF, SF according to the result. Store the {width}-bit result sign-extended to 64-bit in `rd`.",
+        )
+
+    @env.macro
+    def lbt_x86or(name):
+        width = lbt_widths[name]
+        return instruction(
+            intrinsic=f"x86or.{name}",
+            instr=f"x86or.{name} rd, rj, rk",
+            desc=f"x86-style bitwise OR: compute {width}-bit OR of values in `rj` and `rk`. Clear CF, OF, AF. Update PF, ZF, SF according to the result. Store the {width}-bit result sign-extended to 64-bit in `rd`.",
+        )
+
+    @env.macro
+    def lbt_x86xor(name):
+        width = lbt_widths[name]
+        return instruction(
+            intrinsic=f"x86xor.{name}",
+            instr=f"x86xor.{name} rd, rj, rk",
+            desc=f"x86-style bitwise XOR: compute {width}-bit XOR of values in `rj` and `rk`. Clear CF, OF, AF. Update PF, ZF, SF according to the result. Store the {width}-bit result sign-extended to 64-bit in `rd`.",
+        )
+
+    @env.macro
     def all_intrinsics(render=True):
         result = []
         for file in glob.glob("docs/*/*.md"):
