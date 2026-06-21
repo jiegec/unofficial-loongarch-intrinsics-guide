@@ -2149,7 +2149,7 @@ for width, (bits, utype, stype, umax, smin, smax, msb) in x86_w.items():
             print(f"EFLAGS.ZF = result == 0;", file=f)
             print(f"EFLAGS.SF = ({stype})result < 0;", file=f)
 
-    for op, sign in [("and", "&"), ("or", "|")]:
+    for op, sign in [("and", "&"), ("or", "|"), ("xor", "^")]:
         with open(f"x86{op}_{width}.h", "w") as f:
             print(f"{utype} lhs = ({utype})a;", file=f)
             print(f"{utype} rhs = ({utype})b;", file=f)
