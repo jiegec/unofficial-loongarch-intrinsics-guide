@@ -146,8 +146,10 @@ def define_env(env):
             intrinsic_name = intrinsic_name.replace("__lsx_", "__lasx_x")
         if not os.path.exists(f"code/{file_name}.h"):
             file_name = instr.split(" ")[0].replace(".", "_")
-
-        code = open(f"code/{file_name}.h").read().strip()
+        if os.path.exists(f"code/{file_name}.h"):
+            code = open(f"code/{file_name}.h").read().strip()
+        else:
+            code = ""
         code = code.strip()
         if os.path.exists(f"code/{file_name}.cpp"):
             tested = "Tested on real machine."
@@ -200,6 +202,14 @@ def define_env(env):
             examples_text = ""
 
         if is_lbt:
+            operation = f"""
+### Operation
+
+```c++
+{code}
+```
+""" if code else ""
+
             return f"""
 ## {intrinsic_name}
 
@@ -218,12 +228,7 @@ CPU Flags: LBT
 
 {examples_text}
 
-### Operation
-
-```c++
-{code}
-```
-
+{operation}
 {tested}
 
 {latency_throughput}
@@ -2525,6 +2530,56 @@ static inline {ret} {name} ({args}) {{
             intrinsic=f"setarmj",
             instr=f"setarmj rd, cond",
             desc=f"ARM-style set if condition: evaluate ARM condition code `cond` against ARMFLAGS. Store 1 in `rd` if the condition holds, 0 otherwise.")
+
+    @env.macro
+    def lbt_x86mftop():
+        return instruction("x86mftop", "x86mftop rd",
+            "Move from x87 FPU stack top pointer: read the current x87 TOP (stack top index, 3-bit) into `rd`.")
+
+    @env.macro
+    def lbt_x86mttop():
+        return instruction("x86mttop", "x86mttop imm",
+            "Move to x87 FPU stack top pointer: set the x87 TOP (stack top index, 3-bit) to `imm`.")
+
+    @env.macro
+    def lbt_x86inctop():
+        return instruction("x86inctop", "x86inctop",
+            "Increment x87 FPU stack top pointer (FINCSTP): increment TOP by 1, wrapping modulo 8.")
+
+    @env.macro
+    def lbt_x86dectop():
+        return instruction("x86dectop", "x86dectop",
+            "Decrement x87 FPU stack top pointer (FDECSTP): decrement TOP by 1, wrapping modulo 8.")
+
+    @env.macro
+    def lbt_x86settm():
+        return instruction("x86settm", "x86settm",
+            "Set x87 FPU stack translation mode: enable TOP-based remapping of FPR registers (bits 0-7 are offset by TOP when TM is set).")
+
+    @env.macro
+    def lbt_x86clrtm():
+        return instruction("x86clrtm", "x86clrtm",
+            "Clear x87 FPU stack translation mode: disable TOP-based remapping of FPR registers.")
+
+    @env.macro
+    def lbt_x86settag():
+        return instruction("x86settag", "x86settag rd, imm1, imm2",
+            "Set x87 tag word bit in `rd` according to `imm1` and `imm2`. `imm2` selects the target bit position. `imm1%8` determines the operation: 0=set bit (0→1 only), 1=clear bit (1→0 only), 2-4=check tag byte then modify. Raises a BTE (Binary Translation Exception) on invalid state transitions.")
+
+    @env.macro
+    def lbt_fcvt_ud_d():
+        return instruction("fcvt.ud.d", "fcvt.ud.d fd, fj",
+            "Convert double-precision floating point value in `fj` to the upper 16 bits (sign and exponent) of x87 80-bit extended precision format, store in `fd`.")
+
+    @env.macro
+    def lbt_fcvt_ld_d():
+        return instruction("fcvt.ld.d", "fcvt.ld.d fd, fj",
+            "Convert double-precision floating point value in `fj` to the lower 64 bits (integer bit and fraction) of x87 80-bit extended precision format, store in `fd`.")
+
+    @env.macro
+    def lbt_fcvt_d_ld():
+        return instruction("fcvt.d.ld", "fcvt.d.ld fd, fj, fk",
+            "Convert x87 80-bit extended precision value (upper 16 bits in `fj`, lower 64 bits in `fk`) to double-precision floating point, store in `fd`.")
 
     @env.macro
     def all_intrinsics(render=True):
