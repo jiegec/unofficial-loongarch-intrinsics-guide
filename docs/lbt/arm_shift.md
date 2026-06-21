@@ -5,6 +5,8 @@
 {{ lbt_armsra() }}
 {{ lbt_armrotr() }}
 
+{{ lbt_armrrx() }}
+
 {{ lbt_armslli() }}
 {{ lbt_armsrli() }}
 {{ lbt_armsrai() }}
