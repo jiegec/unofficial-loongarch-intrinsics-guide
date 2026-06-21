@@ -11,7 +11,7 @@ uint64_t addu12i_w(eflags &EFLAGS, uint64_t a, int imm) {
     uint64_t _result;                                                          \
     asm volatile("addu12i.w %0, %1, %2"                                        \
                  : "=r"(_result)                                               \
-                 : "r"(a), "n"((((imm) & 0x1f) ^ 16) - 16)                     \
+                 : "r"(a), "n"(imm)                                            \
                  : "memory");                                                  \
     _result;                                                                   \
   })
@@ -19,5 +19,5 @@ uint64_t addu12i_w(eflags &EFLAGS, uint64_t a, int imm) {
 void test() {
   IFUZZ1(addu12i_w, 0);
   IFUZZ1(addu12i_w, 1);
-  IFUZZ1(addu12i_w, 31);
+  IFUZZ1(addu12i_w, 15);
 }
