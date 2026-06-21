@@ -122,6 +122,49 @@ static inline bool arm_cond_holds(eflags &EFLAGS, int cond) {
   }
 }
 
+// ARM condition code evaluation from ARMFLAGS (= eflags).
+// cond values 0-15 match the standard ARM condition encoding.
+static inline bool x86_cond_holds(eflags &EFLAGS, int cond) {
+  bool cf = EFLAGS.CF, pf = EFLAGS.PF, zf = EFLAGS.ZF, sf = EFLAGS.SF,
+       of = EFLAGS.OF;
+  switch (cond & 0xf) {
+  case 0:
+    return !cf && !zf; // A / NBE
+  case 1:
+    return !cf; // AE / NB / NC
+  case 2:
+    return cf; // B / C / NAE
+  case 3:
+    return cf || zf; // BE / NA
+  case 4:
+    return zf; // E / Z
+  case 5:
+    return !zf; // NE / NZ
+  case 6:
+    return !zf && sf == of; // G / NLE
+  case 7:
+    return sf == of; // GE / NL
+  case 8:
+    return sf != of; // L / NGE
+  case 9:
+    return zf || sf != of; // LE / NG
+  case 10:
+    return sf; // S
+  case 11:
+    return !sf; // NS
+  case 12:
+    return of; // O
+  case 13:
+    return !of; // NO
+  case 14:
+    return pf; // P / PE
+  case 15:
+    return !pf; // NP / PO
+  default:
+    return false;
+  }
+}
+
 static inline uint64_t sext(uint64_t v, unsigned w) {
   if (w >= 64)
     return v;
