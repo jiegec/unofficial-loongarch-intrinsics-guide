@@ -2668,8 +2668,10 @@ static inline {ret} {name} ({args}) {{
                                 intrinsic = line[2:].strip()
                                 if "_lsx_" in intrinsic:
                                     extension = "LSX"
-                                else:
+                                elif "_lasx_" in intrinsic:
                                     extension = "LASX"
+                                else:
+                                    extension = "LBT"
 
                                 if render:
                                     result.append(
