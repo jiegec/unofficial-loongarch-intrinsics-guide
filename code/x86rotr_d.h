@@ -1,0 +1,8 @@
+uint64_t v = (uint64_t)a;
+unsigned c = (unsigned)(b & 0x3f);
+unsigned n = c % 64;
+uint64_t r = (uint64_t)((v >> n) | (v << (64 - n)));
+EFLAGS.CF = ((v >> ((n - 1 + 64) % 64)) & 1);
+if (c == 1) {
+  EFLAGS.OF = (((v ^ r) & 0x8000000000000000ULL) != 0);
+}

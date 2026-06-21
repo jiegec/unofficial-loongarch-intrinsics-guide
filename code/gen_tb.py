@@ -608,6 +608,7 @@ x86_two_input = {
     "rcl": ["b", "h", "w", "d"],
     "rcr": ["b", "h", "w", "d"],
     "rotl": ["b", "h", "w", "d"],
+    "rotr": ["b", "h", "w", "d"],
     "mul": ["b", "bu", "h", "hu", "w", "wu", "d", "du"],
 }
 for base, suffixes in x86_two_input.items():
@@ -684,7 +685,7 @@ for base, suffixes in x86_one_input.items():
             print("", file=f)
 
 # Scalar x86 rcli (a, imm)
-for base, suffixes in [("rcli", ["b", "h", "w", "d"]), ("rcri", ["b", "h", "w", "d"]), ("rotli", ["b", "h", "w", "d"])]:
+for base, suffixes in [("rcli", ["b", "h", "w", "d"]), ("rcri", ["b", "h", "w", "d"]), ("rotli", ["b", "h", "w", "d"]), ("rotri", ["b", "h", "w", "d"])]:
     for suffix in suffixes:
         inst_name = f"x86{base}_{suffix}"
         rcli_tests = [0, 1, 7] if suffix in ("b", "h") else [0, 1, 7, 31]
