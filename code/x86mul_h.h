@@ -1,0 +1,10 @@
+uint16_t lhs = (uint16_t)a;
+    uint16_t rhs = (uint16_t)b;
+    __int128 product = (__int128)(int16_t)lhs * (__int128)(int16_t)rhs;
+    bool overflow = product < (__int128)INT16_MIN || product > (__int128)INT16_MAX;
+    EFLAGS.CF = overflow;
+    EFLAGS.OF = overflow;
+    EFLAGS.SF = 0;
+    EFLAGS.ZF = 0;
+    EFLAGS.AF = 0;
+    EFLAGS.PF = 0;

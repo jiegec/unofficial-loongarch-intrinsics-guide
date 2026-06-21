@@ -1,0 +1,10 @@
+uint64_t lhs = (uint64_t)a;
+uint64_t rhs = (uint64_t)b;
+__int128 product = (__int128)(int64_t)lhs * (__int128)(int64_t)rhs;
+bool overflow = product < (__int128)INT64_MIN || product > (__int128)INT64_MAX;
+EFLAGS.CF = overflow;
+EFLAGS.OF = overflow;
+EFLAGS.SF = 0;
+EFLAGS.ZF = 0;
+EFLAGS.AF = 0;
+EFLAGS.PF = 0;

@@ -1,0 +1,10 @@
+uint8_t lhs = (uint8_t)a;
+uint8_t rhs = (uint8_t)b;
+__int128 product = (__int128)(int8_t)lhs * (__int128)(int8_t)rhs;
+bool overflow = product < (__int128)INT8_MIN || product > (__int128)INT8_MAX;
+EFLAGS.CF = overflow;
+EFLAGS.OF = overflow;
+EFLAGS.SF = 0;
+EFLAGS.ZF = 0;
+EFLAGS.AF = 0;
+EFLAGS.PF = 0;
