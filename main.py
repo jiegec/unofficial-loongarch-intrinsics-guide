@@ -2298,6 +2298,94 @@ static inline {ret} {name} ({args}) {{
             desc=f"x86-style bitwise XOR: compute {width}-bit XOR of values in `rj` and `rk`. Clear CF, OF, AF. Update PF, ZF, SF according to the result. Store the {width}-bit result sign-extended to 64-bit in `rd`.",
         )
 
+    def _lbt_x86_shift(stem, name, desc, is_imm):
+        instr = f"{stem}.{name} rd, rj, {'imm' if is_imm else 'rk'}"
+        return instruction(intrinsic=f"{stem}.{name}", instr=instr, desc=desc)
+
+    @env.macro
+    def lbt_x86rcl(name):
+        width = lbt_widths[name]
+        return _lbt_x86_shift("x86rcl", name,
+            f"x86-style rotate left through carry: rotate {width}-bit value in `rj` and CF together as a {width+1}-bit ring left by the amount specified in `rk`. Update CF, OF (for shift count of 1). Store the {width}-bit result sign-extended to 64-bit in `rd`.", False)
+
+    @env.macro
+    def lbt_x86rcli(name):
+        width = lbt_widths[name]
+        return _lbt_x86_shift("x86rcli", name,
+            f"x86-style rotate left through carry: rotate {width}-bit value in `rj` and CF together as a {width+1}-bit ring left by immediate `imm`. Update CF, OF (for shift count of 1). Store the {width}-bit result sign-extended to 64-bit in `rd`.", True)
+
+    @env.macro
+    def lbt_x86rcr(name):
+        width = lbt_widths[name]
+        return _lbt_x86_shift("x86rcr", name,
+            f"x86-style rotate right through carry: rotate {width}-bit value in `rj` and CF together as a {width+1}-bit ring right by the amount specified in `rk`. Update CF, OF (for shift count of 1). Store the {width}-bit result sign-extended to 64-bit in `rd`.", False)
+
+    @env.macro
+    def lbt_x86rcri(name):
+        width = lbt_widths[name]
+        return _lbt_x86_shift("x86rcri", name,
+            f"x86-style rotate right through carry: rotate {width}-bit value in `rj` and CF together as a {width+1}-bit ring right by immediate `imm`. Update CF, OF (for shift count of 1). Store the {width}-bit result sign-extended to 64-bit in `rd`.", True)
+
+    @env.macro
+    def lbt_x86rotl(name):
+        width = lbt_widths[name]
+        return _lbt_x86_shift("x86rotl", name,
+            f"x86-style rotate left: rotate {width}-bit value in `rj` left by the amount specified in `rk`. Update CF, OF (for shift count of 1). Store the {width}-bit result sign-extended to 64-bit in `rd`.", False)
+
+    @env.macro
+    def lbt_x86rotli(name):
+        width = lbt_widths[name]
+        return _lbt_x86_shift("x86rotli", name,
+            f"x86-style rotate left: rotate {width}-bit value in `rj` left by immediate `imm`. Update CF, OF (for shift count of 1). Store the {width}-bit result sign-extended to 64-bit in `rd`.", True)
+
+    @env.macro
+    def lbt_x86rotr(name):
+        width = lbt_widths[name]
+        return _lbt_x86_shift("x86rotr", name,
+            f"x86-style rotate right: rotate {width}-bit value in `rj` right by the amount specified in `rk`. Update CF, OF (for shift count of 1). Store the {width}-bit result sign-extended to 64-bit in `rd`.", False)
+
+    @env.macro
+    def lbt_x86rotri(name):
+        width = lbt_widths[name]
+        return _lbt_x86_shift("x86rotri", name,
+            f"x86-style rotate right: rotate {width}-bit value in `rj` right by immediate `imm`. Update CF, OF (for shift count of 1). Store the {width}-bit result sign-extended to 64-bit in `rd`.", True)
+
+    @env.macro
+    def lbt_x86sll(name):
+        width = lbt_widths[name]
+        return _lbt_x86_shift("x86sll", name,
+            f"x86-style shift left logical: shift {width}-bit value in `rj` left by the amount specified in `rk`. If shift count is non-zero, update CF, PF, ZF, SF (and OF if count is 1). If shift count is zero, flags are unchanged. Store the {width}-bit result sign-extended to 64-bit in `rd`.", False)
+
+    @env.macro
+    def lbt_x86slli(name):
+        width = lbt_widths[name]
+        return _lbt_x86_shift("x86slli", name,
+            f"x86-style shift left logical: shift {width}-bit value in `rj` left by immediate `imm`. If shift count is non-zero, update CF, PF, ZF, SF (and OF if count is 1). If shift count is zero, flags are unchanged. Store the {width}-bit result sign-extended to 64-bit in `rd`.", True)
+
+    @env.macro
+    def lbt_x86srl(name):
+        width = lbt_widths[name]
+        return _lbt_x86_shift("x86srl", name,
+            f"x86-style shift right logical: shift {width}-bit value in `rj` right logically by the amount specified in `rk`. If shift count is non-zero, update CF, PF, ZF, SF (and OF if count is 1). If shift count is zero, flags are unchanged. Store the {width}-bit result sign-extended to 64-bit in `rd`.", False)
+
+    @env.macro
+    def lbt_x86srli(name):
+        width = lbt_widths[name]
+        return _lbt_x86_shift("x86srli", name,
+            f"x86-style shift right logical: shift {width}-bit value in `rj` right logically by immediate `imm`. If shift count is non-zero, update CF, PF, ZF, SF (and OF if count is 1). If shift count is zero, flags are unchanged. Store the {width}-bit result sign-extended to 64-bit in `rd`.", True)
+
+    @env.macro
+    def lbt_x86sra(name):
+        width = lbt_widths[name]
+        return _lbt_x86_shift("x86sra", name,
+            f"x86-style shift right arithmetic: shift {width}-bit value in `rj` right arithmetically by the amount specified in `rk`. If shift count is non-zero, update CF, PF, ZF, SF (OF is set to 0 if count is 1). If shift count is zero, flags are unchanged. Store the {width}-bit result sign-extended to 64-bit in `rd`.", False)
+
+    @env.macro
+    def lbt_x86srai(name):
+        width = lbt_widths[name]
+        return _lbt_x86_shift("x86srai", name,
+            f"x86-style shift right arithmetic: shift {width}-bit value in `rj` right arithmetically by immediate `imm`. If shift count is non-zero, update CF, PF, ZF, SF (OF is set to 0 if count is 1). If shift count is zero, flags are unchanged. Store the {width}-bit result sign-extended to 64-bit in `rd`.", True)
+
     @env.macro
     def all_intrinsics(render=True):
         result = []
