@@ -610,6 +610,7 @@ x86_two_input = {
     "rcr": ["b", "h", "w", "d"],
     "rotl": ["b", "h", "w", "d"],
     "rotr": ["b", "h", "w", "d"],
+    "sll": ["b", "h", "w", "d"],
     "mul": ["b", "bu", "h", "hu", "w", "wu", "d", "du"],
 }
 for base, suffixes in x86_two_input.items():
