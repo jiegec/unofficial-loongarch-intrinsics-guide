@@ -604,6 +604,7 @@ x86_two_input = {
     "add": ["b", "h", "w", "d", "wu", "du"],
     "adc": ["b", "h", "w", "d"],
     "and": ["b", "h", "w", "d"],
+    "or": ["b", "h", "w", "d"],
     "mul": ["b", "bu", "h", "hu", "w", "wu", "d", "du"],
 }
 for base, suffixes in x86_two_input.items():

@@ -2149,17 +2149,17 @@ for width, (bits, utype, stype, umax, smin, smax, msb) in x86_w.items():
             print(f"EFLAGS.ZF = result == 0;", file=f)
             print(f"EFLAGS.SF = ({stype})result < 0;", file=f)
 
-    # x86and
-    with open(f"x86and_{width}.h", "w") as f:
-        print(f"{utype} lhs = ({utype})a;", file=f)
-        print(f"{utype} rhs = ({utype})b;", file=f)
-        print(f"{utype} result = lhs & rhs;", file=f)
-        print(f"EFLAGS.CF = 0;", file=f)
-        print(f"EFLAGS.OF = 0;", file=f)
-        print(f"EFLAGS.AF = 0;", file=f)
-        print(f"EFLAGS.PF = parity_even((uint8_t)result);", file=f)
-        print(f"EFLAGS.ZF = result == 0;", file=f)
-        print(f"EFLAGS.SF = ({stype})result < 0;", file=f)
+    for op, sign in [("and", "&"), ("or", "|")]:
+        with open(f"x86{op}_{width}.h", "w") as f:
+            print(f"{utype} lhs = ({utype})a;", file=f)
+            print(f"{utype} rhs = ({utype})b;", file=f)
+            print(f"{utype} result = lhs {sign} rhs;", file=f)
+            print(f"EFLAGS.CF = 0;", file=f)
+            print(f"EFLAGS.OF = 0;", file=f)
+            print(f"EFLAGS.AF = 0;", file=f)
+            print(f"EFLAGS.PF = parity_even((uint8_t)result);", file=f)
+            print(f"EFLAGS.ZF = result == 0;", file=f)
+            print(f"EFLAGS.SF = ({stype})result < 0;", file=f)
 
     # x86dec
     with open(f"x86dec_{width}.h", "w") as f:
