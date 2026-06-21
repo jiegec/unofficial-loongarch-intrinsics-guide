@@ -5243,12 +5243,76 @@ INSTR_TEST8(armsbc_w_tp,
             "armsbc.w $r12, $r4, 14\narmsbc.w $r13, $r5, 14\narmsbc.w $r14, "
             "$r6, 14\narmsbc.w $r15, $r7, 14\narmsbc.w $r16, $r8, 14\narmsbc.w "
             "$r17, $r9, 14\narmsbc.w $r18, $r10, 14\narmsbc.w $r19, $r11, 14\n")
+INSTR_TEST(armand_w_1, "armand.w $r12, $r12, 14\n", "r12", "r13")
+INSTR_TEST8(armand_w_tp,
+            "armand.w $r12, $r4, 14\narmand.w $r13, $r5, 14\narmand.w $r14, "
+            "$r6, 14\narmand.w $r15, $r7, 14\narmand.w $r16, $r8, 14\narmand.w "
+            "$r17, $r9, 14\narmand.w $r18, $r10, 14\narmand.w $r19, $r11, 14\n")
+INSTR_TEST(armor_w_1, "armor.w $r12, $r12, 14\n", "r12", "r13")
+INSTR_TEST8(armor_w_tp,
+            "armor.w $r12, $r4, 14\narmor.w $r13, $r5, 14\narmor.w $r14, $r6, "
+            "14\narmor.w $r15, $r7, 14\narmor.w $r16, $r8, 14\narmor.w $r17, "
+            "$r9, 14\narmor.w $r18, $r10, 14\narmor.w $r19, $r11, 14\n")
+INSTR_TEST(armxor_w_1, "armxor.w $r12, $r12, 14\n", "r12", "r13")
+INSTR_TEST8(armxor_w_tp,
+            "armxor.w $r12, $r4, 14\narmxor.w $r13, $r5, 14\narmxor.w $r14, "
+            "$r6, 14\narmxor.w $r15, $r7, 14\narmxor.w $r16, $r8, 14\narmxor.w "
+            "$r17, $r9, 14\narmxor.w $r18, $r10, 14\narmxor.w $r19, $r11, 14\n")
+INSTR_TEST8(armnot_w_tp, "armnot.w $r12, 14\narmnot.w $r13, 14\narmnot.w $r14, "
+                         "14\narmnot.w $r15, 14\narmnot.w $r16, 14\narmnot.w "
+                         "$r17, 14\narmnot.w $r18, 14\narmnot.w $r19, 14\n")
+INSTR_TEST(armsll_w_1, "armsll.w $r12, $r12, 14\n", "r12", "r13")
+INSTR_TEST8(armsll_w_tp,
+            "armsll.w $r12, $r4, 14\narmsll.w $r13, $r5, 14\narmsll.w $r14, "
+            "$r6, 14\narmsll.w $r15, $r7, 14\narmsll.w $r16, $r8, 14\narmsll.w "
+            "$r17, $r9, 14\narmsll.w $r18, $r10, 14\narmsll.w $r19, $r11, 14\n")
+INSTR_TEST(armsrl_w_1, "armsrl.w $r12, $r12, 14\n", "r12", "r13")
+INSTR_TEST8(armsrl_w_tp,
+            "armsrl.w $r12, $r4, 14\narmsrl.w $r13, $r5, 14\narmsrl.w $r14, "
+            "$r6, 14\narmsrl.w $r15, $r7, 14\narmsrl.w $r16, $r8, 14\narmsrl.w "
+            "$r17, $r9, 14\narmsrl.w $r18, $r10, 14\narmsrl.w $r19, $r11, 14\n")
+INSTR_TEST(armsra_w_1, "armsra.w $r12, $r12, 14\n", "r12", "r13")
+INSTR_TEST8(armsra_w_tp,
+            "armsra.w $r12, $r4, 14\narmsra.w $r13, $r5, 14\narmsra.w $r14, "
+            "$r6, 14\narmsra.w $r15, $r7, 14\narmsra.w $r16, $r8, 14\narmsra.w "
+            "$r17, $r9, 14\narmsra.w $r18, $r10, 14\narmsra.w $r19, $r11, 14\n")
+INSTR_TEST(armrotr_w_1, "armrotr.w $r12, $r12, 14\n", "r12", "r13")
+INSTR_TEST8(
+    armrotr_w_tp,
+    "armrotr.w $r12, $r4, 14\narmrotr.w $r13, $r5, 14\narmrotr.w $r14, $r6, "
+    "14\narmrotr.w $r15, $r7, 14\narmrotr.w $r16, $r8, 14\narmrotr.w $r17, "
+    "$r9, 14\narmrotr.w $r18, $r10, 14\narmrotr.w $r19, $r11, 14\n")
+INSTR_TEST8(armslli_w_tp,
+            "armslli.w $r12, 1, 14\narmslli.w $r13, 1, 14\narmslli.w $r14, 1, "
+            "14\narmslli.w $r15, 1, 14\narmslli.w $r16, 1, 14\narmslli.w $r17, "
+            "1, 14\narmslli.w $r18, 1, 14\narmslli.w $r19, 1, 14\n")
+INSTR_TEST8(armsrli_w_tp,
+            "armsrli.w $r12, 1, 14\narmsrli.w $r13, 1, 14\narmsrli.w $r14, 1, "
+            "14\narmsrli.w $r15, 1, 14\narmsrli.w $r16, 1, 14\narmsrli.w $r17, "
+            "1, 14\narmsrli.w $r18, 1, 14\narmsrli.w $r19, 1, 14\n")
+INSTR_TEST8(armsrai_w_tp,
+            "armsrai.w $r12, 1, 14\narmsrai.w $r13, 1, 14\narmsrai.w $r14, 1, "
+            "14\narmsrai.w $r15, 1, 14\narmsrai.w $r16, 1, 14\narmsrai.w $r17, "
+            "1, 14\narmsrai.w $r18, 1, 14\narmsrai.w $r19, 1, 14\n")
+INSTR_TEST8(armrotri_w_tp,
+            "armrotri.w $r12, 1, 14\narmrotri.w $r13, 1, 14\narmrotri.w $r14, "
+            "1, 14\narmrotri.w $r15, 1, 14\narmrotri.w $r16, 1, 14\narmrotri.w "
+            "$r17, 1, 14\narmrotri.w $r18, 1, 14\narmrotri.w $r19, 1, 14\n")
+INSTR_TEST8(armrrx_w_tp, "armrrx.w $r12, 14\narmrrx.w $r13, 14\narmrrx.w $r14, "
+                         "14\narmrrx.w $r15, 14\narmrrx.w $r16, 14\narmrrx.w "
+                         "$r17, 14\narmrrx.w $r18, 14\narmrrx.w $r19, 14\n")
 INSTR_TEST(armmove_1, "armmove $r12, $r12, 14\n", "r12", "r13")
 INSTR_TEST8(armmove_tp,
             "armmove $r12, $r4, 14\narmmove $r13, $r5, 14\narmmove $r14, $r6, "
             "14\narmmove $r15, $r7, 14\narmmove $r16, $r8, 14\narmmove $r17, "
             "$r9, 14\narmmove $r18, $r10, 14\narmmove $r19, $r11, 14\n",
             "r12", "r13", "r14", "r15", "r16", "r17", "r18", "r19")
+INSTR_TEST8(armmov_w_tp, "armmov.w $r12, 14\narmmov.w $r13, 14\narmmov.w $r14, "
+                         "14\narmmov.w $r15, 14\narmmov.w $r16, 14\narmmov.w "
+                         "$r17, 14\narmmov.w $r18, 14\narmmov.w $r19, 14\n")
+INSTR_TEST8(armmov_d_tp, "armmov.d $r12, 14\narmmov.d $r13, 14\narmmov.d $r14, "
+                         "14\narmmov.d $r15, 14\narmmov.d $r16, 14\narmmov.d "
+                         "$r17, 14\narmmov.d $r18, 14\narmmov.d $r19, 14\n")
 INSTR_TEST8(armmfflag_tp,
             "armmfflag $r12, 0x39\narmmfflag $r13, 0x39\narmmfflag $r14, "
             "0x39\narmmfflag $r15, 0x39\narmmfflag $r16, 0x39\narmmfflag $r17, "
