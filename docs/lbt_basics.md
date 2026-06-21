@@ -135,6 +135,7 @@ x87 long double (80-bit) is stored across two FPRs:
 | High 16 bits | sign(bit 15) + exponent(bits 14:0) | upper bits of paired register |
 
 Conversion instructions:
+
 - `fcvt.ld.d fd, fj` — double → low 64 bits of extended
 - `fcvt.ud.d fd, fj` — double → high 16 bits of extended
 - `fcvt.d.ld fd, fj, fk` — extended → double
@@ -142,6 +143,7 @@ Conversion instructions:
 ### Tag Word
 
 `x86settag rd, imm1, imm2` manipulates the x87 tag word (stored in a GPR). The operation mode is encoded in `imm1 % 8`:
+
 - 0: set bit (0→1 only), raises BTE on invalid transition
 - 1: clear bit (1→0 only), raises BTE on invalid transition
 - 2–4: check tag byte then modify, raises BTE on invalid state
