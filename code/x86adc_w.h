@@ -1,0 +1,10 @@
+uint32_t lhs = (uint32_t)a;
+uint32_t rhs = (uint32_t)b;
+uint8_t carry_in = EFLAGS.CF;
+uint32_t result = lhs + rhs + carry_in;
+EFLAGS.CF = (uint64_t)lhs + rhs + carry_in > UINT32_MAX;
+EFLAGS.AF = ((lhs ^ rhs ^ result) & 0x10) != 0;
+EFLAGS.OF = ((~(lhs ^ rhs)) & (lhs ^ result) & 0x80000000) != 0;
+EFLAGS.PF = parity_even((uint8_t)result);
+EFLAGS.ZF = result == 0;
+EFLAGS.SF = (int32_t)result < 0;
