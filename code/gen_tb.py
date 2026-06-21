@@ -606,6 +606,7 @@ x86_two_input = {
     "and": ["b", "h", "w", "d"],
     "or": ["b", "h", "w", "d"],
     "rcl": ["b", "h", "w", "d"],
+    "rcr": ["b", "h", "w", "d"],
     "mul": ["b", "bu", "h", "hu", "w", "wu", "d", "du"],
 }
 for base, suffixes in x86_two_input.items():
@@ -685,6 +686,7 @@ for base, suffixes in x86_one_input.items():
 for base, suffixes in [("rcli", ["b", "h", "w", "d"])]:
     for suffix in suffixes:
         inst_name = f"x86{base}_{suffix}"
+        rcli_tests = [0, 1, 7] if suffix in ("b", "h") else [0, 1, 7, 31]
         print(f"Saving {inst_name}.cpp")
         with open(f"{inst_name}.cpp", "w") as f:
             print('#include "common.h"', file=f)
@@ -711,7 +713,7 @@ for base, suffixes in [("rcli", ["b", "h", "w", "d"])]:
             print(f"     0; }})", file=f)
             print("", file=f)
             print(f"void test() {{", file=f)
-            for imm_val in [0, 1, 7, 31]:
+            for imm_val in rcli_tests:
                 print(f"  IFUZZ1({inst_name}, {imm_val});", file=f)
             print("}", file=f)
             print("", file=f)

@@ -1,5 +1,5 @@
 uint8_t v = (uint8_t)a;
-unsigned c = (unsigned)imm;
+unsigned c = (unsigned)(imm & 0x1f);
 unsigned n = c % 9;
 if (n != 0) {
   unsigned carry_out = ((v >> (8 - n)) & 1);

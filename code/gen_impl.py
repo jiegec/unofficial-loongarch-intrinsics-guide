@@ -2202,7 +2202,7 @@ for width, (bits, utype, stype, umax, smin, smax, msb) in x86_w.items():
     # x86rcli (same as rcl but with immediate)
     with open(f"x86rcli_{width}.h", "w") as f:
         print(f"{utype} v = ({utype})a;", file=f)
-        print(f"unsigned c = (unsigned)imm;", file=f)
+        print(f"unsigned c = (unsigned)(imm & {rcl_mask});", file=f)
         print(f"unsigned n = c{rcl_mod};", file=f)
         print(f"if (n != 0) {{", file=f)
         print(f"    unsigned carry_out = ((v >> ({bits} - n)) & 1);", file=f)
@@ -2210,6 +2210,31 @@ for width, (bits, utype, stype, umax, smin, smax, msb) in x86_w.items():
         print(f"    if (c == 1) {{", file=f)
         print(f"        {utype} r = ({utype})(v << 1);", file=f)
         print(f"        EFLAGS.OF = ((r & {msb}) != 0) != carry_out;", file=f)
+        print(f"    }}", file=f)
+        print(f"}}", file=f)
+
+    # x86rcr (rotate right through CF)
+    with open(f"x86rcr_{width}.h", "w") as f:
+        print(f"{utype} v = ({utype})a;", file=f)
+        print(f"unsigned c = (unsigned)(b & {rcl_mask});", file=f)
+        print(f"unsigned n = c{rcl_mod};", file=f)
+        print(f"if (n != 0) {{", file=f)
+        print(f"    unsigned carry_in = EFLAGS.CF;", file=f)
+        print(
+            f"    unsigned carry_out = ((v >> ((n - 1) % ({bits} + 1))) & 1);", file=f
+        )
+        print(f"    EFLAGS.CF = carry_out;", file=f)
+        print(f"    if (c == 1) {{", file=f)
+        carry_shift = (
+            f"((uint{bits}_t)carry_in << {bits - 1})"
+            if bits == 64
+            else f"(carry_in << {bits - 1})"
+        )
+        print(f"        {utype} r = ({utype})((v >> 1) | {carry_shift});", file=f)
+        print(
+            f"        EFLAGS.OF = (((r >> {bits - 1}) ^ (r >> {bits - 2})) & 1) != 0;",
+            file=f,
+        )
         print(f"    }}", file=f)
         print(f"}}", file=f)
 

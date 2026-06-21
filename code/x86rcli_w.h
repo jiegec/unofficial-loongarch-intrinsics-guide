@@ -1,5 +1,5 @@
 uint32_t v = (uint32_t)a;
-unsigned c = (unsigned)imm;
+unsigned c = (unsigned)(imm & 0x1f);
 unsigned n = c;
 if (n != 0) {
   unsigned carry_out = ((v >> (32 - n)) & 1);

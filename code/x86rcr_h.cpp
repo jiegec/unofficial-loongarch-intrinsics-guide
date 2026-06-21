@@ -1,24 +1,25 @@
 #include "common.h"
 
-uint64_t x86rcli_b(eflags &EFLAGS, uint64_t a, int imm) {
+uint64_t x86rcr_h(eflags &EFLAGS, uint64_t a, uint64_t b) {
   uint64_t dst = 0;
-#include "x86rcli_b.h"
+#include "x86rcr_h.h"
   return dst;
 }
 
-#define ref_x86rcli_b(eflags, a, imm)                                          \
+#define ref_x86rcr_h(eflags, a, b)                                             \
   ({                                                                           \
     uint16_t flags = eflags.raw;                                               \
-    asm volatile("x86mtflag %0, 0x3f\nx86rcli.b %1, %2\nx86mfflag %0, 0x3f"    \
+    asm volatile("x86mtflag %0, 0x3f\nx86rcr.h %1, %2\nx86mfflag %0, 0x3f"     \
                  : "+r"(flags)                                                 \
-                 : "r"(a), "n"(imm)                                            \
+                 : "r"(a), "r"(b)                                              \
                  : "memory");                                                  \
     eflags.raw = flags;                                                        \
     0;                                                                         \
   })
 
 void test() {
-  IFUZZ1(x86rcli_b, 0);
-  IFUZZ1(x86rcli_b, 1);
-  IFUZZ1(x86rcli_b, 7);
+  IFUZZ2(x86rcr_h);
+  IFUZZ2(x86rcr_h);
+  IFUZZ2(x86rcr_h);
+  IFUZZ2(x86rcr_h);
 }

@@ -1,5 +1,5 @@
 uint64_t v = (uint64_t)a;
-unsigned c = (unsigned)imm;
+unsigned c = (unsigned)(imm & 0x3f);
 unsigned n = c;
 if (n != 0) {
   unsigned carry_out = ((v >> (64 - n)) & 1);

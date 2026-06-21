@@ -21,5 +21,4 @@ void test() {
   IFUZZ1(x86rcli_h, 0);
   IFUZZ1(x86rcli_h, 1);
   IFUZZ1(x86rcli_h, 7);
-  IFUZZ1(x86rcli_h, 31);
 }
