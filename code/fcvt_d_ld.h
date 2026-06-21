@@ -95,8 +95,7 @@ if (exp_x87 == 0x7FFF && j_bit == 1) {
         if (exp_d >= 0x7FF) {
           // Overflowed to infinity.
           exp_d = 0x7FF;
-          man_d = 0;
-          goto done;
+          result53 = 0;
         }
       }
     }
@@ -104,9 +103,5 @@ if (exp_x87 == 0x7FFF && j_bit == 1) {
   }
 }
 
-done :
-    // Recombine: sign[63] | exponent[62:52] | fraction[51:0]
-    assert(man_d < ((uint64_t)1 << 52));
-assert(sign < ((uint64_t)1 << 1));
-assert(exp_d < ((uint64_t)1 << 11));
+// Recombine: sign[63] | exponent[62:52] | fraction[51:0]
 dst = ((uint64_t)sign << 63) | ((uint64_t)exp_d << 52) | man_d;
