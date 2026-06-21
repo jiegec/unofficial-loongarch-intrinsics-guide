@@ -12,6 +12,7 @@ LBT (LoongArch Binary Translation) is a set of instructions for emulating x86 an
 | LBT4      | High 32 bits: x87 FTOP, Low 32 bits: EFLAGS |
 
 Scratch registers are accessible via:
+
 - `$scr0` = LBT0
 - `$scr1` = LBT1
 - `$scr2` = LBT2
