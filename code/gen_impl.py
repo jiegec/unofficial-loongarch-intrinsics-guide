@@ -2189,6 +2189,7 @@ for width, (bits, utype, stype, umax, smin, smax, msb) in x86_w.items():
     # x86sbc (subtract with carry/borrow)
     with open(f"x86sbc_{width}.h", "w") as f:
         print(f"{utype} lhs = ({utype})a;", file=f)
+        print(f"{utype} rhs = ({utype})b;", file=f)
         print(f"uint8_t carry_in = EFLAGS.CF;", file=f)
         print(f"uint64_t subtrahend = (uint64_t)rhs + carry_in;", file=f)
         print(f"{utype} result = ({utype})(lhs - subtrahend);", file=f)
@@ -2283,12 +2284,21 @@ for width, (bits, utype, stype, umax, smin, smax, msb) in x86_w.items():
         print(f"unsigned n = c{rcl_mod};", file=f)
         print(f"if (n != 0) {{", file=f)
         print(f"    unsigned carry_in = EFLAGS.CF;", file=f)
-        print(f"    unsigned carry_out = ((v >> ((n - 1) % ({bits} + 1))) & 1);", file=f)
+        print(
+            f"    unsigned carry_out = ((v >> ((n - 1) % ({bits} + 1))) & 1);", file=f
+        )
         print(f"    EFLAGS.CF = carry_out;", file=f)
         print(f"    if (c == 1) {{", file=f)
-        carry_shift = f"((uint{bits}_t)carry_in << {bits - 1})" if bits == 64 else f"(carry_in << {bits - 1})"
+        carry_shift = (
+            f"((uint{bits}_t)carry_in << {bits - 1})"
+            if bits == 64
+            else f"(carry_in << {bits - 1})"
+        )
         print(f"        {utype} r = ({utype})((v >> 1) | {carry_shift});", file=f)
-        print(f"        EFLAGS.OF = (((r >> {bits - 1}) ^ (r >> {bits - 2})) & 1) != 0;", file=f)
+        print(
+            f"        EFLAGS.OF = (((r >> {bits - 1}) ^ (r >> {bits - 2})) & 1) != 0;",
+            file=f,
+        )
         print(f"    }}", file=f)
         print(f"}}", file=f)
 
@@ -2330,7 +2340,10 @@ for width, (bits, utype, stype, umax, smin, smax, msb) in x86_w.items():
         print(f"{utype} v = ({utype})a;", file=f)
         print(f"unsigned c = (unsigned)(b & {rcl_mask});", file=f)
         print(f"if (c != 0) {{", file=f)
-        print(f"    uint8_t carry_out = c > {bits} ? 0 : ((v >> ({bits} - c)) & 1);", file=f)
+        print(
+            f"    uint8_t carry_out = c > {bits} ? 0 : ((v >> ({bits} - c)) & 1);",
+            file=f,
+        )
         print(f"    {utype} r = c >= {bits} ? 0 : ({utype})(v << c);", file=f)
         print(f"    EFLAGS.CF = carry_out;", file=f)
         print(f"    EFLAGS.PF = parity_even((uint8_t)r);", file=f)
@@ -2346,7 +2359,10 @@ for width, (bits, utype, stype, umax, smin, smax, msb) in x86_w.items():
         print(f"{utype} v = ({utype})a;", file=f)
         print(f"unsigned c = (unsigned)imm;", file=f)
         print(f"if (c != 0) {{", file=f)
-        print(f"    uint8_t carry_out = c > {bits} ? 0 : ((v >> ({bits} - c)) & 1);", file=f)
+        print(
+            f"    uint8_t carry_out = c > {bits} ? 0 : ((v >> ({bits} - c)) & 1);",
+            file=f,
+        )
         print(f"    {utype} r = c >= {bits} ? 0 : ({utype})(v << c);", file=f)
         print(f"    EFLAGS.CF = carry_out;", file=f)
         print(f"    EFLAGS.PF = parity_even((uint8_t)r);", file=f)
@@ -2362,8 +2378,14 @@ for width, (bits, utype, stype, umax, smin, smax, msb) in x86_w.items():
         print(f"{utype} v = ({utype})a;", file=f)
         print(f"unsigned c = (unsigned)(b & {rcl_mask});", file=f)
         print(f"if (c != 0) {{", file=f)
-        print(f"    uint8_t carry_out = c > {bits} ? 0 : ((v >> (c - 1)) & 1);", file=f)
-        print(f"    {utype} r = c >= {bits} ? ({utype})(({stype})v >> ({bits} - 1)) : ({utype})(({stype})v >> c);", file=f)
+        print(
+            f"    uint8_t carry_out = c > {bits} ? (({stype})v < 0) : ((v >> (c - 1)) & 1);",
+            file=f,
+        )
+        print(
+            f"    {utype} r = c >= {bits} ? ({utype})(({stype})v >> ({bits} - 1)) : ({utype})(({stype})v >> c);",
+            file=f,
+        )
         print(f"    EFLAGS.CF = carry_out;", file=f)
         print(f"    EFLAGS.PF = parity_even((uint8_t)r);", file=f)
         print(f"    EFLAGS.ZF = r == 0;", file=f)
@@ -2394,8 +2416,14 @@ for width, (bits, utype, stype, umax, smin, smax, msb) in x86_w.items():
         print(f"{utype} v = ({utype})a;", file=f)
         print(f"unsigned c = (unsigned)imm;", file=f)
         print(f"if (c != 0) {{", file=f)
-        print(f"    uint8_t carry_out = c > {bits} ? 0 : ((v >> (c - 1)) & 1);", file=f)
-        print(f"    {utype} r = c >= {bits} ? ({utype})(({stype})v >> ({bits} - 1)) : ({utype})(({stype})v >> c);", file=f)
+        print(
+            f"    uint8_t carry_out = c > {bits} ? (({stype})v < 0) : ((v >> (c - 1)) & 1);",
+            file=f,
+        )
+        print(
+            f"    {utype} r = c >= {bits} ? ({utype})(({stype})v >> ({bits} - 1)) : ({utype})(({stype})v >> c);",
+            file=f,
+        )
         print(f"    EFLAGS.CF = carry_out;", file=f)
         print(f"    EFLAGS.PF = parity_even((uint8_t)r);", file=f)
         print(f"    EFLAGS.ZF = r == 0;", file=f)
