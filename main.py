@@ -130,7 +130,14 @@ def define_env(env):
             elif part.startswith("__lasx_"):
                 file_name = part[7:]
                 intrinsic_name = part
-        if cur_simd == "lasx" and file_name[0] != "x":
+        if file_name is None:
+            # Handle raw instructions without intrinsics (e.g., LBT)
+            is_lbt = True
+            intrinsic_name = instr.split(" ")[0]
+            file_name = instr.split(" ")[0].replace(".", "_")
+        else:
+            is_lbt = False
+        if not is_lbt and cur_simd == "lasx" and file_name[0] != "x":
             file_name = "x" + file_name
             instr = "x" + instr
             intrinsic = intrinsic.replace("m128", "m256").replace("_lsx_", "_lasx_x")
@@ -192,7 +199,38 @@ def define_env(env):
         else:
             examples_text = ""
 
-        return f"""
+        if is_lbt:
+            return f"""
+## {intrinsic_name}
+
+### Synopsis
+
+```
+Instruction: {instr}
+CPU Flags: LBT
+```
+
+### Description
+
+{desc}
+
+{diagram}
+
+{examples_text}
+
+### Operation
+
+```c++
+{code}
+```
+
+{tested}
+
+{latency_throughput}
+
+"""
+        else:
+            return f"""
 ## {intrinsic}
 
 ### Synopsis
@@ -2084,6 +2122,78 @@ static inline {ret} {name} ({args}) {{
 
     for macro_name, entry in lasx_128_lane_entries.items():
         env.macros[macro_name] = make_lasx_128_lane_macro(entry)
+
+    lbt_widths = {"b": 8, "h": 16, "w": 32, "d": 64}
+
+    @env.macro
+    def lbt_addu12i(name):
+        width = lbt_widths[name]
+        if name == "w":
+            return instruction(
+                intrinsic=f"addu12i.{name}",
+                instr=f"addu12i.{name} rd, rj, imm",
+                desc=f"Add sign-extended 5-bit immediate left-shifted by 12 to unsigned {width}-bit value in `rj`, sign-extend the {width}-bit result to 64-bit and store in `rd`.",
+            )
+        else:
+            return instruction(
+                intrinsic=f"addu12i.{name}",
+                instr=f"addu12i.{name} rd, rj, imm",
+                desc=f"Add sign-extended 5-bit immediate left-shifted by 12 to {width}-bit value in `rj` and store the result in `rd`.",
+            )
+
+    @env.macro
+    def lbt_adc(name):
+        width = lbt_widths[name]
+        return instruction(
+            intrinsic=f"adc.{name}",
+            instr=f"adc.{name} rd, rj, rk",
+            desc=f"Add {width}-bit values in `rj` and `rk` with carry (CF in EFLAGS), sign-extend the result to 64-bit and store in `rd`.",
+        )
+
+    @env.macro
+    def lbt_sbc(name):
+        width = lbt_widths[name]
+        return instruction(
+            intrinsic=f"sbc.{name}",
+            instr=f"sbc.{name} rd, rj, rk",
+            desc=f"Subtract {width}-bit values in `rj` and `rk` with borrow (CF in EFLAGS), sign-extend the result to 64-bit and store in `rd`.",
+        )
+
+    @env.macro
+    def lbt_rotr(name):
+        width = lbt_widths[name]
+        return instruction(
+            intrinsic=f"rotr.{name}",
+            instr=f"rotr.{name} rd, rj, rk",
+            desc=f"Rotate {width}-bit value in `rj` right by the amount specified in `rk`. The shift amount is masked modulo {width}.",
+        )
+
+    @env.macro
+    def lbt_rotri(name):
+        width = lbt_widths[name]
+        return instruction(
+            intrinsic=f"rotri.{name}",
+            instr=f"rotri.{name} rd, rj, imm",
+            desc=f"Rotate {width}-bit value in `rj` right by immediate `imm`. The shift amount is masked modulo {width}.",
+        )
+
+    @env.macro
+    def lbt_rcr(name):
+        width = lbt_widths[name]
+        return instruction(
+            intrinsic=f"rcr.{name}",
+            instr=f"rcr.{name} rd, rj, rk",
+            desc=f"Rotate {width}-bit value in `rj` and CF (in EFLAGS) together as a {width+1}-bit ring right by the amount specified in `rk`. The result is written to `rd`.",
+        )
+
+    @env.macro
+    def lbt_rcri(name):
+        width = lbt_widths[name]
+        return instruction(
+            intrinsic=f"rcri.{name}",
+            instr=f"rcri.{name} rd, rj, imm",
+            desc=f"Rotate {width}-bit value in `rj` and CF (in EFLAGS) together as a {width+1}-bit ring right by immediate `imm`. The result is written to `rd`.",
+        )
 
     @env.macro
     def all_intrinsics(render=True):
