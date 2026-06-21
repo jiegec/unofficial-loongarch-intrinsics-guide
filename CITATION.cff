@@ -9,6 +9,10 @@ authors:
   family-names: Wang
 - given-names: Binbin
   family-names: Zhou
+- given-names: Runze
+  family-names: Lin
+- given-names: Yang
+  family-names: Liu
 title: "Unofficial LoongArch Intrinsics Guide"
 version: v20250706.1
 identifiers:
