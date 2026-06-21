@@ -1,9 +1,8 @@
 uint64_t lhs = (uint64_t)a;
-uint8_t carry_in = EFLAGS.CF;
-uint64_t subtrahend = (uint64_t)rhs + carry_in;
-uint64_t result = (uint64_t)(lhs - subtrahend);
-EFLAGS.CF = lhs < subtrahend;
-EFLAGS.AF = (lhs & 0xf) < (rhs & 0xf);
+uint64_t rhs = (uint64_t)b;
+uint64_t result = lhs - rhs;
+EFLAGS.CF = lhs < rhs;
+EFLAGS.AF = ((lhs ^ rhs ^ result) & 0x10) != 0;
 EFLAGS.OF = ((lhs ^ rhs) & (lhs ^ result) & 0x8000000000000000ULL) != 0;
 EFLAGS.PF = parity_even((uint8_t)result);
 EFLAGS.ZF = result == 0;

@@ -1,0 +1,9 @@
+uint16_t lhs = (uint16_t)a;
+uint16_t rhs = (uint16_t)b;
+uint16_t result = lhs - rhs;
+EFLAGS.CF = lhs < rhs;
+EFLAGS.AF = ((lhs ^ rhs ^ result) & 0x10) != 0;
+EFLAGS.OF = ((lhs ^ rhs) & (lhs ^ result) & 0x8000) != 0;
+EFLAGS.PF = parity_even((uint8_t)result);
+EFLAGS.ZF = result == 0;
+EFLAGS.SF = (int16_t)result < 0;

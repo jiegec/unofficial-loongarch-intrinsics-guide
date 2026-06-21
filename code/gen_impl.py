@@ -2161,10 +2161,34 @@ for width, (bits, utype, stype, umax, smin, smax, msb) in x86_w.items():
             print(f"EFLAGS.ZF = result == 0;", file=f)
             print(f"EFLAGS.SF = ({stype})result < 0;", file=f)
 
+    # x86sub (subtract, signed widths)
+    with open(f"x86sub_{width}.h", "w") as f:
+        print(f"{utype} lhs = ({utype})a;", file=f)
+        print(f"{utype} rhs = ({utype})b;", file=f)
+        print(f"{utype} result = lhs - rhs;", file=f)
+        print(f"EFLAGS.CF = lhs < rhs;", file=f)
+        print(f"EFLAGS.AF = ((lhs ^ rhs ^ result) & 0x10) != 0;", file=f)
+        print(f"EFLAGS.OF = ((lhs ^ rhs) & (lhs ^ result) & {msb}) != 0;", file=f)
+        print(f"EFLAGS.PF = parity_even((uint8_t)result);", file=f)
+        print(f"EFLAGS.ZF = result == 0;", file=f)
+        print(f"EFLAGS.SF = ({stype})result < 0;", file=f)
+
+    # x86sub_{width}u (unsigned, OF=0)
+    if width in ("w", "d"):
+        with open(f"x86sub_{width}u.h", "w") as f:
+            print(f"{utype} lhs = ({utype})a;", file=f)
+            print(f"{utype} rhs = ({utype})b;", file=f)
+            print(f"{utype} result = lhs - rhs;", file=f)
+            print(f"EFLAGS.CF = lhs < rhs;", file=f)
+            print(f"EFLAGS.AF = ((lhs ^ rhs ^ result) & 0x10) != 0;", file=f)
+            print(f"EFLAGS.OF = 0;", file=f)
+            print(f"EFLAGS.PF = parity_even((uint8_t)result);", file=f)
+            print(f"EFLAGS.ZF = result == 0;", file=f)
+            print(f"EFLAGS.SF = ({stype})result < 0;", file=f)
+
     # x86sbc (subtract with carry/borrow)
     with open(f"x86sbc_{width}.h", "w") as f:
         print(f"{utype} lhs = ({utype})a;", file=f)
-        print(f"{utype} rhs = ({utype})b;", file=f)
         print(f"uint8_t carry_in = EFLAGS.CF;", file=f)
         print(f"uint64_t subtrahend = (uint64_t)rhs + carry_in;", file=f)
         print(f"{utype} result = ({utype})(lhs - subtrahend);", file=f)

@@ -602,6 +602,7 @@ for entry in arm_tb_entries:
 # Scalar x86 instructions (GPR, not SIMD)
 x86_two_input = {
     "add": ["b", "h", "w", "d", "wu", "du"],
+    "sub": ["b", "h", "w", "d", "wu", "du"],
     "adc": ["b", "h", "w", "d"],
     "sbc": ["b", "h", "w", "d"],
     "and": ["b", "h", "w", "d"],

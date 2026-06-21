@@ -1,5 +1,4 @@
 uint8_t lhs = (uint8_t)a;
-uint8_t rhs = (uint8_t)b;
 uint8_t carry_in = EFLAGS.CF;
 uint64_t subtrahend = (uint64_t)rhs + carry_in;
 uint8_t result = (uint8_t)(lhs - subtrahend);
