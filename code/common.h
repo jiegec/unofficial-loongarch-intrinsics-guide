@@ -516,6 +516,7 @@ void print(const char *s, uint64_t num) {
       eflags flags2 = in_flags;                                                \
       uint64_t dst2 = ref_##func(flags2 __VA_OPT__(, ) __VA_ARGS__);           \
       if (dst1 != dst2 || flags1 != flags2) {                                  \
+        PRINT(in_flags.raw);                                                   \
         PRINT(dst1);                                                           \
         PRINT(flags1.raw);                                                     \
         PRINT(dst2);                                                           \
@@ -536,6 +537,7 @@ void print(const char *s, uint64_t num) {
       uint64_t dst2 = ref_##func(flags2, a __VA_OPT__(, ) __VA_ARGS__);        \
       if (dst1 != dst2 || flags1 != flags2) {                                  \
         PRINT(a);                                                              \
+        PRINT(in_flags.raw);                                                   \
         PRINT(dst1);                                                           \
         PRINT(flags1.raw);                                                     \
         PRINT(dst2);                                                           \
@@ -557,6 +559,7 @@ void print(const char *s, uint64_t num) {
       if (dst1 != dst2 || flags1 != flags2) {                                  \
         PRINT(a);                                                              \
         PRINT(b);                                                              \
+        PRINT(in_flags.raw);                                                   \
         PRINT(dst1);                                                           \
         PRINT(flags1.raw);                                                     \
         PRINT(dst2);                                                           \

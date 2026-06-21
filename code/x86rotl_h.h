@@ -1,9 +1,8 @@
 uint16_t v = (uint16_t)a;
 unsigned c = (unsigned)(b & 0x1f);
 unsigned n = c % 16;
-uint8_t carry_out = n == 0 ? ((v >> (16 - 1)) & 1) : ((v >> (16 - n)) & 1);
-uint16_t r = n == 0 ? v : (uint16_t)((v << n) | (v >> (16 - n)));
-EFLAGS.CF = carry_out;
+uint16_t r = (uint16_t)((v << n) | (v >> (16 - n)));
+EFLAGS.CF = ((v >> ((16 - n) % 16)) & 1);
 if (c == 1) {
   EFLAGS.OF = ((v ^ r) & 0x8000) != 0;
 }
