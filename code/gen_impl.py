@@ -2317,6 +2317,22 @@ for width, (bits, utype, stype, umax, smin, smax, msb) in x86_w.items():
         print(f"    }}", file=f)
         print(f"}}", file=f)
 
+    # x86slli (shift left logical immediate)
+    with open(f"x86slli_{width}.h", "w") as f:
+        print(f"{utype} v = ({utype})a;", file=f)
+        print(f"unsigned c = (unsigned)imm;", file=f)
+        print(f"if (c != 0) {{", file=f)
+        print(f"    uint8_t carry_out = c > {bits} ? 0 : ((v >> ({bits} - c)) & 1);", file=f)
+        print(f"    {utype} r = c >= {bits} ? 0 : ({utype})(v << c);", file=f)
+        print(f"    EFLAGS.CF = carry_out;", file=f)
+        print(f"    EFLAGS.PF = parity_even((uint8_t)r);", file=f)
+        print(f"    EFLAGS.ZF = r == 0;", file=f)
+        print(f"    EFLAGS.SF = ({stype})r < 0;", file=f)
+        print(f"    if (c == 1) {{", file=f)
+        print(f"        EFLAGS.OF = ((v ^ r) & {msb}) != 0;", file=f)
+        print(f"    }}", file=f)
+        print(f"}}", file=f)
+
     # x86rotri (rotate right immediate, no CF involvement)
     with open(f"x86rotri_{width}.h", "w") as f:
         print(f"{utype} v = ({utype})a;", file=f)
