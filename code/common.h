@@ -172,6 +172,12 @@ static inline uint64_t sext(uint64_t v, unsigned w) {
   return ((v & ((sign << 1) - 1)) ^ sign) - sign;
 }
 
+static inline bool parity_even(uint8_t v) {
+  v ^= v >> 4;
+  v &= 0xf;
+  return ((0x6996u >> v) & 1u) == 0;
+}
+
 template <typename T> u8 clo(T num) {
   for (int i = sizeof(T) * 8 - 1; i >= 0; i--) {
     if ((num & ((T)1 << i)) == 0) {
