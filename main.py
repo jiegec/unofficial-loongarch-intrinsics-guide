@@ -2582,6 +2582,36 @@ static inline {ret} {name} ({args}) {{
             "Convert x87 80-bit extended precision value (upper 16 bits in `fj`, lower 64 bits in `fk`) to double-precision floating point, store in `fd`.")
 
     @env.macro
+    def lbt_movgr2scr():
+        return instruction("movgr2scr", "movgr2scr scrd, rj",
+            "Move GPR to scratch register: copy value in `rj` to the scratch register selected by `scrd` (0-3). Scratch registers LBT0-LBT3 are accessible via $scr0-$scr3.")
+
+    @env.macro
+    def lbt_movscr2gr():
+        return instruction("movscr2gr", "movscr2gr rd, scrj",
+            "Move scratch register to GPR: copy value in the scratch register selected by `scrj` (0-3) to `rd`.")
+
+    @env.macro
+    def lbt_x86mfflag():
+        return instruction("x86mfflag", "x86mfflag rd, mask",
+            "Move from x86 EFLAGS: read selected x86 flags (CF, PF, AF, ZF, SF, OF) from EFLAGS as determined by `mask`, pack them into `rd`.")
+
+    @env.macro
+    def lbt_x86mtflag():
+        return instruction("x86mtflag", "x86mtflag rd, mask",
+            "Move to x86 EFLAGS: write selected x86 flags (CF, PF, AF, ZF, SF, OF) in EFLAGS from the corresponding bit positions in `rd`, as determined by `mask`.")
+
+    @env.macro
+    def lbt_armmfflag():
+        return instruction("armmfflag", "armmfflag rd, mask",
+            "Move from ARMFLAGS: read selected ARM flags (N, Z, C, V) from ARMFLAGS as determined by `mask`, pack them into `rd`.")
+
+    @env.macro
+    def lbt_armmtflag():
+        return instruction("armmtflag", "armmtflag rd, mask",
+            "Move to ARMFLAGS: write selected ARM flags (N, Z, C, V) in ARMFLAGS from the corresponding bit positions in `rd`, as determined by `mask`.")
+
+    @env.macro
     def all_intrinsics(render=True):
         result = []
         for file in glob.glob("docs/*/*.md"):
