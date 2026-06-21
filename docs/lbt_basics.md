@@ -1,6 +1,6 @@
 # LoongArch LBT Basics
 
-LBT (LoongArch Binary Translation) is a set of instructions for emulating x86 and ARM instruction sets. It provides hardware-accelerated flag manipulation, x87 FPU stack management, and conditional execution primitives.
+LBT (LoongArch Binary Translation) is a set of instructions for emulating x86, ARM, and MIPS instruction sets. It provides hardware-accelerated flag manipulation, x87 FPU stack management, and conditional execution primitives.
 
 ## Registers
 
@@ -147,6 +147,17 @@ Conversion instructions:
 - 0: set bit (0→1 only), raises BTE on invalid transition
 - 1: clear bit (1→0 only), raises BTE on invalid transition
 - 2–4: check tag byte then modify, raises BTE on invalid state
+
+## MIPS Unaligned Memory
+
+LBT provides MIPS-style unaligned load and store instructions for emulating `ldl`/`ldr`/`stl`/`str`:
+
+- `ldl.w`/`ldl.d` — load doubleword left: load left part of an unaligned value from memory, merge with existing bytes in `rd`
+- `ldr.w`/`ldr.d` — load doubleword right: load right part of an unaligned value from memory, merge with existing bytes in `rd`
+- `stl.w`/`stl.d` — store doubleword left: store left part of an unaligned value to memory
+- `str.w`/`str.d` — store doubleword right: store right part of an unaligned value to memory
+
+The offset is a signed 12-bit immediate shifted left by 0 (`.w`) or 3 (`.d`) bits.
 
 ## Instruction Groups
 
