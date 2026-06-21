@@ -26,8 +26,8 @@ typedef double f64;
 #include "common-machine.h"
 
 uint64_t rand64() {
-  // static std::random_device rd;
-  static std::mt19937_64 gen(0);
+  static std::random_device rd;
+  static std::mt19937_64 gen(rd());
   return gen();
 }
 
