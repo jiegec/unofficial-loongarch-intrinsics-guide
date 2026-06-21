@@ -71,6 +71,54 @@ ARM condition flags (N, Z, C, V) are mapped to the corresponding x86 EFLAGS bits
 | C (Carry)    | CF             | 0x001        |
 | V (Overflow) | OF             | 0x800        |
 
+## Condition Codes
+
+### x86 Condition Codes
+
+`setx86j rd, cond` evaluates the x86 condition `cond` against EFLAGS and stores 1 or 0 in `rd`.
+
+| cond | Mnemonic     | Condition          |
+|------|--------------|--------------------|
+| 0    | A / NBE      | CF = 0 and ZF = 0  |
+| 1    | AE / NB / NC | CF = 0             |
+| 2    | B / C / NAE  | CF = 1             |
+| 3    | BE / NA      | CF = 1 or ZF = 1   |
+| 4    | E / Z        | ZF = 1             |
+| 5    | NE / NZ      | ZF = 0             |
+| 6    | G / NLE      | ZF = 0 and SF = OF |
+| 7    | GE / NL      | SF = OF            |
+| 8    | L / NGE      | SF != OF           |
+| 9    | LE / NG      | ZF = 1 or SF != OF |
+| 10   | S            | SF = 1             |
+| 11   | NS           | SF = 0             |
+| 12   | O            | OF = 1             |
+| 13   | NO           | OF = 0             |
+| 14   | P / PE       | PF = 1             |
+| 15   | NP / PO      | PF = 0             |
+
+### ARM Condition Codes
+
+`setarmj rd, cond` evaluates the ARM condition `cond` against ARMFLAGS and stores 1 or 0 in `rd`. These same condition codes govern all ARM instructions (the operation only executes when the condition holds).
+
+| cond | Mnemonic | Condition       |
+|------|----------|-----------------|
+| 0    | EQ       | Z = 1           |
+| 1    | NE       | Z = 0           |
+| 2    | CS / HS  | C = 1           |
+| 3    | CC / LO  | C = 0           |
+| 4    | MI       | N = 1           |
+| 5    | PL       | N = 0           |
+| 6    | VS       | V = 1           |
+| 7    | VC       | V = 0           |
+| 8    | HI       | C = 1 and Z = 0 |
+| 9    | LS       | C = 0 or Z = 1  |
+| 10   | GE       | N = V           |
+| 11   | LT       | N != V          |
+| 12   | GT       | Z = 0 and N = V |
+| 13   | LE       | Z = 1 or N != V |
+| 14   | AL       | always          |
+| 15   | AL       | always          |
+
 ## x87 FPU Emulation
 
 ### FTOP (Stack Top Pointer)
