@@ -2410,6 +2410,122 @@ static inline {ret} {name} ({args}) {{
             desc=f"x86-style loop while not equal: decrement the counter value in `rj`. Store 1 in `rd` if the decremented counter is non-zero and ZF (in EFLAGS) is clear, 0 otherwise.",
         )
 
+    # ── ARM LBT helpers ───────────────────────────────────────────
+    def _arm_inst(stem, instr, desc):
+        return instruction(intrinsic=stem, instr=instr, desc=desc)
+
+    def _arm_inst_2op(stem, desc):
+        return _arm_inst(stem, f"{stem} rd, rj", desc)
+
+    def _arm_inst_3op(stem, desc):
+        return _arm_inst(stem, f"{stem} rd, rj, rk", desc)
+
+    def _arm_inst_shift_imm(stem, desc):
+        return _arm_inst(stem, f"{stem} rd, rj, imm", desc)
+
+    @env.macro
+    def lbt_armadd():
+        return _arm_inst_3op("armadd.w",
+            "ARM-style add (32-bit): conditionally add values in `rj` and `rk`. Update ARMFLAGS (C, V, N, Z). Store the 32-bit result sign-extended to 64-bit in `rd`.")
+
+    @env.macro
+    def lbt_armsub():
+        return _arm_inst_3op("armsub.w",
+            "ARM-style subtract (32-bit): conditionally subtract value in `rk` from `rj`. Update ARMFLAGS (C, V, N, Z). Store the 32-bit result sign-extended to 64-bit in `rd`.")
+
+    @env.macro
+    def lbt_armadc():
+        return _arm_inst_3op("armadc.w",
+            "ARM-style add with carry (32-bit): conditionally add values in `rj` and `rk` with carry (C in ARMFLAGS). Update ARMFLAGS (C, V, N, Z). Store the 32-bit result sign-extended to 64-bit in `rd`.")
+
+    @env.macro
+    def lbt_armsbc():
+        return _arm_inst_3op("armsbc.w",
+            "ARM-style subtract with borrow (32-bit): conditionally subtract value in `rk` from `rj` with borrow (C in ARMFLAGS). Update ARMFLAGS (C, V, N, Z). Store the 32-bit result sign-extended to 64-bit in `rd`.")
+
+    @env.macro
+    def lbt_armand():
+        return _arm_inst_3op("armand.w",
+            "ARM-style bitwise AND (32-bit): conditionally AND values in `rj` and `rk`. Update ARMFLAGS (N, Z). Store the 32-bit result sign-extended to 64-bit in `rd`.")
+
+    @env.macro
+    def lbt_armor():
+        return _arm_inst_3op("armor.w",
+            "ARM-style bitwise OR (32-bit): conditionally OR values in `rj` and `rk`. Update ARMFLAGS (N, Z). Store the 32-bit result sign-extended to 64-bit in `rd`.")
+
+    @env.macro
+    def lbt_armxor():
+        return _arm_inst_3op("armxor.w",
+            "ARM-style bitwise XOR (32-bit): conditionally XOR values in `rj` and `rk`. Update ARMFLAGS (N, Z). Store the 32-bit result sign-extended to 64-bit in `rd`.")
+
+    @env.macro
+    def lbt_armnot():
+        return _arm_inst_2op("armnot.w",
+            "ARM-style bitwise NOT (32-bit): conditionally bitwise NOT the value in `rj`. Update ARMFLAGS (N, Z). Store the 32-bit result sign-extended to 64-bit in `rd`.")
+
+    @env.macro
+    def lbt_armsll():
+        return _arm_inst_3op("armsll.w",
+            "ARM-style logical shift left (32-bit): conditionally shift value in `rj` left by amount in `rk` (masked to 8 bits). Update ARMFLAGS (C, N, Z). Store the 32-bit result sign-extended to 64-bit in `rd`.")
+
+    @env.macro
+    def lbt_armsrl():
+        return _arm_inst_3op("armsrl.w",
+            "ARM-style logical shift right (32-bit): conditionally shift value in `rj` right logically by amount in `rk` (masked to 8 bits). Update ARMFLAGS (C, N, Z). Store the 32-bit result sign-extended to 64-bit in `rd`.")
+
+    @env.macro
+    def lbt_armsra():
+        return _arm_inst_3op("armsra.w",
+            "ARM-style arithmetic shift right (32-bit): conditionally shift value in `rj` right arithmetically by amount in `rk` (masked to 8 bits). Update ARMFLAGS (C, N, Z). Store the 32-bit result sign-extended to 64-bit in `rd`.")
+
+    @env.macro
+    def lbt_armrotr():
+        return _arm_inst_3op("armrotr.w",
+            "ARM-style rotate right (32-bit): conditionally rotate value in `rj` right by amount in `rk` (masked to 8 bits, rotate modulo 32). Update ARMFLAGS (C, N, Z). Store the 32-bit result sign-extended to 64-bit in `rd`.")
+
+    @env.macro
+    def lbt_armslli():
+        return _arm_inst_shift_imm("armslli.w",
+            "ARM-style logical shift left immediate (32-bit): conditionally shift value in `rj` left by `imm`. Update ARMFLAGS (C, N, Z). Store the 32-bit result sign-extended to 64-bit in `rd`.")
+
+    @env.macro
+    def lbt_armsrli():
+        return _arm_inst_shift_imm("armsrli.w",
+            "ARM-style logical shift right immediate (32-bit): conditionally shift value in `rj` right logically by `imm`. Update ARMFLAGS (C, N, Z). Store the 32-bit result sign-extended to 64-bit in `rd`.")
+
+    @env.macro
+    def lbt_armsrai():
+        return _arm_inst_shift_imm("armsrai.w",
+            "ARM-style arithmetic shift right immediate (32-bit): conditionally shift value in `rj` right arithmetically by `imm`. Update ARMFLAGS (C, N, Z). Store the 32-bit result sign-extended to 64-bit in `rd`.")
+
+    @env.macro
+    def lbt_armrotri():
+        return _arm_inst_shift_imm("armrotri.w",
+            "ARM-style rotate right immediate (32-bit): conditionally rotate value in `rj` right by `imm`. Update ARMFLAGS (C, N, Z). Store the 32-bit result sign-extended to 64-bit in `rd`.")
+
+    @env.macro
+    def lbt_armrrx():
+        return _arm_inst_2op("armrrx.w",
+            "ARM-style rotate right extended (32-bit): conditionally rotate the value in `rj` and C (in ARMFLAGS) together as a 33-bit ring right by 1. Update ARMFLAGS (C, N, Z). Store the 32-bit result sign-extended to 64-bit in `rd`.")
+
+    @env.macro
+    def lbt_armmove():
+        return _arm_inst_2op("armmove",
+            "ARM-style conditional move: if the ARM condition holds, copy the value in `rj` to `rd`. ARMFLAGS are not updated.")
+
+    @env.macro
+    def lbt_armmov(name):
+        width = lbt_widths[name]
+        return _arm_inst(f"armmov.{name}", f"armmov.{name} rd, rj",
+            f"ARM-style move (with flag update): conditionally copy {width}-bit value in `rj` to `rd`. Update ARMFLAGS (N, Z).")
+
+    @env.macro
+    def lbt_setarmj():
+        return instruction(
+            intrinsic=f"setarmj",
+            instr=f"setarmj rd, cond",
+            desc=f"ARM-style set if condition: evaluate ARM condition code `cond` against ARMFLAGS. Store 1 in `rd` if the condition holds, 0 otherwise.")
+
     @env.macro
     def all_intrinsics(render=True):
         result = []
