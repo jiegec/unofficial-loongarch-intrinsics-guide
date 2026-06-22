@@ -211,8 +211,6 @@ LBT provides MIPS-style unaligned load and store instructions for emulating `ldl
 - `stl.w`/`stl.d` — store doubleword left: store left part of an unaligned value to memory
 - `str.w`/`str.d` — store doubleword right: store right part of an unaligned value to memory
 
-The offset is a signed 12-bit immediate shifted left by 0 (`.w`) or 3 (`.d`) bits.
-
 ## Instruction Groups
 
 All LBT instruction groups are documented in the following pages:
