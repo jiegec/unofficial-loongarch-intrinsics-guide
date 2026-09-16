@@ -1,0 +1,3 @@
+// v_dp4a_i8_i8_i32 -- Computes the dot product of four packed signed 8-bit integer and signed 8-bit integer elements, adds the signed 32-bit integer accumulator, and writes the low 32-bit result to the vector destination for each active lane
+// The predicate gates the lane write; only the value result of the named operation is modeled here.
+dst[0] = dp4a_i8_i8_i32(src[0], src[1]);

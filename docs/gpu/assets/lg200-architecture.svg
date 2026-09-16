@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 780" role="img" aria-labelledby="title desc">
+  <title id="title">LG200 command layers and pipe lanes</title>
+  <desc id="desc">L0 configures the command interface. Three parallel L1 rings (GPIPE, XDMA, CPIPE HIQ) feed three L2 streams; only the graphics path reaches the L3 shader front end through stage records and kernel entries.</desc>
+<defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#334b5c"/></marker>
+    <style>
+      .frame { fill:#f7f9fb; stroke:#8796a2; stroke-width:2; }
+      .box { stroke:#253746; stroke-width:2; rx:6; }
+      .line { stroke:#334b5c; stroke-width:2.5; fill:none; marker-end:url(#arrow); }
+      .dash { stroke:#697d8c; stroke-width:2; stroke-dasharray:8 6; fill:none; marker-end:url(#arrow); }
+      .title { font:700 20px sans-serif; fill:#17242f; }
+      .label { font:700 15px sans-serif; fill:#17242f; }
+      .small { font:12px sans-serif; fill:#263746; }
+      .mono { font:12px monospace; fill:#263746; }
+      .head { font:600 12px sans-serif; fill:#52645a; }
+    </style>
+  </defs>
+  <rect x="25" y="25" width="1150" height="730" rx="8" class="frame"/>
+  <text x="50" y="60" class="title">LG200 command layers: parallel pipe lanes</text>
+
+  <rect x="50" y="85" width="1100" height="95" class="box" fill="#dbe9f6"/>
+  <text x="70" y="112" class="label">L0 command interface (kernel-owned)</text>
+  <text x="70" y="136" class="mono">ICMD32(mop, sop) / ICMD32i   COMMAND/ARGUMENT/STATUS/RETURN MMIO</text>
+  <text x="70" y="158" class="small">configures pipes (MOP 0x01..0x0e), MMU, interrupts, and VRAM windows</text>
+
+  <g>
+    <rect x="50" y="215" width="360" height="210" class="box" fill="#f4e2be"/>
+    <text x="70" y="240" class="label">L1 GPIPE ring</text>
+    <text x="70" y="262" class="mono">SCMD32(op, cfg)  VMID 0x0f / IB 0x80 / WB 0x10</text>
+    <text x="70" y="282" class="small">cursors 0x18/0x1c, VMIDs 1..3, IRQ 0x01</text>
+    <rect x="70" y="296" width="320" height="40" class="box" fill="#fff"/>
+    <text x="88" y="313" class="mono">VMID | IB | ib_va[63:0] | length_dw</text>
+    <text x="88" y="329" class="small">outer wrapper selects the VM and the inner buffer</text>
+    <line x1="230" y1="336" x2="230" y2="356" class="line"/>
+    <rect x="70" y="356" width="320" height="55" class="box" fill="#d9eee3"/>
+    <text x="88" y="377" class="label">L2 GFX / BPIPE stream</text>
+    <text x="88" y="397" class="small">full-state envelope -&gt; 512-dword state object</text>
+    <text x="88" y="413" class="small">-&gt; BPIPE inner commands (CFGW/DRAW/SYNC)</text>
+  </g>
+
+  <g>
+    <rect x="420" y="215" width="360" height="210" class="box" fill="#eef3f0"/>
+    <text x="440" y="240" class="label">L1 XDMA ring</text>
+    <text x="440" y="262" class="mono">SCMD32(op, cfg)  STSCFG 0x01 / SBMT 0x03</text>
+    <text x="440" y="282" class="small">cursors 0x20/0x24, IRQ 0x23</text>
+    <rect x="440" y="296" width="320" height="40" class="box" fill="#fff"/>
+    <text x="458" y="313" class="mono">STSCFG(8&lt;&lt;20) element/op h/w fill src dst pitches</text>
+    <text x="458" y="329" class="small">counted state packet, then SBMT submits</text>
+    <line x1="600" y1="336" x2="600" y2="356" class="line"/>
+    <rect x="440" y="356" width="320" height="55" class="box" fill="#fff8e8"/>
+    <text x="458" y="377" class="label">L2 XDMA stream</text>
+    <text x="458" y="397" class="small">linear copy (elem 1) and fill (elem 0)</text>
+    <text x="458" y="413" class="small">VA49 + UMAP source/destination addresses</text>
+  </g>
+
+  <g>
+    <rect x="790" y="215" width="360" height="210" class="box" fill="#eadcf1"/>
+    <text x="810" y="240" class="label">L1 CPIPE HIQ (kernel)</text>
+    <text x="810" y="262" class="mono">MAP_PROCESS 0xe0 / MAP_QUEUE 0xe2 / DOORBELL 0xe4</text>
+    <text x="810" y="282" class="small">cursors 0x38/0x3c, VMIDs 4..7, queues 0..7, IRQ 0x22</text>
+    <rect x="810" y="296" width="320" height="40" class="box" fill="#fff"/>
+    <text x="828" y="313" class="mono">MAP_QUEUE: PASID, queue ID, 14-dword MQD</text>
+    <text x="828" y="329" class="small">MQD points to the user ring and rptr/wptr</text>
+    <line x1="970" y1="336" x2="970" y2="356" class="line"/>
+    <rect x="810" y="356" width="320" height="55" class="box" fill="#f8f0f8"/>
+    <text x="828" y="377" class="label">L2 CPIPE user ring</text>
+    <text x="828" y="397" class="small">byte rptr/wptr; submit via HIQ DOORBELL</text>
+    <text x="828" y="413" class="small">compute queue records, completion 0x22</text>
+  </g>
+
+  <rect x="50" y="460" width="360" height="130" class="box" fill="#dbe9f6"/>
+  <text x="70" y="486" class="label">L3 shader front end</text>
+  <text x="70" y="508" class="mono">INST_LO / INST_HI, 64-bit words</text>
+  <text x="70" y="528" class="small">stage record +0x10 kernel_entry -&gt; shader code</text>
+  <text x="70" y="546" class="small">roots -&gt; descriptors -&gt; payload; live-in SGPR/VGPR</text>
+  <text x="70" y="564" class="small">SIO export, check, exit</text>
+  <line x1="230" y1="411" x2="230" y2="460" class="line"/>
+
+  <rect x="420" y="460" width="730" height="130" class="box" fill="#f7f9fb"/>
+  <text x="440" y="486" class="label">Completion and fences</text>
+  <text x="440" y="510" class="small">GPIPE fence: VMID(0) | WB32(0) | address64 | sequence32 | DBAR(0)</text>
+  <text x="440" y="530" class="small">BPIPE writes WR32/WR64 at EOP; POLL waits on memory with a bounded retry</text>
+  <text x="440" y="550" class="small">IRQ sources: 0x01 GPIPE, 0x02 BPIPE, 0x22 CPIPE, 0x23 XDMA</text>
+  <text x="440" y="570" class="small">a fence is not a shader ordering operation; DBAR is not a shader check</text>
+
+  <text x="50" y="625" class="head">DPIPE (MOP 0x0c) and EPIPE (MOP 0x0d) share the L0/L1 interface but are LG210-only routes with no LG200 payload schema.</text>
+</svg>

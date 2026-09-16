@@ -5,6 +5,7 @@ import json
 import markdown
 import re
 import csv
+import html
 
 # dirty way to reduce code
 cur_simd = "lsx"
@@ -64,6 +65,468 @@ for line in open('code/examples.md', 'r'):
         expr, res = line.split(":")
         expr = expr.replace(" COMMA ", ", ")
         examples[name].append(f"{expr}\n={res}")
+
+
+# LG200 (Loongson GPU) instruction metadata, parsed from the vendored
+# instruction table (code/lg200-instructions.tsv). The encoding visual
+# uses the mask/layout columns; Operation pseudocode lives in code/lg200/*.h.
+def _lg200_load_meta():
+    meta = {}
+    tsv = "code/lg200-instructions.tsv"
+    if not os.path.exists(tsv):
+        return meta
+    with open(tsv, "r", encoding="utf-8") as f:
+        for row in csv.DictReader(f, delimiter="\t"):
+            meta[row["mnemonic"]] = {
+                "format": row["format"],
+                "category": row["category"],
+                "semantic_model": row["semantic_model"],
+                "assembly": row["seed_assembly"],
+                "encoding_lo": row["inst_lo"],
+                "encoding_hi": row["inst_hi"],
+                "operand_layout": row["operand_layout"],
+                "masks": {
+                    "fixed_lo": row["fixed_mask_lo"], "fixed_hi": row["fixed_mask_hi"],
+                    "opcode_lo": row["opcode_mask_lo"], "opcode_hi": row["opcode_mask_hi"],
+                    "parameter_lo": row["parameter_mask_lo"], "parameter_hi": row["parameter_mask_hi"],
+                    "ignored_lo": row["ignored_mask_lo"], "ignored_hi": row["ignored_mask_hi"],
+                    "reserved_lo": row["reserved_mask_lo"], "reserved_hi": row["reserved_mask_hi"],
+                },
+                "description": row["description"],
+            }
+    return meta
+
+
+lg200_meta = _lg200_load_meta()
+
+
+# ---- LG200 microbench measurements (PS-carrier differential wall-clock) ----
+# Produced by code/lg200/run_bench.py -> code/lg200/measure-lg200.csv.
+# columns: name,lat_ns_per_op,tp_ns_per_op,lat_intercept_ms,tp_intercept_ms,
+#          lat_r2,tp_r2,reliable
+def _lg200_load_measure():
+    data = {}
+    p = "code/lg200/measure-lg200.csv"
+    if not os.path.exists(p):
+        return data
+    with open(p, newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            try:
+                data[row["name"]] = {
+                    "lat_ns": float(row["lat_ns_per_op"]),
+                    "tp_ns": float(row["tp_ns_per_op"]),
+                    "lat_r2": float(row["lat_r2"]),
+                    "tp_r2": float(row["tp_r2"]),
+                    "reliable": int(row["reliable"]),
+                    "lat_intercept_ms": float(row["lat_intercept_ms"]),
+                    "tp_intercept_ms": float(row["tp_intercept_ms"]),
+                }
+            except (KeyError, ValueError):
+                continue
+    return data
+
+
+lg200_measure = _lg200_load_measure()
+
+
+def _lg200_latency_section(mnemonic):
+    """Render the per-instruction Latency section (GPU data columns).
+
+    GPU microbench data is organized along two axes that LSX/LASX don't
+    need: (1) the measured pattern (dependency-chain latency vs independent
+    8-way throughput) and (2) measurement confidence.  The carrier runs
+    every op on 16 fragments, so both numbers are the wall-clock cost of
+    one op normalized per fragment-lane, in nanoseconds.  They are RELATIVE
+    (submission overhead cancels via the slope), not architectural cycles.
+    """
+    m = lg200_measure.get(mnemonic)
+    if m is None:
+        return ""
+
+    def cell(v, r2):
+        if v <= 0 or r2 < 0.5:
+            return "-"
+        return "%.1f" % v
+
+    lat = cell(m["lat_ns"], m["lat_r2"])
+    tp = cell(m["tp_ns"], m["tp_r2"])
+    rel = ("yes" if m["reliable"] else "no") if (lat != "-" and tp != "-") else "-"
+    warn = ""
+    if not m["reliable"] and (lat != "-" or tp != "-"):
+        warn = (
+            "\n\n> Below the measurement floor (single-submission overhead "
+            "~17ms dominates the per-op signal; the fitted slope is not "
+            "trustworthy)."
+        )
+
+    return f"""
+### Latency
+
+| Pattern | ns/op | Fit R2 | Meaning |
+|---------|------:|-------:|---------|
+| Dependency chain (lat) | {lat} | {m["lat_r2"]:.2f} | one {mnemonic} consuming the previous destination, same lane |
+| Independent streams (tp) | {tp} | {m["tp_r2"]:.2f} | 8 independent register streams, no cross-op dependency |
+| Carrier | 16 fragments | - | every op executes on all 16 fragment lanes |
+| Confidence | {rel} | - | both slopes > 0 with R2 > 0.5 |
+
+Measured by the PS-carrier differential wall-clock bench (slope of
+wall-clock vs op count, code/lg200/run_bench.py); the fixed
+submission/readback overhead subtracts out. Numbers are **relative
+wall-clock nanoseconds**, not architectural cycles (no shader-visible GPU
+clock; see [Measurements](measurements.md)).{warn}
+"""
+
+
+
+
+# ---- LG200 encoding visual (bit-field strip, legend, operand chips) ----
+_LG200_LAYOUT_HEAD = re.compile(r"([A-Za-z][A-Za-z0-9_.]*)@INST_(LO|HI)\[(\d+)(?::(\d+))?\]")
+_LG200_LAYOUT_TAIL = re.compile(r"INST_(LO|HI)\[(\d+)(?::(\d+))?\]")
+
+
+def _lg200_parse_layout(layout):
+    fields = []
+    if not layout or layout == "-":
+        return fields
+    for token in layout.split(";"):
+        token = token.strip()
+        if not token:
+            continue
+        segments = []
+        name = None
+        for part in token.split("+"):
+            part = part.strip()
+            match = _LG200_LAYOUT_HEAD.fullmatch(part)
+            if match:
+                part_name, word, hi_text, lo_text = match.groups()
+                if name is not None and part_name != name:
+                    raise ValueError("mixed field names in layout token: %s" % token)
+                name = part_name
+            else:
+                match = _LG200_LAYOUT_TAIL.fullmatch(part)
+                if not match or name is None:
+                    raise ValueError("invalid layout segment: %s" % part)
+                word, hi_text, lo_text = match.groups()
+            hi = int(hi_text)
+            lo = int(lo_text) if lo_text is not None else hi
+            if hi < lo or hi > 31 or lo < 0:
+                raise ValueError("invalid bit range in layout segment: %s" % part)
+            segments.append((word, hi, lo))
+        if name is None or not segments:
+            raise ValueError("invalid operand layout token: %s" % token)
+        encoded_bits = "+".join(
+            "INST_%s[%d:%d]" % (word, hi, lo) if hi != lo else "INST_%s[%d]" % (word, hi)
+            for word, hi, lo in segments)
+        fields.append({
+            "name": name,
+            "segments": segments,
+            "bits": encoded_bits,
+            "width": sum(hi - lo + 1 for _, hi, lo in segments),
+        })
+    return fields
+
+
+def _lg200_field_class(name):
+    if name.startswith("PJ"):
+        return "p"
+    if name.startswith("M."):
+        return "m"
+    if name.startswith("V"):
+        return "v"
+    if name.startswith("G"):
+        return "g"
+    if name.startswith("R"):
+        return "r"
+    if name.startswith("I"):
+        return "i"
+    if name.startswith("U"):
+        return "u"
+    if name.startswith("X"):
+        return "x"
+    return "parameter"
+
+
+def _lg200_field_label(name, width):
+    if name.startswith("M."):
+        stem = name[2:]
+        w = str(width)
+        if stem.endswith(w):
+            stem = stem[:-len(w)]
+        abbr = {"bl1": "B1", "bl2": "B2", "clmp": "CL", "dmask": "DM",
+                "idxen": "IDX", "offen": "OFF", "sioid": "SIO",
+                "channum": "CHN", "chan": "CH"}
+        return abbr.get(stem, stem.upper())
+    if name.startswith("X"):
+        return name.split("_")[0]
+    match = re.match(r"[A-Z]+", name)
+    return match.group(0) if match else name
+
+
+def _lg200_field_meaning(name, width):
+    tuple_match = re.search(r"x(\d+)$", name)
+    tuple_width = int(tuple_match.group(1)) if tuple_match else 1
+    if name.startswith("PJ"):
+        return "predicate selector"
+    if name.startswith("M."):
+        stem = name[2:]
+        w = str(width)
+        if stem.endswith(w):
+            stem = stem[:-len(w)]
+        return stem + " instruction modifier"
+    if name.startswith("VD"):
+        if tuple_width > 1:
+            return "base of a %d-register vector destination tuple" % tuple_width
+        return "vector destination selector"
+    if name.startswith("V"):
+        if tuple_width > 1:
+            return "base of a %d-register vector operand tuple" % tuple_width
+        return "vector operand selector"
+    if name.startswith("G"):
+        if tuple_width > 1:
+            return "general source selector for a %d-register tuple" % tuple_width
+        return "general source selector"
+    if name.startswith("RD"):
+        if tuple_width > 1:
+            return "base of a %d-register scalar result tuple" % tuple_width
+        return "scalar or row-defined result selector"
+    if name.startswith("R"):
+        if tuple_width > 1:
+            return "base of a %d-register scalar or descriptor tuple" % tuple_width
+        return "scalar operand or descriptor-base selector"
+    if name.startswith("UO"):
+        return "unsigned offset field"
+    if name.startswith("I"):
+        return "immediate field"
+    if name.startswith("X"):
+        return "row-defined control or data field"
+    return "encoded operand field"
+
+
+def _lg200_mask(info, kind, word):
+    return int(info["masks"]["%s_%s" % (kind, word.lower())], 16)
+
+
+def _lg200_active_layout(info, fields):
+    active = []
+    for field in fields:
+        active_segments = 0
+        for word, hi, lo in field["segments"]:
+            segment_mask = ((1 << (hi - lo + 1)) - 1) << lo
+            overlap = segment_mask & _lg200_mask(info, "parameter", word)
+            if overlap not in (0, segment_mask):
+                raise ValueError("field only partly parameter-masked")
+            active_segments += overlap != 0
+        if active_segments == len(field["segments"]):
+            active.append(field)
+    return active
+
+
+def _lg200_segment_value(word_value, hi, lo):
+    return (word_value >> lo) & ((1 << (hi - lo + 1)) - 1)
+
+
+def _lg200_format_value(value, width):
+    if width == 1:
+        return str(value)
+    if width <= 4:
+        return "0b%0*d" % (width, value)
+    return "0x%x" % value
+
+
+def _lg200_word_segments(info, word, fields):
+    bit_field = {}
+    for field in fields:
+        for field_word, hi, lo in field["segments"]:
+            if field_word != word:
+                continue
+            for bit in range(lo, hi + 1):
+                if bit in bit_field:
+                    raise ValueError("overlapping operands at INST_%s[%d]" % (word, bit))
+                bit_field[bit] = field["name"]
+    masks = {kind: _lg200_mask(info, kind, word)
+             for kind in ("fixed", "opcode", "parameter", "ignored", "reserved")}
+
+    def classify(bit):
+        name = bit_field.get(bit)
+        if name is not None:
+            return _lg200_field_class(name), name
+        flag = 1 << bit
+        if masks["opcode"] & flag:
+            return "opcode", None
+        if masks["ignored"] & flag:
+            return "ignored", None
+        if masks["reserved"] & flag:
+            return "reserved", None
+        if masks["parameter"] & flag:
+            return "parameter", None
+        if masks["fixed"] & flag:
+            return "fixed", None
+        raise ValueError("unclassified INST_%s[%d]" % (word, bit))
+
+    blocks = []
+    bit = 31
+    while bit >= 0:
+        cls, name = classify(bit)
+        low = bit
+        while low > 0 and classify(low - 1) == (cls, name):
+            low -= 1
+        blocks.append((cls, name, bit, low))
+        bit = low - 1
+    return blocks
+
+
+def _lg200_encoding_visual(info, fields):
+    fields_by_name = {f["name"]: f for f in fields}
+    out = ['<div class="encoding-compact">']
+    for word in ("HI", "LO"):
+        word_value = int(info["encoding_%s" % word.lower()], 16)
+        out.append('<div class="encoding-row"><div class="encoding-word-tag">INST_%s</div>' % word)
+        for cls, name, hi, lo in _lg200_word_segments(info, word, fields):
+            width = hi - lo + 1
+            bit_range = "%d:%d" % (hi, lo) if hi != lo else str(hi)
+            if name is not None:
+                label = _lg200_field_label(name, fields_by_name[name]["width"])
+                enc = _lg200_format_value(_lg200_segment_value(word_value, hi, lo), width)
+                title = "%s, INST_%s[%s], value %s" % (name, word, bit_range, enc)
+                detail = "%s = %s" % (bit_range, enc)
+            elif cls == "ignored":
+                label = "&middot;"
+                title = "ignored, INST_%s[%s]" % (word, bit_range)
+                detail = bit_range
+            elif cls == "parameter":
+                label = "PARAM"
+                title = "unnamed parameter, INST_%s[%s]" % (word, bit_range)
+                detail = bit_range
+            else:
+                value = _lg200_segment_value(word_value, hi, lo)
+                enc = _lg200_format_value(value, width)
+                label = {"fixed": "F", "opcode": "OP", "reserved": "R"}[cls]
+                title = "%s, INST_%s[%s], value %s" % (cls, word, bit_range, enc)
+                detail = "%s = %s" % (bit_range, enc)
+            esc_label = html.escape(label) if name is not None else label
+            esc_detail = html.escape(detail)
+            esc_title = html.escape(title, quote=True)
+            out.append(
+                '<span class="encoding-field field-%s" title="%s" ' % (cls, esc_title)
+                + 'style="flex:%d %d 0"><b>%s</b><small>%s</small></span>'
+                % (width, width, esc_label, esc_detail))
+        out.append("</div>")
+    out.append(
+        '<div class="encoding-legend">'
+        '<span class="legend-chip field-fixed">fixed</span>'
+        '<span class="legend-chip field-opcode">opcode</span>'
+        '<span class="legend-chip field-g">general source</span>'
+        '<span class="legend-chip field-v">vector</span>'
+        '<span class="legend-chip field-r">scalar / descriptor</span>'
+        '<span class="legend-chip field-i">immediate</span>'
+        '<span class="legend-chip field-p">predicate</span>'
+        '<span class="legend-chip field-m">modifier</span>'
+        '<span class="legend-chip field-x">row-defined</span>'
+        '<span class="legend-chip field-ignored">ignored</span>'
+        '<span class="legend-chip field-reserved">reserved</span>'
+        "</div>")
+    out.append("</div>")
+    return "\n".join(out)
+
+
+def _lg200_encoding_section(info):
+    declared = _lg200_parse_layout(info["operand_layout"])
+    layout = _lg200_active_layout(info, declared)
+    active_names = {f["name"] for f in layout}
+    inactive = [f for f in declared if f["name"] not in active_names]
+    out = []
+    out.append("### Encoding and operands\n")
+    out.append(_lg200_encoding_visual(info, layout) + "\n")
+    out.append(
+        '<div class="encoding-base"><b>Base encoding</b> '
+        '<code>INST_LO=0x%s</code> <code>INST_HI=0x%s</code></div>\n'
+        % (info["encoding_lo"], info["encoding_hi"]))
+    if inactive:
+        names = ", ".join('<code>%s</code>' % html.escape(f["name"]) for f in inactive)
+        out.append(
+            '<p class="encoding-note"><b>Inactive layout fields:</b> '
+            + names
+            + ". The row mask classifies these bit positions as ignored, "
+            + "so they are not encoded operands in this machine row.</p>\n")
+    if layout:
+        out.append('<div class="operand-strip" aria-label="Encoded operands">')
+        for field in layout:
+            name = field["name"]
+            domain = _lg200_field_class(name)
+            out.append(
+                '<div class="operand-chip domain-%s">' % domain
+                + "<strong>%s</strong>" % html.escape(name)
+                + "<span>%s</span>" % html.escape(_lg200_field_meaning(name, field["width"]))
+                + '<small><code>%s</code> &middot; %d encoded bit(s)</small></div>'
+                % (html.escape(field["bits"]), field["width"]))
+        out.append("</div>\n")
+        out.append("| Field | Encoded bits | Width |")
+        out.append("|-------|--------------|------:|")
+        for field in layout:
+            out.append("| `%s` | `%s` | %d |" % (field["name"], field["bits"], field["width"]))
+        out.append("")
+    else:
+        out.append('<p class="operand-empty">No active operand fields in this row.</p>\n')
+    return "\n".join(out)
+
+def lg200_instruction(mnemonic):
+    """Render one LG200 (Loongson GPU) instruction section.
+
+    Data-driven: Description/encoding come from code/lg200-instructions.tsv,
+    Operation pseudocode comes from code/lg200/<mnemonic>.h. The anatomy
+    mirrors the LBT raw-instruction pages: Synopsis, Description, Encoding and
+    operands, Operation.
+    """
+
+    info = lg200_meta.get(mnemonic)
+    if info is None:
+        return "## " + mnemonic + "\n\n> NOT IN LG200 META\n"
+    code_path = f"code/lg200/{mnemonic}.h"
+    if os.path.exists(code_path):
+        code = open(code_path, encoding="utf-8").read().strip()
+    else:
+        code = ""
+
+    synopsis = "\n".join([
+        f"Instruction: {info['assembly']}",
+        f"Format: {info['format']}",
+        f"Class: {info['category']}",
+        f"Semantic model: {info['semantic_model']}",
+        f"Encoding: 0x{info['encoding_lo']} (INST_LO), 0x{info['encoding_hi']} (INST_HI)",
+    ])
+
+    encoding = ""
+    try:
+        encoding = _lg200_encoding_section(info)
+    except ValueError as e:
+        encoding = "### Encoding and operands\n\n> Encoding visual unavailable: %s\n" % e
+
+
+    operation = ""
+    if code:
+        operation = ("\n### Operation\n\nReference pseudocode."
+                     "\n\n```c++\n" + code + "\n```\n")
+
+    latency = _lg200_latency_section(mnemonic)
+
+    return f"""
+## {mnemonic}
+
+### Synopsis
+
+```
+{synopsis}
+```
+
+### Description
+
+{info['description']}
+
+{encoding}
+{operation}
+{latency}
+"""
+
 
 # depends on implementation of env.macro()
 def my_macro(env):
@@ -2131,6 +2594,11 @@ static inline {ret} {name} ({args}) {{
     lbt_widths = {"b": 8, "bu": 8, "h": 16, "hu": 16, "w": 32, "wu": 32, "d": 64, "du": 64}
 
     @env.macro
+    def lg200(mnemonic):
+        return lg200_instruction(mnemonic)
+
+
+    @env.macro
     def lbt_addu12i(name):
         width = lbt_widths[name]
         if name == "w":
@@ -2717,6 +3185,42 @@ static inline {ret} {name} ({args}) {{
                     result.append(title)
                     break
         return json.dumps(sorted(list(set(result))))
+
+
+    @env.macro
+    def lg200_latency_table():
+        """Sortable overview of LG200 PS-carrier microbench measurements.
+
+        Columns follow the GPU data model: two measurement patterns
+        (dependency-chain latency, independent 8-way throughput), the fit
+        quality of each slope, an overall confidence flag, and the measured
+        submission intercept (fixed overhead for reference).  Values in ns/op
+        are RELATIVE wall-clock numbers, not cycles.
+        """
+        result = ("<table><thead><tr>"
+                  "<th>Instruction</th><th>lat ns/op</th><th>tp ns/op</th>"
+                  "<th>tp/lat</th><th>lat R2</th><th>tp R2</th>"
+                  "<th>Confident</th>"
+                  "</tr></thead><tbody>")
+        for name in sorted(lg200_measure):
+            m = lg200_measure[name]
+            def fmt(v, r2):
+                if v <= 0 or r2 < 0.5:
+                    return "-"
+                return "%.1f" % v
+            lat = fmt(m["lat_ns"], m["lat_r2"])
+            tp = fmt(m["tp_ns"], m["tp_r2"])
+            conf = "yes" if m["reliable"] else "no"
+            if lat != "-" and tp != "-" and float(tp) > 0:
+                ratio = "%.2f" % (float(tp) / float(lat))
+            else:
+                ratio = "-"
+            result += (
+                "<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td>"
+                "<td>%.2f</td><td>%.2f</td><td>%s</td></tr>"
+                % (name, lat, tp, ratio, m["lat_r2"], m["tp_r2"], conf))
+        result += "</tbody></table>"
+        return result
 
     @env.macro
     def latency_throughput_table():

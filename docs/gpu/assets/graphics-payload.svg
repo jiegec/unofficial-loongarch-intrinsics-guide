@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 700" role="img" aria-labelledby="title desc">
+  <title id="title">LG200 GFX full-state payload</title>
+  <desc id="desc">The GFX IB carries a 528-dword envelope: a 12-byte header, a 512-dword graphical state object, a terminator and an end command. The object holds draw/raster/attachment state, stage configuration, and six shader-info slots.</desc>
+<defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#334b5c"/></marker>
+    <style>
+      .frame { fill:#f7f9fb; stroke:#8796a2; stroke-width:2; }
+      .box { stroke:#253746; stroke-width:2; rx:6; }
+      .line { stroke:#334b5c; stroke-width:2.5; fill:none; marker-end:url(#arrow); }
+      .dash { stroke:#697d8c; stroke-width:2; stroke-dasharray:8 6; fill:none; marker-end:url(#arrow); }
+      .title { font:700 20px sans-serif; fill:#17242f; }
+      .label { font:700 15px sans-serif; fill:#17242f; }
+      .small { font:12px sans-serif; fill:#263746; }
+      .mono { font:12px monospace; fill:#263746; }
+      .head { font:600 12px sans-serif; fill:#52645a; }
+    </style>
+  </defs>
+  <rect x="25" y="25" width="1150" height="650" rx="8" class="frame"/>
+  <text x="50" y="58" class="title">GFX full-state payload: envelope and 512-dword object</text>
+
+  <rect x="50" y="85" width="330" height="330" class="box" fill="#d9eee3"/>
+  <text x="70" y="110" class="label">Envelope (528 dwords)</text>
+  <text x="70" y="134" class="mono">0     0x00000f04   full-state</text>
+  <text x="70" y="154" class="mono">1     10           mode</text>
+  <text x="70" y="174" class="mono">2     0x20000001   range: 512 dw</text>
+  <text x="70" y="196" class="mono">3..514    state object</text>
+  <text x="70" y="216" class="mono">515   0x00000003   terminator</text>
+  <text x="70" y="236" class="mono">516   0x00000f05   end</text>
+  <text x="70" y="256" class="mono">517..527      zero</text>
+  <text x="70" y="280" class="small">packet byte = state offset + 0x0c</text>
+  <text x="70" y="300" class="small">state offsets are relative to dword 3</text>
+
+  <rect x="430" y="85" width="720" height="330" class="box" fill="#fff8e8"/>
+  <text x="450" y="110" class="label">512-dword graphical state object</text>
+  <text x="450" y="136" class="small">0x000 Draw Info        0x024 draw tail</text>
+  <text x="450" y="156" class="small">0x030 Pipe Enables     0x048 Viewport[0..15]</text>
+  <text x="450" y="176" class="small">0x308 Guardband        0x318 Line Raster</text>
+  <text x="450" y="196" class="small">0x324 Depth Control    0x334 Stencil front/back</text>
+  <text x="450" y="216" class="small">0x33c Blend Control/RT  0x360 Blend Constants</text>
+  <text x="450" y="236" class="small">0x370 Color Buffer[0..7] 0x470 Depth Buffer</text>
+  <text x="450" y="256" class="small">0x490 pipeline config (unassigned)</text>
+  <text x="450" y="278" class="small">0x4c0 Shader Config     0x4c8..0x4e8 stage config</text>
+  <text x="450" y="298" class="small">0x4f0 Fragment Attribute Map / Input / Output</text>
+  <text x="450" y="320" class="small">0x540..0x780 six 0x60-byte shader-info slots</text>
+  <text x="450" y="340" class="small">0x780 state tail (unassigned)</text>
+
+  <rect x="50" y="450" width="1090" height="120" class="box" fill="#eadcf1"/>
+  <text x="70" y="475" class="label">Graphics-to-shader hand-off</text>
+  <text x="70" y="499" class="mono">state + 0x4c0             stage enable/topology</text>
+  <text x="70" y="519" class="mono">state + 0x540 + 0x60*n    shader-info record n</text>
+  <text x="70" y="539" class="mono">record + 0x10             kernel_entry GPU VA</text>
+  <text x="70" y="559" class="mono">record + 0x28..0x40       descriptor roots</text>
+
+  <rect x="50" y="600" width="1090" height="55" class="box" fill="#f7f9fb"/>
+  <text x="70" y="622" class="small">the state object is a graphics ABI, not a shader binary; its enums are not instruction operands</text>
+  <text x="70" y="642" class="small">a stage enable bit selects a slot; it does not rename another stage's calling convention</text>
+</svg>

@@ -1,0 +1,5 @@
+// prefix_tp8 -- Sets the instruction-prefix state used by the following
+// operation to the TP8 mode encoded by the immediate.
+// Prefix-state effect only: the prefix is consumed by the following
+// prefix-defined operation and no register value is produced.
+return true;

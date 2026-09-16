@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 700" role="img" aria-labelledby="title desc">
+  <title id="title">LG200 shader-info record layout</title>
+  <desc id="desc">The 0x60-byte stage record: resource word, type, initial VGPR, code size, kernel entry, kernel config, five descriptor roots, four stage arguments, and a stage tail.</desc>
+<defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#334b5c"/></marker>
+    <style>
+      .frame { fill:#f7f9fb; stroke:#8796a2; stroke-width:2; }
+      .box { stroke:#253746; stroke-width:2; rx:6; }
+      .line { stroke:#334b5c; stroke-width:2.5; fill:none; marker-end:url(#arrow); }
+      .dash { stroke:#697d8c; stroke-width:2; stroke-dasharray:8 6; fill:none; marker-end:url(#arrow); }
+      .title { font:700 20px sans-serif; fill:#17242f; }
+      .label { font:700 15px sans-serif; fill:#17242f; }
+      .small { font:12px sans-serif; fill:#263746; }
+      .mono { font:12px monospace; fill:#263746; }
+      .head { font:600 12px sans-serif; fill:#52645a; }
+    </style>
+  </defs>
+  <rect x="25" y="25" width="850" height="650" rx="8" class="frame"/>
+  <text x="50" y="58" class="title">Shader-info record: 0x60 bytes per stage</text>
+  <text x="50" y="80" class="head">offsets relative to the logical record; packet byte = state offset + 0x0c + record offset</text>
+
+  <g transform="translate(50,100)">
+    <rect x="0" y="0" width="500" height="34" class="box" fill="#eef3f0"/>
+    <text x="12" y="22" class="mono">+0x00  resource word: SGPR size | VGPR size | LDS size</text>
+
+    <rect x="0" y="38" width="500" height="34" class="box" fill="#f8f0f8"/>
+    <text x="12" y="60" class="mono">+0x04  shader type (1B)     +0x05  initial VGPR (1B)</text>
+
+    <rect x="0" y="76" width="500" height="34" class="box" fill="#f8f0f8"/>
+    <text x="12" y="98" class="mono">+0x06  code size (2B, bytes)</text>
+
+    <rect x="0" y="114" width="500" height="34" class="box" fill="#eef3f0"/>
+    <text x="12" y="136" class="mono">+0x08  alignment / reserved (8B)</text>
+
+    <rect x="0" y="152" width="500" height="34" class="box" fill="#dbe9f6"/>
+    <text x="12" y="174" class="mono">+0x10  kernel_entry (8B)   GPU VA of first instruction</text>
+
+    <rect x="0" y="190" width="500" height="34" class="box" fill="#eef3f0"/>
+    <text x="12" y="212" class="mono">+0x18  kernel_config (8B)  stage-specific launch</text>
+
+    <rect x="0" y="228" width="500" height="34" class="box" fill="#d9eee3"/>
+    <text x="12" y="250" class="mono">+0x20  rw_buffer root (8B)</text>
+
+    <rect x="0" y="266" width="500" height="34" class="box" fill="#d9eee3"/>
+    <text x="12" y="288" class="mono">+0x28  const_buffer root (8B)</text>
+
+    <rect x="0" y="304" width="500" height="34" class="box" fill="#d9eee3"/>
+    <text x="12" y="326" class="mono">+0x30  constant root (8B)</text>
+
+    <rect x="0" y="342" width="500" height="34" class="box" fill="#d9eee3"/>
+    <text x="12" y="364" class="mono">+0x38  resource_sampler root (8B)</text>
+
+    <rect x="0" y="380" width="500" height="34" class="box" fill="#d9eee3"/>
+    <text x="12" y="402" class="mono">+0x40  attributes root (8B)</text>
+
+    <rect x="0" y="418" width="500" height="34" class="box" fill="#f4e2be"/>
+    <text x="12" y="440" class="mono">+0x48  arguments 0..3 (16B, stage-defined)</text>
+
+    <rect x="0" y="456" width="500" height="34" class="box" fill="#eef3f0"/>
+    <text x="12" y="478" class="mono">+0x58  tail / reserved (8B)</text>
+  </g>
+
+  <rect x="600" y="100" width="230" height="120" class="box" fill="#f7f9fb"/>
+  <text x="615" y="122" class="head">Shader type values</text>
+  <text x="615" y="144" class="mono">DS / vertex   3</text>
+  <text x="615" y="164" class="mono">GS            4</text>
+  <text x="615" y="184" class="mono">PS            5</text>
+  <text x="615" y="204" class="mono">SS            6</text>
+  <text x="615" y="226" class="small">VS/HS standalone values unassigned</text>
+
+  <rect x="600" y="240" width="230" height="150" class="box" fill="#f7f9fb"/>
+  <text x="615" y="262" class="head">Invariants</text>
+  <text x="615" y="284" class="small">all multi-byte fields little-endian</text>
+  <text x="615" y="304" class="small">code size in bytes; stream is a</text>
+  <text x="615" y="322" class="small">multiple of eight bytes</text>
+  <text x="615" y="342" class="small">no host handle in the record</text>
+  <text x="615" y="362" class="small">every address resolved in the VM</text>
+  <text x="615" y="382" class="small">initial VGPR is a resource value,</text>
+  <text x="615" y="400" class="small">not a wave count</text>
+</svg>
