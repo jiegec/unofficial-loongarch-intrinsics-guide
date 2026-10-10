@@ -1,0 +1,8 @@
+// atomic_sm_cmpswap_lt_f64 -- Atomically swaps in the source when the 64-bit float contents are less: `new = (old < src) ? Src : old`.
+//
+
+u64 updated = sm_cmpswap_lt_f64(((u64)src[0] | ((u64)src[0+1] << 32)), ((u64)src[2] | ((u64)src[2+1] << 32)));
+dst[0] = src[0];
+dst[1] = src[1];
+dst[2] = (u32)(updated & 0xffffffffu);
+dst[3] = (u32)(updated >> 32);

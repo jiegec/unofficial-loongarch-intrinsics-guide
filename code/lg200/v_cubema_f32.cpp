@@ -1,0 +1,15 @@
+// v_cubema_f32 -- CPU oracle and case vectors.
+#include "ops/oracle_macros.hpp"
+
+LG200_ORACLE_BEGIN(v_cubema_f32, 3)
+#include "v_cubema_f32.h"
+LG200_ORACLE_END(1)
+
+LG200_CASE_BEGIN(v_cubema_f32)
+CASE(data, 0x3f800000, 0x0, 0x0, 0x40000000)
+CASE(py, 0x0, 0x3f800000, 0x0, 0x40000000)
+CASE(pz, 0x0, 0x0, 0x3f800000, 0x40000000)
+CASE(nx, 0xbf800000, 0x0, 0x0, 0xc0000000)
+CASE(ny, 0x0, 0xbf800000, 0x0, 0xc0000000)
+CASE(nz, 0x0, 0x0, 0xbf800000, 0xc0000000)
+LG200_CASE_END

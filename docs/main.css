@@ -5,3 +5,181 @@
 .wy-nav-content {
   max-width: none;
 }
+
+/* ============ LG200 encoding & operand visuals (ported from lg200-isa-doc) ============ */
+:root {
+  --lgpu-ink: #17211b;
+  --lgpu-green: #176b4d;
+  --lgpu-blue: #2f648f;
+  --lgpu-red: #a33a32;
+  --lgpu-gold: #9a6a10;
+  --lgpu-purple: #7e4b87;
+  --lgpu-line: #cbd5cf;
+  --lgpu-paper: #f7faf8;
+}
+
+.encoding-compact {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin: 10px 0 6px;
+  overflow-x: auto;
+}
+
+.encoding-row {
+  display: flex;
+  align-items: stretch;
+  min-width: 680px;
+}
+
+.encoding-word-tag {
+  flex: 0 0 62px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 8px;
+  color: #66736d;
+  font-family: monospace;
+  font-size: 0.68rem;
+  user-select: none;
+}
+
+.encoding-field {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  overflow: hidden;
+  margin: 0 1px;
+  padding: 3px 4px;
+  border: 1px solid rgba(23, 33, 27, 0.35);
+  border-radius: 3px;
+  line-height: 1.05;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.encoding-field b {
+  font-family: monospace;
+  font-size: 0.72rem;
+}
+
+.encoding-field small {
+  margin-top: 2px;
+  color: rgba(40, 50, 44, 0.65);
+  font-size: 0.58rem;
+}
+
+.encoding-legend,
+.operand-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+  font-size: 0.66rem;
+}
+
+.legend-chip {
+  display: inline-block;
+  padding: 1px 8px;
+  border: 1px solid rgba(23, 33, 27, 0.2);
+  border-radius: 3px;
+}
+
+.operand-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  margin: 14px 0 18px;
+  font-size: 0.86rem;
+}
+
+.operand-chip {
+  min-width: 0;
+  min-height: 58px;
+  padding: 9px 10px;
+  border: 1px solid var(--lgpu-line);
+  border-left-width: 4px;
+  border-radius: 4px;
+  background: #fff;
+}
+
+.operand-chip strong,
+.operand-chip span,
+.operand-chip small {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.operand-chip strong {
+  margin-bottom: 4px;
+  font-family: monospace;
+}
+
+.operand-chip span {
+  line-height: 1.28;
+  color: var(--lgpu-ink);
+}
+
+.operand-chip small {
+  margin-top: 5px;
+  color: #52645a;
+}
+
+.domain-r { border-left-color: var(--lgpu-green); background: #eff8f3; }
+.domain-v { border-left-color: var(--lgpu-blue); background: #f0f6fb; }
+.domain-g { border-left-color: var(--lgpu-gold); background: #fff9e8; }
+.domain-p { border-left-color: var(--lgpu-purple); background: #f8f0f8; }
+.domain-i,
+.domain-u { border-left-color: #64776d; background: #f3f5f4; }
+.domain-m { border-left-color: #8c6a35; background: #fbf4e9; }
+.domain-x,
+.domain-parameter { border-left-color: var(--lgpu-red); background: #fbf1ef; }
+
+.encoding-base {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 5px 10px;
+  margin: 7px 0 12px 70px;
+  color: #52645a;
+  font-size: 0.74rem;
+}
+
+.encoding-note {
+  margin: 8px 0 12px 70px;
+  padding: 7px 10px;
+  border-left: 4px solid var(--lgpu-gold);
+  background: #fff9e8;
+  color: #52645a;
+  font-size: 0.8rem;
+}
+
+.operand-empty {
+  margin: 12px 0 16px;
+  padding: 8px 10px;
+  border-left: 4px solid var(--lgpu-line);
+  background: var(--lgpu-paper);
+}
+
+.field-r { background: #dff1e7; }
+.field-v { background: #e5eff8; }
+.field-g { background: #fff0c5; }
+.field-p { background: #f4e7f5; }
+.field-i,
+.field-u { background: #e8ecea; }
+.field-m { background: #f6e8d2; }
+.field-x,
+.field-unresolved { background: #f5e7e5; }
+.field-opcode { background: #cfd8d3; }
+.field-fixed { background: #e3e8e5; }
+.field-parameter { background: #e9f3ee; }
+.field-ignored { background: #f3f3f3; color: #6d7771; }
+.field-reserved { background: #fff; color: #77837d; }
+
+@media (max-width: 700px) {
+  .encoding-row { min-width: 620px; }
+  .operand-strip { grid-template-columns: 1fr; }
+}
+
+

@@ -19,3 +19,100 @@ plugins:
 
 extra_css:
   - main.css
+
+nav:
+  - Home: index.md
+  - Latency and Throughput: latency_throughput.md
+  - LoongArch LBT Basics: lbt_basics.md
+  - LoongArch SIMD Basics: loongarch_simd_basics.md
+  - Migrating from AVX to LASX: migrating_avx.md
+  - Migrating from SSE to LSX: migrating_sse.md
+  - Browse All Intrinsics: viewer.md
+  - Lasx:
+      - lasx/bitwise_operations.md
+      - lasx/branch.md
+      - lasx/float_comparison.md
+      - lasx/float_computation.md
+      - lasx/float_conversion.md
+      - lasx/float_misc.md
+      - lasx/fma.md
+      - lasx/integer_comparison.md
+      - lasx/integer_computation.md
+      - lasx/logical.md
+      - lasx/memory.md
+      - lasx/misc.md
+      - lasx/permutation.md
+      - lasx/shift.md
+      - lasx/shuffling.md
+      - lasx/undocumented.md
+  - Lbt:
+      - lbt/arm_integer.md
+      - lbt/arm_logical.md
+      - lbt/arm_misc.md
+      - lbt/arm_shift.md
+      - lbt/integer.md
+      - lbt/jump.md
+      - lbt/mips_memory.md
+      - lbt/state.md
+      - lbt/x86_fpu.md
+      - lbt/x86_integer.md
+      - lbt/x86_logical.md
+      - lbt/x86_misc.md
+      - lbt/x86_shift.md
+  - Lsx:
+      - lsx/bitwise_operations.md
+      - lsx/branch.md
+      - lsx/float_comparison.md
+      - lsx/float_computation.md
+      - lsx/float_conversion.md
+      - lsx/float_misc.md
+      - lsx/fma.md
+      - lsx/integer_comparison.md
+      - lsx/integer_computation.md
+      - lsx/logical.md
+      - lsx/memory.md
+      - lsx/misc.md
+      - lsx/permutation.md
+      - lsx/shift.md
+      - lsx/shuffling.md
+      - lsx/undocumented.md
+  - Loongson GPU (LG200):
+      - Overview: gpu/overview.md
+      - Generation Profile: gpu/chips/lg200.md
+      - Glossary: gpu/concepts/glossary.md
+      - Execution Model: gpu/concepts/execution-model.md
+      - Host Interface:
+          - Host Interface: gpu/host/interface.md
+          - Graphics Submission: gpu/host/submission.md
+      - Graphics State:
+          - State Object: gpu/graphics/state-object.md
+          - Draw and Rasterization: gpu/graphics/draw-raster.md
+          - Depth, Stencil and Blend: gpu/graphics/depth-blend.md
+      - Shaders:
+          - Shader ABI: gpu/shader/abi.md
+          - Stage Interfaces: gpu/shader/stages.md
+          - Descriptors: gpu/shader/descriptors.md
+          - SIO: gpu/shader/sio.md
+      - Instruction Set:
+          - Encoding: gpu/isa/encoding.md
+          - Operands and Registers: gpu/isa/operands.md
+          - Memory and Image Family: gpu/isa/family-memory.md
+          - Control Flow Family: gpu/isa/family-control.md
+          - Atomic Family: gpu/isa/family-atomic.md
+          - Vector ALU Family: gpu/isa/family-vector.md
+          - Scalar ALU Family: gpu/isa/family-scalar.md
+          - Vector ALU: gpu/vector-alu.md
+          - Scalar ALU: gpu/scalar-alu.md
+          - Memory and Image: gpu/memory-image.md
+          - Atomic: gpu/atomic.md
+          - Control Prefix: gpu/control-prefix.md
+          - SIO and Export: gpu/sio-export.md
+          - Interpolation: gpu/interpolation.md
+      - Verification Tooling: gpu/tools/verification.md
+      - Measurements: gpu/measurements.md
+      - Command Layer (kernel side):
+          - Command Words: gpu/host/scmd32.md
+          - GPIPE: gpu/host/gpipe.md
+          - BPIPE: gpu/host/bpipe.md
+          - XDMA: gpu/host/xdma.md
+          - CPIPE: gpu/host/cpipe.md
