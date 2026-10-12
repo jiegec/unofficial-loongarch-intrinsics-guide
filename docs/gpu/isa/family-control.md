@@ -161,9 +161,16 @@ address form of the global side, and the ordering requirements are UNRESOLVED.
   (`jumpstack_check.py`, problems 0).  What stays open is what the predicate MEANS -
   whether it gates the push or pop itself or selects a stack - and that needs a device.
 * Nothing on the namespace itself, which is settled (2026-10-13): the identifiers are a packed launch-state record addressed through the kernarg pair `s[0:1]`, plus the local ids in `v0/v1/v2` and the group ids at `s[kernel_sgpr_cnt + 0..2]` - see the Compute page. What stays open is `getreg`'s own `hw_reg` numbering, which no producer path reaches.
-* The defined prefix operations and the effect of their literals.
+* The defined prefix operations' EFFECTS, narrowed on 2026-10-13: the closed backend
+  exposes `prefix_tp4` and `prefix_tp8` as move builtins (`mov_i32`, `mov_u32`, `mov_f32`)
+  and not `prefix_sw` at all, and asking it to emit one alone fails with `Cannot select:
+  LGGPUISD::PREFIX_TP4`, so a prefix is only selectable fused to the operation it
+  defines.  What each operation does to its literal is still open.
 * The transfer granularity and address form of the shared-memory copies.
 * The `flag` and `rfe` forms.
-* Whether `check` may be placed inside divergent code, and what a zero
-  domain operand orders.
+* Whether `check` may be placed inside divergent code.  The second half of this bullet
+  is now partly answered: the class operand is driven by the fence scope - `sm` exactly
+  when the local side is named, `k|vm|vs` for the global side - and no zero operand
+  appeared in five scope probes.  What makes the producer emit a zero, and what the
+  hardware orders then, stays open and needs a device.
 * Whether the barrier has any effect outside a compute workgroup.
