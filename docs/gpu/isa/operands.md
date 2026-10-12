@@ -13,7 +13,7 @@ instruction acts on.
 | Scalar / descriptor | `RJ8`, `RK8`, `RA8`, `RD8` and their tuples | scalar register, descriptor base, result or VCC position, per the row |
 | Immediate | `IJ32`, `IK32`, `IA16`, `IJ16`, `IK16`, `UO8`, `UO12`, `UO20` | literal or offset |
 | Modifier | `M.*` | an operation or addressing control |
-| Predicate | `PJ2` | present in most layouts; semantics UNRESOLVED |
+| Predicate | `PJ2` | present in most layouts; it is the instruction mask, and an established producer uses all four (p0-p3) as the leading operand |
 
 A tuple suffix names consecutive registers: `RJ8x4` is four consecutive scalar
 registers starting at the encoded index, `VJ8x8` is eight consecutive vector

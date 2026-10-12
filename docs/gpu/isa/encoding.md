@@ -113,8 +113,12 @@ A conditional branch additionally carries its condition register in
 
 ## UNRESOLVED
 
-* The semantics of the 2-bit `PJ2` field, which appears in most layouts but is
-  not used as a predicate by any established producer.
+* Nothing: the `PJ2` field IS used as a predicate by an established producer, and the
+  earlier claim that it is not was WRONG (corrected 2026-10-13).  A census over the
+  closed producer's output counts all four as the leading operand of instructions -
+  p0 2772, p1 5244, p2 4290, p3 4142 in one whole linked program - which is exactly
+  what U5 already recorded: the four predicate registers are the masks, carried as each
+  instruction's first operand.
 * The meaning of reserved bits: they are emitted at the row's base value, but
   whether the hardware requires that value is not established.
 * Whether the opcode fields of formats 9 and 10 (the 4-bit `INST_HI[26:23]`
