@@ -62,8 +62,12 @@ these rows to reproduce a reference interpolation.
 
 ## UNRESOLVED
 
-* Which operand position addresses the coefficient payload and which the
-  barycentric value.
+* Nothing: the assignment is established (2026-10-13) by two independent lines that
+  agree.  The rows themselves give the arithmetic - the result is the SECOND source
+  times the sum of the FIRST source plus one - and the driver-side disassembly of the
+  same instructions reads `v_interp_1_f32 result, v2, coefficient`, putting the
+  **coefficient in the second source** (`GK11`) and the barycentric value in the first
+  (`GJ11`).  Coefficient x (barycentric + 1) follows.
 * The arithmetic of `v_interp_2_f32` when the state it reads is not neutral,
   including its rounding, its denormal flushing and the identity by which it
   becomes a pass-through.
