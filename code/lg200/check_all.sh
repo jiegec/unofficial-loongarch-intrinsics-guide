@@ -45,6 +45,8 @@ echo "== bench_doc_check"
 python3 bench_doc_check.py
 echo "== md_table_check"
 cd "$REPO" && python3 code/lg200/md_table_check.py | tail -1
+echo "== fp_mode_audit"
+cd "$REPO" && python3 code/lg200/fp_mode_audit.py --check | tail -1
 echo "== check_gpu"
 # check_gpu.py lives at the checkout root, not beside these scripts.
 cd "$REPO"

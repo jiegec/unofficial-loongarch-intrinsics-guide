@@ -25,9 +25,10 @@ so it could not fail on an over-claim, which is the defect it exists to find.
 
 THE ELEVEN GATES, ACCOUNTED FOR (2026-10-13):
 
-  proven in this tool (10): set_desc, check_doc_numbers, header_sync, check_gpu,
+  proven in this tool (11): set_desc, check_doc_numbers, header_sync, check_gpu,
                             run_cases, format_audit, bench_doc_check,
-                            rule_dupe_check, md_table_check, check_all.sh
+                            rule_dupe_check, md_table_check, check_all.sh,
+                            fp_mode_audit
   reports by design (2):    prose_audit, doc_register_audit
 
 The last two have no failing mode to prove: prose_audit findings include three expected
@@ -169,6 +170,10 @@ def mutate_suite(text):
     return text.replace('echo "ALL CHECKS PASSED"',
                         'false | tail -1' + chr(10) + 'echo "ALL CHECKS PASSED"', 1)
 
+def mutate_fp_mode(text):
+    """Change a policy-token count on the page, leaving the cases alone."""
+    return text.replace("`ftz` in 92", "`ftz` in 93", 1)
+
 CASES = [
     ("set_desc.py --check", "code/lg200-instructions.tsv", mutate_tsv,
      "cd code/lg200 && python3 set_desc.py --check"),
@@ -189,7 +194,9 @@ CASES = [
     ("md_table_check.py", "docs/gpu/appendix/status.md", mutate_table,
      "cd code/lg200 && python3 md_table_check.py"),
     ("check_all.sh", "code/lg200/check_all.sh", mutate_suite,
-     "sh code/lg200/check_all.sh"),]
+     "sh code/lg200/check_all.sh"),
+    ("fp_mode_audit.py", "docs/gpu/appendix/case-boundaries.md", mutate_fp_mode,
+     "cd code/lg200 && python3 fp_mode_audit.py --check"),]
 
 
 def main() -> int:
