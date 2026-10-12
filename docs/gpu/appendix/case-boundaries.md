@@ -137,6 +137,8 @@ immediate form - were in exactly that state, so they now carry the measured
 the hand-written compare vectors had ever used a denormal**, so that cross-check
 came only from the generated grid.
 
+case_coverage.py now reports this every run - "FP rows: N declared a policy, M did NOT" - so it cannot drift back: a floating-point case with no policy is silently evaluated as round-to-nearest with no flush, which is not the measured mode and would disagree with the device on any denormal.  The current run is 173 and 0.
+
 The rounding DIRECTION is a different matter.  The 2-bit `M.mod2` and 1-bit
 `M.clmp1` fields are the operation modifiers, and the register records that the
 carrier emits them at fixed values - so a case cannot yet drive the hardware's

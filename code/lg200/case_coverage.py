@@ -169,6 +169,16 @@ def main():
           % (full, total - full))
     print("  launch-shape rows (need a launch state, not a case): %s"
           % " ".join(launch))
+
+    # A floating-point case with no declared policy is silently evaluated as
+    # "round to nearest, no flush" - which is NOT the measured hardware mode, so
+    # such a row would disagree with the device on any denormal.  Report them.
+    fp_rows = {m for m in mnemonics if sem.get(m) == "floating-point-value"}
+    undeclared = sorted({c.mnemonic for c in cases
+                         if c.mnemonic in fp_rows and not c.fp_policy})
+    declared = sorted(fp_rows - set(undeclared))
+    print("  FP rows: %d declared a policy, %d did NOT: %s"
+          % (len(declared), len(undeclared), " ".join(undeclared) or "-"))
     print()
     print("%-28s %s" % ("class space", "instructions missing it"))
     for k, n in gaps.most_common():
