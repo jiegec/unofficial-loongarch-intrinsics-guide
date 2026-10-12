@@ -90,6 +90,25 @@ def main() -> int:
         print("  NOTE: the grid is NEWER than the matrix, so vectors added since")
         print("        the matrix are oracle expectations, NOT measurements.")
 
+    # Evidence STRENGTH per row, straight from the matrix: a row either compared
+    # its vectors against the oracle (pass > 0), or only OBSERVED what the
+    # hardware did (u-l-i-g's observed mode), or ran nothing at all.
+    compared = observed = empty = 0
+    with MATRIX.open() as fh:
+        for row in csv.DictReader(fh, delimiter="\t"):
+            npass = (row.get("pass") or "0").strip()
+            detail = row.get("detail") or ""
+            if npass not in ("0", ""):
+                compared += 1
+            elif "observed" in detail:
+                observed += 1
+            else:
+                empty += 1
+    print("  evidence strength: %d rows compared against the oracle, %d merely"
+          % (compared, observed))
+    print("                     OBSERVED (hardware value recorded, no independent"
+          " comparison), %d with nothing run at all" % empty)
+
     grown = sorted((m, measured[m], n) for m, n in now.items()
                    if m in measured and n > measured[m])
     extra = sum(b - a for _, a, b in grown)
