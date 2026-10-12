@@ -45,6 +45,18 @@ fields.  Where the two disagree the masks are authoritative: a decoder reads
 `parameter`, and a position the row does not consume is classified as fixed,
 ignored or reserved.
 
+The field lists above are the format's **principal** fields, not an exhaustive inventory,
+and the distinction was checked mechanically on 2026-10-13 (`code/lg200/format_audit.py`,`
+which compares each list with the fields the rows of that format actually carry).  The
+result is reassuring in one direction and not the other: **no list names a field that the
+rows do not use**, so the table never sends a reader looking for an encoding field that
+does not exist - but several lists are incomplete, because some rows of a format reach
+for an alternative operand the list omits.  `flat` uses `RA8` for its scalar-address
+forms, `shared-memory` uses `RJ8`, `UO8` and `X0_16`, `sio-id` and `sio-imm` add `IK16`
+and `VD8`, some `vop` tuple forms carry `VJ8`, and `jump-stack`/`smem`/`sop-imm-control`
+each add an `X` field.  For a given instruction, therefore, **its own layout is the
+authority**, and this table is the shape of the format.
+
 ## Mask discipline
 
 Five masks describe each row.  They are bit masks over the 64-bit instruction:
