@@ -3680,9 +3680,10 @@ std::optional<EnvelopeProgram> build_cs_bench_flat(const std::string& mnemonic,
 std::optional<EnvelopeProgram> build_cs_bench_flat_atomic(
     const std::string& mnemonic, unsigned copies, bool chained, unsigned lanes,
     std::string& error) {
-  if (mnemonic.find("cmpswap") != std::string::npos) {
-    error = "flat atomic bench: the cmpswap form stages a compare pair this "
-            "template does not build";
+  const bool cmpswap = mnemonic.find("cmpswap") != std::string::npos;
+  if (cmpswap && mnemonic.find("b64") != std::string::npos) {
+    error = "flat atomic bench: the 64-bit cmpswap stages a compare PAIR as well "
+            "as a value pair";
     return std::nullopt;
   }
   const bool wide64 = mnemonic.find("_i64") != std::string::npos ||
@@ -3711,10 +3712,29 @@ std::optional<EnvelopeProgram> build_cs_bench_flat_atomic(
     builder.s_mov_imm_b32(imm_temp, 1u);
     builder.v_mov_b32(isa::vgpr(8 + p), imm_temp, isa::predicate(0));
   }
+  if (cmpswap) {
+    // cmpswap stages the compare in the dword above the value, so the value and
+    // compare form the v8:v9 pair the instruction both reads and writes.
+    builder.s_mov_imm_b32(imm_temp, 1u);
+    builder.v_mov_b32(isa::vgpr(9), imm_temp, isa::predicate(0));
+  }
   for (unsigned copy = 0; copy < copies; ++copy) {
-    builder.atomic_v_flat(mnemonic, isa::predicate(0),
-                          chained ? data_v : result_v, addr_pair, flat_base,
-                          data_v);
+    if (cmpswap) {
+      if (!chained) {
+        // Independent copies need both halves re-staged, or the pair would make
+        // copy i+1 depend on copy i's returned value.
+        builder.s_mov_imm_b32(imm_temp, 1u);
+        builder.v_mov_b32(isa::vgpr(8), imm_temp, isa::predicate(0));
+        builder.s_mov_imm_b32(imm_temp, 1u);
+        builder.v_mov_b32(isa::vgpr(9), imm_temp, isa::predicate(0));
+      }
+      builder.atomic_v_flat(mnemonic, isa::predicate(0), isa::vgpr(8, 2),
+                            addr_pair, flat_base, isa::vgpr(8, 2));
+    } else {
+      builder.atomic_v_flat(mnemonic, isa::predicate(0),
+                            chained ? data_v : result_v, addr_pair, flat_base,
+                            data_v);
+    }
   }
   const isa::Reg zero_address = isa::vgpr(9);
   builder.v_mov_b32(zero_address, isa::zero_reg(), isa::predicate(0));
@@ -3798,9 +3818,10 @@ std::optional<EnvelopeProgram> build_cs_bench_sm_atomic(
 std::optional<EnvelopeProgram> build_cs_bench_buff_atomic(
     const std::string& mnemonic, unsigned copies, bool chained, unsigned lanes,
     std::string& error) {
-  if (mnemonic.find("cmpswap") != std::string::npos) {
-    error = "buff atomic bench: the cmpswap form stages a compare pair this "
-            "template does not build";
+  const bool cmpswap = mnemonic.find("cmpswap") != std::string::npos;
+  if (cmpswap && mnemonic.find("b64") != std::string::npos) {
+    error = "buff atomic bench: the 64-bit cmpswap stages a compare PAIR as well "
+            "as a value pair";
     return std::nullopt;
   }
   const bool wide64 = mnemonic.find("_i64") != std::string::npos ||
@@ -3823,15 +3844,26 @@ std::optional<EnvelopeProgram> build_cs_bench_buff_atomic(
     builder.s_mov_imm_b32(imm_temp, 1u);
     builder.v_mov_b32(isa::vgpr(8 + p), imm_temp, isa::predicate(0));
   }
+  if (cmpswap) {
+    // The compare sits in the dword above the value: one register pair that the
+    // instruction both reads and writes.
+    builder.s_mov_imm_b32(imm_temp, 1u);
+    builder.v_mov_b32(isa::vgpr(9), imm_temp, isa::predicate(0));
+  }
   for (unsigned copy = 0; copy < copies; ++copy) {
     if (!chained) {
-      for (unsigned p = 0; p < width; ++p) {
+      for (unsigned p = 0; p < (cmpswap ? 2u : width); ++p) {
         builder.s_mov_imm_b32(imm_temp, 1u);
         builder.v_mov_b32(isa::vgpr(8 + p), imm_temp, isa::predicate(0));
       }
     }
-    builder.buff_atomic(mnemonic, isa::predicate(0), data_v, load_desc,
-                        isa::zero_reg(), off, true);
+    if (cmpswap) {
+      builder.buff_atomic(mnemonic, isa::predicate(0), isa::vgpr(8, 2),
+                          load_desc, isa::zero_reg(), off, true);
+    } else {
+      builder.buff_atomic(mnemonic, isa::predicate(0), data_v, load_desc,
+                          isa::zero_reg(), off, true);
+    }
   }
   builder.check_k_vm_vs_sm();
   for (unsigned p = 0; p < width; ++p)
