@@ -40,6 +40,12 @@ INT = [0x00000000, 0x00000001, 0x7FFFFFFF, 0x80000000, 0xFFFFFFFE, 0xFFFFFFFF]
 INT_TBL = {"i8": INT8 + INT, "u8": INT8 + INT,
            "i16": INT16 + INT, "u16": INT16 + INT}
 
+# 64-bit integer operands are word pairs; these cover the six classes the audit
+# asks of a u64/i64 (0, 1, max, min, -2, -1) without a 36-pair expansion.
+INT_PAIRS = [(0x00000000, 0x00000000), (0x00000001, 0x00000000),
+             (0xffffffff, 0x7fffffff), (0x00000000, 0x80000000),
+             (0xfffffffe, 0xffffffff), (0xffffffff, 0xffffffff)]
+
 # Boundary classes required of every floating-point operand.  The set must name
 # the whole signed space the format admits: both zeros, both infinities, quiet
 # AND signalling NaN in both signs, the finite limits and the denormal range, so
@@ -123,7 +129,11 @@ def grid_cols(cols):
             for b in cols[1]:
                 yield [a, b]
         return
-    anchors = [0, 1, 0x80000000]
+    # A tuple-valued column list means the grid is over PAIRS (a 64-bit operand),
+    # so the anchors must be pairs too.
+    pairwise = bool(cols[0]) and isinstance(cols[0][0], tuple)
+    anchors = ([(0, 0), (1, 0), (0, 0x80000000)] if pairwise
+               else [0, 1, 0x80000000])
     if n == 4:
         # Four sources (a binary f64 row, or a 64-bit atomic pair): a full grid
         # would be |cols|^4, so take the two natural pairs plus the diagonal.
@@ -203,7 +213,7 @@ def case_targets() -> list:
     for mnemonic in sorted(meta):
         sig = meta[mnemonic].get("operand_signature", "")
         if ATOMIC_OK.match(mnemonic):
-            if not IMM_SLOT.search(sig) and nin_of(mnemonic) in (2, 3, 4):
+            if not IMM_SLOT.search(sig) and nin_of(mnemonic) in (2, 3, 4, 6):
                 out.append(mnemonic)
             continue
         # Rows whose last input is an immediate: the register columns keep the
@@ -211,6 +221,7 @@ def case_targets() -> list:
         # bench's target set has never been able to express.
         if not IMM_SLOT.search(sig):
             continue
+        # (the i64/u64 pair rows are admitted by the dedicated pass below)
         if mnemonic.startswith(("load_", "store_", "samp", "gather", "get",
                                 "copy_sm_", "jirl", "jpush", "jpop", "nop",
                                 "exit", "trap", "barrier", "cb", "czb", "flag",
@@ -226,7 +237,7 @@ def case_targets() -> list:
     for mnemonic in sorted(meta):
         if mnemonic.startswith(("load_", "store_", "atomic_", "samp", "gather")):
             continue
-        if nin_of(mnemonic) == 4 and input_format(mnemonic) in ("i64", "u64"):
+        if nin_of(mnemonic) in (4, 5, 6) and input_format(mnemonic) in ("i64", "u64", "f64"):
             out.append(mnemonic)
     return list(dict.fromkeys(out))
 
@@ -273,9 +284,13 @@ def main() -> int:
                         out.append(mnemonic + "\t" + FP_POLICY + "\t" +
                                    hex(a) + " " + hex(e))
             continue
-        if fmt == "f64":
-            # every source operand is a word pair, so the grid is over pairs
-            for row in grids(F64, nin // 2):
+        # A 64-bit operand is a word pair in every family, including the b64
+        # atomics whose names carry no type token.
+        pfmt = fmt if fmt in ("f64", "i64", "u64") else ("b64" if "b64" in mnemonic
+                                                         and fmt == "" else "")
+        if pfmt and nin % 2 == 0 and nin > 0:
+            plist = F64 if pfmt == "f64" else INT_PAIRS
+            for row in grids(plist, nin // 2):
                 out.append(mnemonic + "\t" + FP_POLICY + "\t" +
                            " ".join(hex(v) for v in flat(row)))
             continue

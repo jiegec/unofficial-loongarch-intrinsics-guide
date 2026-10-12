@@ -70,9 +70,13 @@ group as the other atomics.
 The 64-bit integer compares are two pair operands, exactly like a binary f64, but
 the bench's own set is f64-only for the four-dword shape.  @@case_targets()@@
 therefore admits them without moving @@targets()@@ (still 308) - which is the reason
-the two functions exist separately.  Coverage is **710 of 768**, and the vector
-count went 20,732 -> 46,966 -> 49,930 -> 51,754 -> 72,910 -> 76,426 -> 78,188 ->
-**79,592**.
+the two functions exist separately.
+
+The last shapes are the six-dword rows - a 64-bit compare-and-swap or a binary
+f64 multiply-add, i.e. three pair operands.  The grid now anchors on PAIRS when
+its column list is tuple-valued, and a 64-bit operand routes through the pair path
+in every family (including the @@b64@@ atomics, whose names carry no type token).
+Coverage is **712 of 768**.
 
 ## 4. The boundary cases changed the answer the hardware gives
 
