@@ -8,5 +8,6 @@ LG200_ORACLE_END(1)
 LG200_CASE_BEGIN(v_cmp_u_f32)
 CASE(finite, 0x3f800000, 0x40000000, 0x0)
 CASE(nan, 0x3f800000, 0x7fc00000, 0xffff)
+CASE(snan, 0x3f800000, 0x7f800001, 0xffff)
 CASE(both-nan, 0x7fc00000, 0x7fc00000, 0xffff)
 LG200_CASE_END
