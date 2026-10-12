@@ -41,6 +41,13 @@ struct FieldRule {
   const char* modifier_name = nullptr;
   bool is_output = false;
   bool omit_zero = false;
+  // A parameter bit the canonical assembly does not spell.  The bit is in the
+  // table's parameter mask (a producer may set it) but no canonical form names
+  // it, so an emitter that omits the operand must still encode: the field
+  // stays at its template value instead of reaching the encoder as a missing
+  // operand.  Applies to the trailing X0_1 of the scalar-load and jump-stack
+  // forms; see codec/semantics.cpp.
+  bool optional = false;
 };
 
 struct SemanticSpec {

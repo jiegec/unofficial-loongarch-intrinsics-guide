@@ -681,6 +681,14 @@ bool encode_generic(const generated::CodecRow& row, const SemanticSpec& spec,
       }
     } else {
       if (operand_index >= operands.size()) {
+        if (rule.optional) {
+          // A parameter bit the canonical assembly does not spell: keep the
+          // template's value for the field and consume no operand.  Without
+          // this, every emitter that follows the canonical form (all of them)
+          // fails on these rows - the scalar flat/buffer loads and the
+          // jump-stack pair.
+          continue;
+        }
         error = std::string("missing operand for field ") + rule.field;
         return false;
       }

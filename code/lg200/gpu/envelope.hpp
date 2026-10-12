@@ -48,6 +48,13 @@ struct EnvelopeProgram {
   bool observe = false;
   // 1-ulp tolerant compare for the hardware-approximation families.
   bool approx1ulp = false;
+  // Highest SGPR index + 1 and VGPR index + 1 the program touches, derived
+  // from the emitted operands.  The kernel descriptor declares the wave's
+  // register allocation from these; a program that uses a register outside its
+  // own declaration is undefined, so the compute path passes them through
+  // rather than declaring a fixed window.
+  std::uint32_t sgpr_high_water = 0;
+  std::uint32_t vgpr_high_water = 0;
   // GS family: bytes/words carry the GS program; fs_bytes carries the
   // companion fragment shader (solid export).
   std::vector<std::uint8_t> fs_bytes;
@@ -69,6 +76,16 @@ std::optional<EnvelopeProgram> build_bench(const std::string& mnemonic,
                                            unsigned copies, bool chained,
                                            std::string& error);
 
+// The compute-pipe counterpart: the same instruction template emitted through
+// the generic compute carrier (flat result store, CarrierEnv::compute), so a
+// benchmark and the validated CS matrix share one code path.  The timestamps
+// come from the firmware block in the signal allocation, which the submit layer
+// already writes; see the CS microbench section of the README.
+std::optional<EnvelopeProgram> build_cs_bench(const std::string& mnemonic,
+                                              unsigned copies, bool chained,
+                                              unsigned lanes,
+                                              std::string& error);
+
 // Builds the generic PS program for one mnemonic and its case rows.
 // Results must be 1-2 dwords and inputs must cover the operand template.
 // VCC-output mnemonics keep only the primary destination dword. Returns
@@ -77,15 +94,42 @@ std::optional<EnvelopeProgram> build_ps(const std::string& mnemonic,
                                         const std::vector<EnvelopeCase>& rows,
                                         std::string& error);
 
+// The two launch environments the generic emitter can target.  They share
+// everything except where the result-store buffer descriptor's base comes
+// from: Graphics assembles the argument BO's fixed VA, Compute reads the
+// output BO's VA out of the kernarg block the hardware points s[6:7] at.
+enum class LaunchEnvironment { Graphics, Compute };
+
+// How many lanes each launch engine executes.  The graphics fragment launch
+// runs a 4x4 region; a compute dispatch runs exactly the workgroup it is
+// handed, so the compute side has no constant and must be told (cs_group() in
+// main.cpp is the one place that decides it).  The per-lane atomics are the
+// consumers: see atomic_final_n in envelope.cpp.
+inline constexpr unsigned kGraphicsLanes = 16;
+
+// Builds the same generic program for a compute (CPIPE) dispatch.  On the
+// compute stage there is no constant root and no hydrated user data, so the
+// result buffer is reached by the absolute VA in carrier_map.hpp
+// (carrier::kCsArgVa), which drm::submit_compute maps the output BO at - the
+// two sides share that constant rather than deriving the address at runtime.
+// The launch contract is still loongvk's: the .kd enables en_sgpr_kernarg_ptr,
+// so s[6:7] holds the kernarg VA, and the carrier reads it once as launch-state
+// evidence (the host writes the output BO's VA as the first user argument
+// there).  Using a literal instead of deriving the address from s[6:7] is a
+// deliberate deviation; see README, "Launch and memory path vs loongvk".
+//
+// `lanes` is the number of work-items the dispatch will execute (the product
+// of the group's dimensions).  It is a required argument rather than a default
+// so that the expected values and the launch cannot disagree: a per-lane
+// atomic's expectation is a function of this number.
+std::optional<EnvelopeProgram> build_cs(const std::string& mnemonic,
+                                        const std::vector<EnvelopeCase>& rows,
+                                        std::string& error, unsigned lanes);
+
 
 
 // True for the control-prefix family (no numeric result).
 bool is_control(const std::string& mnemonic);
-
-// Control (execute-and-observe) carrier: control-prefix family.
-std::optional<EnvelopeProgram> build_control(const std::string& mnemonic,
-                                             const std::vector<EnvelopeCase>& rows,
-                                             std::string& error);
 
 // Environment-register sweep: executes getreg s8,<id> per entry; each read
 // value is stored at 0x40 + 4*i in the argument BO.  Returns nullopt with
@@ -119,37 +163,20 @@ std::optional<EnvelopeProgram> build_movidx_base_probe(
     std::uint32_t base, std::uint32_t idx, std::uint32_t magic,
     std::string& error);
 
-// Flat-address memory carrier: load_v_flat_*/store_v_flat_*/atomic_v_flat_*.
-std::optional<EnvelopeProgram> build_flat(const std::string& mnemonic,
-                                          const std::vector<EnvelopeCase>& rows,
-                                          std::string& error);
-std::optional<EnvelopeProgram> build_buff(const std::string& mnemonic,
-                                          const std::vector<EnvelopeCase>& rows,
-                                          std::string& error);
-
-// Workgroup shared memory carrier: load_sm_*/store_sm_*.
-std::optional<EnvelopeProgram> build_lds(const std::string& mnemonic,
-                                         const std::vector<EnvelopeCase>& rows,
-                                         std::string& error);
-
-// Texture fetch carrier: load_v_tex with an explicitly staged T# tuple.
-std::optional<EnvelopeProgram> build_tex_store(
-    const std::string& mnemonic, const std::vector<EnvelopeCase>& rows,
-    std::string& error);
-std::optional<EnvelopeProgram> build_tex_atomic(
-    const std::string& mnemonic, const std::vector<EnvelopeCase>& rows,
-    std::string& error);
-std::optional<EnvelopeProgram> build_samp(
-    const std::string& mnemonic, const std::vector<EnvelopeCase>& rows,
-    std::string& error);
-std::optional<EnvelopeProgram> build_tex(const std::string& mnemonic,
-                                         const std::vector<EnvelopeCase>& rows,
-                                         std::string& error);
-
-// Single entry point: routes one mnemonic to its carrier (generic, control,
-// buff, flat, lds, tex/atex/stex, samp) by family prefix, in one place.
+// Single entry point: routes one mnemonic to its carrier family in one place.
+// `kind` selects the launch environment, which changes only where the result
+// buffer lives and how it is reached - never which family owns a mnemonic.
+// `lanes` is the launch's executed lane count (see kGraphicsLanes / build_cs).
 std::optional<EnvelopeProgram> build_carrier(
     const std::string& mnemonic, const std::vector<EnvelopeCase>& rows,
-    std::string& error);
+    LaunchEnvironment kind, std::string& error,
+    unsigned lanes = kGraphicsLanes);
+
+// The compute launch-state self-test: reads the kernarg pointer's first user
+// argument and the group/local id registers and stores all eight dwords at
+// output offsets 0..28.  Returns nullopt with a readable error on assembler
+// failure.
+std::optional<EnvelopeProgram> build_cs_probe(std::string& error,
+                                             unsigned lanes);
 
 }  // namespace lgpu::envelope

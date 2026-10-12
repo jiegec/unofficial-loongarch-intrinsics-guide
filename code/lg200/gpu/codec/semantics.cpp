@@ -283,8 +283,6 @@ constexpr FieldRule kFlatLoadRules[] = {
     {"VD8", FieldSem::VectorDest8, 1, nullptr, true, false},
     {"VJ8x2", FieldSem::VectorSource8, 2, nullptr, false, false},
     {"RK8x2", FieldSem::Scalar8, 2, nullptr, false, false},
-    {"M.bl11", FieldSem::Modifier, 1, "bl1", false, true},
-    {"M.bl21", FieldSem::Modifier, 1, "bl2", false, true},
 };
 
 // flat-store: pred, vdata, vaddr-pair, desc-pair, mods.
@@ -293,8 +291,6 @@ constexpr FieldRule kFlatStoreRules[] = {
     {"VJ8", FieldSem::VectorSource8, 1, nullptr, false, false},
     {"VK8x2", FieldSem::VectorSource8, 2, nullptr, false, false},
     {"RA8x2", FieldSem::Scalar8, 2, nullptr, false, false},
-    {"M.bl11", FieldSem::Modifier, 1, "bl1", false, true},
-    {"M.bl21", FieldSem::Modifier, 1, "bl2", false, true},
 };
 
 // tex-store: pred, vdata-quad, coords-oct, desc-octet, mods.
@@ -344,8 +340,10 @@ constexpr FieldRule kSbuffLoadRules[] = {
     {"GK8", FieldSem::GeneralSource8, 1, nullptr, false, false},
     {"UO20", FieldSem::Immediate20, 1, nullptr, false, false},
     // The layout declares this parameter bit and the mask marks it free, so a
-    // producer can set it; the table used to drop it silently.
-    {"X0_1", FieldSem::Immediate8, 1, nullptr, false, false},
+    // producer can set it; the canonical form
+    // (`load_s_flat_w2 s[0:1], s[0:1], zero, 0x00000`) does not spell it, so it
+    // is optional in the operand list rather than required.
+    {"X0_1", FieldSem::Immediate8, 1, nullptr, false, false, true},
 };
 
 // ================= agentD: atomics =================
@@ -438,8 +436,6 @@ constexpr FieldRule kFlatAtomic32Rules[] = {
     {"VJ8x2", FieldSem::VectorSource8, 2, nullptr, false, false},
     {"RK8x2", FieldSem::Scalar8, 2, nullptr, false, false},
     {"VA8", FieldSem::VectorSource8, 1, nullptr, false, false},
-    {"M.bl11", FieldSem::Modifier, 1, "bl1", false, true},
-    {"M.bl21", FieldSem::Modifier, 1, "bl2", false, true},
 };
 
 constexpr FieldRule kFlatAtomic64Rules[] = {
@@ -448,8 +444,6 @@ constexpr FieldRule kFlatAtomic64Rules[] = {
     {"VJ8x2", FieldSem::VectorSource8, 2, nullptr, false, false},
     {"RK8x2", FieldSem::Scalar8, 2, nullptr, false, false},
     {"VA8", FieldSem::VectorSource8, 1, nullptr, false, false},
-    {"M.bl11", FieldSem::Modifier, 1, "bl1", false, true},
-    {"M.bl21", FieldSem::Modifier, 1, "bl2", false, true},
 };
 
 constexpr FieldRule kTexAtomicRules[] = {
@@ -527,7 +521,9 @@ constexpr FieldRule kJumpStackRules[] = {
     {"X2_23", FieldSem::Immediate23, 1, nullptr, false, false},
     // As above: declared in the layout, free in the mask, and the description
     // already says its role on this row is UNRESOLVED - dropping it said less.
-    {"X0_1", FieldSem::Immediate8, 1, nullptr, false, false},
+    // The canonical form ends at the jump-stack index, so the operand is
+    // optional rather than required.
+    {"X0_1", FieldSem::Immediate8, 1, nullptr, false, false, true},
 };
 
 // s_select_b32: RA8 accepts the "SCC" selector encoding 0x80.
@@ -639,8 +635,8 @@ constexpr ClassSpec kClasses[] = {
     {"tex-gather", kTexGatherRules, 11},
     {"vbuff-load", kVbuffLoadRules, 9},
     {"vbuff-store", kVbuffStoreRules, 9},
-    {"flat-load", kFlatLoadRules, 6},
-    {"flat-store", kFlatStoreRules, 6},
+    {"flat-load", kFlatLoadRules, 4},
+    {"flat-store", kFlatStoreRules, 4},
     {"tex-store", kTexStoreRules, 10},
     {"sm-pred", kSmPredRules, 1},
     {"sm-load", kSmLoadRules, 3},
@@ -655,8 +651,8 @@ constexpr ClassSpec kClasses[] = {
     {"sm-atomic64", kSmAtomic64Rules, 4},
     {"sm-atomic-cmpswap32", kSmAtomicCmpswap32Rules, 5},
     {"sm-atomic-cmpswap64", kSmAtomicCmpswap64Rules, 5},
-    {"flat-atomic32", kFlatAtomic32Rules, 7},
-    {"flat-atomic64", kFlatAtomic64Rules, 7},
+    {"flat-atomic32", kFlatAtomic32Rules, 5},
+    {"flat-atomic64", kFlatAtomic64Rules, 5},
     // agentE: control/sio/sm
     {"sop-imm", kSopImmRules, 3},
     {"smem-load", kSmemLoadRules, 4},

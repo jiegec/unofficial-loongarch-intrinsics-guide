@@ -35,6 +35,7 @@ endif
 # includes its header directly.
 SRCS := main.cpp envelope.cpp drm.cpp ps_packet.cpp mcs/loongvk_mcs.c \
         codec/codec.cpp codec/operand.cpp codec/semantics.cpp
+CODEC_SRCS := codec/codec.cpp codec/operand.cpp codec/semantics.cpp
 # Both suffixes must become build/%.o: leaving a .c path in OBJS makes the
 # trailing -include read that C file as a makefile.
 OBJS := $(patsubst %.c,build/%.o,$(patsubst %.cpp,build/%.o,$(SRCS)))
@@ -50,6 +51,15 @@ build/%.o: %.c
 build/lgpu-gpu: $(OBJS)
 	$(CXX) $(CXXFLAGS) $(INC) $(LGPU_CFLAGS) $(LGPU_DEF) $(OBJS) $(LGPU_LIBS) $(LGPU_RPATH) -o $@
 
+# Encoding cross-check against the vendor's own assembler (no GPU needed).
+build/enc_probe: enc_probe.cpp $(patsubst %.cpp,build/%.o,$(CODEC_SRCS))
+	$(CXX) $(CXXFLAGS) $(INC) -c enc_probe.cpp -o build/enc_probe.o
+	$(CXX) $(CXXFLAGS) $(INC) build/enc_probe.o \
+	    $(patsubst %.cpp,build/%.o,$(CODEC_SRCS)) -o $@
+
+enc-probe: build/enc_probe
+	python3 enc_probe.py
+
 matrix: build/lgpu-gpu
 	./build/lgpu-gpu --matrix
 
@@ -61,4 +71,4 @@ clean:
 
 -include $(OBJS:.o=.d)
 
-.PHONY: matrix verify-gpu clean
+.PHONY: matrix enc-probe verify-gpu clean
