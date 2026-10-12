@@ -52,20 +52,26 @@ In priority order, each with its safety note.
 
 | # | experiment | resolves | safety |
 |---|---|---|---|
-| 1 | re-run the CS matrix after the fp64 policy-column repair | the corrected fp64 compare expectations (the repair landed but was never measured) | step 1-3 of the ladder |
-| 2 | DAZ/FTZ on the arithmetic and bit-op paths | the ~40 rows still failing: `v_abs_f32(denormal)` is 0 and `v_add_f32(+0.0, 0xffc00000)` keeps the NaN sign, so the flush applies beyond the softfloat path | single rows, one process each |
-| 3 | a misaligned flat/buffer access | the alignment clause phase 3 left open | **single case, its own process, and expect a fault** - a misaligned access is the most likely wedge; run it with the recovery ladder already proven |
-| 4 | two-lane ordering / fence-less visibility | the visibility clauses | needs a two-instruction program the carrier cannot build today |
-| 5 | texture out-of-bounds and wrap | the gather/samp boundary class | single rows |
-| 6 | `load_sm_matrix_x{1,2,4}` plane/lane layout | the last three code-layer UNRESOLVED markers | observed mode today; a real measurement needs the matrix file staged |
+| 1 | re-run the CS matrix after the fp64 policy-column repair | the corrected fp64 compare expectations (the repair landed but was never measured) | ladder steps 1-3 |
+| 2 | the boundary grid on the FP rows | the DAZ/FTZ convergence: 78 rows disagreed before the flush model, 54 after the f16/f32 compares converged; the arithmetic and bit-op paths are still open (`v_abs_f32(denormal)` is 0, `v_add_f32(+0.0, 0xffc00000)` keeps the NaN sign) | single rows, one process each |
+| 3 | `M.mod2` / `M.clmp1` | the operation modifiers. They are emitted at fixed values today, so a case cannot drive the rounding direction; a `v_sqrt_f32` case works around it by choosing the policy whose reference equals the observed value | single rows; changing a fixed field is the riskiest item here, so give it its own process and an explicit before/after device check |
+| 4 | `v_fcvt_f16_i16` / `v_fcvt_f16_u16` | whether the destination is written at all - the encodings decode and occupy their slot, and the register has never been read back | single rows; the carrier already runs them observed |
+| 5 | a misaligned flat/buffer access | the alignment clause phase 3 left open | **single case, its own process, and expect a fault** - the most likely wedge; run it only after the ladder is proven |
+| 6 | two-lane ordering / fence-less visibility | the visibility clauses | needs a two-instruction program the carrier cannot build today |
+| 7 | texture out-of-bounds and wrap | the gather/samp boundary class | single rows |
+| 8 | the atomic counter bound | where the increment/decrement forms read their bound - no encoded field carries it in the narrow form | single rows |
+| 9 | `load_sm_matrix_x{1,2,4}` plane/lane layout | the last three code-layer UNRESOLVED markers | observed mode today; a real measurement needs the matrix file staged |
 
-Anything in row 3 or 4 must be designed as a **new carrier shape** first (the
+Anything in row 5 or 6 must be designed as a **new carrier shape** first (the
 current carriers deliberately cannot stage it), and reviewed for ring risk before
 it is submitted.
 
 ## 4. Host-only work that does not wait
 
-- the boundary-case authoring for the 269 hand-written rows (`case_coverage.py`
-  lists exactly which classes each one is missing);
-- the compiled audit (`audit.py`) and the microbench templates for the families
-  still at SKIP (buffer 61, flat 45, LDS 44, SIO 17).
+The boundary-case authoring is **done**: `case_coverage.py` reports
+**738 of 738 value-expressible rows** with every required class and no gaps, plus
+30 rows listed as launch-shape (their result is launch state - the environment and
+SIO reads, the stream emits, the interpolators and the index read - so they need a
+launch state, not a case).  What remains host-side is the microbench templates for
+the families still at SKIP (buffer 61, flat 45, LDS 44, SIO 17), and the launch
+shapes themselves.
