@@ -4195,6 +4195,48 @@ std::optional<EnvelopeProgram> build_cs_bench_buff_store(
 // offset through one scalar move, adding no instruction to the chain.  The vector
 // forms cannot do this - their destination is a VGPR, and feeding it back to a
 // scalar offset would need v_readfirstlane, an instruction inside the measurement.
+
+// The sub-word buffer stores.  Their emit differs from the plain store's - no VQ8
+// format operand, and the data sits in one register - but the chain is the plain
+// store's: write, then read the cell back into the same data register, so the next
+// copy's operand is what this copy wrote with nothing in between.
+std::optional<EnvelopeProgram> build_cs_bench_buff_subword_store(
+    const std::string& mnemonic, unsigned copies, bool chained, unsigned lanes,
+    std::string& error) {
+  if (mnemonic != "store_v_buff_b8" && mnemonic != "store_v_buff_b16") {
+    error = "sub-word buffer store bench: only the b8 and b16 forms are staged";
+    return std::nullopt;
+  }
+  const CarrierEnv env = CarrierEnv::compute(lanes);
+  Builder builder;
+  emit_env_prelude(builder, env);
+  const isa::Reg store_desc = carrier::kStoreDesc();
+  const isa::Reg load_desc = isa::sgpr(4, 4);
+  emit_load_desc(builder, env, load_desc, env.arg_va + carrier::kLoadWindow);
+  const isa::Reg data_v = isa::vgpr(8);
+  const isa::Reg imm_temp = isa::sgpr(16);
+  const std::uint32_t off = 0u;
+  EnvelopeProgram program;
+  program.probe = true;
+  builder.s_mov_imm_b32(imm_temp, 0x20u);
+  builder.v_mov_b32(data_v, imm_temp, isa::predicate(0));
+  for (unsigned copy = 0; copy < copies; ++copy) {
+    builder.buff_subword_store(mnemonic, isa::predicate(0), data_v, store_desc,
+                               isa::vgpr(0), carrier::kLoadWindow + off, false);
+    if (chained) {
+      builder.buff_subword_load("load_v_buff_u8", isa::predicate(0), data_v,
+                                load_desc, isa::vgpr(0), off, false);
+    }
+  }
+  builder.check_k_vm_vs_sm();
+  builder.v_mov_b32(isa::vgpr(10), data_v, isa::predicate(0));
+  emit_result_store(builder, env, isa::vgpr(10), isa::zero_reg(), 0u);
+  if (!finalize_program(builder, program, error)) {
+    return std::nullopt;
+  }
+  return program;
+}
+
 std::optional<EnvelopeProgram> build_cs_bench_buff_sload(
     const std::string& mnemonic, unsigned copies, bool chained, unsigned lanes,
     std::string& error) {
@@ -4409,6 +4451,8 @@ std::optional<EnvelopeProgram> build_cs_bench(const std::string& mnemonic,
     return build_cs_bench_flat_store(mnemonic, copies, chained, lanes, error);
   if (mnemonic.rfind("store_sm_", 0) == 0)
     return build_cs_bench_sm_store(mnemonic, copies, chained, lanes, error);
+  if (mnemonic == "store_v_buff_b8" || mnemonic == "store_v_buff_b16")
+    return build_cs_bench_buff_subword_store(mnemonic, copies, chained, lanes, error);
   if (mnemonic.rfind("store_v_buff_", 0) == 0)
     return build_cs_bench_buff_store(mnemonic, copies, chained, lanes, error);
   if (copies == 0) {

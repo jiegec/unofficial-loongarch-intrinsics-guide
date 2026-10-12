@@ -78,8 +78,8 @@ fourth:
 
 | correctness builds it | bench lat | bench tp | rows |
 |---|---|---|---|
-| yes | yes | yes | **615** |
-| yes | no | no | **68** |
+| yes | yes | yes | **617** |
+| yes | no | no | **66** |
 | no | no | no | **85** |
 
 There is no row in the missing fourth class: **nothing is benchable that the correctness
@@ -102,7 +102,7 @@ grouped, they are nine classes:
   content is launch state, and their chain is not a chain of independent work |
 | control | 14 | nothing - no cost to chain and no operand to chain it through; throughput
   is measurable, latency is not |
-| buffer store | 10 | the remaining sub-word forms, which do not share the plain
+| buffer store | 8 | the remaining sub-word forms, which do not share the plain
   b32/b64/b96/b128 shape |
 | environment | 4 | nothing - the row returns launch state, so there is no computed value to
   time |
