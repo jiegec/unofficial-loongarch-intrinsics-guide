@@ -81,7 +81,15 @@ A row may also name **more than one width** (@@v_fcvt_f32_f16@@,
 @@v_dp4a_i8_i8_i32@@).  The audit asks for every tag's classes, so the boundary
 list is a UNION over the row's type tags rather than the last tag's list alone: a
 32-bit class is matched on the whole word and a 16-bit one on either half, so one
-column can carry both.  Coverage is **749 of 768**.
+column can carry both.
+
+A row whose source is 64-bit can still name 32-bit tags (@@v_fcvt_f32_f64@@), so the
+pair list also carries those tags' boundaries as a pair's low word.  Coverage is
+**753 of 768** - the fifteen that remain are the twelve load rows (whose
+boundaries live in memory content the carrier cannot stage), the two interpolator
+rows (launch-owned coefficient window) and @@v_threadid_u32@@ (an
+execution-environment read).  Each is a carrier limitation, not a value the grid
+could have supplied.
 
 ## 4. The boundary cases changed the answer the hardware gives
 

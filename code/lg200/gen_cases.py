@@ -87,6 +87,26 @@ TYPE_TOKENS = ("f64", "f32", "f16", "i64", "u64", "i32", "u32",
                "i16", "u16", "i8", "u8")
 
 
+# A row whose SOURCE is 64-bit may still name 32-bit tags (v_fcvt_f32_f64).  The
+# pair list then also carries those tags' boundaries as a pair's low word, so the
+# 32-bit classes are exercised on a whole input word.
+PAIR32 = {"f32": F32, "i32": INT, "u32": INT, "i16": INT16, "u16": INT16,
+          "i8": INT8, "u8": INT8}
+
+
+def pair_list(mnemonic: str):
+    out, seen = [], set()
+    cand = list(F64)
+    for t, lst in PAIR32.items():
+        if t in mnemonic:
+            cand += [(v, 0) for v in lst]
+    for p in cand:
+        if p not in seen:
+            seen.add(p)
+            out.append(p)
+    return out
+
+
 def union_base(mnemonic: str, fmt: str):
     """The boundary list for a row, unioned over every type tag its name carries."""
     seen, out = set(), []
@@ -306,7 +326,7 @@ def main() -> int:
         pfmt = fmt if fmt in ("f64", "i64", "u64") else ("b64" if "b64" in mnemonic
                                                          and fmt == "" else "")
         if pfmt and nin % 2 == 0 and nin > 0:
-            plist = F64 if pfmt == "f64" else INT_PAIRS
+            plist = pair_list(mnemonic) if pfmt == "f64" else INT_PAIRS
             for row in grids(plist, nin // 2):
                 out.append(mnemonic + "\t" + FP_POLICY + "\t" +
                            " ".join(hex(v) for v in flat(row)))
