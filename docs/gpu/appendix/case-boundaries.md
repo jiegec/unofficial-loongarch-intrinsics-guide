@@ -141,12 +141,17 @@ came only from the generated grid.
 
 case_coverage.py now reports this every run - "FP rows: N declared a policy, M did NOT" - so it cannot drift back: a floating-point case with no policy is silently evaluated as round-to-nearest with no flush, which is not the measured mode and would disagree with the device on any denormal.  The current run is 173 and 0.
 
-The rounding DIRECTION is a different matter.  The 2-bit `M.mod2` and 1-bit
-`M.clmp1` fields are the operation modifiers, and the register records that the
-carrier emits them at fixed values - so a case cannot yet drive the hardware's
-rounding direction.  A row that needs it (the v_sqrt approximation) works around
-it by choosing the policy whose reference result equals the observed hardware
-value.  Establishing `mod2` is a hardware item, not a case-authoring one.
+The rounding DIRECTION is a different matter, and the reason is now sharper than
+"the modifiers are fixed".  The direction is chosen by the **opcode**: the producer
+emits `v_ceil.f32`, `v_floor.f32`, `v_trunc.f32` and `v_rndne.f32` as four distinct
+instructions, and in two whole linked programs (the runtime libraries included,
+~30,000 lines each) the printed modifiers are **`bl1` only** - every occurrence of
+`mod2`, `clmp1`, `dmask` and `un` is absent, meaning the producer emits them all at
+zero.  So there is no field a case could drive to change the rounding direction: the
+instruction IS the choice, and a case picks it by picking the mnemonic.  A row whose
+hardware value does not match any instruction's (the v_sqrt approximation) still
+works around it by choosing the policy whose reference result equals the observed
+value.  What `mod2` means when it is NOT zero remains a hardware item.
 
 ## 6. Status
 
