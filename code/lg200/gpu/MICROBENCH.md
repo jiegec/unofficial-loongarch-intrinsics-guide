@@ -153,6 +153,23 @@ few seconds - and reports the outcome and the reason:
 | no semantic specification | 6 |
 | refused on the compute pipe (known to wedge) | 1 |
 
+
+
+The "no canonical variant" reason is worth spelling out: it is a gap in the
+codecs *variant* table, not in the encode table or in a template.
+kCanonicalVariants carries **581 entries over 530 of the 768 mnemonics**; the
+other **238 have no variant at all** - atomic 88, load 41, samp 32, gather 24,
+store 24, siordrot 6, siowrrot 4, prefix 3, and a few singletons.  They are the
+same memory, texture and SIO families the sections above describe, and they have
+no variant because the correctness carrier emits them through *named* builder
+calls (load_v_flat, buff_mem, sm_op, image_op, ...) rather than through the
+generic operand walk - so nothing ever needed one.  The bench does, because its
+template assigns registers from the decoded operand classes.
+
+A family template therefore has to do one of two things: derive the classes from
+the rows layout instead of from a decoded variant, or give the family variant
+entries.  Either way the template is what is missing; the reason string names the
+first symptom.
 505 is 497 (the last hardware run's OK) plus the eight flat load rows this
 template added - i.e. the offline number and the device number agree, which is
 what makes it usable as a target before a session.  The reasons are the same
