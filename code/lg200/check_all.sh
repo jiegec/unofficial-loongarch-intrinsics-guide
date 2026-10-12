@@ -14,7 +14,13 @@
 #   format_audit.py          the encoding table's field lists against the rows
 #
 # None of these touch hardware, so they are safe to run at any time.
-set -e
+#
+# pipefail is not decoration.  With plain `set -e`, a check written as `python3 x.py |
+# tail -1` reports success when x.py fails, because the pipeline's status is tail's.  That
+# went unnoticed on 2026-10-13 when this script ran a check whose path I had just broken:
+# the shell printed "can't open file" and the suite still printed ALL CHECKS PASSED.  A
+# suite that reports success while a check is missing is worse than no suite.
+set -eo pipefail
 HERE=$(cd "$(dirname "$0")" && pwd)
 REPO=$(cd "$HERE/../.." && pwd)
 
@@ -35,10 +41,10 @@ echo "== format_audit"
 python3 format_audit.py | tail -1
 echo "== rule_dupe_check"
 python3 rule_dupe_check.py
-cd "$REPO"
 echo "== md_table_check"
 cd "$REPO" && python3 code/lg200/md_table_check.py | tail -1
-cd "$REPO/code/lg200"
 echo "== check_gpu"
+# check_gpu.py lives at the checkout root, not beside these scripts.
+cd "$REPO"
 python3 check_gpu.py | tail -1
 echo "ALL CHECKS PASSED"
