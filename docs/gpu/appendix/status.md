@@ -42,9 +42,28 @@ record.
 
 | measure | start | now |
 |---|---|---|
-| rows stating an `UNRESOLVED` | 737 | **582** |
-| distinct UNRESOLVED sentences | 872 | **793** (1,026 occurrences) |
+| rows stating an `UNRESOLVED` | 737 | **580** |
+| distinct UNRESOLVED sentences | 872 | **792** (1,024 occurrences) |
 | explicit placeholder bodies in `code/lg200` | 11 | **0** |
+
+### What the remaining sentences are about
+
+The 792 remaining sentences are no longer a documentation problem: settled from
+recorded facts, they would be.  Grouped by the kind of question they are, and by
+the hardware-plan item that would settle each:
+
+| kind | occurrences | settled by |
+|---|---|---|
+| atomic bound / order among lanes | 245 | plan 9, plus same-location ordering (a new shape) |
+| alignment / misaligned access | 193 | plan 6 |
+| out-of-window / out-of-allocation | 132 | plans 6 and 8 |
+| texture sampling / lod / wrap | 75 | plan 8 |
+| flush / rounding / nan | 73 | plans 1 and 2 |
+| selector / reserved range | 35 | which encodings a decoder should reject |
+| visibility / memory ordering | 29 | plan 7 |
+| sub-word / narrowing / read-modify-write | 11 | hardware |
+| modifier semantics (mod2, clmp1) | 4 | plan 3 |
+| smaller, ungrouped questions | 227 | mostly hardware, one row at a time |
 
 Twenty-six classes are closed, each with its evidence named on
 [UNRESOLVED Status](unresolved-status.md) - hardware measurements for the
