@@ -127,7 +127,24 @@ floating-point row, which fixed the arithmetic rows' denormal cases.  The FP
 two words), so they still disagree on denormal inputs - that is the remaining fix,
 together with the NaN-sign rule.
 
-## 5. Status
+## 5. The emitted policy is now declared everywhere it matters
+
+A case's `CASE_FP` policy is what tells the reference how to model the hardware's
+flush, so a floating-point row whose cases omit it is silently evaluated as
+"round to nearest, no flush".  The 89 compare rows - every `v_cmp_*` and its
+immediate form - were in exactly that state, so they now carry the measured
+`rtne|daz|ftz`.  No expectation changed, which is itself the finding: **none of
+the hand-written compare vectors had ever used a denormal**, so that cross-check
+came only from the generated grid.
+
+The rounding DIRECTION is a different matter.  The 2-bit `M.mod2` and 1-bit
+`M.clmp1` fields are the operation modifiers, and the register records that the
+carrier emits them at fixed values - so a case cannot yet drive the hardware's
+rounding direction.  A row that needs it (the v_sqrt approximation) works around
+it by choosing the policy whose reference result equals the observed hardware
+value.  Establishing `mod2` is a hardware item, not a case-authoring one.
+
+## 6. Status
 
 | measure | value |
 |---|---|
