@@ -25,10 +25,10 @@ so it could not fail on an over-claim, which is the defect it exists to find.
 
 THE ELEVEN GATES, ACCOUNTED FOR (2026-10-13):
 
-  proven in this tool (13): set_desc, check_doc_numbers, header_sync, check_gpu,
+  proven in this tool (14): set_desc, check_doc_numbers, header_sync, check_gpu,
                             run_cases, format_audit, bench_doc_check,
                             rule_dupe_check, md_table_check, check_all.sh,
-                            fp_mode_audit, case_provenance, addr_scan
+                            fp_mode_audit, case_provenance, addr_scan, gate_check
   note: addr_scan's case proves the EXIT CODE, by forcing a hit.  Detecting a real
         hit needs a rebuilt lgpu-gpu, so that half is not covered here.
   reports by design (2):    prose_audit, doc_register_audit
@@ -184,6 +184,10 @@ def mutate_addr_scan(text):
     """Force a hit, which tests the exit code rather than the detection."""
     return text.replace('total += len(hits)', 'total += len(hits) + 1', 1)
 
+def mutate_gate_file(text):
+    """Take a gate's failure path away, so gate_check should report it."""
+    return text.replace('return 1', 'return 0', 1)
+
 CASES = [
     ("set_desc.py --check", "code/lg200-instructions.tsv", mutate_tsv,
      "cd code/lg200 && python3 set_desc.py --check"),
@@ -210,7 +214,9 @@ CASES = [
     ("case_provenance.py", "docs/gpu/appendix/status.md", mutate_provenance,
      "cd code/lg200 && python3 case_provenance.py --check"),
     ("addr_scan.py", "code/lg200/gpu/addr_scan.py", mutate_addr_scan,
-     "python3 code/lg200/gpu/addr_scan.py"),]
+     "python3 code/lg200/gpu/addr_scan.py"),
+    ("gate_check.py", "code/lg200/md_table_check.py", mutate_gate_file,
+     "python3 code/lg200/gate_check.py"),]
 
 
 def main() -> int:

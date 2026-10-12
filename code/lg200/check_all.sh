@@ -49,6 +49,8 @@ echo "== fp_mode_audit"
 cd "$REPO" && python3 code/lg200/fp_mode_audit.py --check | tail -1
 echo "== case_provenance"
 cd "$REPO" && python3 code/lg200/case_provenance.py --check | tail -1
+echo "== gate_check"
+cd "$REPO" && python3 code/lg200/gate_check.py | tail -1
 echo "== addr_scan"
 cd "$REPO" && python3 code/lg200/gpu/addr_scan.py | tail -1
 echo "== check_gpu"
