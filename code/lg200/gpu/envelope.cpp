@@ -947,7 +947,11 @@ std::optional<EnvelopeProgram> build_generic(
     return std::nullopt;
   }
   if (mnemonic == "nop" || mnemonic == "exit" || mnemonic == "check") {
-    error = "excluded mnemonic";
+    // Same reason as the control refusal in build_cs_bench: there is no cost to chain and
+    // no operand to chain it through.  "excluded mnemonic" said neither, and it appeared
+    // in two builders, so the better text goes to both.
+    error = "control row: no cost to chain and no operand to chain it through; its "
+            "throughput is measurable on the compute path, its latency is not";
     return std::nullopt;
   }
 
@@ -3476,7 +3480,11 @@ std::optional<EnvelopeProgram> build_bench(const std::string& mnemonic,
     return std::nullopt;
   }
   if (mnemonic == "nop" || mnemonic == "exit" || mnemonic == "check") {
-    error = "excluded mnemonic";
+    // Same reason as the control refusal in build_cs_bench: there is no cost to chain and
+    // no operand to chain it through.  "excluded mnemonic" said neither, and it appeared
+    // in two builders, so the better text goes to both.
+    error = "control row: no cost to chain and no operand to chain it through; its "
+            "throughput is measurable on the compute path, its latency is not";
     return std::nullopt;
   }
 
@@ -4366,17 +4374,23 @@ std::optional<EnvelopeProgram> build_cs_bench(const std::string& mnemonic,
     error = "not materializable on the generic carrier";
     return std::nullopt;
   }
-  if (mnemonic == "nop" || mnemonic == "exit" || mnemonic == "check") {
-    error = "excluded mnemonic";
-    return std::nullopt;
-  }
+  // A second nop/exit/check check stood here returning "excluded mnemonic".  It was dead:
+  // the control refusal above, in this same function, catches all three first.  It was
+  // removed on 2026-10-13 rather than reworded, because a branch that cannot fire is not a
+  // message - and if the control list ever shrinks, this is the commit that says why the
+  // three words are gone.
+  //
   // The one mnemonic the compute carrier itself refuses: its register-window
   // shape wedged the pipe once already (see the movindex note in the README),
   // and a benchmark must never re-introduce a stream the validation path
   // refuses.  Every other unimplementable shape is already excluded below by
-  // materializable()'s rejection of descriptor/offset semantics.
+  // materializable()'s rejection of descriptor/offset semantics.  The message says the
+  // root, not just that it is known: "known to wedge" tells a reader nothing they can act
+  // on, while the shape is what makes it dangerous.
   if (mnemonic == "v_movindex_b32") {
-    error = "refused on the compute pipe (known to wedge)";
+    error = "v_movindex_b32: refused on the compute pipe - its register-window shape "
+            "wedged the pipe once (the movindex note in the README) and a benchmark must "
+            "not re-introduce a stream the validation path refuses";
     return std::nullopt;
   }
 
