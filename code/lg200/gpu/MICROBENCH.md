@@ -70,7 +70,23 @@ ticks; `bench_ns.py` derives `lat_ns`/`tp_ns`.
 
 The 84 are the **stable** side of that split: they are the carrier own
 refusal (SKIP-ENVELOPE), which holds whatever else the matrix says.  The 187 are
-everything else the bench skips.  Classifying them by correctness **PASS** instead
+everything else the bench skips.
+
+**Cross-checked against the correctness path on 2026-10-13**, joining the carrier's
+fresh dry listings with `bench_buildable.py`'s per-row output - three classes, and no
+fourth:
+
+| correctness builds it | bench lat | bench tp | rows |
+|---|---|---|---|
+| yes | yes | yes | **610** |
+| yes | no | no | **73** |
+| no | no | no | **85** |
+
+There is no row in the missing fourth class: **nothing is benchable that the correctness
+carrier refuses.**  That is the rule the carrier states in prose - a bench must not
+exercise a stream the validation path rejects - and this is it measured, with zero
+counterexamples, rather than asserted.  The 73 are the bench's own gaps; the 85 are the
+carrier's refusals and not a bench problem at all.  Classifying them by correctness **PASS** instead
 - which is what this report did - makes the split depend on the matrix being a
 clean run, and the matrix on disk is **the run that wedged** (307 PASS / 84
 SKIP-ENVELOPE / 377 HANG-FAULT).  That last number is not 377 faults: 376 of those
