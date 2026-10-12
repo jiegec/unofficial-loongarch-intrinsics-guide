@@ -59,9 +59,14 @@ are the 16-bit extremes (@@0x7fff@@/@@0x8000@@/@@0xfffe@@/@@0xffff@@), not the 3
 ones, so a single INT list left every narrow row short of the values its operands
 admit.  The narrow sets are UNIONS with the 32-bit list - a narrow row still wants
 the wider patterns, since its neighbours and destination may be wider - which is
-why the first attempt (replacement rather than union) cost two rows.  Coverage is
-**680 of 768**, and the vector count went
-20,732 -> 46,966 -> 49,930 -> 51,754 -> 72,910 -> **76,426**.
+why the first attempt (replacement rather than union) cost two rows.
+
+Two more corrections came from looking at what the remaining gaps actually were:
+the boundary set is chosen by the **name's** type token even when the row's
+semantic model is not a value class (an f32 compare-and-swap is an atomic, but its
+operands are still f32), and the texture-atomic family belongs in the same
+group as the other atomics.  Coverage is **692 of 768**, and the vector count went
+20,732 -> 46,966 -> 49,930 -> 51,754 -> 72,910 -> 76,426 -> **78,188**.
 
 ## 4. The boundary cases changed the answer the hardware gives
 

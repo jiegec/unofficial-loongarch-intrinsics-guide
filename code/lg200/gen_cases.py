@@ -190,7 +190,7 @@ def targets() -> list:
 # stage the cell and the operand straight from the case inputs - their address
 # comes from the case index, not from a case value - so a boundary grid is
 # stageable even though the bench cannot time them.
-ATOMIC_OK = re.compile(r"^atomic_(sm|v_buff|v_flat)_")
+ATOMIC_OK = re.compile(r"^atomic_(sm|v_buff|v_flat|v_tex)_")
 
 
 def case_targets() -> list:
@@ -242,8 +242,10 @@ def main() -> int:
     for mnemonic in case_targets():
         sem = meta[mnemonic]["semantic_model"]
         nin = nin_of(mnemonic)
-        fmt = input_format(mnemonic) if sem in ("floating-point-value",
-                                                "integer-value") else ""
+        # The name's type token decides the boundary set even when the row's
+        # semantic model is not a value class (an f32 compare-and-swap is an
+        # atomic, but its operands are still f32 and want the f32 boundaries).
+        fmt = input_format(mnemonic)
         base = ({"f64": F64, "f16": F16, "f32": F32}.get(fmt) or
                 INT_TBL.get(fmt, INT))
         # [HW 2026-08-24] ldexp carries an integer exponent in the last
