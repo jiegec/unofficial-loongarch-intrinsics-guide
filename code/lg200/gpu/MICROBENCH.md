@@ -49,7 +49,7 @@ ticks; `bench_ns.py` derives `lat_ns`/`tp_ns`.
 |---|---|
 | `build/cs_bench_results.tsv` | 768 rows: mnemonic, status, lat_ticks_per_op, tp_ticks_per_op, note |
 | `build/cs_bench_results_ns.tsv` | the same + `lat_ns` / `tp_ns` (`bench_ns.py`) |
-| `build/cs_bench_coverage.tsv` | per-mnemonic bench vs correctness status + family/reason (`bench_coverage.py`) |
+| `build/cs_bench_coverage.tsv` | per-mnemonic bench vs correctness status + family/reason/detail (`bench_coverage.py`) |
 
     cd code/lg200/gpu
     ./build/lgpu-gpu csverify          # host preflight, no submission
@@ -73,7 +73,11 @@ refusal (SKIP-ENVELOPE), which holds whatever else the matrix says.  The 187 are
 everything else the bench skips.  Classifying them by correctness **PASS** instead
 - which is what this report did - makes the split depend on the matrix being a
 clean run, and the matrix on disk is **the run that wedged** (307 PASS / 84
-SKIP-ENVELOPE / 377 HANG-FAULT).  Rows that run never reached were neither PASS
+SKIP-ENVELOPE / 377 HANG-FAULT).  That last number is not 377 faults: 376 of those
+rows share one detail, `csrun: signal=0x0 cannot open /dev/dri/renderD128`, so the device
+node was gone and they **never ran** - the first of them is `v_abs_f32`, the row right
+after `trap`.  Exactly one row carries a submission detail, and it is `trap`.  The report
+names that split, and the `detail` column carries it into the TSV.  Rows that run never reached were neither PASS
 nor SKIP, so they silently fell out of both buckets and the gap was undercounted
 as 184.  The report now classifies by the carrier refusal and **warns** when the
 matrix is not clean; the numbers above are from that run.
