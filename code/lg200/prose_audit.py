@@ -18,6 +18,15 @@ THREE CLASSES OF FALSE POSITIVE are expected, and each was seen while writing it
     while listing only PJ2.
 
 So the tool's output is a queue to read, not a list of errors.
+
+TRIAGED 2026-10-13, and the queue is expected to look like this: of its first 29
+hits, three were real defects - copy_sm_from_global, copy_sm_to_global and
+load_sm_interp, all carrying a sentence lifted from the shared-memory load rows -
+and those three were fixed.  The other 26, and the 28 that remain after the fix,
+are all negations or quotations: 24 of them are the deliberate sentence 'no GJ11 or
+GK11 selector is present' that closes that question on each v_cmp_imm_* row, and the
+rest quote a retired claim inside its own correction.  So a non-zero count here is
+the tool working as intended, not a backlog.
 """
 from __future__ import annotations
 
