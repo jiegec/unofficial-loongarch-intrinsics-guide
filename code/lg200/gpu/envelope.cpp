@@ -4156,6 +4156,61 @@ std::optional<EnvelopeProgram> build_cs_bench_buff_store(
   return program;
 }
 
+// The SCALAR flat load family's bench template (load_s_flat_w1/w2/w4/w8/w16).  The
+// same LCO flat form the carrier's own environment probe uses - (dst, addr_pair,
+// soff, immediate), no predicate - but the destination is an SGPR tuple and the
+// address is an SGPR pair, so the chain costs one scalar move per link:
+//   lat - after each load, the just-loaded low word becomes the address low word
+//         again, so the next access waits on this one.
+//   tp  - the address stays fixed and the result goes to a separate tuple.
+// The window's first dword is preloaded with that same address low word, so the
+// chained address is stable and stays inside the carrier's window.
+std::optional<EnvelopeProgram> build_cs_bench_flat_sload(
+    const std::string& mnemonic, unsigned copies, bool chained, unsigned lanes,
+    std::string& error) {
+  unsigned width = 1;
+  if (mnemonic == "load_s_flat_w2") width = 2;
+  else if (mnemonic == "load_s_flat_w4") width = 4;
+  else if (mnemonic == "load_s_flat_w8") width = 8;
+  else if (mnemonic == "load_s_flat_w16") width = 16;
+  else if (mnemonic != "load_s_flat_w1") {
+    error = "scalar flat load bench: unknown width";
+    return std::nullopt;
+  }
+  const CarrierEnv env = CarrierEnv::compute(lanes);
+  Builder builder;
+  emit_env_prelude(builder, env);
+  const isa::Reg addr_pair = isa::sgpr(6, 2);
+  const isa::Reg dst = isa::sgpr(8, width);
+  const isa::Reg result = isa::sgpr(8, width);
+  const isa::Reg imm_temp = isa::sgpr(28);
+  const std::uint32_t addr = carrier::kLoadWindow;
+  const std::uint64_t full_va = env.arg_va + addr;
+  builder.s_mov_imm_b32(isa::sgpr(6), static_cast<std::uint32_t>(full_va));
+  builder.s_mov_imm_b32(isa::sgpr(7), static_cast<std::uint32_t>(full_va >> 32));
+  EnvelopeProgram program;
+  program.probe = true;
+  program.arg_preloads.emplace_back(addr, static_cast<std::uint32_t>(full_va));
+  for (unsigned copy = 0; copy < copies; ++copy) {
+    builder.sflat_load(mnemonic, dst, addr_pair, isa::zero_reg(), 0u);
+    if (chained) {
+      // The loaded low word IS the address low word, so the next access depends
+      // on this one through a single scalar move.
+      builder.s_mov_b32(isa::sgpr(6), result);
+    }
+  }
+  builder.s_mov_imm_b32(imm_temp, 0u);
+  builder.v_mov_b32(isa::vgpr(0), imm_temp, isa::predicate(0));
+  for (unsigned p = 0; p < (width < 4u ? width : 4u); ++p) {
+    builder.v_mov_b32(isa::vgpr(10 + p), isa::sgpr(8 + p), isa::predicate(0));
+    emit_result_store(builder, env, isa::vgpr(10 + p), isa::vgpr(0), 4 * p);
+  }
+  if (!finalize_program(builder, program, error)) {
+    return std::nullopt;
+  }
+  return program;
+}
+
 std::optional<EnvelopeProgram> build_cs_bench(const std::string& mnemonic,
                                               unsigned copies, bool chained,
                                               unsigned lanes,
@@ -4212,6 +4267,8 @@ std::optional<EnvelopeProgram> build_cs_bench(const std::string& mnemonic,
             "atomics avoid it";
     return std::nullopt;
   }
+  if (mnemonic.rfind("load_s_flat_", 0) == 0)
+    return build_cs_bench_flat_sload(mnemonic, copies, chained, lanes, error);
   if (mnemonic.rfind("copy_sm_", 0) == 0) {
     error = "copy bench: the global<->LDS copy is a control-path op in the "
             "correctness carrier (predicate-only), so it has no operand to chain "

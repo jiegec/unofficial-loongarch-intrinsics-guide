@@ -143,6 +143,14 @@ store stores, so the trip needs no extra instruction.  The b8/b16 and
 fmtdesc/fmtinst forms are refused explicitly: they take the subword/format branch
 of the correctness carrier and have a different operand shape.
 
+**The scalar flat loads are in too** (`load_s_flat_w1/w2/w4/w8/w16`), the last
+five rows that were still on a generic refusal.  They use the same LCO flat form
+the carrier's own environment probe uses - `(dst, addr_pair, soff, immediate)`, no
+predicate - but the destination is an SGPR tuple and the address an SGPR pair, so
+the chain costs one scalar move per link: after each load the just-loaded low word
+becomes the address low word again.  The window's first dword is preloaded with
+that same word, so the chained address is stable and in-window.
+
 **The STORES are in too, with a caveat the CSV now carries** (6 `store_v_flat_*`
 and 5 `store_sm_*`).  A store has no result, so there is no register to chain
 through; the only way to make one copy depend on the previous one is to READ BACK
@@ -226,23 +234,21 @@ few seconds - and reports the outcome and the reason:
 
 | | rows |
 |---|---|
-| buildable for both kinds | **605** |
+| buildable for both kinds | **610** |
 | texture bench: the correctness carrier refuses the family (SKIP-ENVELOPE) | 79 |
 | buffer load bench: the chain needs a live index or offset register (item 10) | 21 |
 | sio bench: run OBSERVED, and their chain is not a chain of independent work | 20 |
 | control bench: control and geometry-stream rows, nothing to chain | 14 |
 | buff store bench: only the plain b32/b64/b96/b128 forms share this shape | 10 |
-| no canonical variant | 5 |
 | environment bench: the row returns launch state, not a computed value | 4 |
 | sm load bench: the matrix and interpolator forms address UNRESOLVED state | 4 |
 | copy bench: the global<->LDS copy is a control-path op (predicate-only) | 2 |
 | 64-bit cmpswap: stages a compare pair as well as a value pair (flat, buff) | 2 |
-| not materializable on the generic carrier | 1 |
 | refused on the compute pipe (known to wedge) | 1 |
 
 
 
-Only five rows are still on a GENERIC reason - the scalar flat loads - and
+NO row is on a generic reason any more, and
 every other refusal now names the evidence behind it: the texture family is the
 one the correctness carrier refuses (SKIP-ENVELOPE), the buffer loads are the ones
 whose chain needs a register nothing exercises yet, the control and
@@ -267,8 +273,9 @@ A family template therefore has to do one of two things: derive the classes from
 the rows layout instead of from a decoded variant, or give the family variant
 entries.  Either way the template is what is missing; the reason string names the
 first symptom.
-605 is 497 (the last hardware run's OK) plus the eight flat load rows, the 24 flat atomic rows and the 26 shared-memory
-atomic rows, the 24 buffer atomic rows the 7 shared-memory load rows the 11 store rows the 4 plain buffer store rows the two 32-bit cmpswap rows and the six shared-memory cmpswap rows this work added - i.e. the offline number and the device number agree, which is
+610 is 497 (the last hardware run's OK) plus the eight flat load rows, the 24 flat atomic rows and the 26 shared-memory
+atomic rows, the 24 buffer atomic rows the 7 shared-memory load rows the 11 store rows the 4 plain buffer store rows the two 32-bit cmpswap rows, the six shared-memory cmpswap rows and the five
+scalar flat load rows this work added - i.e. the offline number and the device number agree, which is
 what makes it usable as a target before a session.  The reasons are the same
 per-family gaps the sections above describe.
 
