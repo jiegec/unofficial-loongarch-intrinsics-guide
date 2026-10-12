@@ -344,15 +344,20 @@ RD8             result tuple
   producer's intrinsic layer, which is why every established producer emits them at
   fixed values.  That is a stronger statement than "changing one is unsupported" -
   there is no producer-level way to change one.
-* What `bl1` and `bl2` MEAN.  One data point, from compiling the device library:
-  the only buffer accesses in its compiled form are the compiler's own register
-  spills, and `store.v.buff.b32 ... , bl1` / `load.v.buff.b32 ... , bl1` is how they
-  are emitted - so `bl1` accompanies private scratch traffic.  That is a hint, not an
-  answer.  The ordering experiment that would answer it is blocked twice over: the
-  atomic implementations live in `opencl.bc`, which is generic (it contains no lggpu
-  intrinsics until the runtime links it) and on which `llc -march=lggpu` CRASHES
-  outright, while `ockl.bc` compiles cleanly (79,305 lines) and holds no atomics at
-  all.
+* What `bl1` and `bl2` MEAN - **narrowed by a full pipeline run**, not by a hint.
+  Linking a probe against the runtime's own bitcode (`opencl.bc` + `ockl.bc` + the
+  `oclc_*` modules) and compiling the result with `llc -march=lggpu` gives a whole
+  program, and the census is unambiguous: it contains 26 buffer accesses, every one
+  of them `load.v.buff.b32` / `store.v.buff.b32` on the compiler's **private
+  spill/reload** path, and every one carries `bl1` - while `bl2` appears NOWHERE in
+  the program.  So within everything a producer emits, `bl1` marks real private
+  scratch traffic and `bl2` is simply not used; what either bit means to the hardware
+  is still open.
+* A lowering fact from the same run, useful on its own: **the producer does not use
+  the buffer forms for OpenCL atomics at all**.  Global atomics lower to `flat`
+  (241 in that program) and local ones to `sm` (3), and the buffer atomics appear
+  zero times.  So `atomic_v_buff_*` is not the path a working OpenCL compiler takes
+  for `atomic_*` on this target.
 * What the hardware does when a modifier is not at its default: a cleared
   `marker`, or a `form` bit at the value the producers do not emit.  The
   defaults are observations of every established producer, not hardware
