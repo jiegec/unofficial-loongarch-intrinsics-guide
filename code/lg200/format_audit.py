@@ -75,7 +75,12 @@ def main() -> int:
                   % (f, counts[f], ",".join(only_page) or "-", ",".join(only_rows)))
     print()
     print("formats where the table over-claims: %d" % over)
-    return 0
+    # An over-claim is a real defect - the page promises an encoding field the rows do
+    # not carry - so this is a gate and returns non-zero on one.  It returned 0
+    # unconditionally until 2026-10-13, which meant its place in check_all.sh was a
+    # report: the suite could not fail on the thing this file exists to catch.  The
+    # count is 0 today, so nothing changes now; what changes is that it would.
+    return 1 if over else 0
 
 
 if __name__ == "__main__":

@@ -17,8 +17,15 @@ PROVEN BOTH WAYS (this tool): set_desc, check_doc_numbers, header_sync, check_gp
 PROVEN BY A ONE-OFF INJECTION ELSEWHERE: rule_dupe_check and md_table_check, both on
 2026-10-13, by changing a size rule and by stranding a table row.
 
-NOT YET PROVEN: run_cases, prose_audit, doc_register_audit, format_audit.  They are
-listed rather than left implicit, because all checks pass is worth exactly as much as
+REPORTS BY DESIGN, so they have no failing mode to prove: prose_audit (its findings
+include three expected classes of false positive) and doc_register_audit (its bound -
+a wrong register name and nothing else - is stated in its own docstring).  format_audit
+was in this group until 2026-10-13 and is now a gate: it returned 0 unconditionally,
+so it could not fail on an over-claim, which is the defect it exists to find.
+
+NOT YET PROVEN: format_audit, which now returns non-zero on an over-claim but has no
+case in this tool yet, and run_cases was in this group until the run below proved
+it.  They arelisted rather than left implicit, because all checks pass is worth exactly as much as
 the number of them shown to be able to fail, and four of the ten have not been shown.
 Adding a case means finding what the check reads - its own anchored comparison - and
 breaking that, not something nearby.
@@ -65,6 +72,12 @@ def mutate_row_count(text):
     return ''.join(lines[:1] + lines[2:])
 
 
+def mutate_case(text):
+    # run_cases compares each vector against the compiled runner: flip an expected value
+    m = re.search(r"CASE\(add, 0x5, 0x3, 0x5, 0x8\)", text)
+    return text[:m.start()] + "CASE(add, 0x5, 0x3, 0x5, 0x9)" + text[m.end():]
+
+
 CASES = [
     ("set_desc.py --check", "code/lg200-instructions.tsv", mutate_tsv,
      "cd code/lg200 && python3 set_desc.py --check"),
@@ -74,6 +87,8 @@ CASES = [
      "cd code/lg200 && python3 header_sync.py --check"),
     ("check_gpu.py", "code/lg200-instructions.tsv", mutate_row_count,
      "python3 check_gpu.py"),
+    ("run_cases.py", "code/lg200/atomic_sm_add_u32.cpp", mutate_case,
+     "cd code/lg200 && python3 run_cases.py"),
 ]
 
 
