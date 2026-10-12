@@ -25,10 +25,12 @@ so it could not fail on an over-claim, which is the defect it exists to find.
 
 THE ELEVEN GATES, ACCOUNTED FOR (2026-10-13):
 
-  proven in this tool (12): set_desc, check_doc_numbers, header_sync, check_gpu,
+  proven in this tool (13): set_desc, check_doc_numbers, header_sync, check_gpu,
                             run_cases, format_audit, bench_doc_check,
                             rule_dupe_check, md_table_check, check_all.sh,
-                            fp_mode_audit, case_provenance
+                            fp_mode_audit, case_provenance, addr_scan
+  note: addr_scan's case proves the EXIT CODE, by forcing a hit.  Detecting a real
+        hit needs a rebuilt lgpu-gpu, so that half is not covered here.
   reports by design (2):    prose_audit, doc_register_audit
 
 The last two have no failing mode to prove: prose_audit findings include three expected
@@ -178,6 +180,10 @@ def mutate_provenance(text):
     """Change the unmeasured-vector count on the page, leaving the grid alone."""
     return text.replace('+62,969 vectors', '+62,970 vectors', 1)
 
+def mutate_addr_scan(text):
+    """Force a hit, which tests the exit code rather than the detection."""
+    return text.replace('total += len(hits)', 'total += len(hits) + 1', 1)
+
 CASES = [
     ("set_desc.py --check", "code/lg200-instructions.tsv", mutate_tsv,
      "cd code/lg200 && python3 set_desc.py --check"),
@@ -202,7 +208,9 @@ CASES = [
     ("fp_mode_audit.py", "docs/gpu/appendix/case-boundaries.md", mutate_fp_mode,
      "cd code/lg200 && python3 fp_mode_audit.py --check"),
     ("case_provenance.py", "docs/gpu/appendix/status.md", mutate_provenance,
-     "cd code/lg200 && python3 case_provenance.py --check"),]
+     "cd code/lg200 && python3 case_provenance.py --check"),
+    ("addr_scan.py", "code/lg200/gpu/addr_scan.py", mutate_addr_scan,
+     "python3 code/lg200/gpu/addr_scan.py"),]
 
 
 def main() -> int:

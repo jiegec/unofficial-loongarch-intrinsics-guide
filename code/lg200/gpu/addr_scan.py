@@ -18,7 +18,7 @@ register is one of them.
 
     python3 addr_scan.py        # expects "0 mnemonics" on both pipes
 """
-import re, subprocess
+import re, subprocess, sys
 from pathlib import Path
 GPU = Path(__file__).resolve().parent          # code/lg200/gpu
 ROOT = GPU.parent                              # code/lg200
@@ -36,6 +36,7 @@ def regs(spec):
     m = re.match(r'v(\d+)$', spec)
     return [int(m.group(1))] if m else []
 
+total = 0
 for pipe in ('ps', 'cs'):
     hits = {}
     for m in rows:
@@ -70,5 +71,12 @@ for pipe in ('ps', 'cs'):
                 addr = int(mm.group(1))
             if addr is not None and addr in tainted:
                 hits.setdefault(m, []).append(line)
+    total += len(hits)
     print(f"=== {pipe}: {len(hits)} mnemonics store results through a register holding case data")
     for m in sorted(hits)[:6]: print(f"    {m:24s} {hits[m][0][:80]}")
+print(f"addr scan: {total} mnemonics store results through a register holding case data")
+# This guarded the fault that wedged the platform, and it could not fail: it
+# printed a count and exited 0 for every count, so wiring it into the suite
+# would have been theatre.  The exit code is the gate.
+sys.exit(1 if total else 0)
+
