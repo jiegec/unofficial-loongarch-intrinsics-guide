@@ -18,6 +18,8 @@ no state ladder: a case either passes, fails, or (when no carrier can stage
 its I/O model) is reported as cannot-run by the caller. Microbenchmarking is
 a separate mode (`lgpu-gpu bench` / `run_bench.py`, below).
 
+**Before resuming after a fault, read [HARDWARE-SESSION-PLAN.md](HARDWARE-SESSION-PLAN.md)**: it records the `trap` wedge, the preconditions, the recovery ladder, and the ordered list of experiments that still need the device.
+
 ## Build
 
 Requires libdrm_loonggpu.  Point `LIBDRMDIR` at an uninstalled libdrm build
