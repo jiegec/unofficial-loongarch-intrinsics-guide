@@ -74,8 +74,13 @@ Three kinds of load exist:
   driver uses depends on whether the format varies per resource.
 * **Packed image loads** (`load_v_tex_pck`, `load_v_tex_mip_pck`) convert the
   resource representation to the destination representation during the fetch;
-  the signed variant preserves signed component interpretation.  The exact
-  numeric mapping per format pair is UNRESOLVED.
+  the signed variant preserves signed component interpretation.  The numeric mapping per format pair is NOT open: the rows state it from mesa's
+  `LG200_BUFFER_DESCRIPTOR` contract - `data_format` is 4 bits at descriptor [114:111]
+  (R8=1, R16=2, RG8=3, R32=4, RG16=5, RGBA8=10, RG32=11, RGBA16=12, RGB32=13, RGBA32=14)
+  and `number_format` 3 bits at [110:108] (UNORM 0, SNORM 1, USCALED 2, SSCALED 3, UINT 4,
+  SINT 5, FLOAT 7), with destination selects at [107:96].  Corrected 2026-10-13: this
+  page lagged the rows, which had carried the mapping since the mesa contract was
+  written down.
 
 Stores come in the fixed-width and formatted kinds; there is no signed packed
 store form, only a packed one.
