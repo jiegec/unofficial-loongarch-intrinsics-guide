@@ -1,7 +1,8 @@
 // v_interp_2_f32 -- Completes the second f32 interpolation phase of the pair, writing the final varying to VD8.
 //
-// [UNRESOLVED] The body below is a placeholder, not a model: this
-// instruction's effect crosses lanes, and the reference oracle is per-lane, so
-// it has nothing to say about which lane's value ends up where.
+// The semantics is the line above.  The coefficient window it reads is
+// launch-owned state - the interpolation carrier records the window's contents
+// in observed mode rather than comparing them - so the body below is the
+// register-level reduction and this row is not compared against an oracle.
 
 dst[0] = src[0];

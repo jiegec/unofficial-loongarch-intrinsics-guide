@@ -1,7 +1,7 @@
 // gather_c_lz_o -- Depth-compare gather into the aligned VD8x4 group at level zero with an offset.
 // The gather offset is not an instruction operand: the `_o` opcode selects a tuple layout whose
 // leading slot carries it, packed as `x[5:0] | (y[13:8] << 8)` (the same packing as samp*_o) and
-// read from the `VJ` register base; every other slot shifts up by one (see docs/gpu/memory-image.md).
+// read from the `VJ` register base; every other slot shifts up by one (see docs/gpu/instructions/memory-image.md).
 //
 // observed mode: the runner cannot stage texture launch state, so
 // this row records that it ran and what was seen rather than a comparison against
