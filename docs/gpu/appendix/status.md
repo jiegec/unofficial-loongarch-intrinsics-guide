@@ -42,8 +42,8 @@ record.
 
 | measure | start | now |
 |---|---|---|
-| rows stating an `UNRESOLVED` | 737 | **606** |
-| distinct UNRESOLVED sentences | 872 | **802** (1,057 occurrences) |
+| rows stating an `UNRESOLVED` | 737 | **600** |
+| distinct UNRESOLVED sentences | 872 | **801** (1,051 occurrences) |
 | explicit placeholder bodies in `code/lg200` | 11 | **0** |
 
 Twenty-six classes are closed, each with its evidence named on
