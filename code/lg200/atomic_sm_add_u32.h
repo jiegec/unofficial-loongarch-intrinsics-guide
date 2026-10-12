@@ -1,4 +1,4 @@
-// atomic_sm_add_u32 -- Atomically adds the lane's source to the 32-bit shared-memory element: `new = old + src` modulo 2**32.
+// atomic_sm_add_u32 -- Atomically adds the lane's source to the 32-bit shared-memory element: `new = old + src` modulo 2^32.
 //
 
 u32 old = src[0];
