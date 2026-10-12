@@ -85,7 +85,10 @@ def input_format(mnemonic: str) -> str:
             last, pos = t, i
     return last if last in FLOAT_TAGS else ""
 
-IMM_SLOT = re.compile(r"(?:X\d+|I[A-Z]?\d+)")
+# X0_16 is the unexercised modifier field the atomic layouts carry, not an
+# operand slot: a case supplies no value for it (see the resolved note in
+# code/lg200-instructions.tsv), so it must not disqualify a row from the grid.
+IMM_SLOT = re.compile(r"I[A-Z]?\d+|X\d+(?!_16)")
 
 
 def nin_of(mnemonic: str) -> int:

@@ -40,8 +40,13 @@ along with the other memory rows.  Their carrier stages the cell and the operand
 straight from the case inputs - the address comes from the case index, not from a
 case value - so a boundary grid is stageable even though the bench cannot time
 them; @@case_targets()@@ adds those fifty rows without touching the bench's own
-target set.  Coverage: **531 of 768**, and the vector count went
-20,732 -> 46,966 -> 49,930.
+target set.
+
+A second exclusion turned out to be a false positive: the "immediate slot" test
+matched @@X0_16@@, the modifier field the atomic layouts carry and no case supplies
+a value for.  Distinguishing it from a real immediate admits a further 32 atomic
+rows and leaves the bench's target set at 308 unchanged.  Coverage is now
+**550 of 768**, and the vector count went 20,732 -> 46,966 -> 49,930 -> 51,754.
 
 ## 4. The boundary cases changed the answer the hardware gives
 
