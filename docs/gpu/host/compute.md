@@ -94,7 +94,7 @@ gap that remains.
   | global_size_x / _y / _z | kernarg + 0xc / + 0x10 / + 0x14 |
   | global_offset_x / _y / _z | kernarg + 0x38 / + 0x3c / + 0x40 |
   | local_id_x / _y / _z | v0 / v1 / v2 - no load, the lane id is already there |
-  | group_id_x / _y / _z | DISPUTED - see the note below |
+  | group_id_x / _y / _z | s[kernel_sgpr_cnt + 0 / 1 / 2] - kernel-dependent, see below |
 
   The group ids do NOT sit at fixed registers: they sit at **`s[kernel_sgpr_cnt + 0]`,
   `+1`, `+2`** - right after the kernel's declared user-SGPR count, which the `.kd`
