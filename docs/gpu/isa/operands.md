@@ -374,5 +374,17 @@ RD8             result tuple
   operand appears or a value changes - has been applied to `rsz`, `na`, `dmask`,
   `un`, `bl1` and `bl2`, and not exhaustively to the rest.
 * The address unit and lane mapping of shared-memory addressing.
-* The operand form of 8- and 16-bit buffer loads and stores: no verified form
-  exists.
+* The operand form of 8- and 16-bit buffer loads and stores - **settled 2026-10-13, and
+  this bullet was the last place still calling it open**.  The form IS the layout: the
+  8-bit loads carry `RK8`, `RJ8x4`, `VD8`, `UO12` and the enables with no index operand,
+  while the 16-bit loads and the 8-bit store name one (`VQ8` and `RA8`).  What is missing
+  is execution, not description: the carrier cannot stage a buffer descriptor, so no
+  sub-word buffer access has ever been run.
+* The alignment rule for a two-register pair - **narrowed by the producer's output**, not
+  decided.  Across two whole linked programs (~30,000 lines each, runtime libraries
+  included) every multi-register vector operand starts at an even register: 5,481
+  occurrences drawing on 21 distinct bases, and not one odd base.  That is usage evidence
+  and not a requirement - the allocator may simply never produce an odd base - so the
+  question stays open and one deliberate odd-base submission would settle it.  What the
+  evidence does rule out is the opposite reading: nothing shows an odd base being used
+  and working, so nothing contradicts a rule that pairs are even-aligned.
