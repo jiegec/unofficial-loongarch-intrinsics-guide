@@ -17,6 +17,7 @@ and the width extremes.
 | f32 | `+0` `-0` `+1` `-1` `+0.5` `max_norm` `-max_norm` `min_norm` `-min_norm` `max_denorm` `min_denorm` `+inf` `-inf` `qnan` `-qnan` `snan` `-snan` (17) |
 | f16 | the same 17 against the f16 encoding, in the low half of the word |
 | f64 | the same 17 as word pairs |
+| i8/i16/i32/i64 | `0` `1` `max` `min` `-2` `-1` |
 
 The count read (19) until 2026-10-13 while the list beside it named 17 - the row was
 counted from memory rather than from its own contents, which is the defect this page
@@ -24,7 +25,6 @@ records elsewhere.  And `case_coverage.py` required only 12 of the 17 for f64 ro
 rows were judged against a weaker requirement than f32 and f16: no negative max/min, no
 `max_denorm`, no negative NaN.  Both are fixed, and the full set still passes 738 of 738 -
 which means the generated vectors had carried the five all along.
-| i8/i16/i32/i64 | `0` `1` `max` `min` `-2` `-1` |
 
 ## 2. Measurement
 
@@ -41,6 +41,19 @@ wrong - and that has now happened twice in this campaign, once in each direction
 audit that read only `CASE_FP` lines reported classes missing that the generated vectors
 carried, and a hand check of a `.cpp` reached the same conclusion from the other side.
 Parse through `cases.py` instead of counting a file.
+
+**The split, measured independently (2026-10-13).**  A count that does not use the parser
+agrees with it exactly: 4,288 hand-written `CASE`/`CASE_FP` lines across the 768 `.cpp`
+files plus 81,357 rows in `generated_cases.tsv` is 85,645, which is what `parse_case_files`
+returns.  So the merge is complete, and that is worth stating because the sum is the only
+thing here that does not depend on the parser being right.
+
+**What the parse does not carry is the source.**  A parsed `Case` has `id`, `mnemonic`,
+`inputs`, `expected` and `fp_policy` - no origin.  A provenance question, such as which of
+the two sources a vector came from, has to be re-derived by matching keys against the two
+files; it cannot be looked up in the parse.  The first attempt at that comparison here got
+it wrong in the usual way - it compared 4,288 declared case LINES against 85,645 expanded
+VECTORS and reported 617 mismatches in a parser that is correct.
 
     python3 code/lg200/case_coverage.py --tsv build/case_coverage.tsv
 
