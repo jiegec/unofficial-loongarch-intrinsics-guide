@@ -4284,9 +4284,19 @@ std::optional<EnvelopeProgram> build_cs_bench(const std::string& mnemonic,
       mnemonic.rfind("store_v_tex", 0) == 0 ||
       mnemonic.rfind("load_v_tex", 0) == 0 ||
       mnemonic.rfind("image_", 0) == 0) {
-    error = "texture bench: the correctness carrier refuses the texture family "
-            "(SKIP-ENVELOPE in the CS matrix); a bench must not exercise a stream "
-            "the validation path rejects";
+    // Say WHY, one hop further.  This message used to explain the bench's refusal by
+    // the correctness carrier's, which is circular from where the reader stands: it sends
+    // them to another file to find the reason.  The reason is in this file already - the
+    // correctness builder routes these rows to a graphics family with
+    // "needs the image T# the graphics packet hydrates" - so a bench on the compute pipe
+    // cannot supply the descriptor, and that is a property of the PIPE, not of the row.
+    // Same shape as the control rows: the refusal is about the compute path, and the
+    // message should say so rather than pointing at a second refusal.
+    error = "texture bench: the compute carrier cannot supply the image T# and sampler "
+            "S# a texture read needs - the graphics packet hydrates those - so the "
+            "correctness path routes these rows to a graphics family and records them as "
+            "SKIP-ENVELOPE in the CS matrix.  This is a property of the compute pipe, "
+            "not of the instruction";
     return std::nullopt;
   }
   // The remaining buffer loads: their chain needs a LIVE index or offset register,
