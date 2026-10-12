@@ -22,21 +22,41 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 RUNNER = HERE / "build" / "lgpu-cases"
 
-# one word per class, 32-bit
-BOUNDS = [
-    ("nan-pos", 0x7FC00000),
-    ("nan-neg", 0xFFC00000),
-    ("inf-pos", 0x7F800000),
-    ("inf-neg", 0xFF800000),
-    ("zero-neg", 0x80000000),
-    ("subnormal-min", 0x00000001),
-    ("subnormal-neg", 0x807FFFFF),
-]
+# Samples per class, keyed by the class names fp_boundary_audit.py checks, 32-bit.
+#
+# This list was seven entries long until 2026-10-13 and had no zero-pos, no signalling
+# NaN and no finite limits - so re-running this tool would have produced a set that FAILS
+# the audit it exists to satisfy.  The fills that covered those classes were done by
+# throwaway scripts, which is exactly how a committed tool drifts away from the data it
+# claims to produce.  The assert below makes the two definitions one: the class names here
+# must be the audit's, so neither can move without the other failing.
+BOUNDS = {
+    "nan-quiet": [("nan-pos", 0x7FC00000), ("nan-neg", 0xFFC00000)],
+    "nan-signal": [("nan-signal-pos", 0x7F800001), ("nan-signal-neg", 0xFF800001)],
+    "inf": [("inf-pos", 0x7F800000), ("inf-neg", 0xFF800000)],
+    "poszero": [("zero-pos", 0x00000000)],
+    "negzero": [("zero-neg", 0x80000000)],
+    "subnormal": [("subnormal-min", 0x00000001),
+                  ("subnormal-neg", 0x807FFFFF)],
+    "finite-max": [("finite-max-pos", 0x7F7FFFFF),
+                   ("finite-max-neg", 0xFF7FFFFF)],
+    "finite-min": [("finite-min-pos", 0x00800000),
+                   ("finite-min-neg", 0x80800000)],
+}
+CASES = [pair for cls in sorted(BOUNDS) for pair in BOUNDS[cls]]
+
+
+def _check_classes():
+    from fp_boundary_audit import NAMES
+    if set(BOUNDS) != set(NAMES):
+        raise SystemExit("bound class lists disagree: %s vs %s"
+                         % (sorted(BOUNDS), sorted(NAMES)))
 FILLER = 0x3F800000  # 1.0f, the neutral element for the comparison-shaped rows too
 GOT = re.compile(r"got (0x[0-9a-fA-F]+)")
 
 
 def main(argv) -> int:
+    _check_classes()
     emit = "--emit" in argv
     rows = []
     for path in sorted(HERE.glob("*.cpp")):
@@ -53,7 +73,7 @@ def main(argv) -> int:
     print("32-bit floating-point rows considered: %d" % len(rows))
     total = 0
     for name, nin, path in rows:
-        for cid, word in BOUNDS:
+        for cid, word in CASES:
             inputs = [FILLER] * nin
             inputs[0] = word
             ins = " ".join(hex(v) for v in inputs)
