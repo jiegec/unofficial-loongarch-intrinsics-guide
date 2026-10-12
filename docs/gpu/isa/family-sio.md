@@ -25,9 +25,13 @@ through one register.
 
 The direction is a property of the operation code, not of an operand: `siowrite`,
 `siordrot` and `siowrrot` have identical operand signatures and differ only in
-the opcode.  What separates the `read` and `rot` spellings is therefore
-UNRESOLVED; only `siowrrot`, `siowrrot_imm` and `siordrot_id_c4` are emitted by
-an established producer.
+the opcode.  The difference between the spellings is stated on the rows themselves, so it is not
+open: the `rot` family names its channel slot explicitly - `siordrot` addresses it with
+a register, `siordrot_imm` with an immediate - while `sioread` and `siowrite` use the
+form's own slot, and the direction is in the mnemonic (`rd`/`wr`).  What the ledger can
+usefully record is which of them an established producer actually emits: only
+`siowrrot`, `siowrrot_imm` and `siordrot_id_c4`, so the rest are described but
+unexercised.
 
 ## Operands
 
