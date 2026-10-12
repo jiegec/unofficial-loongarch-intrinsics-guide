@@ -79,10 +79,10 @@ def run(script, cwd):
 def main() -> int:
     rows, sents, occ = unresolved_counts()
     cov = run('case_coverage.py', ROOT)
-    m = re.search(r'with all required boundary classes: (\d+)\s+with gaps: (\d+)', cov)
-    launch = re.search(r'\((\d+) launch-shape\)', cov)
+    m = re.search(r'with all required boundary classes: ([0-9]+)\s+with gaps: ([0-9]+)', cov)
+    launch = re.search(r'\(([0-9]+) launch-shape\)', cov)
     vec = run('run_cases.py', ROOT)
-    nvec = re.search(r'\d+ instructions, (\d+) vectors', vec)
+    nvec = re.search(r'[0-9]+ instructions, ([0-9]+) vectors', vec)
     if not (m and launch and nvec):
         print('could not read the live tools:'); print(cov[-300:]); print(vec[-300:])
         return 2
@@ -99,21 +99,23 @@ def main() -> int:
         'targets': len(gen_cases.targets()),
     }
     checks = [
-        ('unresolved.md', r'(\d+) of the 768', 'rows-unresolved'),
-        ('status.md', r'\\?\| rows stating an .UNRESOLVED. \| \d+ \| \*\*(\d+)\*\*', 'rows-unresolved'),
-        ('status.md', r'distinct UNRESOLVED sentences \| \d+ \| \*\*(\d+)\*\*', 'sentences'),
-        ('status.md', r'(1,\d+) occurrences', 'occurrences'),
-        ('case-boundaries.md', r'\*\*(\d+) of \d+ value-expressible', 'covered'),
-        ('status.md', r'(\d+) of \d+ value-expressible', 'covered'),
+        ('unresolved.md', r'([0-9]+) of the 768', 'rows-unresolved'),
+        ('status.md', r'\\?\| rows stating an .UNRESOLVED. \| [0-9]+ \| \*\*([0-9]+)\*\*', 'rows-unresolved'),
+        ('status.md', r'distinct UNRESOLVED sentences \| [0-9]+ \| \*\*([0-9]+)\*\*', 'sentences'),
+        ('status.md', r'(1,[0-9]+) occurrences', 'occurrences'),
+        ('case-boundaries.md', r'\*\*([0-9]+) of [0-9]+ value-expressible', 'covered'),
+        ('status.md', r'([0-9]+) of [0-9]+ value-expressible', 'covered'),
         # unresolved-status.md keeps a dated snapshot, so its current figures carry a
         # date and are anchored by it.  This file had no anchor at all until 2026-10-13:
         # it is the fourth page with count claims and the only one the check did not read.
-        ('case-boundaries.md', r'still \*\*(\d+)\*\*', 'targets'),
-        ('case-boundaries.md', r'The \*\*(\d+)\*\* that remain are ' +
+        ('case-boundaries.md', r'rows still with gaps \| \*\*([0-9]+)\*\*', 'gaps'),
+        ('status.md', r'768 PASS / \*\*([0-9,]+)\*\* rows', 'vectors'),
+        ('case-boundaries.md', r'still \*\*([0-9]+)\*\*', 'targets'),
+        ('case-boundaries.md', r'The \*\*([0-9]+)\*\* that remain are ' +
                                 r'\*\*launch-shape\*\*', 'launch-shape'),
-        ('unresolved-status.md', r'\*\*(\d+) as of 2026-10-13\*\*', 'rows-unresolved'),
-        ('unresolved-status.md', r'is (\d+) distinct sentences', 'sentences'),
-        ('unresolved-status.md', r'distinct sentences and ([\d,]+) occurrences', 'occurrences'),
+        ('unresolved-status.md', r'\*\*([0-9]+) as of 2026-10-13\*\*', 'rows-unresolved'),
+        ('unresolved-status.md', r'is ([0-9]+) distinct sentences', 'sentences'),
+        ('unresolved-status.md', r'distinct sentences and ([0-9,]+) occurrences', 'occurrences'),
     ]
     bad = 0
     for doc, pat, key in checks:
@@ -135,7 +137,10 @@ def main() -> int:
     # was not - gaps and vectors were computed and never compared with anything - which
     # is the same failure as the missing anchor itself, one level up.  So the claim is
     # checked rather than asserted.
-    UNSTATED = {'vectors', 'gaps'}   # no page quotes these; nothing to anchor them to
+    # Empty, and it should stay that way: the two entries it first held were wrong.
+    # vectors is stated on three pages and gaps on one, and neither was anchored, so
+    # listing them as unstated was a way of not looking rather than a finding.
+    UNSTATED = set()
     anchored_keys = {key for _doc, _pat, key in checks}
     for key in live:
         if key not in anchored_keys and key not in UNSTATED:
