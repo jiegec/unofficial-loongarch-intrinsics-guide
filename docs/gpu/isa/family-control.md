@@ -15,6 +15,13 @@ eight bytes and counted from the instruction that follows the branch:
 target = branch_address + 8 + displacement * 8
 ```
 
+
+**There is no delay slot.**  The target is measured from the instruction that
+follows the branch, so the word after a branch is never executed as part of it.
+The producer's output agrees where it can: in a whole linked program every `b` and
+`jirl` is followed directly by a label.  A conditional `czb` is sometimes followed by
+a run of `nop`s instead - but those are unreachable padding, and it is the target
+formula above, not the census, that rules a delay slot out.
 `b` has no other operand.  `cb` and `czb` add a condition register, encoded in
 `INST_HI[7:0]`; `cb` branches when it is nonzero and `czb` when it is zero.  The
 register is a lane-mask register or the scalar condition register, exactly as in
