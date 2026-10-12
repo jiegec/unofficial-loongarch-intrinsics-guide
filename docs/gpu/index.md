@@ -75,6 +75,15 @@ and `copy_sm_from_global` and `copy_sm_to_global` move blocks between the
 workgroup allocation and global memory.
 
 ## How the descriptions are written
+**A current figure is bold; a historical one is not.**  Where a page states a
+number that a tool computes - coverage, the bench counts, the UNRESOLVED tallies -
+the figure that is true now is written in bold, and a superseded figure is kept
+plain, usually with the date it was true.  `check_doc_numbers.py` enforces the
+bold side: it scans every page for bold figures near those measures and fails if
+one is not the live value.  So a stale number stays readable as history, and a new
+copy of a live number cannot appear without the suite noticing - which is the only
+reason it is safe to repeat a computed figure in prose at all.
+
 
 Each instruction page states what the row computes, the operands with their bit
 positions, the reference pseudocode and the boundary behaviour that matters.
