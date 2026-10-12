@@ -46,6 +46,26 @@ record.
 | distinct UNRESOLVED sentences | 872 | **776** (1,008 occurrences) |
 | explicit placeholder bodies in `code/lg200` | 11 | **0** |
 
+### The rules for citing evidence (2026-10-13)
+
+Before a clause is settled by "hardware", answer three questions, all of them
+mechanically checkable with case_provenance.py:
+
+1. **Was it executed?**  Only vectors inside the measured baseline - the 10-10 grid
+   (4f26f81, 18,542 vectors) - may settle anything.  The 10-13 regeneration added
+   62,969 vectors that are oracle expectation, not reading.
+2. **How strong is the record?**  Of the 768 matrix rows, 631 were compared against
+   the oracle, 117 were merely OBSERVED (the hardware value recorded without an
+   independent comparison) and 20 ran nothing at all.  Observed is a weaker class
+   and a claim resting on it must say so - entry 16 was rewritten for exactly that.
+3. **Is the artifact clean?**  Everything written after the 2026-10-13 01:42 trap
+   carries "cannot open /dev/dri/renderD128".  The CS matrix has 377 HANG/FAULT
+   rows, and that band IS the wedge, not 377 failing rows; read as evidence it says
+   the opposite of the truth.
+
+A claim that cannot answer all three does not settle a clause: it stays
+UNRESOLVED, and says which of the three it is missing.
+
 ### Which evidence was actually executed
 
 `case_provenance.py` answers this mechanically.  The hardware matrix records a
