@@ -3728,6 +3728,62 @@ std::optional<EnvelopeProgram> build_cs_bench_flat_atomic(
   return program;
 }
 
+// The shared-memory ATOMIC family's bench template, the LDS twin of the flat one.
+// Same two kinds - the destination is the operand, so copy i's returned old value
+// is copy i+1's operand - with one extra piece of setup: the cell has to be
+// STORED, because shared memory starts undefined (the flat family preloads it
+// from the host instead).  That in-program store needs one ordering fence before
+// the atomics; the copies themselves are ordered by the register dependency, so
+// no per-copy fence is emitted - a fence per copy would put the ordering cost
+// into the latency window.
+std::optional<EnvelopeProgram> build_cs_bench_sm_atomic(
+    const std::string& mnemonic, unsigned copies, bool chained, unsigned lanes,
+    std::string& error) {
+  if (mnemonic.find("cmpswap") != std::string::npos) {
+    error = "sm atomic bench: the cmpswap form stages a compare value this "
+            "template does not build";
+    return std::nullopt;
+  }
+  const bool wide64 = mnemonic.find("_u64") != std::string::npos ||
+                      mnemonic.find("_i64") != std::string::npos ||
+                      mnemonic.find("_b64") != std::string::npos;
+  const unsigned width = wide64 ? 2u : 1u;
+  const CarrierEnv env = CarrierEnv::compute(lanes);
+  Builder builder;
+  emit_env_prelude(builder, env);
+  const isa::Reg addr_v = isa::vgpr(8);
+  const isa::Reg cell_v = isa::vgpr(9, width);
+  const isa::Reg data_v = isa::vgpr(11, width);
+  const isa::Reg old_v = isa::vgpr(13, width);
+  const isa::Reg imm_temp = isa::sgpr(16);
+  builder.s_mov_imm_b32(imm_temp, 0u);
+  builder.v_mov_b32(isa::vgpr(0), imm_temp, isa::predicate(0));
+  builder.s_mov_imm_b32(imm_temp, 0x20u);  // kLdsBase: the first LDS cell
+  builder.v_mov_b32(addr_v, imm_temp, isa::predicate(0));
+  EnvelopeProgram program;
+  program.probe = true;
+  for (unsigned p = 0; p < width; ++p) {
+    builder.s_mov_imm_b32(imm_temp, 1u);
+    builder.v_mov_b32(isa::vgpr(9 + p), imm_temp, isa::predicate(0));
+    builder.s_mov_imm_b32(imm_temp, 1u);
+    builder.v_mov_b32(isa::vgpr(11 + p), imm_temp, isa::predicate(0));
+  }
+  builder.sm_op(width == 2 ? "store_sm_b64" : "store_sm_b32",
+                isa::predicate(0), cell_v, addr_v);
+  builder.check_k_vm_vs_sm();
+  for (unsigned copy = 0; copy < copies; ++copy) {
+    builder.sm_atomic(mnemonic, isa::predicate(0), addr_v, data_v,
+                      chained ? data_v : old_v);
+  }
+  for (unsigned p = 0; p < width; ++p)
+    emit_result_store(builder, env, chained ? data_v : old_v, isa::vgpr(0),
+                      4 * p);
+  if (!finalize_program(builder, program, error)) {
+    return std::nullopt;
+  }
+  return program;
+}
+
 std::optional<EnvelopeProgram> build_cs_bench(const std::string& mnemonic,
                                               unsigned copies, bool chained,
                                               unsigned lanes,
@@ -3738,6 +3794,8 @@ std::optional<EnvelopeProgram> build_cs_bench(const std::string& mnemonic,
     return build_cs_bench_flat(mnemonic, copies, chained, lanes, error);
   if (mnemonic.rfind("atomic_v_flat_", 0) == 0)
     return build_cs_bench_flat_atomic(mnemonic, copies, chained, lanes, error);
+  if (mnemonic.rfind("atomic_sm_", 0) == 0)
+    return build_cs_bench_sm_atomic(mnemonic, copies, chained, lanes, error);
   if (copies == 0) {
     error = "copies must be positive";
     return std::nullopt;
