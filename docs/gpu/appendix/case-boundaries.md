@@ -119,6 +119,8 @@ values are exactly where the oracle's floating-point MODEL is wrong.
 | denormal **outputs** | flushed (FTZ) | `v_mul_f32(min_normal, 0.5)` is **0**, not the denormal `2^-127` (`0x00400000`) |
 | NaN sign | the source NaN's sign is propagated | `v_add_f32(+0.0, 0xffc00000)` is `0xffc00000`, the oracle says `0x7fc00000` |
 
+**Caveat (2026-10-13).**  That NaN row is a hardware OBSERVATION from the early run, and the oracle still disagrees with it: the current oracle canonicalises that input to `0x7fc00000`.  The grid was regenerated AFTER the hardware matrix and has never been run, so the top row above is evidence about the DEVICE while the generated expectation is only the oracle.  Re-measurement decides, and the affected clauses are left open (register entry 36).
+
 So the hardware runs **round-to-nearest-even with DAZ and FTZ**, while the oracle's
 default policy is plain `rtne`.  The case protocol already carries an FP policy
 (`CASE_FP(id, "rtne|daz|ftz", ...)`): the generator now emits it for every
