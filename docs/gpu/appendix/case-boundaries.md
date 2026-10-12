@@ -52,8 +52,16 @@ register columns belong in the value grid and the immediate column belongs in it
 own - the immediate is the operand the ISA prints last, and it carries the row's
 own type, so it takes that type's boundary list.  @@grid_cols()@@ expresses a grid
 over per-column lists (with @@grids()@@ as the single-list case), and
-@@case_targets()@@ now admits 156 such rows.  Coverage is **678 of 768**, and the
-vector count went 20,732 -> 46,966 -> 49,930 -> 51,754 -> **72,910**.
+@@case_targets()@@ now admits 156 such rows.
+
+Finally the integer grid became **width-aware**.  A 16-bit row's boundary classes
+are the 16-bit extremes (@@0x7fff@@/@@0x8000@@/@@0xfffe@@/@@0xffff@@), not the 32-bit
+ones, so a single INT list left every narrow row short of the values its operands
+admit.  The narrow sets are UNIONS with the 32-bit list - a narrow row still wants
+the wider patterns, since its neighbours and destination may be wider - which is
+why the first attempt (replacement rather than union) cost two rows.  Coverage is
+**680 of 768**, and the vector count went
+20,732 -> 46,966 -> 49,930 -> 51,754 -> 72,910 -> **76,426**.
 
 ## 4. The boundary cases changed the answer the hardware gives
 

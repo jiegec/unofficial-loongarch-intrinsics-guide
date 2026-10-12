@@ -29,7 +29,16 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 TSV = ROOT.parent / "lg200-instructions.tsv"
 
+# Integer boundary sets, one per source width.  A 16-bit row's classes are the
+# 16-bit extremes, not the 32-bit ones, so a single INT list leaves every narrow
+# row short of the values its operands actually admit.
+INT8 = [0x00, 0x01, 0x7F, 0x80, 0xFE, 0xFF]
+INT16 = [0x0000, 0x0001, 0x7FFF, 0x8000, 0xFFFE, 0xFFFF]
 INT = [0x00000000, 0x00000001, 0x7FFFFFFF, 0x80000000, 0xFFFFFFFE, 0xFFFFFFFF]
+# A narrow row still wants the wider patterns too (a row's neighbours and its
+# destination may be wider), so the narrow set is a UNION, not a replacement.
+INT_TBL = {"i8": INT8 + INT, "u8": INT8 + INT,
+           "i16": INT16 + INT, "u16": INT16 + INT}
 
 # Boundary classes required of every floating-point operand.  The set must name
 # the whole signed space the format admits: both zeros, both infinities, quiet
@@ -83,7 +92,7 @@ def input_format(mnemonic: str) -> str:
         i = mnemonic.rfind(t)
         if i > pos:
             last, pos = t, i
-    return last if last in FLOAT_TAGS else ""
+    return last
 
 # X0_16 is the unexercised modifier field the atomic layouts carry, not an
 # operand slot: a case supplies no value for it (see the resolved note in
@@ -233,8 +242,10 @@ def main() -> int:
     for mnemonic in case_targets():
         sem = meta[mnemonic]["semantic_model"]
         nin = nin_of(mnemonic)
-        fmt = input_format(mnemonic) if sem == "floating-point-value" else ""
-        base = {"f64": F64, "f16": F16, "f32": F32}.get(fmt, INT)
+        fmt = input_format(mnemonic) if sem in ("floating-point-value",
+                                                "integer-value") else ""
+        base = ({"f64": F64, "f16": F16, "f32": F32}.get(fmt) or
+                INT_TBL.get(fmt, INT))
         # [HW 2026-08-24] ldexp carries an integer exponent in the last
         # slot: bit-pattern floats there are meaningless (and the generic
         # grid made most v_ldexp rows unverifiable).  Use the INT grid
