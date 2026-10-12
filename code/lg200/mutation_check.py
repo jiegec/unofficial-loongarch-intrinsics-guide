@@ -25,9 +25,9 @@ so it could not fail on an over-claim, which is the defect it exists to find.
 
 THE ELEVEN GATES, ACCOUNTED FOR (2026-10-13):
 
-  proven in this tool (9):  set_desc, check_doc_numbers, header_sync, check_gpu,
+  proven in this tool (10): set_desc, check_doc_numbers, header_sync, check_gpu,
                             run_cases, format_audit, bench_doc_check,
-                            rule_dupe_check, md_table_check
+                            rule_dupe_check, md_table_check, check_all.sh
   reports by design (2):    prose_audit, doc_register_audit
 
 The last two have no failing mode to prove: prose_audit findings include three expected
@@ -132,6 +132,9 @@ def suite_accounting():
         return name.split()[0].rsplit('/', 1)[-1][:-3] if name.endswith('.py') \
             else name.split()[0].rsplit('/', 1)[-1].replace('.py', '')
     accounted = {bare(name) for name, _path, _mut, _cmd in CASES}
+    # The runner is mutated by a case of its own.  It runs, but it does not announce
+    # itself the way the checks it drives do, so it is counted on the ran side.
+    ran.add('check_all.sh')
     # rule_dupe_check and md_table_check were proven by one-off injection
     # until they joined CASES; the union below no longer needs them named twice.
     accounted |= {"prose_audit", "doc_register_audit"}       # reports by design
@@ -157,6 +160,15 @@ def mutate_table(text):
     """Detach a row from every table by starting a new one at the end."""
     return text.rstrip(chr(10)) + chr(10) + chr(10) + "| stranded | row | And text that no table wants. |" + chr(10)
 
+def mutate_suite(text):
+    """Make the last pipeline in the suite fail, which is the shape it once hid.
+
+    Without set -o pipefail a failed command whose output is piped to tail returns tail's
+    status, and the suite printed ALL CHECKS PASSED while a check had not run.  This
+    mutation reproduces exactly that shape, so the fix stays fixed."""
+    return text.replace('echo "ALL CHECKS PASSED"',
+                        'false | tail -1' + chr(10) + 'echo "ALL CHECKS PASSED"', 1)
+
 CASES = [
     ("set_desc.py --check", "code/lg200-instructions.tsv", mutate_tsv,
      "cd code/lg200 && python3 set_desc.py --check"),
@@ -175,7 +187,9 @@ CASES = [
     ("rule_dupe_check.py", "docs/gpu/shader/registers.md", mutate_size_rule,
      "cd code/lg200 && python3 rule_dupe_check.py"),
     ("md_table_check.py", "docs/gpu/appendix/status.md", mutate_table,
-     "cd code/lg200 && python3 md_table_check.py"),]
+     "cd code/lg200 && python3 md_table_check.py"),
+    ("check_all.sh", "code/lg200/check_all.sh", mutate_suite,
+     "sh code/lg200/check_all.sh"),]
 
 
 def main() -> int:
