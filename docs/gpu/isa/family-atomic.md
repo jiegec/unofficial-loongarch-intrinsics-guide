@@ -117,12 +117,20 @@ other instructions in the same invocation are UNRESOLVED.
 * The unit of the shared-memory offset operand is **BYTES**, settled 2026-10-13: the sm rows carry a byte address in `VK8`, and the closed producer's own code for `l[t + 1]` on an `int` array adds `0x4` to it rather than `0x1`.
 * Alignment requirements per width, and the behaviour of a misaligned access.
 * Nothing: **the counter bound IS the source operand** (`VJ8`) - the row's own semantics give `new = (old < b) ? old + 1 : 0` and its seed passes one.  The earlier claim that no field carries it was wrong (corrected 2026-10-13).  What remains is narrower: no producer path exercises the counter forms, because the closed backend lowers `atomic_inc`/`atomic_dec` to add/sub with 1 - so what the hardware does AT the bound is untested.
-* Which register supplies the data operand of the 32-bit buffer forms.
+* Nothing: the rows answer it - "The data operand is the destination register: the form is
+  two-address, so the incoming value and the returned old value occupy the same register"
+  (`VD8`).  Closed 2026-10-13.
 * Out-of-range behaviour for a descriptor-relative access and for an image
   coordinate.
 * Whether the image forms other than the 32-bit swap are permanently inert or
   merely unobserved.
-* The meaning of the predicate field, and of the two memory behaviour controls.
-* Whether the atomic forms affect lane masks.
+* Narrowed, not closed.  The predicate field IS the per-instruction mask (`PJ2`), and an
+  established producer uses all four (p0 2772, p1 5244, p2 4290, p3 4142 in one whole
+  linked program); `bl1` and `bl2` are reachable booleans - the buffer forms' two
+  parameters, ordered bl2 then bl1 - and only `bl1` is used, on private spills.  What
+  remains open is what the two memory behaviour bits MEAN.
+* Nothing: **they do not**.  U2 established it (producer static + graphics measurement,
+  2026-10-12): the flat, atomic and shared forms do not clear the lane mask.  Closed
+  2026-10-13 by reference.
 * Whether a 64-bit update is one 64-bit access or two 32-bit steps.
 * The cause of the ordered 64-bit floating-point forms not updating.
