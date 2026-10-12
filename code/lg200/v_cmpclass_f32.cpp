@@ -16,4 +16,8 @@ CASE_FP(finite-inf, rtne|daz|ftz, 0x7f800000, 0x1f8, 0x0)
 CASE_FP(finite-norm, rtne|daz|ftz, 0x3f800000, 0x1f8, 0xffff)
 CASE_FP(zero-neg, rtne, 0x80000000 0x3f800000, 0x00000000)
 CASE_FP(zero-pos, rtne, 0x0 0x3f800000, 0x00000000)
+CASE_FP(finite-max-pos, rtne, 0x7f7fffff 0x3f800000, 0x0)
+CASE_FP(finite-max-neg, rtne, 0xff7fffff 0x3f800000, 0x0)
+CASE_FP(finite-min-pos, rtne, 0x800000 0x3f800000, 0x0)
+CASE_FP(finite-min-neg, rtne, 0x80800000 0x3f800000, 0x0)
 LG200_CASE_END

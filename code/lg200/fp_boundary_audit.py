@@ -23,15 +23,30 @@ CASE = re.compile(r"CASE_FP\(\s*([A-Za-z0-9_-]+)\s*,\s*([^,]+),\s*(.+?)\)\s*$")
 
 
 def _classify(width: int, exp_bits: int, mant_bits: int, w: int) -> str:
+    """The class of one operand.
+
+    Quiet and signalling NaN are separate: the mantissa's top bit tells them apart, and
+    the per-row requirement names both.  So are the finite limits - the largest finite
+    value and the smallest normal one - because 'the bounds' is a class, not a value.
+    Collapsing any of these, as this audit did until 2026-10-13, reports a gap as closed
+    while the thing the page asks for has never been exercised.
+    """
     sign = (w >> (width - 1)) & 1
     exp = (w >> mant_bits) & ((1 << exp_bits) - 1)
     mant = w & ((1 << mant_bits) - 1)
+    top = 1 << (mant_bits - 1)
     if exp == (1 << exp_bits) - 1:
-        return "nan" if mant else "inf"
+        if not mant:
+            return "inf"
+        return "nan-quiet" if mant & top else "nan-signal"
     if exp == 0:
         if mant == 0:
             return "negzero" if sign else "poszero"
         return "subnormal"
+    if exp == (1 << exp_bits) - 2 and mant == (1 << mant_bits) - 1:
+        return "finite-max"
+    if exp == 1 and mant == 0:
+        return "finite-min"
     return "normal"
 
 
@@ -92,7 +107,8 @@ def main() -> int:
             for f in re.split(r"[|\s]+", fl.strip()):
                 if f and f != "rtne":
                     flags[path.stem].add(f)
-    names = {"nan", "inf", "poszero", "negzero", "subnormal"}
+    names = {"nan-quiet", "nan-signal", "inf", "poszero", "negzero", "subnormal",
+             "finite-max", "finite-min"}
     print("fp rows with CASE_FP vectors: %d" % len(rows))
     gaps = []
     for m in sorted(rows):
@@ -105,9 +121,9 @@ def main() -> int:
         print("   %-28s missing %-34s modes %s" % (m, ",".join(missing), ",".join(fl) or "-"))
     print()
     named = [m for m in sorted(rows) if not (names - rows[m])]
-    print("rows covering all five classes: %d" % len(named))
-    floor = [m for m in sorted(rows) if "nan" not in rows[m]]
-    print("rows with NO NaN input at all: %d" % len(floor))
+    print("rows covering every required class: %d" % len(named))
+    floor = [m for m in sorted(rows) if not ({"nan-quiet", "nan-signal"} & rows[m])]
+    print("rows with NO NaN input at all (quiet or signalling): %d" % len(floor))
     for m in floor[:24]:
         print("   " + m)
     return 0

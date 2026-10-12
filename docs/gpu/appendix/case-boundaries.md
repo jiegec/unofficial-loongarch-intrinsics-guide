@@ -171,9 +171,19 @@ compute path - is an open question and needs a device; it is the same question a
 
 | measure | value |
 |---|---|
-| rows exercising every required class | **499 / 768** |
-| rows still with gaps | 269 (dominated by the hand-written families: atomic 206, plus rows with immediate slots) |
-| hardware rows failing under the expanded set | 78 (a work list, not a regression: the oracle model is incomplete) |
+| rows exercising every required class | **738 / 738 value-expressible** (2026-10-13) |
+| rows still with gaps | **0** |
+| launch-shape rows with no case by construction | 30 (they need a launch state; listed by case_coverage.py) |
+| hardware rows failing under the expanded set | 78 (measured earlier, before the boundary fill; the device is parked, so this number is stale and is the next hardware task) |
+
+The first row read 499/768 when this table was written, and 269 rows had gaps.  The
+floating-point work then filled the value classes row by row.  Two corrections during
+that work are worth keeping: `case_coverage.py`'s class list was COARSER than this
+page's own requirement, so it reported zero gaps while no row had ever seen a signalling
+NaN or a finite limit; and the audit classified every case word as 32-bit, so a 16-bit
+NaN read as an ordinary number.  Both now use the finer classes - quiet and signalling
+NaN, the largest finite value, the smallest normal one - and both report 173 of 173
+floating-point rows complete.
 
 The 78 failures are the input to the next fix; until the oracle models DAZ/FTZ in
 the compares and the NaN-sign rule, the boundary suite is expected to be red.
