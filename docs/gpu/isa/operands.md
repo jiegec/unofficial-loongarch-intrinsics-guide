@@ -344,6 +344,15 @@ RD8             result tuple
   producer's intrinsic layer, which is why every established producer emits them at
   fixed values.  That is a stronger statement than "changing one is unsupported" -
   there is no producer-level way to change one.
+* What `bl1` and `bl2` MEAN.  One data point, from compiling the device library:
+  the only buffer accesses in its compiled form are the compiler's own register
+  spills, and `store.v.buff.b32 ... , bl1` / `load.v.buff.b32 ... , bl1` is how they
+  are emitted - so `bl1` accompanies private scratch traffic.  That is a hint, not an
+  answer.  The ordering experiment that would answer it is blocked twice over: the
+  atomic implementations live in `opencl.bc`, which is generic (it contains no lggpu
+  intrinsics until the runtime links it) and on which `llc -march=lggpu` CRASHES
+  outright, while `ockl.bc` compiles cleanly (79,305 lines) and holds no atomics at
+  all.
 * What the hardware does when a modifier is not at its default: a cleared
   `marker`, or a `form` bit at the value the producers do not emit.  The
   defaults are observations of every established producer, not hardware
