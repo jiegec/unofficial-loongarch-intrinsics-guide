@@ -87,6 +87,37 @@ carrier refuses.**  That is the rule the carrier states in prose - a bench must 
 exercise a stream the validation path rejects - and this is it measured, with zero
 counterexamples, rather than asserted.  The 73 are the bench's own gaps; the 85 are the
 carrier's refusals and not a bench problem at all.  Classifying them by correctness **PASS** instead
+
+### What the 73 are, and what each class needs
+
+Their refusals are not one reason either. `bench_buildable.py` prints them with counts;
+grouped, they are nine classes:
+
+| class | rows | what a template would need |
+|---|---|---|
+| buffer load | 21 | a **live index or offset register** to chain through - the loaded word
+  cannot be the address the way it is for the flat loads, so the next index must be derived
+  from the value just loaded |
+| SIO / GS-prefix | 20 | semantics first: these run OBSERVED because the channel-file
+  content is launch state, and their chain is not a chain of independent work |
+| control | 14 | nothing - no cost to chain and no operand to chain it through; throughput
+  is measurable, latency is not |
+| buffer store | 10 | the remaining sub-word forms, which do not share the plain
+  b32/b64/b96/b128 shape |
+| environment | 4 | nothing - the row returns launch state, so there is no computed value to
+  time |
+| sm load | 4 | the matrix and interpolator forms address state the ISA chapter leaves
+  UNRESOLVED |
+| copy global to LDS | 2 | an operand to chain through: the correctness carrier treats it as
+  a predicate-only control-path op |
+| buffer atomic | 1 | the 64-bit cmpswap stages a compare pair as well as a value pair |
+| texture | 79 | nothing: the compute pipe cannot supply the image T# and sampler S# |
+
+The buffer-load class is worth attacking first, and the shape of the fix is already in this
+file: `build_cs_bench_flat_sload` shows the pattern for a live address (the loaded low word
+IS the next address low word), and `build_cs_bench_buff_store` shows how a descriptor is
+staged: `emit_load_desc(builder, env, desc, env.arg_va + carrier::kLoadWindow)`. A buffer load
+needs both, plus an index whose next value comes from the loaded result.
 - which is what this report did - makes the split depend on the matrix being a
 clean run, and the matrix on disk is **the run that wedged** (307 PASS / 84
 SKIP-ENVELOPE / 377 HANG-FAULT).  That last number is not 377 faults: 376 of those
