@@ -73,6 +73,12 @@ def main() -> int:
         ('status.md', r'(1,\d+) occurrences', 'occurrences'),
         ('case-boundaries.md', r'\*\*(\d+) of \d+ value-expressible', 'covered'),
         ('status.md', r'(\d+) of \d+ value-expressible', 'covered'),
+        # unresolved-status.md keeps a dated snapshot, so its current figures carry a
+        # date and are anchored by it.  This file had no anchor at all until 2026-10-13:
+        # it is the fourth page with count claims and the only one the check did not read.
+        ('unresolved-status.md', r'\*\*(\d+) as of 2026-10-13\*\*', 'rows-unresolved'),
+        ('unresolved-status.md', r'is (\d+) distinct sentences', 'sentences'),
+        ('unresolved-status.md', r'distinct sentences and ([\d,]+) occurrences', 'occurrences'),
     ]
     bad = 0
     for doc, pat, key in checks:
