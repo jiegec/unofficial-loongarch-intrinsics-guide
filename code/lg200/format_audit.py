@@ -26,9 +26,11 @@ import re
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
-TSV = ROOT / "lg200-instructions.tsv"
-ENCODING = ROOT / "docs/gpu/isa/encoding.md"
+# the TSV lives beside code/lg200/, the docs at the repository root
+CODE = Path(__file__).resolve().parent.parent
+REPO = CODE.parent
+TSV = CODE / "lg200-instructions.tsv"
+ENCODING = REPO / "docs/gpu/isa/encoding.md"
 
 
 def base(name: str) -> str:
