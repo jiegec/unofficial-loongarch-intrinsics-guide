@@ -107,7 +107,7 @@ group as the other atomics.
 
 The 64-bit integer compares are two pair operands, exactly like a binary f64, but
 the bench's own set is f64-only for the four-dword shape.  @@case_targets()@@
-therefore admits them without moving @@targets()@@ (still 308) - which is the reason
+therefore admits them without moving @@targets()@@ (still **308**) - which is the reason
 the two functions exist separately.
 
 The last shapes are the six-dword rows - a 64-bit compare-and-swap or a binary

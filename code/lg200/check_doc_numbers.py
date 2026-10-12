@@ -15,6 +15,9 @@ import re
 import subprocess
 import sys
 from pathlib import Path
+import sys as _sys
+_sys.path.insert(0, str(Path(__file__).resolve().parent))
+import gen_cases
 
 ROOT = Path(__file__).resolve().parent
 DOCS = ROOT.parent.parent / 'docs' / 'gpu' / 'appendix'
@@ -91,6 +94,9 @@ def main() -> int:
         'gaps': int(m.group(2)),
         'launch-shape': int(launch.group(1)),
         'vectors': int(nvec.group(1)),
+        # gen_cases.targets() is the row set the boundary grid is built for.  The
+        # page states its size, so it is read from the generator rather than typed.
+        'targets': len(gen_cases.targets()),
     }
     checks = [
         ('unresolved.md', r'(\d+) of the 768', 'rows-unresolved'),
@@ -103,6 +109,7 @@ def main() -> int:
         # date and are anchored by it.  This file had no anchor at all until 2026-10-13:
         # it is the fourth page with count claims and the only one the check did not read.
         ('unresolved-status.md', r'\*\*(\d+) as of 2026-10-13\*\*', 'rows-unresolved'),
+        ('case-boundaries.md', r'still \*\*(\d+)\*\*', 'targets'),
         ('unresolved-status.md', r'is (\d+) distinct sentences', 'sentences'),
         ('unresolved-status.md', r'distinct sentences and ([\d,]+) occurrences', 'occurrences'),
     ]
