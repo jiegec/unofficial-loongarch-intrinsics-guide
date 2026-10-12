@@ -9,4 +9,8 @@ LG200_CASE_BEGIN(v_cmp_imm_eq_f16)
 CASE_FP(equal, rtne|daz|ftz, 0x3c00, 0x3c00, 0xffff)
 CASE_FP(nan, rtne|daz|ftz, 0x7e00, 0x7e00, 0x0)
 CASE_FP(zero-sign, rtne|daz|ftz, 0x0, 0x8000, 0xffff)
+CASE_FP(inf-pos, rtne, 0x7c00 0x3c00, 0x00000000)
+CASE_FP(inf-neg, rtne, 0xfc00 0x3c00, 0x00000000)
+CASE_FP(subnormal-min, rtne, 0x1 0x3c00, 0x00000000)
+CASE_FP(subnormal-neg, rtne, 0x83ff 0x3c00, 0x00000000)
 LG200_CASE_END

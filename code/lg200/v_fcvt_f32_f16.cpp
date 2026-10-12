@@ -11,4 +11,6 @@ CASE_FP(negative, rtne, 0xbc00, 0xbf800000)
 CASE_FP(subnormal, rtne|daz, 0x1, 0x0)
 CASE_FP(inf, rtne, 0x7c00, 0x7f800000)
 CASE_FP(nan, rtne, 0x7e00, 0x7fc00000)
+CASE_FP(zero-pos, rtne, 0x0, 0x00000000)
+CASE_FP(zero-neg, rtne, 0x8000, 0x80000000)
 LG200_CASE_END

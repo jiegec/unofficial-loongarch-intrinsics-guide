@@ -9,4 +9,7 @@ LG200_CASE_BEGIN(v_fcvt_f16_i16)
 CASE_FP(zero, rtne, 0x0, 0x0)
 CASE_FP(one, rtne, 0x1, 0x3c00)
 CASE_FP(neg, rtne, 0xffffffff, 0xbc00)
+CASE_FP(inf-pos, rtne, 0x7f800000, 0x00000000)
+CASE_FP(inf-neg, rtne, 0xff800000, 0x00000000)
+CASE_FP(zero-neg, rtne, 0x80000000, 0x00000000)
 LG200_CASE_END
