@@ -50,7 +50,12 @@ shader type value for a hull stage.
 | `[703:640]` | Argument 1 | stage-defined |
 | `[767:704]` | Argument 2 and tail | streamout writes the record capacity here |
 
-Size rules:
+## Size rules
+
+These rules are restated in [Registers and Allocation](registers.md#size-rules),
+where the fields are read as allocation; the two copies are compared mechanically by
+`code/lg200/rule_dupe_check.py`, because two copies of one requirement is how this
+documentation has drifted before.
 
 * SGPR size is at least 16 and at most 102.
 * VGPR size is at least 8 for the vertex role, 64 for geometry, 16 for fragment

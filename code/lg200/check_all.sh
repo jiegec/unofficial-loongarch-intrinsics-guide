@@ -33,6 +33,8 @@ echo "== doc_register_audit"
 python3 doc_register_audit.py | sed -n '2p'
 echo "== format_audit"
 python3 format_audit.py | tail -1
+echo "== rule_dupe_check"
+python3 rule_dupe_check.py
 cd "$REPO"
 echo "== check_gpu"
 python3 check_gpu.py | tail -1
