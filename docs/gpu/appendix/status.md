@@ -43,7 +43,7 @@ record.
 | measure | start | now |
 |---|---|---|
 | rows stating an `UNRESOLVED` | 737 | **580** |
-| distinct UNRESOLVED sentences | 872 | **776** (1,008 occurrences) |
+| distinct UNRESOLVED sentences | 872 | **777** (1,012 occurrences) |
 | explicit placeholder bodies in `code/lg200` | 11 | **0** |
 
 ### The rules for citing evidence (2026-10-13)
@@ -90,7 +90,13 @@ The remaining sentences are no longer a documentation problem: settled from
 recorded facts, they would be.  Grouped by the kind of question they are, and by
 the hardware-plan item that would settle each:
 
-Measured 2026-10-13: **786 distinct sentences, 1048 occurrences** across the 580
+Measured 2026-10-13: **777 distinct sentences, 1,012 occurrences** across the 580
+rows that still carry the word.  An earlier version of this line said 786 and 1,048,
+from a keyword census that split sentences on the escaped newlines as if they were
+breaks; the tracked count above, which the drift check reads, is the one used here,
+and the table below stays indicative because its kinds are assigned by first matching
+keyword.  The two definitions disagreeing inside one file is exactly the drift the
+check exists to catch, and it caught this one.
 rows that still carry the word.  The split below is by keyword with first-match, so
 the counts are indicative rather than exact - a sentence is attributed to the first
 kind it mentions - and the last row is what no keyword claimed.  Its 192 distinct

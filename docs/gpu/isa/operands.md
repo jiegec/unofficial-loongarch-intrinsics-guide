@@ -136,6 +136,16 @@ The lane-mask mechanism is:
   invocation.
 * Vector selection between two values uses a three-source vector select whose
   third source is a lane mask.
+
+* The dot-product family carries a source the driver row does not name. A
+  `v_dp4a_*` row is `GJ11 GK11 VD8`, but the encoding also carries `LO[23:16]`,
+  outside every field the row names - the driver prints it as ignored - and the
+  hardware adds the scalar register that field selects. Measured on the compute pipe:
+  every case returned expected + `0x000b0000`, and that is exactly the `s0` the
+  prelude stages as the result-store descriptor base. On graphics, where the packet
+  hydrates `s0` to zero, the term is absent. Whether the selected scalar is the whole
+  implicit input stays UNRESOLVED - one further implicit term survives, with the byte
+  pattern `0xff` at every lane count - so it is recorded as open rather than guessed at.
 * A scalar condition is the SCC bit: compare instructions write it, and
   add-with-carry, subtract-with-borrow and scalar select read it back as their
   third source.
