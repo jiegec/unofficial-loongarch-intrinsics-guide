@@ -102,6 +102,26 @@ gap that remains.
   | local_id_x / _y / _z | v0 / v1 / v2 - no load, the lane id is already there |
   | group_id_x / _y / _z | s[kernel_sgpr_cnt + 0 / 1 / 2] - kernel-dependent, see below |
 
+  **Cross-checked against the driver's own record (2026-10-13).**  `loongvk_kd.h` in the
+  LoongVK tree defines a 96-byte kernel descriptor whose offsets come from the producer's
+  DWARF, and the two agree exactly where they overlap: group size x/y/z at **+4/+6/+8**
+  and kernel size x/y/z at **+12/+16/+20** - which is this table's local_size and
+  global_size.  Note the naming: the driver calls the second group *kernel size*, this
+  table calls it *global size*; they are the same three fields.
+
+  The one place they part is **+0x0**, and it is worth being precise about because it
+  tells you the two records are not the same record.  This table has the compiled builtin
+  reading `work_dim` from kernarg +0x0 masked `0x3`; the driver writes `0x0fac` at KD +0x0
+  and documents it as a **flags** word, so a work_dim read there would return 0.  Both
+  statements come from their own evidence - the builtins compiled with the closed backend,
+  and the descriptor from the producer's DWARF - so the conclusion is not that one is
+  wrong: it is that the **kernarg block** and the **kernel descriptor** are two records
+  that share the size offsets, and a driver must not assume the rest of the layout is
+  shared.  Which record a given read targets is what a driver has to know.
+
+  The `global_offset` row is not cross-checked: the descriptor names no field at +0x38,
+  so nothing in the driver confirms or contradicts it.
+
   The group ids do NOT sit at fixed registers: they sit at **`s[kernel_sgpr_cnt + 0]`,
   `+1`, `+2`** - right after the kernel's declared user-SGPR count, which the `.kd`
   descriptor carries.  That is why two readings appear to disagree and both are
