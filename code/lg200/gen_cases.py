@@ -30,8 +30,60 @@ ROOT = Path(__file__).resolve().parent
 TSV = ROOT.parent / "lg200-instructions.tsv"
 
 INT = [0x00000000, 0x00000001, 0x7FFFFFFF, 0x80000000, 0xFFFFFFFE, 0xFFFFFFFF]
-FLOAT = [0x00000000, 0x80000000, 0x3f000000, 0x3f800000, 0xbf800000,
-         0x00800000, 0x7f7fffff, 0x7f800000, 0xff800000, 0x7fc00000]
+
+# Boundary classes required of every floating-point operand.  The set must name
+# the whole signed space the format admits: both zeros, both infinities, quiet
+# AND signalling NaN in both signs, the finite limits and the denormal range, so
+# a row's cases cannot pin the ordinary values while leaving NaN, infinity or
+# the subnormal boundary unexercised.
+F32 = [0x00000000, 0x80000000, 0x3f000000, 0x3f800000, 0xbf800000,
+       0x00800000, 0x80800000, 0x7f7fffff, 0xff7fffff,
+       0x00000001, 0x007fffff, 0x80000001, 0x807fffff,
+       0x7f800000, 0xff800000, 0x7fc00000, 0xffc00000,
+       0x7f800001, 0xff800001]
+# f16 operands sit in the low half of a word (the collected-vector convention).
+F16 = [0x0000, 0x8000, 0x3800, 0x3c00, 0xbc00,
+       0x0400, 0x8400, 0x7bff, 0xfbff,
+       0x0001, 0x03ff, 0x8001, 0x83ff,
+       0x7c00, 0xfc00, 0x7e00, 0xfe00,
+       0x7c01, 0xfc01]
+# f64 operands are word pairs, low word first.
+F64 = [(0, 0), (0, 0x80000000), (0, 0x3fe00000), (0, 0x3ff00000),
+       (0, 0xbff00000), (0, 0x00100000), (0, 0x80100000),
+       (0xffffffff, 0x7fefffff), (0xffffffff, 0xffefffff),
+       (1, 0), (0xffffffff, 0x000fffff), (1, 0x80000000),
+       (0xffffffff, 0x800fffff), (0, 0x7ff00000), (0, 0xfff00000),
+       (0, 0x7ff80000), (0, 0xfff80000), (1, 0x7ff00000), (1, 0xfff00000)]
+
+# Backwards-compatible alias: the f32 set is what "the float grid" meant.
+FLOAT = F32
+
+# The hardware's floating-point mode, measured (2026-10-12): denormal INPUTS
+# read as zero (v_cmp_eq_f32(0.0, min_denormal) is true) and denormal OUTPUTS
+# are flushed (v_mul_f32(min_normal, 0.5) is 0, not the denormal 2^-127), i.e.
+# daz + ftz around a round-to-nearest-even core.  The oracle's default policy is
+# plain rtne, so every denormal case disagreed until this was carried.
+FP_POLICY = "rtne|daz|ftz"
+
+FLOAT_TAGS = ("f64", "f32", "f16")
+# Every type token a name can end with; the LAST one names the source operand
+# (names read v_<op>_<dst>_<src>), so v_fcvt_f64_i32 reads an integer.
+TYPE_TOKENS = ("f64", "f32", "f16", "i64", "u64", "i32", "u32",
+               "i16", "u16", "i8", "u8")
+
+
+def input_format(mnemonic: str) -> str:
+    """The format of the mnemonic's SOURCE operands.
+
+    Names read v_<op>_<dst>_<src>..., so the last float tag names the input; a
+    single-tag name has that tag on both sides.
+    """
+    last, pos = "", -1
+    for t in TYPE_TOKENS:
+        i = mnemonic.rfind(t)
+        if i > pos:
+            last, pos = t, i
+    return last if last in FLOAT_TAGS else ""
 
 IMM_SLOT = re.compile(r"(?:X\d+|I[A-Z]?\d+)")
 
@@ -52,8 +104,19 @@ def grids(patterns, nin: int):
             for b in patterns:
                 yield [a, b]
         return
-    # nin == 3
     anchors = [0, 1, 0x80000000]
+    if nin == 4:
+        # Four sources (a binary f64 row is four dwords).  A full grid would be
+        # |patterns|^4, so take the two natural pairs plus the all-equal
+        # diagonal: enough to cross every boundary value with every other.
+        for a in patterns:
+            for b in patterns:
+                yield [a, b, anchors[0], anchors[0]]
+                yield [anchors[0], anchors[0], a, b]
+        for x in patterns:
+            yield [x, x, x, x]
+        return
+    # nin == 3
     for a in patterns:
         for b in patterns:
             yield [a, b, anchors[0]]
@@ -90,7 +153,11 @@ def targets() -> list:
                                 "barrier", "cb", "czb", "flag", "prefix_")):
             continue
         nin = nin_of(mnemonic)
-        if nin not in (1, 2, 3):
+        if nin not in (1, 2, 3, 4):
+            continue
+        # A four-dword row is a binary f64 (two pair operands); nothing else
+        # has a four-source pure-register shape.
+        if nin == 4 and input_format(mnemonic) != "f64":
             continue
         out.append(mnemonic)
     return out
@@ -102,29 +169,48 @@ def main() -> int:
         for row in csv.DictReader(f, delimiter="\t"):
             meta[row["mnemonic"]] = row
     out = []
+
+    def flat(row):
+        """Expand a row of f64 pairs into the dword stream the table stores."""
+        if row and isinstance(row[0], tuple):
+            vals = []
+            for pair in row:
+                vals += [pair[0], pair[1]]
+            return vals
+        return list(row)
+
     for mnemonic in targets():
         sem = meta[mnemonic]["semantic_model"]
-        patterns = FLOAT if sem == "floating-point-value" else INT
         nin = nin_of(mnemonic)
+        fmt = input_format(mnemonic) if sem == "floating-point-value" else ""
+        base = {"f64": F64, "f16": F16, "f32": F32}.get(fmt, INT)
         # [HW 2026-08-24] ldexp carries an integer exponent in the last
         # slot: bit-pattern floats there are meaningless (and the generic
         # grid made most v_ldexp rows unverifiable).  Use the INT grid
         # for the exponent column.
         if mnemonic in ("v_ldexp_f64", "v_ldexp_f32"):
-            if nin == 3:
-                for row in grids(patterns, 2):
+            if fmt == "f64":
+                for row in grids(F64, (nin - 1) // 2):
                     for e in INT:
                         out.append(mnemonic + "\t\t" +
-                                   " ".join(hex(v) for v in row) + " " +
+                                   " ".join(hex(v) for v in flat(row)) + " " +
                                    hex(e))
             else:  # f32: (mantissa, exponent)
-                for a in patterns:
+                for a in base:
                     for e in INT:
                         out.append(mnemonic + "\t\t" +
                                    hex(a) + " " + hex(e))
             continue
-        for row in grids(patterns, nin):
-            out.append(mnemonic + "\t\t" + " ".join(hex(v) for v in row))
+        if fmt == "f64":
+            # every source operand is a word pair, so the grid is over pairs
+            for row in grids(F64, nin // 2):
+                out.append(mnemonic + "\t\t" +
+                           " ".join(hex(v) for v in flat(row)))
+            continue
+        pol = FP_POLICY if sem == "floating-point-value" else ""
+        for row in grids(base, nin):
+            out.append(mnemonic + "\t" + pol + "\t" +
+                       " ".join(hex(v) for v in row))
     print("\n".join(out))
     return 0
 

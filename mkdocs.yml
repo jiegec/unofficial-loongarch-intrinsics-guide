@@ -123,3 +123,4 @@ nav:
           - Measurements: gpu/appendix/measurements.md
           - UNRESOLVED Register: gpu/appendix/unresolved.md
           - UNRESOLVED Status: gpu/appendix/unresolved-status.md
+          - Case Boundary Coverage: gpu/appendix/case-boundaries.md

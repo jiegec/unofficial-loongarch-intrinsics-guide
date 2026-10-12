@@ -1,0 +1,69 @@
+# Case boundary coverage
+
+Every row's case vectors must exercise the boundary values its operand types
+admit.  This page records what that means, how it is measured, and what the
+measurement found.
+
+## 1. The required classes
+
+Derived from the mnemonic's own type suffix, so a mixed row (`v_cvt_f32_i32`)
+is asked for both sides.  A floating-point operand must see the whole signed
+space: both zeros, both infinities, quiet **and** signalling NaN in both signs,
+the finite limits, and the denormal range.  An integer operand must see 0, ±1,
+and the width extremes.
+
+| format | classes |
+|---|---|
+| f32 | `+0` `-0` `+1` `-1` `+0.5` `max_norm` `-max_norm` `min_norm` `-min_norm` `max_denorm` `min_denorm` `+inf` `-inf` `qnan` `-qnan` `snan` `-snan` (19) |
+| f16 | the same 19 against the f16 encoding, in the low half of the word |
+| f64 | the same set as word pairs |
+| i8/i16/i32/i64 | `0` `1` `max` `min` `-2` `-1` |
+
+## 2. Measurement
+
+`code/lg200/case_coverage.py` joins the table's type suffixes with the parsed
+case set and reports, per instruction, which required classes its inputs never
+take.
+
+    python3 code/lg200/case_coverage.py --tsv build/case_coverage.tsv
+
+## 3. What it found (2026-10-12)
+
+The generated boundary grid previously carried a ten-value f32-only list, so
+before phase 4: **398 of 768** instruction rows exercised every class their
+operands admit.  After the generator gained per-format tables (f16/f64 included),
+the full signed value space (signalling NaN and negated NaN/limits/denormals
+included), fp64 pair operands and the four-dword binary-f64 shape: **499 of 768**.
+
+The vector count went 20,732 -> 46,966.
+
+## 4. The boundary cases changed the answer the hardware gives
+
+Running the expanded set on the compute pipe surfaced **78 rows where the oracle
+and the hardware disagree** (previously 1).  They are not random: the boundary
+values are exactly where the oracle's floating-point MODEL is wrong.
+
+| behaviour | what the hardware does | evidence |
+|---|---|---|
+| denormal **inputs** | read as zero (DAZ) | `v_cmp_eq_f32(0.0, min_denormal)` is **true** on hardware, false in the oracle |
+| denormal **outputs** | flushed (FTZ) | `v_mul_f32(min_normal, 0.5)` is **0**, not the denormal `2^-127` (`0x00400000`) |
+| NaN sign | the source NaN's sign is propagated | `v_add_f32(+0.0, 0xffc00000)` is `0xffc00000`, the oracle says `0x7fc00000` |
+
+So the hardware runs **round-to-nearest-even with DAZ and FTZ**, while the oracle's
+default policy is plain `rtne`.  The case protocol already carries an FP policy
+(`CASE_FP(id, "rtne|daz|ftz", ...)`): the generator now emits it for every
+floating-point row, which fixed the arithmetic rows' denormal cases.  The FP
+**compare** oracles do not consult the policy yet (`oracle_cmp_*` take only the
+two words), so they still disagree on denormal inputs - that is the remaining fix,
+together with the NaN-sign rule.
+
+## 5. Status
+
+| measure | value |
+|---|---|
+| rows exercising every required class | **499 / 768** |
+| rows still with gaps | 269 (dominated by the hand-written families: atomic 206, plus rows with immediate slots) |
+| hardware rows failing under the expanded set | 78 (a work list, not a regression: the oracle model is incomplete) |
+
+The 78 failures are the input to the next fix; until the oracle models DAZ/FTZ in
+the compares and the NaN-sign rule, the boundary suite is expected to be red.
