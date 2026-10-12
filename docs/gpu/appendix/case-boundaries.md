@@ -4,6 +4,14 @@ Every row's case vectors must exercise the boundary values its operand types
 admit.  This page records what that means, how it is measured, and what the
 measurement found.
 
+**A note on the `@@...@@` markers.**  They are a build-time substitution
+convention: the name or value inside comes from the case tools, and in this source
+it stays literal because the site build does not run in this checkout (`mkdocs`
+fails on a missing dependency).  Read what is inside as a code identifier or a
+value from `gen_cases.py`; the figures that matter are also written in prose beside
+them, and the ones that are current are bold, so nothing here depends on the
+substitution having run.
+
 ## 1. The required classes
 
 Derived from the mnemonic's own type suffix, so a mixed row (`v_cvt_f32_i32`)
