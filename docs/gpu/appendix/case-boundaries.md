@@ -141,7 +141,7 @@ raw bit patterns a @@bNN@@ operand admits, they need the same treatment.  With t
 **every row whose boundaries are expressible as an input value is covered**:
 @@case_coverage.py@@ now reports **738 of 738 value-expressible rows**, 0 gaps.
 
-The 30 that remain are **launch-shape** rows, and the auditor names them
+The **30** that remain are **launch-shape** rows, and the auditor names them
 explicitly rather than counting them as gaps: the execution-environment and SIO
 reads, the geometry-stream emits, the interpolators (a launch-owned coefficient
 window) and the index read.  Their result is launch state, not an operand, so they

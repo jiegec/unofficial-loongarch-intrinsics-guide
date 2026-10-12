@@ -109,7 +109,9 @@ def main() -> int:
         # date and are anchored by it.  This file had no anchor at all until 2026-10-13:
         # it is the fourth page with count claims and the only one the check did not read.
         ('unresolved-status.md', r'\*\*(\d+) as of 2026-10-13\*\*', 'rows-unresolved'),
-        ('case-boundaries.md', r'still \*\*(\d+)\*\*', 'targets'),
+        ('case-boundaries.md', r'The \*\*(\d+)\*\* that remain are ' +
+                                r'\*\*launch-shape\*\*', 'launch-shape'),
+        ('unresolved-status.md', r'\*\*(\d+) as of 2026-10-13\*\*', 'rows-unresolved'),
         ('unresolved-status.md', r'is (\d+) distinct sentences', 'sentences'),
         ('unresolved-status.md', r'distinct sentences and ([\d,]+) occurrences', 'occurrences'),
     ]
