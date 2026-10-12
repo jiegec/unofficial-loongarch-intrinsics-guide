@@ -56,16 +56,17 @@ In priority order, each with its safety note.
 | 2 | the boundary grid on the FP rows | the DAZ/FTZ convergence: 78 rows disagreed before the flush model, 54 after the f16/f32 compares converged; the arithmetic and bit-op paths are still open (`v_abs_f32(denormal)` is 0, `v_add_f32(+0.0, 0xffc00000)` keeps the NaN sign) | single rows, one process each |
 | 3 | `M.mod2` / `M.clmp1` | the operation modifiers. They are emitted at fixed values today, so a case cannot drive the rounding direction; a `v_sqrt_f32` case works around it by choosing the policy whose reference equals the observed value | single rows; changing a fixed field is the riskiest item here, so give it its own process and an explicit before/after device check |
 | 4 | `v_fcvt_f16_i16` / `v_fcvt_f16_u16` | whether the destination is written at all - the encodings decode and occupy their slot, and the register has never been read back | single rows; the carrier already runs them observed |
-| 5 | a misaligned flat/buffer access | the alignment clause phase 3 left open | **single case, its own process, and expect a fault** - the most likely wedge; run it only after the ladder is proven |
-| 6 | two-lane ordering / fence-less visibility | the visibility clauses | needs a two-instruction program the carrier cannot build today |
-| 7 | texture out-of-bounds and wrap | the gather/samp boundary class | single rows |
-| 8 | the atomic counter bound | where the increment/decrement forms read their bound - no encoded field carries it in the narrow form | single rows |
-| 10 | the buffer index/offset registers with `idxen`/`offen` live | whether the buffer form addresses the way the descriptor stride implies.  The correctness carrier never exercises these: its load keeps the index and offset registers at zero and puts the offset in the immediate.  The memory bench templates cannot be built without this - and a wrong index register is an out-of-window access, so it is also a wedge risk | single rows, its own process, one access before any chain |
-| 9 | `load_sm_matrix_x{1,2,4}` plane/lane layout | the last three code-layer UNRESOLVED markers | observed mode today; a real measurement needs the matrix file staged |
+| 5 | **the microbench re-run** | the phase-2 numbers for every template added since the last CSV: **605 rows are buildable now against 497 in it**, so 108 rows would produce a timing for the first time.  The runner also emits a per-row `note` now, which the CSV carries - the store rows will label their lat column as the store+load round trip it is | the ordinary batch path (bounded streams, per-row timeout); no control rows, no `trap` |
+| 6 | a misaligned flat/buffer access | the alignment clause phase 3 left open | **single case, its own process, and expect a fault** - the most likely wedge; run it only after the ladder is proven |
+| 7 | two-lane ordering / fence-less visibility | the visibility clauses | needs a two-instruction program the carrier cannot build today |
+| 8 | texture out-of-bounds and wrap | the gather/samp boundary class | single rows |
+| 9 | the atomic counter bound | where the increment/decrement forms read their bound - no encoded field carries it in the narrow form | single rows |
+| 10 | the buffer index/offset registers with `idxen`/`offen` live | whether the buffer form addresses the way the descriptor stride implies.  The correctness carrier exercises neither live: its load keeps the index and offset registers at zero and puts the offset in the immediate.  The remaining memory bench rows (buffer loads, scalar buffer loads) cannot be chained without this - and a wrong index register is an out-of-window access, so it is also a wedge risk | single rows, its own process, one access before any chain |
+| 11 | `load_sm_matrix_x{1,2,4}` plane/lane layout | the last three code-layer UNRESOLVED markers | observed mode today; a real measurement needs the matrix file staged |
 
-Anything in row 5 or 6 must be designed as a **new carrier shape** first (the
-current carriers deliberately cannot stage it), and reviewed for ring risk before
-it is submitted.
+Items 6 and 7 must be designed as a **new carrier shape** first (the current
+carriers deliberately cannot stage them), and reviewed for ring risk before they
+are submitted.
 
 ## 4. Host-only work that does not wait
 
@@ -73,6 +74,19 @@ The boundary-case authoring is **done**: `case_coverage.py` reports
 **738 of 738 value-expressible rows** with every required class and no gaps, plus
 30 rows listed as launch-shape (their result is launch state - the environment and
 SIO reads, the stream emits, the interpolators and the index read - so they need a
-launch state, not a case).  What remains host-side is the microbench templates for
-the families still at SKIP (buffer 61, flat 45, LDS 44, SIO 17), and the launch
-shapes themselves.
+launch state, not a case).
+
+The microbench templates are done for every family this side of the hardware
+questions: **605 of 768 rows build now** (`bench_buildable.py`), against 497 in
+the last hardware CSV.  What is left falls into three named piles rather than one:
+
+| pile | rows | why it waits |
+|---|---|---|
+| texture (`samp` 32, `gather` 24) | 56 | the correctness carrier refuses them (SKIP-ENVELOPE); a bench must not exercise a stream the validation path rejects |
+| buffer and scalar-buffer loads | 27 | the chain needs a live index or offset register - item 10 |
+| subword/format buffer stores | 10 | the carrier records a measured fault for the b16 shape; a bench must not re-derive it |
+| SIO and GS-prefix | 20 | their correctness carrier runs them OBSERVED and their chain is not a chain of independent work; U8 is open |
+| `copy_sm_*`, and rows with no semantic spec | 8 | the same kind of gap, not yet classified further |
+
+`check_doc_numbers.py` keeps the pages' figures honest in the meantime, and
+`bench_buildable.py` keeps the buildable count measurable without a device.
