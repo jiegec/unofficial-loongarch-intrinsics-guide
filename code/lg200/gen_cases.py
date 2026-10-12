@@ -37,8 +37,9 @@ INT16 = [0x0000, 0x0001, 0x7FFF, 0x8000, 0xFFFE, 0xFFFF]
 INT = [0x00000000, 0x00000001, 0x7FFFFFFF, 0x80000000, 0xFFFFFFFE, 0xFFFFFFFF]
 # A narrow row still wants the wider patterns too (a row's neighbours and its
 # destination may be wider), so the narrow set is a UNION, not a replacement.
-INT_TBL = {"i8": INT8 + INT, "u8": INT8 + INT,
-           "i16": INT16 + INT, "u16": INT16 + INT}
+INT_TBL = {"i8": INT8 + INT, "u8": INT8 + INT, "b8": INT8 + INT,
+           "i16": INT16 + INT, "u16": INT16 + INT, "b16": INT16 + INT,
+           "b32": INT}
 
 # 64-bit integer operands are word pairs; these cover the six classes the audit
 # asks of a u64/i64 (0, 1, max, min, -2, -1) without a 36-pair expansion.
@@ -84,7 +85,7 @@ FLOAT_TAGS = ("f64", "f32", "f16")
 # Every type token a name can end with; the LAST one names the source operand
 # (names read v_<op>_<dst>_<src>), so v_fcvt_f64_i32 reads an integer.
 TYPE_TOKENS = ("f64", "f32", "f16", "i64", "u64", "i32", "u32",
-               "i16", "u16", "i8", "u8")
+               "i16", "u16", "i8", "u8", "b64", "b32", "b16", "b8")
 
 
 # A row whose SOURCE is 64-bit may still name 32-bit tags (v_fcvt_f32_f64).  The
@@ -241,6 +242,11 @@ ATOMIC_OK = re.compile(r"^atomic_(sm|v_buff|v_flat|v_tex)_")
 # classes the row's element width admits.  Their second input is the address
 # offset, which must stay inside the carrier's window and so is held at zero.
 LOAD_OK = re.compile(r"^load_(sm|v_buff|v_flat)_[iu](8|16)$")
+# The plain-width (bNN) loads and stores take their content from the case too.
+# When the element is one dword their SECOND input is the address offset, which
+# must stay inside the carrier's window and is held at zero.
+SUBWORD_OK = re.compile(r"^(load|store)_(sm|v_buff|v_flat)_"
+                         r"(b8|b16|b32|b64|swizzle_b64)$")
 
 
 def case_targets() -> list:
@@ -255,7 +261,12 @@ def case_targets() -> list:
             if not IMM_SLOT.search(sig) and nin_of(mnemonic) in (2, 3, 4, 6):
                 out.append(mnemonic)
             continue
-        if LOAD_OK.match(mnemonic):
+        # The vector <-> scalar moves stage the value in the generic carrier, so
+        # their boundaries are ordinary input coverage.
+        if mnemonic in ("v_v2s_b32", "v_s2v_b32", "v_firstv2s_b32"):
+            out.append(mnemonic)
+            continue
+        if LOAD_OK.match(mnemonic) or SUBWORD_OK.match(mnemonic):
             if nin_of(mnemonic) in (1, 2):
                 out.append(mnemonic)
             continue
@@ -280,7 +291,9 @@ def case_targets() -> list:
     for mnemonic in sorted(meta):
         if mnemonic.startswith(("load_", "store_", "atomic_", "samp", "gather")):
             continue
-        if nin_of(mnemonic) in (4, 5, 6) and input_format(mnemonic) in ("i64", "u64", "f64"):
+        if nin_of(mnemonic) in (4, 5, 6) and (input_format(mnemonic) in
+                                              ("i64", "u64", "f64", "b64")
+                                              or "b64" in mnemonic):
             out.append(mnemonic)
     return list(dict.fromkeys(out))
 
@@ -332,8 +345,7 @@ def main() -> int:
             continue
         # A 64-bit operand is a word pair in every family, including the b64
         # atomics whose names carry no type token.
-        pfmt = fmt if fmt in ("f64", "i64", "u64") else ("b64" if "b64" in mnemonic
-                                                         and fmt == "" else "")
+        pfmt = fmt if fmt in ("f64", "i64", "u64", "b64") else ""
         if pfmt and nin % 2 == 0 and nin > 0:
             plist = pair_list(mnemonic) if pfmt == "f64" else INT_PAIRS
             for row in grids(plist, nin // 2):
@@ -346,7 +358,8 @@ def main() -> int:
             # seed reads v_cmp_imm_eq_f16 p0, s0, v0, 0x00000000).
             cols = [base] * (nin - 1) + [base]
             gen = grid_cols(cols)
-        elif LOAD_OK.match(mnemonic) and nin == 2:
+        elif (LOAD_OK.match(mnemonic) or
+              (SUBWORD_OK.match(mnemonic) and "b64" not in mnemonic)) and nin == 2:
             # content | address offset (held in-window)
             gen = grid_cols([base, [0]])
         else:

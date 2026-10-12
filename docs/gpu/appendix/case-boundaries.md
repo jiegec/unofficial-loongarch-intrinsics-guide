@@ -93,9 +93,19 @@ exercises exactly the classes the element width admits.  Their second input is t
 address offset, which must stay inside the carrier's window and is therefore held
 at zero.  Coverage is **765 of 768**.
 
-The three that remain are not values the grid could supply: the two interpolator
-rows read a launch-owned coefficient window, and @@v_threadid_u32@@ reads
-execution-environment state.  Each needs a launch shape, not a case.
+The plain-width (@@bNN@@) rows were the last omission of the same kind: their
+content is staged like the sub-word loads', and once the audit also asks for the
+raw bit patterns a @@bNN@@ operand admits, they need the same treatment.  With that
+**every row whose boundaries are expressible as an input value is covered**:
+@@case_coverage.py@@ now reports **738 of 738 value-expressible rows**, 0 gaps.
+
+The 30 that remain are **launch-shape** rows, and the auditor names them
+explicitly rather than counting them as gaps: the execution-environment and SIO
+reads, the geometry-stream emits, the interpolators (a launch-owned coefficient
+window) and the index read.  Their result is launch state, not an operand, so they
+need a launch shape rather than a case.  The vector<->scalar moves are NOT in that
+set - their carrier stages the value, so their boundaries are ordinary input
+coverage.
 
 ## 4. The boundary cases changed the answer the hardware gives
 

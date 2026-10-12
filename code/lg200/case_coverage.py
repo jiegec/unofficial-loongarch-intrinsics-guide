@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import argparse
 import collections
+import csv
 import re
 import sys
 from pathlib import Path
@@ -56,11 +57,14 @@ I64 = {"0": 0, "1": 1, "max": 0x7fffffffffffffff, "min": 0x8000000000000000,
 def classes_for(mnemonic: str):
     """(name, value, width) triples required by the mnemonic's suffixes."""
     req = []
+    # b8/b16/b32/b64 name a width without a signedness: the raw bit patterns an
+    # operand of that width admits are the same boundary set.
     for tag, tbl, bits in (("f32", F32, 32), ("f16", F16, 16),
                            ("f64", None, 64), ("i8", I8, 8), ("u8", I8, 8),
-                           ("i16", I16, 16), ("u16", I16, 16),
-                           ("i32", I32, 32), ("u32", I32, 32),
-                           ("i64", I64, 64), ("u64", I64, 64)):
+                           ("b8", I8, 8),
+                           ("i16", I16, 16), ("u16", I16, 16), ("b16", I16, 16),
+                           ("i32", I32, 32), ("u32", I32, 32), ("b32", I32, 32),
+                           ("i64", I64, 64), ("u64", I64, 64), ("b64", I64, 64)):
         if tag not in mnemonic:
             continue
         if tag == "f64":
@@ -125,8 +129,30 @@ def main():
     for c in cases:
         by[c.mnemonic].append(words_of(c.inputs))
 
-    rows, gaps = [], collections.Counter()
+    # A row whose result is not an operand value cannot be asked for input
+    # classes: an execution-environment read returns launch state, and the
+    # interpolator returns the coefficient window.  Those are LAUNCH-SHAPE rows -
+    # they need a launch state, not a case - and are reported separately rather
+    # than counted as gaps the grid could close.
+    sem = {}
+    with open(Path(__file__).resolve().parent.parent /
+              "lg200-instructions.tsv", encoding="utf-8") as f:
+        for row in csv.DictReader(f, delimiter="\t"):
+            sem[row["mnemonic"]] = row.get("semantic_model", "")
+    # Rows whose result is launch state, not an operand: the environment and SIO
+    # reads, the geometry-stream emits, the interpolators (a launch-owned
+    # coefficient window) and the index read.  The vector<->scalar moves are NOT
+    # here: their carrier stages the value, so their classes are ordinary input
+    # coverage.
+    LAUNCH_SEM = ("execution-environment", "graphics-sio")
+    LAUNCH_EXTRA = ("v_v2s_b32", "v_s2v_b32", "v_firstv2s_b32")
+    launch_skip = set(LAUNCH_EXTRA)
+
+    rows, gaps, launch = [], collections.Counter(), []
     for m in sorted(mnemonics):
+        if sem.get(m) in LAUNCH_SEM and m not in launch_skip:
+            launch.append(m)
+            continue
         req = classes_for(m)
         ws = by.get(m, [])
         missing = [name for name, v, bits in req
@@ -137,8 +163,12 @@ def main():
 
     total = len(rows)
     full = sum(1 for r in rows if r[2] == 0)
-    print("instructions: %d   with all required boundary classes: %d   with gaps: %d"
-          % (total, full, total - full))
+    print("instructions: %d value-expressible (%d launch-shape)"
+          % (total, len(launch)))
+    print("  with all required boundary classes: %d   with gaps: %d"
+          % (full, total - full))
+    print("  launch-shape rows (need a launch state, not a case): %s"
+          % " ".join(launch))
     print()
     print("%-28s %s" % ("class space", "instructions missing it"))
     for k, n in gaps.most_common():
