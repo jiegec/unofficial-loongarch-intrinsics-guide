@@ -107,6 +107,14 @@ pair) and preloads a small value, then:
   therefore includes that add**, and the staged value is small so the chained
   address stays inside the carrier window.
 
+**The buffer ATOMICS are in too** (24 of the 26 `atomic_v_buff_*` rows).  Their
+operand IS their destination - the buffer form stages one register that is both
+read and written - which decides the two kinds: `lat` stages the operand once and
+lets the returned old value be the next operand, while `tp` RE-stages the constant
+operand before every copy so no copy depends on the previous one.  The move
+pipelines, so it does not carry the atomic cost.  Cell preload and descriptor
+assembly are both shapes the correctness carrier already exercises.
+
 **The shared-memory ATOMICS are in too** (26 of the 32 `atomic_sm_*` rows).
 Same two kinds - the destination is the operand, so the returned old value feeds
 the next copy - with one extra piece of setup: shared memory starts undefined, so
@@ -162,11 +170,12 @@ few seconds - and reports the outcome and the reason:
 
 | | rows |
 |---|---|
-| buildable for both kinds | **555** |
-| no canonical variant | 172 |
-| not materializable on the generic carrier | 26 |
+| buildable for both kinds | **579** |
+| no canonical variant | 155 |
+| not materializable on the generic carrier | 17 |
 | no semantic specification | 6 |
 | flat atomic bench: cmpswap stages a compare pair this template does not build | 2 |
+| buff atomic bench: cmpswap stages a compare pair this template does not build | 2 |
 | sm atomic bench: cmpswap stages a compare value this template does not build | 6 |
 | refused on the compute pipe (known to wedge) | 1 |
 
@@ -187,8 +196,8 @@ A family template therefore has to do one of two things: derive the classes from
 the rows layout instead of from a decoded variant, or give the family variant
 entries.  Either way the template is what is missing; the reason string names the
 first symptom.
-555 is 497 (the last hardware run's OK) plus the eight flat load rows, the 24 flat atomic rows and the 26 shared-memory
-atomic rows this work added - i.e. the offline number and the device number agree, which is
+579 is 497 (the last hardware run's OK) plus the eight flat load rows, the 24 flat atomic rows and the 26 shared-memory
+atomic rows, the 24 buffer atomic rows this work added - i.e. the offline number and the device number agree, which is
 what makes it usable as a target before a session.  The reasons are the same
 per-family gaps the sections above describe.
 

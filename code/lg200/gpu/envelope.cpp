@@ -3784,6 +3784,64 @@ std::optional<EnvelopeProgram> build_cs_bench_sm_atomic(
   return program;
 }
 
+// The buffer ATOMIC family's bench template.  Its operand IS its destination - the
+// buff form stages one register that is both read and written - which decides how
+// the two kinds are built:
+//   lat - stage the operand once, then let each copy's returned old value be the
+//         next copy's operand; the register is the chain.
+//   tp  - re-stage the constant operand before every copy, so no copy depends on
+//         the previous one's result and the accesses are independent.  The move
+//         pipelines, so it does not carry the atomic's cost.
+// The cell is preloaded from the host (arg_preloads), the descriptor is assembled
+// against the carrier's own window, and both are shapes the correctness carrier
+// already exercises.
+std::optional<EnvelopeProgram> build_cs_bench_buff_atomic(
+    const std::string& mnemonic, unsigned copies, bool chained, unsigned lanes,
+    std::string& error) {
+  if (mnemonic.find("cmpswap") != std::string::npos) {
+    error = "buff atomic bench: the cmpswap form stages a compare pair this "
+            "template does not build";
+    return std::nullopt;
+  }
+  const bool wide64 = mnemonic.find("_i64") != std::string::npos ||
+                      mnemonic.find("_u64") != std::string::npos ||
+                      mnemonic.find("_b64") != std::string::npos;
+  const unsigned width = wide64 ? 2u : 1u;
+  const CarrierEnv env = CarrierEnv::compute(lanes);
+  Builder builder;
+  emit_env_prelude(builder, env);
+  const isa::Reg load_desc = isa::sgpr(4, 4);
+  emit_load_desc(builder, env, load_desc, env.arg_va + carrier::kLoadWindow);
+  const isa::Reg data_v = isa::vgpr(8, width);
+  const isa::Reg imm_temp = isa::sgpr(16);
+  const std::uint32_t off = 0u;
+  EnvelopeProgram program;
+  program.probe = true;
+  for (unsigned p = 0; p < width; ++p)
+    program.arg_preloads.emplace_back(carrier::kLoadWindow + off + 4 * p, 1u);
+  for (unsigned p = 0; p < width; ++p) {
+    builder.s_mov_imm_b32(imm_temp, 1u);
+    builder.v_mov_b32(isa::vgpr(8 + p), imm_temp, isa::predicate(0));
+  }
+  for (unsigned copy = 0; copy < copies; ++copy) {
+    if (!chained) {
+      for (unsigned p = 0; p < width; ++p) {
+        builder.s_mov_imm_b32(imm_temp, 1u);
+        builder.v_mov_b32(isa::vgpr(8 + p), imm_temp, isa::predicate(0));
+      }
+    }
+    builder.buff_atomic(mnemonic, isa::predicate(0), data_v, load_desc,
+                        isa::zero_reg(), off, true);
+  }
+  builder.check_k_vm_vs_sm();
+  for (unsigned p = 0; p < width; ++p)
+    emit_result_store(builder, env, isa::vgpr(8 + p), isa::zero_reg(), 4 * p);
+  if (!finalize_program(builder, program, error)) {
+    return std::nullopt;
+  }
+  return program;
+}
+
 std::optional<EnvelopeProgram> build_cs_bench(const std::string& mnemonic,
                                               unsigned copies, bool chained,
                                               unsigned lanes,
@@ -3796,6 +3854,8 @@ std::optional<EnvelopeProgram> build_cs_bench(const std::string& mnemonic,
     return build_cs_bench_flat_atomic(mnemonic, copies, chained, lanes, error);
   if (mnemonic.rfind("atomic_sm_", 0) == 0)
     return build_cs_bench_sm_atomic(mnemonic, copies, chained, lanes, error);
+  if (mnemonic.rfind("atomic_v_buff_", 0) == 0)
+    return build_cs_bench_buff_atomic(mnemonic, copies, chained, lanes, error);
   if (copies == 0) {
     error = "copies must be positive";
     return std::nullopt;
