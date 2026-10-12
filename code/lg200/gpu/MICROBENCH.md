@@ -148,6 +148,17 @@ offsets so the loaded word is a valid next offset without masking. The **vector*
 stay refused, and the reason is worth keeping rather than hiding: their destination is a VGPR,
 and feeding it back into a scalar offset needs `v_readfirstlane`, an instruction inside the
 thing being timed. That is a decision about what their measured chain includes, and it has not
+**Probed (2026-10-13):** the codec **accepts a VGPR in the offset slot** of this family.  The
+scalar builder was rebuilt with a VGPR offset and the program assembled, so the operand class
+is not restricted to a scalar as the `UO` spelling suggests.
+
+That does **not** make the vector forms benchable, and the distinction is worth keeping.  The
+correctness carrier never passes anything but `zero_reg()` or a scalar there, so a bench
+chained through a VGPR offset would be the first thing to use the form - and with the device
+parked its behaviour could not be checked.  A number produced that way would be the only
+evidence for its own validity.  So the refusal stays, and what changed is that the decision now
+has a fact under it rather than a guess: the encoding is reachable, the validation path does
+not use it, and the question is still what the measured chain would include.
 been made.
 includes.
 - which is what this report did - makes the split depend on the matrix being a
