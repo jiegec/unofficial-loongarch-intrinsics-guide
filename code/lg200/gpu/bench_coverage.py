@@ -24,6 +24,10 @@ BENCH = ROOT / "build" / "cs_bench_results.tsv"
 CORR = ROOT / "build" / "gpu_cs_generic_results.tsv"
 OUT = ROOT / "build" / "cs_bench_coverage.tsv"
 
+# The ISA source, so every row carries its own provenance rather than leaving the
+# reader to infer it from the document header.
+ISA = ROOT.parent.parent / "lg200-instructions.tsv"
+
 # family -> (prefixes, why the bench has no template for it)
 FAMILIES = [
     (("atomic_sm", "load_sm", "store_sm", "copy_sm"),
@@ -59,6 +63,10 @@ def main():
              csv.DictReader(open(BENCH), delimiter="\t")}
     corr = {r["mnemonic"]: r for r in
             csv.DictReader(open(CORR), delimiter="\t")}
+    desc = {}
+    with open(ISA) as f:
+        for r in csv.DictReader(f, delimiter=chr(9)):
+            desc[r["mnemonic"]] = r.get("description") or ""
     rows = []
     for m in sorted(set(bench) | set(corr)):
         b = bench.get(m, {})
@@ -75,14 +83,30 @@ def main():
             # node was gone - so they never ran, and reading them as faults of those
             # instructions is wrong.
             "detail": (c.get("detail") or "").strip(),
+            # Per-row provenance: which u-l-i-g page this row claims against, and
+            # whether that page leaves any part of the row UNRESOLVED.  A timing here
+            # would rest on a page that says so, which the CSV should show.
+            "isa_source": "code/lg200/%s.cpp" % m,
+            "unresolved": "yes" if "UNRESOLVED" in desc.get(m, "") else "",
         })
     out = Path(sys.argv[sys.argv.index("--out") + 1]) if "--out" in sys.argv else OUT
     with open(out, "w", newline="") as f:
         w = csv.DictWriter(f, fieldnames=["mnemonic", "bench", "correctness",
-                                          "family", "reason", "detail"],
+                                          "family", "reason", "detail",
+                                          "isa_source", "unresolved"],
                            delimiter="\t")
         w.writeheader()
         w.writerows(rows)
+
+    # The provenance columns join by mnemonic, and a miss would leave them empty
+    # and look like a row with nothing to say.  A row with no u-l-i-g page is a
+    # different problem and should be said out loud.
+    orphan = [r["mnemonic"] for r in rows if not r["isa_source"]
+              or r["mnemonic"] not in desc]
+    if orphan:
+        print("no u-l-i-g page for %d rows, e.g. %s"
+              % (len(orphan), ", ".join(orphan[:5])), file=sys.stderr)
+        return 1
 
     ok = sum(1 for r in rows if r["bench"] == "OK")
     skip = sum(1 for r in rows if r["bench"] == "SKIP")

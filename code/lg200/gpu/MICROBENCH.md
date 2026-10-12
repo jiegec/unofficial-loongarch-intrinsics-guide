@@ -16,6 +16,12 @@ and every number reproducible.
 | reference for comparison | the closed producer's own `code/lg200/measure-lg200.csv` (see §6) |
 | sample | 768 mnemonics (the full universe) |
 
+Every row of the coverage CSV carries two of those axes itself, so the file can be read
+without this page: `isa_source` names the u-l-i-g page the row's claim rests on, and
+`unresolved` is `yes` when that page leaves part of the row open.  `bench_coverage.py`
+refuses to write the file if any row has no u-l-i-g page, because an empty provenance
+column reads as a row with nothing to say rather than as a broken join.
+
 ## 2. Method
 
 - **Window**: four 64-bit firmware counters at signal `+0x20/+0x28/+0x30/+0x38`
