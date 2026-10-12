@@ -68,12 +68,16 @@ destination field names.
 
 ## UNRESOLVED
 
-* `PJ2` is named as a predicate in every row of the family, but no established
-  producer predicates with it; per-lane gating is done with a lane mask.
+* Nothing on `PJ2`: the earlier claim that no established producer predicates with it was
+  WRONG (corrected 2026-10-13) - a census of the closed producer's output counts all four
+  (p0 2772, p1 5244, p2 4290, p3 4142 in one whole linked program), which is what U5 records.
+  Per-lane gating is a separate matter and is done with a lane mask.
 * The rows other than `siowrrot`, `siowrrot_imm` and `siordrot_id_c4` are not
   emitted by any established producer, so their operand roles come from the
   field layout rather than from observation.
-* What distinguishes the `read` and `rot` spellings of the read and write forms.
+* Nothing: the difference is on the rows (2026-10-13) - the `rot` family names its channel
+  slot explicitly (`siordrot` by register, `siordrot_imm` by immediate) while
+  `sioread`/`siowrite` use the form's own slot, and the direction is in the mnemonic.
 * Why `sioread` and `sioread_imm` carry no register channel slot while the other
   forms do, and which ring position they read.
 * The offset field's classes beyond the ordinary window and the special payload

@@ -113,6 +113,10 @@ A conditional branch additionally carries its condition register in
 
 ## UNRESOLVED
 
+> Items marked **settled** here have been closed; they are kept in place so the change
+> is visible rather than silent.
+
+
 * Nothing: the `PJ2` field IS used as a predicate by an established producer, and the
   earlier claim that it is not was WRONG (corrected 2026-10-13).  A census over the
   closed producer's output counts all four as the leading operand of instructions -
