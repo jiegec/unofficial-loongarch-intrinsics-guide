@@ -107,6 +107,13 @@ pair) and preloads a small value, then:
   therefore includes that add**, and the staged value is small so the chained
   address stays inside the carrier window.
 
+**The flat ATOMICS are in too** (24 rows, `atomic_v_flat_*` minus the two cmpswap
+forms).  An atomic takes an operand AND returns the old value, so the two kinds
+fall out naturally: `tp` keeps the result in a separate register, and `lat` makes
+the destination the operand, so copy i's returned old value is copy i+1's
+operand and the copies form one chain.  Both use only positions the correctness
+carrier already exercises, and neither needs an untested operand form.
+
 The flat STORES are still skipped, and deliberately: a store has no value to chain
 through, so what its latency would measure is the address computation rather than
 the store.  Buffer and LDS still need the same treatment on top of their descriptor
@@ -147,10 +154,11 @@ few seconds - and reports the outcome and the reason:
 
 | | rows |
 |---|---|
-| buildable for both kinds | **505** |
-| no canonical variant | 230 |
+| buildable for both kinds | **529** |
+| no canonical variant | 204 |
 | not materializable on the generic carrier | 26 |
 | no semantic specification | 6 |
+| flat atomic bench: cmpswap stages a compare pair this template does not build | 2 |
 | refused on the compute pipe (known to wedge) | 1 |
 
 
@@ -170,8 +178,8 @@ A family template therefore has to do one of two things: derive the classes from
 the rows layout instead of from a decoded variant, or give the family variant
 entries.  Either way the template is what is missing; the reason string names the
 first symptom.
-505 is 497 (the last hardware run's OK) plus the eight flat load rows this
-template added - i.e. the offline number and the device number agree, which is
+529 is 497 (the last hardware run's OK) plus the eight flat load rows and the 24 flat atomic rows
+this work added - i.e. the offline number and the device number agree, which is
 what makes it usable as a target before a session.  The reasons are the same
 per-family gaps the sections above describe.
 
