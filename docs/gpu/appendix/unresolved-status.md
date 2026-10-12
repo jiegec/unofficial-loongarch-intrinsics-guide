@@ -142,6 +142,18 @@ reach.  What remains is bit-exact semantics, which needs a device and CTS.  The
 evidence, and the U-item list this entry follows, live in
 `analysis/lco/unresolved_probes.md` and `u12-run-shape-latch-reverified.md` in the
 LCO repository; nothing on this page depends on them.
+**U3** - the private and shared segment bases - is settled on the compute side and blocked
+on the graphics side, and the distinction belongs here rather than only in the LCO
+repository.  What the ISA part establishes is the flat contract: a flat access is an absolute
+64-bit address pair and the hardware does *not* add an implicit private segment base, so any
+segment base has to be staged by the driver - which is why `load_s_flat_w1.h` records the
+compute case as `s[6:7]` holding the kernarg pointer and the address as a full VA.
+
+What is not established is the graphics half: the LCO repository has no closed graphics
+shader object to compare a base layout against, only disassembly dumps, so the graphics
+segment enable bits and base placement have no counterpart.  That is a capture problem, not
+an ISA question, and it is recorded here so the item is not left implicit.
+
 
 Still open in the code layer: `load_sm_matrix_x{1,2,4}` (plane/lane layout) and
 `load_v_buff_fmt*` / `store_v_buff_fmt*` (descriptor format decode), 19 lines
