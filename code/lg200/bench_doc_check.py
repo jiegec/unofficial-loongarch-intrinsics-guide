@@ -25,6 +25,7 @@ PAGES = [
     ]),
     (HERE / "gpu" / "HARDWARE-SESSION-PLAN.md", [
         r"\*\*(\d+) of 768 rows build now\*\*",
+        r"\*\*(\d+) rows are buildable now against",
     ]),
 ]
 TOOL = HERE / "gpu" / "bench_buildable.py"
