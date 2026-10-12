@@ -74,7 +74,26 @@ gap that remains.
 * The compute queue record as a user-mode driver sees it, and the doorbell's
   acknowledgement.
 * How a compute submission's completion relates to a graphics fence.
-* The `hw_reg` NUMBER each environment identifier uses.  The identifiers themselves are enumerated by the closed frontend (`get_work_dim`, `get_global_size_*`, `get_local_size_*`, `get_local_id_*`, `get_num_groups_*`, `get_group_id_*`, `get_global_offset_*`), and `get_global_id_*` is commented out there, so a global id is built as `group_id * local_size + local_id`; the immediate packing (`size[4:0]`, `offset[9:5]`, `hw_reg[15:10]`) is established, but the number-to-identifier map is not in this tree.
-  identifiers.
+* Where each environment identifier actually comes from.  The identifiers are
+  enumerated by the closed frontend (get_work_dim, get_global_size_*,
+  get_local_size_*, get_local_id_*, get_num_groups_*, get_group_id_*,
+  get_global_offset_*), and get_global_id_* is commented out there, so a global
+  id must be built as group_id * local_size + local_id.  Compiling each builtin
+  with the closed LLVM 18 lggpu backend shows where the value comes from - no
+  hardware involved:
+
+  | identifier | source |
+  |---|---|
+  | work_dim | kernarg block + 0x0, masked with 0x3 |
+  | local_size_x / _y / _z | kernarg + 0x4 / + 0x6 / + 0x8, masked with 0xffff |
+  | global_size_x / _y / _z | kernarg + 0xc / + 0x10 / + 0x14 |
+  | global_offset_x / _y / _z | kernarg + 0x38 / + 0x3c / + 0x40 |
+  | local_id_x / _y / _z | v0 / v1 / v2 - no load, the lane id is already there |
+  | group_id_x / _y / _z | s4 / s5 / s6 - fixed scalar registers |
+  | num_groups_* | NOTHING is emitted at all: the closed backend does not implement it |
+
+  So the compute identifiers do NOT come from getreg indices: they come from a
+  packed launch-state record addressed through the kernarg pair s[0:1], plus
+  three fixed scalar registers and the three leading vector registers.
 * Whether a compute stage uses the same shader-info record shape as a graphics
   stage, including its roots and arguments.
