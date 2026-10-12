@@ -13,6 +13,15 @@ nothing about the check.  These two mutations are taken from the checks own anch
 set_desc forbids a literal newline in a cell, and check_doc_numbers reads a specific
 numbered row of status.md.
 
+PROVEN BOTH WAYS (this tool): set_desc, check_doc_numbers, header_sync, check_gpu.
+PROVEN BY A ONE-OFF INJECTION ELSEWHERE: rule_dupe_check and md_table_check, both on
+2026-10-13, by changing a size rule and by stranding a table row.
+
+NOT YET PROVEN: run_cases, prose_audit, doc_register_audit, format_audit.  They are
+listed rather than left implicit, because all checks pass is worth exactly as much as
+the number of them shown to be able to fail, and four of the ten have not been shown.
+Adding a case means finding what the check reads - its own anchored comparison - and
+breaking that, not something nearby.
 Usage:  python3 mutation_check.py
 """
 import hashlib
@@ -43,11 +52,28 @@ def mutate_doc(text):
     return text[:m.start(2)] + "999" + text[m.end(2):]
 
 
+def mutate_header(text):
+    # header_sync compares the .h first line against the row's description
+    lines = text.splitlines(keepends=True)
+    lines[0] = lines[0].rstrip(chr(10)) + 'X' + chr(10)
+    return ''.join(lines)
+
+
+def mutate_row_count(text):
+    # check_gpu asserts the documented row count
+    lines = text.splitlines(keepends=True)
+    return ''.join(lines[:1] + lines[2:])
+
+
 CASES = [
     ("set_desc.py --check", "code/lg200-instructions.tsv", mutate_tsv,
      "cd code/lg200 && python3 set_desc.py --check"),
     ("check_doc_numbers.py", "docs/gpu/appendix/status.md", mutate_doc,
      "cd code/lg200 && python3 check_doc_numbers.py"),
+    ("header_sync.py --check", "code/lg200/v_add_f32.h", mutate_header,
+     "cd code/lg200 && python3 header_sync.py --check"),
+    ("check_gpu.py", "code/lg200-instructions.tsv", mutate_row_count,
+     "python3 check_gpu.py"),
 ]
 
 
