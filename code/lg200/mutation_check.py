@@ -193,6 +193,18 @@ def mutate_addr_detect(text):
     """Break the detector rather than the exit code, so the selftest should notice."""
     return text.replace('    return hits', '    return []', 1)
 
+def mutate_case_list(text):
+    '''Rename a case's gate, leaving that gate in the suite but unproven.
+
+    The target is assembled rather than written out.  Spelled literally, the first
+    occurrence in the file is this function's own pattern, so the mutation renamed
+    itself instead of the case - and the check passed, which is how it was found.
+    '''
+    q = chr(34)
+    old = '(' + q + 'run_cases.py' + q + ', ' + q + 'code/lg200/atomic_sm_add_u32.cpp' + q
+    new = '(' + q + 'run_cases_renamed.py' + q + ', ' + q + 'code/lg200/atomic_sm_add_u32.cpp' + q
+    return text.replace(old, new, 1)
+
 CASES = [
     ("set_desc.py --check", "code/lg200-instructions.tsv", mutate_tsv,
      "cd code/lg200 && python3 set_desc.py --check"),
@@ -223,7 +235,9 @@ CASES = [
     ("gate_check.py", "code/lg200/md_table_check.py", mutate_gate_file,
      "python3 code/lg200/gate_check.py"),
     ("addr_scan.py", "code/lg200/gpu/addr_scan.py", mutate_addr_detect,
-     "python3 code/lg200/gpu/addr_scan.py --selftest"),]
+     "python3 code/lg200/gpu/addr_scan.py --selftest"),
+    ("gate_check.py", "code/lg200/mutation_check.py", mutate_case_list,
+     "python3 code/lg200/gate_check.py"),]
 
 
 def main() -> int:

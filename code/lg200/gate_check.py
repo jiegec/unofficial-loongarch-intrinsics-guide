@@ -34,6 +34,12 @@ def main() -> int:
     if not names:
         print("no python checks found in check_all.sh")
         return 1
+    # Having a failure path is not the same as the failure triggering.  Every gate
+    # also needs a case in mutation_check, which is what actually runs it broken.
+    mc = (HERE / "mutation_check.py").read_text(encoding="utf-8")
+    cased = set()
+    for nm in re.findall(r"[(][\"]([a-z_]+[.]py[^\"]*)[\"]", mc):
+        cased.add(nm.split()[0][:-3])
     bad = 0
     for name in names:
         if name in REPORTS:
@@ -50,9 +56,13 @@ def main() -> int:
         if not re.search(r"return [1-9]|sys[.]exit\([1-9]|exit\([1-9]", body):
             print("CANNOT FAIL  %s is a gate in the suite and has no failure path" % name)
             bad += 1
+        if name not in cased:
+            print("UNPROVEN  %s is a gate and no mutation case ever breaks it"
+                  % name)
+            bad += 1
     if bad:
         return 1
-    print("gate check: %d suite scripts, %d named as reports, the rest can fail"
+    print("gate check: %d suite scripts, %d named as reports, the rest can fail and are all broken by a case"
           % (len(names), len(REPORTS & set(names))))
     return 0
 
