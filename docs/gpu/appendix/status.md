@@ -67,13 +67,15 @@ Boundary coverage of the required classes, as measured by `case_coverage.py`:
 | the immediate rows, the width-aware integer tables | 680 |
 | type-token selection, texture atomics, 64-bit integer compares | 710 |
 | the six-dword three-pair shape, the type union, pair low words | 753 |
-| the sub-word loads | **765 of 768** |
+| the sub-word loads | 765 |
+| the plain-width (`bNN`) rows, and separating launch-shape rows | **738 of 738 value-expressible** |
 
-The vector count went 20,732 -> 83,253.  The three that remain are not values a
-grid can supply: the two interpolator rows read a launch-owned coefficient window
-and `v_threadid_u32` reads execution-environment state - each needs a launch
-shape, not a case.  The full record is in
-[Case Boundary Coverage](case-boundaries.md).
+The vector count went 20,732 -> 83,547.  The auditor now separates the rows whose
+result is **launch state rather than an operand** - the environment and SIO reads,
+the stream emits, the interpolators and the index read, 30 in all - and reports
+them as launch-shape: they need a launch state, not a case.  Every row whose
+boundaries *are* expressible as an input value is covered, with 0 gaps.  The full
+record is in [Case Boundary Coverage](case-boundaries.md).
 
 ## What the boundaries changed
 
