@@ -93,8 +93,7 @@ this family:
 | `s_movindex_b32` | a dword of an environment-supplied window, selected by an index; this row belongs to the [scalar ALU family](family-scalar.md) |
 
 These instructions read launch and environment state rather than ordinary
-registers; the namespace of the environment registers, and which of them are
-meaningful during a graphics stage, is UNRESOLVED.
+registers.  **The identifier namespace is named, though not yet numbered** (closed frontend, `BuiltinsLGGPU.def`): the workitem builtins enumerate `get_work_dim`, `get_global_size_{x,y,z}`, `get_global_id_{x,y,z}`, `get_local_size_{x,y,z}`, `get_local_id_{x,y,z}`, `get_num_groups_{x,y,z}`, `get_group_id_{x,y,z}` and `get_global_offset_{x,y,z}`.  Notably the three `get_global_id_*` entries are COMMENTED OUT in that file, so a producer must build a global id as `group_id * local_size + local_id` rather than read one.  The `getreg` immediate packing is established (`size[4:0]`, `offset[9:5]`, `hw_reg[15:10]`), but which `hw_reg` number carries which identifier above is still UNRESOLVED: the tree holds no producer source or compiled kernel that calls the builtin, so the number can only be read from the closed lowering binary or from hardware.
 
 ## Prefix instructions
 

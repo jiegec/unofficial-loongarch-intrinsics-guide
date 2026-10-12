@@ -74,7 +74,7 @@ gap that remains.
 * The compute queue record as a user-mode driver sees it, and the doorbell's
   acknowledgement.
 * How a compute submission's completion relates to a graphics fence.
-* Which environment index selects each of the workgroup, local and global
+* The `hw_reg` NUMBER each environment identifier uses.  The identifiers themselves are enumerated by the closed frontend (`get_work_dim`, `get_global_size_*`, `get_local_size_*`, `get_local_id_*`, `get_num_groups_*`, `get_group_id_*`, `get_global_offset_*`), and `get_global_id_*` is commented out there, so a global id is built as `group_id * local_size + local_id`; the immediate packing (`size[4:0]`, `offset[9:5]`, `hw_reg[15:10]`) is established, but the number-to-identifier map is not in this tree.
   identifiers.
 * Whether a compute stage uses the same shader-info record shape as a graphics
   stage, including its roots and arguments.
