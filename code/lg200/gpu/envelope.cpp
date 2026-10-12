@@ -4160,6 +4160,19 @@ std::optional<EnvelopeProgram> build_cs_bench(const std::string& mnemonic,
                                               unsigned copies, bool chained,
                                               unsigned lanes,
                                               std::string& error) {
+  // The SIO and GS-prefix rows are refused for a reason that is about evidence,
+  // not shape: the correctness carrier runs them OBSERVED because the channel-file
+  // content they return is launch state and not oracle-able, and their chain would
+  // not be a chain of independent work anyway - they read and write lane-crossing
+  // state.  A benchmark needs a shape whose semantics are settled first, and U8
+  // (the SIO channum) is still open, so say that rather than "no canonical
+  // variant".
+  if (mnemonic.rfind("sio", 0) == 0 || mnemonic.rfind("prefix_", 0) == 0) {
+    error = "sio bench: the SIO and GS-prefix rows run OBSERVED in the correctness "
+            "carrier (channel-file content is launch state) and their chain is not "
+            "a chain of independent work; a template needs the semantics first";
+    return std::nullopt;
+  }
   // The memory families have no semantic spec to build a generic template from,
   // so they get their own shape before the spec lookup.
   if (mnemonic.rfind("load_v_flat_", 0) == 0)

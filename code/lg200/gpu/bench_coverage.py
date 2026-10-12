@@ -80,12 +80,27 @@ def main():
 
     ok = sum(1 for r in rows if r["bench"] == "OK")
     skip = sum(1 for r in rows if r["bench"] == "SKIP")
-    # the interesting split: benchable-in-principle vs carrier-limited
-    tmpl = [r for r in rows if r["bench"] == "SKIP" and r["correctness"] == "PASS"]
+    # The interesting split is benchable-in-principle vs carrier-limited, and the
+    # CARRIER'S OWN refusal is the stable side of it: a row the correctness
+    # carrier refuses (SKIP-ENVELOPE) cannot be benchmarked whatever the rest of
+    # the matrix says.  Classifying by PASS instead makes the split depend on the
+    # matrix being a clean run: the matrix on disk is the run that WEDGED, so
+    # hundreds of rows are neither PASS nor SKIP and silently fell out of both
+    # buckets, undercounting the template gaps.
     car = [r for r in rows if r["bench"] == "SKIP" and r["correctness"].startswith("SKIP")]
+    tmpl = [r for r in rows if r["bench"] == "SKIP"
+            and not r["correctness"].startswith("SKIP")]
     print("rows=%d  bench OK=%d  bench SKIP=%d" % (len(rows), ok, skip))
-    print("  SKIP but correctness PASS (template gap) : %d" % len(tmpl))
     print("  SKIP and correctness SKIP (carrier limit): %d" % len(car))
+    print("  SKIP for any other reason (template gap) : %d" % len(tmpl))
+    health = collections.Counter(r["correctness"] for r in rows)
+    dirty = {k: v for k, v in health.items() if k not in ("PASS", "SKIP-ENVELOPE")}
+    print("  matrix health: %s" % ", ".join("%s=%d" % kv for kv in health.most_common()))
+    if dirty:
+        print("  WARNING: the matrix is not a clean run (%s) - every number above"
+              % ", ".join("%s=%d" % kv for kv in sorted(dirty.items())))
+        print("           that mentions correctness beyond the carrier's own SKIP"
+              " is unreliable.")
     print("  -> %s" % out)
     print()
     agg = collections.Counter((r["family"], r["reason"]) for r in tmpl)

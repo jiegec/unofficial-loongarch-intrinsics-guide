@@ -65,8 +65,18 @@ ticks; `bench_ns.py` derives `lat_ns`/`tp_ns`.
 
 | split | rows | meaning |
 |---|---|---|
-| SKIP but correctness **PASS** | 187 | the CS carrier builds and passes them; only the bench lacks a template |
 | SKIP and correctness **SKIP** | 84 | the carrier itself refuses them (descriptor / sampler / texture) |
+| SKIP for any other reason | 187 | the bench lacks a template |
+
+The 84 are the **stable** side of that split: they are the carrier own
+refusal (SKIP-ENVELOPE), which holds whatever else the matrix says.  The 187 are
+everything else the bench skips.  Classifying them by correctness **PASS** instead
+- which is what this report did - makes the split depend on the matrix being a
+clean run, and the matrix on disk is **the run that wedged** (307 PASS / 84
+SKIP-ENVELOPE / 377 HANG-FAULT).  Rows that run never reached were neither PASS
+nor SKIP, so they silently fell out of both buckets and the gap was undercounted
+as 184.  The report now classifies by the carrier refusal and **warns** when the
+matrix is not clean; the numbers above are from that run.
 
 Of those, twenty are control/flow ("no cost to chain"), so the actionable
 remaining bench work is the memory and SIO families: buffer memory 61, flat memory
