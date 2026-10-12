@@ -78,8 +78,8 @@ fourth:
 
 | correctness builds it | bench lat | bench tp | rows |
 |---|---|---|---|
-| yes | yes | yes | **625** |
-| yes | no | no | **58** |
+| yes | yes | yes | **626** |
+| yes | no | no | **57** |
 | no | no | no | **85** |
 
 There is no row in the missing fourth class: **nothing is benchable that the correctness
@@ -108,9 +108,11 @@ grouped, they are nine classes:
   time |
 | sm load | 4 | the matrix and interpolator forms address state the ISA chapter leaves
   UNRESOLVED |
+| flat atomic | 1 | the same 64-bit cmpswap as the buffer one, in the flat builder, which still
+  refuses it; that builder address operand is 4 wide for this form |
 | copy global to LDS | 2 | an operand to chain through: the correctness carrier treats it as
   a predicate-only control-path op |
-| buffer atomic | 1 | the 64-bit cmpswap stages a compare pair as well as a value pair |
+| buffer atomic | 0 | staged (2026-10-13): value pair v8:v9, compare pair v10:v11, one operand |
 | texture | 79 | nothing: the compute pipe cannot supply the image T# and sampler S# |
 
 The buffer-load class is worth attacking first, and the shape of the fix is already in this
