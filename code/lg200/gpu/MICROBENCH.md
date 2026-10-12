@@ -78,8 +78,8 @@ fourth:
 
 | correctness builds it | bench lat | bench tp | rows |
 |---|---|---|---|
-| yes | yes | yes | **617** |
-| yes | no | no | **66** |
+| yes | yes | yes | **625** |
+| yes | no | no | **58** |
 | no | no | no | **85** |
 
 There is no row in the missing fourth class: **nothing is benchable that the correctness
@@ -102,7 +102,7 @@ grouped, they are nine classes:
   content is launch state, and their chain is not a chain of independent work |
 | control | 14 | nothing - no cost to chain and no operand to chain it through; throughput
   is measurable, latency is not |
-| buffer store | 8 | the remaining sub-word forms, which do not share the plain
+| buffer store | 0 | every form is staged now; this class closes (2026-10-13) |
   b32/b64/b96/b128 shape |
 | environment | 4 | nothing - the row returns launch state, so there is no computed value to
   time |
@@ -148,7 +148,10 @@ offsets so the loaded word is a valid next offset without masking. The **vector*
 stay refused, and the reason is worth keeping rather than hiding: their destination is a VGPR,
 and feeding it back into a scalar offset needs `v_readfirstlane`, an instruction inside the
 thing being timed. That is a decision about what their measured chain includes, and it has not
-**Probed (2026-10-13):** the codec **accepts a VGPR in the offset slot** of this family.  The
+**Probed (2026-10-13):** the codec **accepts a VGPR in the offset argument** of the SCALAR buffer-load emit.  The
+formatted stores are the counter-example that makes the scope worth stating: their `UO12`
+field **rejects** a register and wants a 12-bit immediate, and the codec says so - the two
+families spell the field the same way and take different operand classes.  The
 scalar builder was rebuilt with a VGPR offset and the program assembled, so the operand class
 is not restricted to a scalar as the `UO` spelling suggests.
 

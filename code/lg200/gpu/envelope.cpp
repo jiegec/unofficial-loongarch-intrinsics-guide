@@ -106,6 +106,18 @@ struct Builder {
     if (bl1) operands.push_back(isa::op_modifier("bl1", 1));
     append(isa::McInst{mne, "", std::move(operands)});
   }
+  // The formatted buffer stores put the descriptor before the data - the driver
+  // layout is RA8, RK8x4, VJ8xN, UO12, modifiers - which is not the sub-word
+  // store's order (pred, data, descriptor, index).  Writing it wrong is caught by
+  // the codec at assembly time, so the layout is the specification here.
+  void buff_fmt_store(const std::string& mne, const isa::Reg& pred,
+                      const isa::Reg& descriptor_base, const isa::Reg& data,
+                      std::uint32_t immediate) {
+    std::vector<isa::Operand> operands = {
+        isa::op_reg(pred), isa::op_reg(descriptor_base), isa::op_reg(data),
+        isa::op_imm(immediate)};
+    append(isa::McInst{mne, "", std::move(operands)});
+  }
   void buff_subword_store(const std::string& mne, const isa::Reg& pred,
                           const isa::Reg& data,
                           const isa::Reg& descriptor_base,
@@ -4200,6 +4212,57 @@ std::optional<EnvelopeProgram> build_cs_bench_buff_store(
 // format operand, and the data sits in one register - but the chain is the plain
 // store's: write, then read the cell back into the same data register, so the next
 // copy's operand is what this copy wrote with nothing in between.
+
+// The formatted buffer stores (fmtdesc_c1..c4 and fmtinst_c1..c4).  Their emit takes
+// the descriptor before the data, and the channel count in the suffix sets the data
+// width.  The descriptor is the same one the plain store uses, so whatever format it
+// carries is the one already verified for that form; the chain is the plain store's
+// readback.
+std::optional<EnvelopeProgram> build_cs_bench_buff_fmt_store(
+    const std::string& mnemonic, unsigned copies, bool chained, unsigned lanes,
+    std::string& error) {
+  const bool known = mnemonic.rfind("store_v_buff_fmtdesc_", 0) == 0 ||
+                     mnemonic.rfind("store_v_buff_fmtinst_", 0) == 0;
+  if (!known) {
+    error = "formatted buffer store bench: unknown form";
+    return std::nullopt;
+  }
+  unsigned width = 1;
+  if (mnemonic.find("_c2") != std::string::npos) width = 2;
+  else if (mnemonic.find("_c3") != std::string::npos) width = 3;
+  else if (mnemonic.find("_c4") != std::string::npos) width = 4;
+  const CarrierEnv env = CarrierEnv::compute(lanes);
+  Builder builder;
+  emit_env_prelude(builder, env);
+  const isa::Reg store_desc = carrier::kStoreDesc();
+  const isa::Reg load_desc = isa::sgpr(4, 4);
+  emit_load_desc(builder, env, load_desc, env.arg_va + carrier::kLoadWindow);
+  const isa::Reg data_v = isa::vgpr(8, width);
+  const isa::Reg imm_temp = isa::sgpr(16);
+  const std::uint32_t off = 0u;
+  EnvelopeProgram program;
+  program.probe = true;
+  for (unsigned p = 0; p < width; ++p) {
+    builder.s_mov_imm_b32(imm_temp, 0x20u);
+    builder.v_mov_b32(isa::vgpr(8 + p), imm_temp, isa::predicate(0));
+  }
+  for (unsigned copy = 0; copy < copies; ++copy) {
+    builder.buff_fmt_store(mnemonic, isa::predicate(0), store_desc, data_v,
+                           carrier::kLoadWindow + off);
+    if (chained) {
+      builder.buff_mem("load_v_buff_b32", isa::predicate(0), data_v,
+                       isa::vgpr(0), load_desc, isa::zero_reg(), off, true,
+                       false, false, false);
+    }
+  }
+  builder.check_k_vm_vs_sm();
+  for (unsigned p = 0; p < width; ++p)
+    emit_result_store(builder, env, isa::vgpr(8 + p), isa::zero_reg(), 4 * p);
+  if (!finalize_program(builder, program, error)) {
+    return std::nullopt;
+  }
+  return program;
+}
 std::optional<EnvelopeProgram> build_cs_bench_buff_subword_store(
     const std::string& mnemonic, unsigned copies, bool chained, unsigned lanes,
     std::string& error) {
@@ -4451,6 +4514,9 @@ std::optional<EnvelopeProgram> build_cs_bench(const std::string& mnemonic,
     return build_cs_bench_flat_store(mnemonic, copies, chained, lanes, error);
   if (mnemonic.rfind("store_sm_", 0) == 0)
     return build_cs_bench_sm_store(mnemonic, copies, chained, lanes, error);
+  if (mnemonic.rfind("store_v_buff_fmtdesc_", 0) == 0 ||
+      mnemonic.rfind("store_v_buff_fmtinst_", 0) == 0)
+    return build_cs_bench_buff_fmt_store(mnemonic, copies, chained, lanes, error);
   if (mnemonic == "store_v_buff_b8" || mnemonic == "store_v_buff_b16")
     return build_cs_bench_buff_subword_store(mnemonic, copies, chained, lanes, error);
   if (mnemonic.rfind("store_v_buff_", 0) == 0)
