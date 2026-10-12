@@ -54,7 +54,11 @@ applies to.  Closing one sentence closes every row that carries it.
 | 20 | "any reinterpretation at encoding time" of the immediate literal | **6** | **static**: the field is `IK32@INST_LO[31:0]`, emitted verbatim - the vendor seed prints the raw value - so the comparison uses the raw bits. | 2026-10-12 |
 | 21 | "no row follows another by complementing; generalisation is UNRESOLVED" (five wordings) | **21** | **static**: each compare row is its own encoding (the f64 set alone is 16 rows with 16 pairwise-distinct fixed words, 0 collisions), so nothing is derived by complementing. | 2026-10-12 |
 
-Rows 2, 5, 9, 10, 12, 13, 15, 16, 17, 18, 19, 20 and 21 are *static or
+| 22 | "the predicate field is shared with the always-true row / within the family" | **6** | **static, disproved** (same result as rows 9 and 21): each row is its own encoding. | 2026-10-12 |
+| 23 | "whether bits 31:16 of a 16-bit source word are ignored or sign-extended" | **6** | **recorded hardware**: bits 31:16 are ignored - one element per register, in the low half, per the `v_cmp_eq_i16` result of row 13. | 2026-10-12 |
+| 24 | the literal's width and reading ("uses its low half / the whole word / a truncated value", "read raw or converted", four wordings) | **19** | **static**: the literal is the low 16 bits of its `IK32` field, emitted verbatim and read raw; and the destination's upper half is not cleared (full 32-bit lane mask, row 3). | 2026-10-12 |
+
+Rows 2, 5, 9, 10, 12, 13, 15, 16, 17, 18, 19, 20, 21, 22, 23 and 24 are *static or
 recorded-evidence* resolutions; rows 1, 3, 4, 6, 7, 8 and 11 carry direct hardware
 measurements; row 14 is a partial resolution that names what remains and why.
 
