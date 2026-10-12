@@ -121,7 +121,11 @@ The sub-word loads turned out to be the same kind of omission: their carriers
 stores it first, the flat and buffer paths preload it), so a boundary grid
 exercises exactly the classes the element width admits.  Their second input is the
 address offset, which must stay inside the carrier's window and is therefore held
-at zero.  Coverage is **765 of 768**.
+at zero.  Coverage read **765 of 768** at the time; **as of 2026-10-13 it is 768 of
+768 rows accounted for - 738 value-expressible with every required class and 30
+launch-shape** - and the earlier figure is kept rather than overwritten.  Both
+current measures are anchored in `check_doc_numbers.py`, so this sentence cannot
+drift again without the suite saying so.
 
 The plain-width (@@bNN@@) rows were the last omission of the same kind: their
 content is staged like the sub-word loads', and once the audit also asks for the
