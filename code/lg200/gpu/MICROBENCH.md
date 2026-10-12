@@ -200,6 +200,7 @@ few seconds - and reports the outcome and the reason:
 | buildable for both kinds | **597** |
 | no canonical variant | 129 |
 | not materializable on the generic carrier | 11 |
+| buff store bench: only the plain b32/b64/b96/b128 forms share this shape | 10 |
 | no semantic specification | 6 |
 | flat atomic bench: cmpswap stages a compare pair this template does not build | 2 |
 | buff atomic bench: cmpswap stages a compare pair this template does not build | 2 |
