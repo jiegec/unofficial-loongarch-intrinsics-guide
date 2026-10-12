@@ -96,6 +96,21 @@ hydrates the descriptor, and `build_lds` stores the content before the load.  So
 **throughput** for the three memory families is reachable by reusing that setup and
 repeating the access; **latency** needs the address-chaining construction and its
 mask, which is a new program shape rather than a template.
+**Implemented so far: the flat LOAD forms** (`load_v_flat_b32/b64/b96/b128` and
+the `i8/u8/i16/u16` sub-words - 8 rows).  `build_cs_bench_flat` stages the LCO
+address shape (the full absolute VA in the vaddr pair, a literal-zero scalar base
+pair) and preloads a small value, then:
+
+* `tp` issues K independent accesses from that one address;
+* `lat` feeds each access value into the next access address through one
+  `v_add_imm_u32`, so the copies form a dependency chain.  **The measured window
+  therefore includes that add**, and the staged value is small so the chained
+  address stays inside the carrier window.
+
+The flat STORES are still skipped, and deliberately: a store has no value to chain
+through, so what its latency would measure is the address computation rather than
+the store.  Buffer and LDS still need the same treatment on top of their descriptor
+and window setup.
 
 Until a construction is chosen and measured, the honest state for these 150 rows
 is `tp`-only or benchmarked, and neither should be reported as a latency.

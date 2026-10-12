@@ -27,6 +27,18 @@ Requires libdrm_loonggpu.  Point `LIBDRMDIR` at an uninstalled libdrm build
 empty.
 
     make -j build/lgpu-gpu          # or: make -j
+
+`LIBDRMDIR` is only honoured when that directory contains
+`libdrm_loonggpu-uninstalled.pc`, which is the meson layout.  An *installed*
+prefix has its `.pc` under `lib/pkgconfig` instead, and then neither
+`LIBDRMDIR` nor the system `pkg-config` finds it unless the prefix is on
+`PKG_CONFIG_PATH` - the link then fails with `undefined reference to
+loonggpu_bo_va_op` and leaves no binary behind.  Pass the two variables
+explicitly in that case:
+
+    P=/path/to/prefix
+    make LGPU_LIBS="-L$P/lib -ldrm_loonggpu" \
+         LGPU_RPATH="-Wl,-rpath,$P/lib" build/lgpu-gpu
     
 Options
     make matrix                     # dump mnemonic / materializable / form

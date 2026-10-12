@@ -3594,10 +3594,90 @@ std::optional<EnvelopeProgram> build_bench(const std::string& mnemonic,
   return program;
 }
 
+// The flat memory family's bench template.  A memory access has no register
+// source to chain through (see MICROBENCH.md 5.1), so the two kinds are built
+// differently:
+//   tp  - K independent accesses from one staged address.  This is a THROUGHPUT
+//         number; it is not a latency and must not be reported as one.
+//   lat - each access's value feeds the next access's address, so the copies form
+//         a dependency chain.  The link costs one integer add, which the measured
+//         window therefore includes; the loaded value is a small staged constant
+//         so the chained address stays inside the carrier's own window.
+// Only the load forms are built: a store has no value to chain through, and what
+// its "latency" would measure is the address computation, not the store.
+std::optional<EnvelopeProgram> build_cs_bench_flat(const std::string& mnemonic,
+                                                   unsigned copies, bool chained,
+                                                   unsigned lanes,
+                                                   std::string& error) {
+  if (mnemonic.rfind("load_v_flat_", 0) != 0) {
+    error = "flat bench: only the load forms are built";
+    return std::nullopt;
+  }
+  const std::string suffix = mnemonic.substr(std::string("load_v_flat_").size());
+  // The sub-word loads are spelled i8/u8/i16/u16; b8/b16 have no load form.
+  if (suffix != "i8" && suffix != "u8" && suffix != "i16" && suffix != "u16" &&
+      suffix != "b32" && suffix != "b64" && suffix != "b96" && suffix != "b128") {
+    error = "flat bench: unknown access width";
+    return std::nullopt;
+  }
+  const unsigned width = suffix == "b128" ? 4u : (suffix == "b96" ? 3u
+                                                   : (suffix == "b64" ? 2u : 1u));
+  const CarrierEnv env = CarrierEnv::compute(lanes);
+  Builder builder;
+  emit_env_prelude(builder, env);
+  const isa::Reg flat_base = isa::sgpr(20, 2);
+  const isa::Reg addr_pair = isa::vgpr(0, 2);
+  const isa::Reg addr_lo = isa::vgpr(0);
+  const isa::Reg chained_dst = isa::vgpr(2, width);
+  const isa::Reg result_v = isa::vgpr(10, width);
+  const isa::Reg imm_temp = isa::sgpr(16);
+  // The LCO shape: the vaddr pair carries the full absolute 64-bit VA and the
+  // scalar base pair is literal zero.
+  builder.s_mov_imm_b32(isa::sgpr(20), 0u);
+  builder.s_mov_imm_b32(isa::sgpr(21), 0u);
+  const std::uint32_t addr = carrier::kLoadWindow;
+  const std::uint64_t full_va = env.arg_va + addr;
+  builder.s_mov_imm_b32(imm_temp, static_cast<std::uint32_t>(full_va));
+  builder.v_mov_b32(addr_lo, imm_temp, isa::predicate(0));
+  builder.s_mov_imm_b32(imm_temp, static_cast<std::uint32_t>(full_va >> 32));
+  builder.v_mov_b32(isa::vgpr(1), imm_temp, isa::predicate(0));
+  EnvelopeProgram program;
+  program.probe = true;
+  // A small staged value keeps a chained address inside the carrier's window.
+  for (unsigned p = 0; p < width; ++p)
+    program.arg_preloads.emplace_back(addr + 4 * p, 8u);
+  for (unsigned copy = 0; copy < copies; ++copy) {
+    builder.load_v_flat(mnemonic, isa::predicate(0),
+                        chained ? chained_dst : result_v, addr_pair, flat_base);
+    if (chained) {
+      // The seed reads v_add_imm_u32 p0, v0, v0, 0x0: the predicate comes first.
+      builder.append_target(isa::McInst{
+          "v_add_imm_u32", "",
+          {isa::op_reg(isa::predicate(0)), isa::op_reg(addr_lo),
+           isa::op_reg(chained_dst),
+           isa::op_imm(static_cast<std::uint32_t>(full_va))}});
+    }
+  }
+  const isa::Reg zero_address = isa::vgpr(9);
+  builder.v_mov_b32(zero_address, isa::zero_reg(), isa::predicate(0));
+  builder.s_mov_imm_b32(isa::sgpr(4), 0u);
+  for (unsigned p = 0; p < width; ++p)
+    emit_result_store(builder, env, chained ? chained_dst : result_v,
+                      zero_address, 4 * p);
+  if (!finalize_program(builder, program, error)) {
+    return std::nullopt;
+  }
+  return program;
+}
+
 std::optional<EnvelopeProgram> build_cs_bench(const std::string& mnemonic,
                                               unsigned copies, bool chained,
                                               unsigned lanes,
                                               std::string& error) {
+  // The memory families have no semantic spec to build a generic template from,
+  // so they get their own shape before the spec lookup.
+  if (mnemonic.rfind("load_v_flat_", 0) == 0)
+    return build_cs_bench_flat(mnemonic, copies, chained, lanes, error);
   if (copies == 0) {
     error = "copies must be positive";
     return std::nullopt;
