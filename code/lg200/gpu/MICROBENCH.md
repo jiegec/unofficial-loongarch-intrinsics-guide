@@ -138,6 +138,26 @@ write lane-crossing state, so a chain of them is not a chain of independent work
 One OK row is **not** a valid timing: `v_mbcnt_u32` fails the CS correctness
 matrix (see §7).
 
+### 5.2 Buildable now (host-only, no device)
+
+The coverage above joins a hardware CSV, so a template that was just written
+cannot show up until the device returns.  bench_buildable.py asks the runner to
+build every row for both kinds in **dry-run** mode - no device, no submission, a
+few seconds - and reports the outcome and the reason:
+
+| | rows |
+|---|---|
+| buildable for both kinds | **505** |
+| no canonical variant | 230 |
+| not materializable on the generic carrier | 26 |
+| no semantic specification | 6 |
+| refused on the compute pipe (known to wedge) | 1 |
+
+505 is 497 (the last hardware run's OK) plus the eight flat load rows this
+template added - i.e. the offline number and the device number agree, which is
+what makes it usable as a target before a session.  The reasons are the same
+per-family gaps the sections above describe.
+
 ## 6. Reference values and cross-check
 
 | mnemonic | lat (ns) | tp (ns) |
