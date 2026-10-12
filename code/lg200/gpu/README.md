@@ -46,6 +46,22 @@ Pass all four.  `LGPU_LIBS`/`LGPU_RPATH` alone only fix the LINK: any source tha
 has to be recompiled still needs `LGPU_CFLAGS` and `LGPU_DEF`, and without the
 defines a DRM source compiles against the no-DRM stubs and fails with errors like
 `variable or field 'cs_fill_request' declared void`.
+
+When more than one candidate prefix is on the host, pick the one whose library
+actually exports what the source calls - a staged or older build may not.  Checking
+is one command:
+
+    nm -D --defined-only $P/lib/libdrm_loonggpu.so | grep -c loonggpu_userq_free
+
+A prefix missing it links until that symbol and then fails, which reads like a source
+problem and is not one; the deb-staged tree under a LoongGPU build/ directory is the
+usual offender.  On the host this guide was written against, the prefix that works is
+`/home/lin/work/build/libdrm-loonggpu-prefix`, whose `.pc` sits in `lib/pkgconfig`, so
+
+    PKG_CONFIG_PATH=/home/lin/work/build/libdrm-loonggpu-prefix/lib/pkgconfig make -j
+
+suffices.  Worth reading this section before reaching for the link error: every symptom
+below the fold here has already happened once.
     
 Options
     make matrix                     # dump mnemonic / materializable / form
