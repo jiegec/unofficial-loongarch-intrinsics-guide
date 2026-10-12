@@ -94,7 +94,19 @@ gap that remains.
   | global_size_x / _y / _z | kernarg + 0xc / + 0x10 / + 0x14 |
   | global_offset_x / _y / _z | kernarg + 0x38 / + 0x3c / + 0x40 |
   | local_id_x / _y / _z | v0 / v1 / v2 - no load, the lane id is already there |
-  | group_id_x / _y / _z | s4 / s5 / s6 - fixed scalar registers |
+  | group_id_x / _y / _z | DISPUTED - see the note below |
+
+  The group-id row is the one entry I do NOT trust.  The closed backend emits
+  s4 / s5 / s6 for it, but the driver-side measured notes put the group ids in
+  s11 / s12 / s13, and the emitted code disqualifies itself: every one of those
+  functions begins with 's_mov.b32 s5, s32, scc', which CLOBBERS s5 before the
+  function reads it as group_id_y.  A value returned through a register the prologue
+  has just overwritten cannot be right, so the measured s11/s12/s13 is preferred and
+  the static reading is kept only as a discrepancy to explain (it may be a
+  pre-relocation numbering that the .kd's en_sgpr_group_id_* fields re-map, or a
+  backend defect).  The rest of the table is unaffected: work_dim, the sizes, the
+  offsets and the local ids in v0/v1/v2 are self-consistent and agree with the
+  driver-side notes.
   | num_groups_* | NOTHING is emitted at all: the closed backend does not implement it |
 
   So the compute identifiers do NOT come from getreg indices: they come from a
