@@ -42,9 +42,12 @@ applies to.  Closing one sentence closes every row that carries it.
 
 | 13 | "how a 16-bit lane is packed inside a register" / "whether both halves ... are compared" (seven wordings) | **33** | **hardware**: the 16-bit compares read one element per register, in the **low half** - `v_cmp_eq_i16(0x00000000, 0x80000000)` is true (low halves equal, high halves differ), and that pair sits in the matrix recorded as 683 PASS / 1 FAIL, so bits 31:16 do not enter the comparison. | 2026-10-12 |
 
-Rows 2, 5, 9, 10, 12 and 13 are *static or recorded-evidence* resolutions (a
-census, a seed reading, an encoding-uniqueness proof, or a case already known to
-have passed); rows 1, 3, 4, 6, 7, 8 and 11 carry direct hardware measurements.
+| 14 | the flat atomics' "address resolution, alignment, rejected accesses, lane collisions and fence-less visibility" | **20** | **partly established**: address resolution is the absolute 64-bit VA (Axis-1/U3) and lane collisions are architecturally undefined (the carrier leaves the per-lane old value unverified); the alignment requirement, out-of-range behaviour and fence-less visibility stay open because they need a fault-tolerant misaligned access or a two-instruction ordering test the single-instruction carrier cannot stage. | 2026-10-12 |
+| 15 | "whether a mask selector reads this destination back" | **14** | **static**: the layout carries both a predicate selector (`PJ2`) and a scalar destination (`RD8`), the vendor seed names both, and the row's own Semantics says the destination may be either - so a predicate consumer and a scalar read both see the mask. | 2026-10-12 |
+
+Rows 2, 5, 9, 10, 12, 13 and 15 are *static or recorded-evidence* resolutions; rows
+1, 3, 4, 6, 7, 8 and 11 carry direct hardware measurements; row 14 is a partial
+resolution that names exactly what remains and why.
 
 ## 2b. Executable-body writebacks (`code/lg200/*.h`)
 
