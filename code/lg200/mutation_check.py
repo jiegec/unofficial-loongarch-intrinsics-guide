@@ -23,12 +23,23 @@ a wrong register name and nothing else - is stated in its own docstring).  forma
 was in this group until 2026-10-13 and is now a gate: it returned 0 unconditionally,
 so it could not fail on an over-claim, which is the defect it exists to find.
 
-NOT YET PROVEN: format_audit, which now returns non-zero on an over-claim but has no
-case in this tool yet, and run_cases was in this group until the run below proved
-it.  They arelisted rather than left implicit, because all checks pass is worth exactly as much as
-the number of them shown to be able to fail, and four of the ten have not been shown.
-Adding a case means finding what the check reads - its own anchored comparison - and
-breaking that, not something nearby.
+THE TEN GATES, ACCOUNTED FOR (2026-10-13):
+
+  proven in this tool (6):  set_desc, check_doc_numbers, header_sync, check_gpu,
+                            run_cases, format_audit
+  proven by injection (2):  rule_dupe_check, md_table_check
+  reports by design (2):    prose_audit, doc_register_audit
+
+The last two have no failing mode to prove: prose_audit findings include three expected
+classes of false positive, and doc_register_audit states in its own docstring that it
+catches a wrong register name and nothing else.  Every other gate has been shown to fail
+on something it actually reads, which is what makes the suite mean anything: all checks
+pass is worth as much as the number of them shown to be able to fail.
+
+Getting a mutation right is most of the work.  Three times in this exercise the first
+attempt changed something the check does not read - a generic 768, the generation cell of
+the TSV, an early cell of the format table when format_audit reads only the last - and
+each looked like a weak check until the mutation was aimed at the check own anchor.
 Usage:  python3 mutation_check.py
 """
 import hashlib
@@ -78,6 +89,17 @@ def mutate_case(text):
     return text[:m.start()] + "CASE(add, 0x5, 0x3, 0x5, 0x9)" + text[m.end():]
 
 
+def mutate_format_claim(text):
+    # format_audit compares the page table against the rows, and reads the LAST cell of
+    # each row - so the field has to go in the operand-positions column.  The first
+    # version of this inserted early in the row and was invisible: the third time in
+    # this exercise that a mutation was not something the check reads.
+    # Add a field the rows never
+    # carry, which is the over-claim it exists to catch
+    m = re.search(r"^\| 0 \| `sop` \|[^\n]*\|", text, re.M)
+    return text[:m.end() - 1] + ", `VD99` " + text[m.end() - 1:]
+
+
 CASES = [
     ("set_desc.py --check", "code/lg200-instructions.tsv", mutate_tsv,
      "cd code/lg200 && python3 set_desc.py --check"),
@@ -89,6 +111,8 @@ CASES = [
      "python3 check_gpu.py"),
     ("run_cases.py", "code/lg200/atomic_sm_add_u32.cpp", mutate_case,
      "cd code/lg200 && python3 run_cases.py"),
+    ("format_audit.py", "docs/gpu/isa/encoding.md", mutate_format_claim,
+     "cd code/lg200 && python3 format_audit.py"),
 ]
 
 
