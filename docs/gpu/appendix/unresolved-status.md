@@ -140,7 +140,8 @@ guard, and an unconditional back edge from BB4 - which is structurally what the 
 calls for, so the residual does not reproduce on the shapes that repository can
 reach.  What remains is bit-exact semantics, which needs a device and CTS.  The
 evidence, and the U-item list this entry follows, live in
-`analysis/lco/unresolved_probes.md` and `u12-run-shape-latch-reverified.md` in the
+`analysis/lco/unresolved_probes.md` and
+`docs/mesa/probe-results/lg200-lco-unresolved/u12-run-shape-latch-reverified.md` in the
 LCO repository; nothing on this page depends on them.
 **U3** - the private and shared segment bases - is settled on the compute side and blocked
 on the graphics side, and the distinction belongs here rather than only in the LCO
