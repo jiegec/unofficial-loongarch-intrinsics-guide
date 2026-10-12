@@ -3759,14 +3759,19 @@ std::optional<EnvelopeProgram> build_cs_bench_flat_atomic(
 std::optional<EnvelopeProgram> build_cs_bench_sm_atomic(
     const std::string& mnemonic, unsigned copies, bool chained, unsigned lanes,
     std::string& error) {
-  if (mnemonic.find("cmpswap") != std::string::npos) {
-    error = "sm atomic bench: the cmpswap form stages a compare value this "
-            "template does not build";
-    return std::nullopt;
-  }
+  // The three cmpswap shapes the correctness carrier emits, each with its own
+  // old-value destination: the eq form takes a compare in v13 and returns in v17,
+  // the f64 gt/lt form returns in the v9 pair, and the f32 gt/lt form returns in
+  // v13.  Mirroring the carrier's forms is what makes this safe - none of them is
+  // re-derived here.
+  const bool cmpswap = mnemonic.find("cmpswap") != std::string::npos;
+  const bool cmpswap_eq = mnemonic.find("cmpswap_eq") != std::string::npos;
+  const bool cmpswap_f64 =
+      cmpswap && mnemonic.find("f64") != std::string::npos;
   const bool wide64 = mnemonic.find("_u64") != std::string::npos ||
                       mnemonic.find("_i64") != std::string::npos ||
-                      mnemonic.find("_b64") != std::string::npos;
+                      mnemonic.find("_b64") != std::string::npos ||
+                      cmpswap_f64;
   const unsigned width = wide64 ? 2u : 1u;
   const CarrierEnv env = CarrierEnv::compute(lanes);
   Builder builder;
@@ -3791,12 +3796,52 @@ std::optional<EnvelopeProgram> build_cs_bench_sm_atomic(
   builder.sm_op(width == 2 ? "store_sm_b64" : "store_sm_b32",
                 isa::predicate(0), cell_v, addr_v);
   builder.check_k_vm_vs_sm();
+  const isa::Reg cmp_v = isa::vgpr(13, width);
+  const isa::Reg old17_v = isa::vgpr(17, width);
+  auto restage = [&]() {
+    for (unsigned p = 0; p < width; ++p) {
+      builder.s_mov_imm_b32(imm_temp, 1u);
+      builder.v_mov_b32(isa::vgpr(11 + p), imm_temp, isa::predicate(0));
+      if (cmpswap_eq) {
+        builder.s_mov_imm_b32(imm_temp, 1u);
+        builder.v_mov_b32(isa::vgpr(13 + p), imm_temp, isa::predicate(0));
+      }
+    }
+  };
+  if (cmpswap_eq) restage();
   for (unsigned copy = 0; copy < copies; ++copy) {
-    builder.sm_atomic(mnemonic, isa::predicate(0), addr_v, data_v,
-                      chained ? data_v : old_v);
+    if (!chained && cmpswap) restage();
+    if (cmpswap_eq) {
+      builder.sm_cmpswap(mnemonic, isa::predicate(0), isa::vgpr(11, width),
+                         addr_v, cmp_v, old17_v);
+      if (chained)
+        for (unsigned p = 0; p < width; ++p)
+          builder.v_mov_b32(isa::vgpr(11 + p), isa::vgpr(17 + p),
+                            isa::predicate(0));
+    } else if (cmpswap_f64) {
+      builder.append_target(isa::McInst{
+          mnemonic, "",
+          {isa::op_reg(isa::predicate(0)), isa::op_reg(isa::vgpr(11, 2)),
+           isa::op_reg(addr_v), isa::op_reg(isa::vgpr(9, 2))}});
+      if (chained)
+        for (unsigned p = 0; p < 2; ++p)
+          builder.v_mov_b32(isa::vgpr(11 + p), isa::vgpr(9 + p),
+                            isa::predicate(0));
+    } else if (cmpswap) {
+      builder.sm_atomic(mnemonic, isa::predicate(0), addr_v,
+                        isa::vgpr(11, width), cmp_v);
+      if (chained)
+        for (unsigned p = 0; p < width; ++p)
+          builder.v_mov_b32(isa::vgpr(11 + p), isa::vgpr(13 + p),
+                            isa::predicate(0));
+    } else {
+      builder.sm_atomic(mnemonic, isa::predicate(0), addr_v, data_v,
+                        chained ? data_v : old_v);
+    }
   }
+  const isa::Reg shown = cmpswap ? isa::vgpr(11, width) : (chained ? data_v : old_v);
   for (unsigned p = 0; p < width; ++p)
-    emit_result_store(builder, env, chained ? data_v : old_v, isa::vgpr(0),
+    emit_result_store(builder, env, isa::vgpr(shown.index + p), isa::vgpr(0),
                       4 * p);
   if (!finalize_program(builder, program, error)) {
     return std::nullopt;

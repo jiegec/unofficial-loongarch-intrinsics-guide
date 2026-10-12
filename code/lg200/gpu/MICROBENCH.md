@@ -107,6 +107,13 @@ pair) and preloads a small value, then:
   therefore includes that add**, and the staged value is small so the chained
   address stays inside the carrier window.
 
+The **shared-memory cmpswap** rows are in too (all six).  They have not one
+shape but three, each with its own old-value destination - the eq form takes a
+compare in v13 and returns in v17, the f64 gt/lt form returns in the v9 pair, and
+the f32 gt/lt form returns in v13 - and the template mirrors the correctness
+carrier for each rather than re-deriving any of them.  The chain moves the old
+value back into the data register; `tp` re-stages it instead.
+
 The 32-bit **cmpswap** forms of both the flat and buffer atomics are in as well
 (`atomic_v_flat_cmpswap_b32`, `atomic_v_buff_cmpswap_b32`).  A cmpswap stages the
 compare in the dword above the value, so value and compare are one register pair
@@ -209,7 +216,7 @@ few seconds - and reports the outcome and the reason:
 
 | | rows |
 |---|---|
-| buildable for both kinds | **599** |
+| buildable for both kinds | **605** |
 | no canonical variant | 129 |
 | not materializable on the generic carrier | 11 |
 | buff store bench: only the plain b32/b64/b96/b128 forms share this shape | 10 |
@@ -217,7 +224,6 @@ few seconds - and reports the outcome and the reason:
 | flat atomic bench: the 64-bit cmpswap stages a compare pair as well as a value pair | 1 |
 | buff atomic bench: the 64-bit cmpswap stages a compare pair as well as a value pair | 1 |
 | sm load bench: the matrix and interpolator forms address UNRESOLVED state | 4 |
-| sm atomic bench: cmpswap stages a compare value this template does not build | 6 |
 | refused on the compute pipe (known to wedge) | 1 |
 
 
@@ -237,8 +243,8 @@ A family template therefore has to do one of two things: derive the classes from
 the rows layout instead of from a decoded variant, or give the family variant
 entries.  Either way the template is what is missing; the reason string names the
 first symptom.
-599 is 497 (the last hardware run's OK) plus the eight flat load rows, the 24 flat atomic rows and the 26 shared-memory
-atomic rows, the 24 buffer atomic rows the 7 shared-memory load rows the 11 store rows the 4 plain buffer store rows and the two 32-bit cmpswap rows this work added - i.e. the offline number and the device number agree, which is
+605 is 497 (the last hardware run's OK) plus the eight flat load rows, the 24 flat atomic rows and the 26 shared-memory
+atomic rows, the 24 buffer atomic rows the 7 shared-memory load rows the 11 store rows the 4 plain buffer store rows the two 32-bit cmpswap rows and the six shared-memory cmpswap rows this work added - i.e. the offline number and the device number agree, which is
 what makes it usable as a target before a session.  The reasons are the same
 per-family gaps the sections above describe.
 
