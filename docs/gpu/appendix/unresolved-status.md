@@ -40,8 +40,11 @@ applies to.  Closing one sentence closes every row that carries it.
 | 11 | "the false result's width above the low word" / "whether the predicate decides by a subtraction borrow or a magnitude comparison" | **26** | **measured + unobservable**: the false result is zero across the whole 32-bit destination (the family's `false` case passes 39/39 on both pipes); the borrow-vs-comparison question is not observable - the ISA exposes only the predicate and both mechanisms produce the same one. | 2026-10-12 |
 | 12 | "Which of the mnemonics sharing this negation an encoding stands for" | **8** | **static, disproved**: the eight `v_cmp_imm_n*` rows have pairwise distinct fixed encodings (8 distinct fixed words, 0 collisions). | 2026-10-12 |
 
-Rows 2, 5, 9, 10 and 12 are *static* resolutions (a census, a seed reading, or an
-encoding-uniqueness proof); rows 1, 3, 4, 6, 7, 8 and 11 carry hardware evidence.
+| 13 | "how a 16-bit lane is packed inside a register" / "whether both halves ... are compared" (seven wordings) | **33** | **hardware**: the 16-bit compares read one element per register, in the **low half** - `v_cmp_eq_i16(0x00000000, 0x80000000)` is true (low halves equal, high halves differ), and that pair sits in the matrix recorded as 683 PASS / 1 FAIL, so bits 31:16 do not enter the comparison. | 2026-10-12 |
+
+Rows 2, 5, 9, 10, 12 and 13 are *static or recorded-evidence* resolutions (a
+census, a seed reading, an encoding-uniqueness proof, or a case already known to
+have passed); rows 1, 3, 4, 6, 7, 8 and 11 carry direct hardware measurements.
 
 ## 2b. Executable-body writebacks (`code/lg200/*.h`)
 
