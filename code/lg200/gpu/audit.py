@@ -338,7 +338,23 @@ def audit(path, pipe):
                 continue
             spec = SPECS.get(m)
             if spec is None:
-                continue          # dedicated codec (no rule class)
+                # No semantic rule class.  This used to `continue` silently, which meant
+                # the F class - 'every declared field must be modelled by the codec's rule
+                # class' - passed a row with no rule at all by never looking at it.  The
+                # distinction that matters is whether something ELSE built it: a dedicated
+                # codec does for some families, and nothing does for the control and
+                # geometry-stream rows, which is why their benchmark cannot be assembled
+                # ('no semantic specification', measured 2026-10-13).
+                # The `else` here would be dead code, and writing it taught the bound of
+                # this class: F reads the runner's LISTINGS, so every row it sees was
+                # built by something, and "no rule and nothing built it" can never appear.
+                # That case is real - the control rows cannot be assembled at all - but it
+                # belongs to a row-level check over the universe, not to a listing audit.
+                # bench_buildable.py is where it shows up.
+                notes.append(('F', m, 'no semantic rule class; a dedicated codec built it '
+                                      'instead (this class sees only rows that were '
+                                      'built, so the opposite case is not visible here)'))
+                continue
             declared = [p.split('@')[0].strip()
                         for p in layout.split(';') if p.strip()]
             spec_base = {re.sub(r'x\d+$', '', f) for f in spec}
