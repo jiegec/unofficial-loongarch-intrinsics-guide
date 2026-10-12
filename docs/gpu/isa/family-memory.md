@@ -82,10 +82,18 @@ store form, only a packed one.
 
 ## Sub-word access
 
-An 8- or 16-bit buffer access reads or writes an element narrower than a
-register.  The operand form for these widths is not established: no verified
-operand form exists, and the extension or truncation rules are UNRESOLVED.
-A driver should avoid them or verify them before relying on them.
+An 8- or 16-bit buffer access reads or writes an element narrower than a register.
+**The operand form IS established (2026-10-13)** - it is the layout: `load_v_buff_i8`
+and `_u8` carry `RK8`, `RJ8x4`, the destination `VD8`, `UO12` and the enable/modifier
+bits and **no index operand at all**, while the 16-bit loads and the 8-bit store name
+one (`VQ8` on the loads, `RA8` on the store).  The extension rules are stated on the
+rows as well: the byte becomes `0xffffff80` from `0x80` and `0x00000080` for the
+unsigned sibling, and the halfword likewise.
+
+So what is actually missing is not the form but **hardware verification**: the carrier
+cannot stage a buffer descriptor, so no sub-word buffer access has ever been executed
+and compared.  A driver should still avoid them or verify them first - but the reason
+is the missing execution, not a missing description.
 
 ## Shared memory
 
