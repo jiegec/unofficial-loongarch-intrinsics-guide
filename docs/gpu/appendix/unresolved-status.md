@@ -5,6 +5,23 @@ that is not established is still written as `UNRESOLVED` in place; the rule is
 unchanged (DEVELOPMENT.md).  What changes is that an entry leaves the set only
 with **evidence**, and the evidence is named here.
 
+### Which entries rest on the weaker classes (2026-10-13)
+
+Applying the three rules above to the register itself.  Most entries are
+unaffected: they are static, or they rest on the compared rows of the clean PS
+matrix.
+
+| entry | why it is flagged | what it means |
+|---|---|---|
+| 16 | its row, v_mma_323216_i8_i8_i32, is in the OBSERVED grade (run=0) | the wrapping rule is a hardware reading, not an oracle-checked comparison - now stated in the entry |
+| 32, 34 | they cite v_sqrt_f64 / the 64-bit members, whose flush is the pending measurement | only the f32 half is settled, and the entries say so |
+| 36 | open on purpose - the oracle and an early hardware observation disagree | not settled, and the grid vector that would answer it has never run |
+| 1, 3, 4, 13, 23, 26, 27, 35 | the cited measurements predate the artifacts in the tree | their raw records are not under build/, so they cannot be re-checked from this tree alone |
+
+Nothing here reopens an entry: it records how hard each one is, which is what a
+reader needs before leaning on it.
+
+
 ### How the closed classes were settled
 
 Thirty-four of the thirty-six entries below are closed (two are open: 31 and 36); **entry 31 is reopened** and
