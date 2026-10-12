@@ -94,7 +94,14 @@ def main() -> int:
     for m in thin[:16]:
         print('   %-28s missing %s' % (m, ','.join(sorted(NAMES - rows[m]))))
     print()
-    print('rows covering every required class: %d' % (len(rows) - len(thin)))
+    # NOT 'every required class'.  This tool checks the eight BOUNDARY classes it names
+    # above; the full required set is seventeen, and case_coverage.py is the gate that
+    # checks it.  Saying 'required' here while checking a subset was the defect this
+    # campaign keeps finding - a definition coarser than the thing it is measured
+    # against - and the fix is to say what is checked, not to keep a second copy of the
+    # requirement.
+    print('rows covering every boundary class above: %d' % (len(rows) - len(thin)))
+    print('  (the full required set is case_coverage.py\'s; this is the boundary subset)')
     floor = sorted(m for m in rows if not ({'nan-quiet', 'nan-signal'} & rows[m]))
     print('rows with NO NaN input at all (quiet or signalling): %d' % len(floor))
     for m in floor[:16]:
