@@ -46,6 +46,24 @@ record.
 | distinct UNRESOLVED sentences | 872 | **776** (1,008 occurrences) |
 | explicit placeholder bodies in `code/lg200` | 11 | **0** |
 
+### Which evidence was actually executed
+
+`case_provenance.py` answers this mechanically.  The hardware matrix records a
+per-row row count, and comparing it with the grid shows how much has been added since.
+The measured baseline is pinned by the matrix itself rather than by a date:
+`v_add_f32` row says row=111 with detail `PASS gen2510`, and the 10-10 grid
+(`4f26f81`, 18,542 vectors) carries 11 hand cases plus 100 generated vectors for that
+row - 111.  The matrix measured THAT grid.
+
+Everything the 10-13 regeneration added is therefore oracle expectation, not reading:
+**457 rows grew, +62,969 vectors, about three quarters of the current grid**.  Two
+concrete consequences, both checked by hand:
+
+| vector | in the 10-10 grid? | therefore |
+|---|---|---|
+| `v_add_f32 0x80000000 0x80000000 -> 0x80000000` | yes | measured, so the zero-sign clauses stand |
+| `v_add_f32 0x0 0xffc00000 -> 0x7fc00000` | no | oracle only, so the NaN clause stays open (entry 36) |
+
 ### What the remaining sentences are about
 
 The 792 remaining sentences are no longer a documentation problem: settled from
