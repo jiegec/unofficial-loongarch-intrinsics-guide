@@ -7,7 +7,7 @@ with **evidence**, and the evidence is named here.
 
 ### How the closed classes were settled
 
-Thirty-two of the thirty-three entries below are closed; **entry 31 is reopened** and
+Thirty-three of the thirty-four entries below are closed; **entry 31 is reopened** and
 is listed so the correction stays visible rather than silent.  By the kind of
 evidence that settles them:
 
@@ -89,7 +89,8 @@ applies to.  Closing one sentence closes every row that carries it.
 | 31 | "any condition-register effect of the wrapped shared-memory atomic" | **4** | **REOPENED after a wrong resolution.**  It was recorded as settled by the encoding (the form carries no condition-register operand); that argument is unsound, because the scalar compare forms carry no such operand either and still write the condition register as their destination - `s_cmp_imm`'s fields are only IK32 and RJ8 - and the sibling bitwise rows ask which condition bit they write.  The absence proves nothing; the effect stays open, and only a hardware read-back settles it. | 2026-10-13 |
 | 32 | "whether a denormal input is flushed" (the f32 rows) | **7** | **measured + the chapter itself**: a denormal input reads as zero - `v_abs_f32(min_denormal)` is 0 and `v_cmp_eq_f32(0.0, min_denormal)` is true - and the sibling arithmetic rows already state the same flush as established.  The 64-bit member is different: its flush is the PENDING measurement (the fp64 policy repair landed but was never run), so `v_sqrt_f64` keeps an UNRESOLVED that names hardware plan item 1. | 2026-10-13 |
 | 33 | "whether the destination may overlap the source" (one more row, `v_frexp_mant_f64`) | **1** | **encoding**: same class as entry 15's neighbours - independent selectors, and the instruction reads its sources before writing its destination. | 2026-10-13 |
-Rows 2, 5, 9, 10, 12, 13, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32 and 33 are
+| 34 | the remaining denormal-flush clauses (three f32 rows) and the halfway tie-break | **5** | **measured + the family rule**: the f32 flush is the measured mode, and the convert-to-integer tie goes to even because the family mode is rtne and the sibling rndne rows state the rule with worked examples.  The five 64-bit members are kept DIFFERENT: their flush is the pending measurement (hardware plan item 1), not the f32 answer. | 2026-10-13 |
+Rows 2, 5, 9, 10, 12, 13, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33 and 34 are
 *static or recorded-evidence* resolutions; rows 1, 3, 4, 6, 7, 8 and 11 carry
 direct hardware measurements; row 14 is a partial resolution that names what
 remains and why.

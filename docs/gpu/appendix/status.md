@@ -43,7 +43,7 @@ record.
 | measure | start | now |
 |---|---|---|
 | rows stating an `UNRESOLVED` | 737 | **580** |
-| distinct UNRESOLVED sentences | 872 | **787** (1,020 occurrences) |
+| distinct UNRESOLVED sentences | 872 | **781** (1,013 occurrences) |
 | explicit placeholder bodies in `code/lg200` | 11 | **0** |
 
 ### What the remaining sentences are about
@@ -65,7 +65,7 @@ the hardware-plan item that would settle each:
 | modifier semantics (mod2, clmp1) | 4 | plan 3 |
 | smaller, ungrouped questions | 227 | mostly hardware, one row at a time |
 
-Thirty-two classes are closed, each with its evidence named on
+Thirty-three classes are closed, each with its evidence named on
 [UNRESOLVED Status](unresolved-status.md) - hardware measurements for the
 behavioural ones, closed-producer censuses and encoding-uniqueness proofs for the
 static ones.  What remains is dominated by **memory-access semantics** (address
