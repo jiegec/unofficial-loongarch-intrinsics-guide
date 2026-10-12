@@ -20,6 +20,12 @@ from __future__ import annotations
 import subprocess, sys
 from pathlib import Path
 
+# bench_coverage.py owns the family -> reason mapping for a row the carrier cannot
+# build.  Import it rather than restate it: a SKIP whose reason is generic ('not
+# benchable on the compute carrier') cannot be acted on, and the CSV is the artifact a
+# reader works from.  That file is guarded, so importing it does not run its scan.
+from bench_coverage import classify as _bench_reason
+
 ROOT = Path(__file__).resolve().parent
 UNIVERSE = ROOT.parent.parent / "lg200-instructions.tsv"
 RUNNER = ROOT / "build" / "lgpu-gpu"
@@ -62,7 +68,10 @@ def run_batch(ms: list[str]):
 
 def verdict(m, wins, skipped, notes=None):
     if any((m, k) in skipped for k in ("lat", "tp")):
-        return ("SKIP", "", "", "not benchable on the compute carrier")
+        _fam, _why = _bench_reason(m)
+        reason = ("not benchable on the compute carrier"
+                  if not _why else "%s: %s" % (_fam, _why))
+        return ("SKIP", "", "", reason)
     got = {}
     for kind in ("lat", "tp"):
         a, b = wins.get((m, kind, K_SMALL)), wins.get((m, kind, K_LARGE))
