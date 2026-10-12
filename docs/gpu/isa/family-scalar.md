@@ -38,7 +38,11 @@ Two properties of this register matter:
 2. **It is short-lived across compares.**  A consumer must be materialised before
    the next compare is issued; the form of a compare that writes the result to a
    scalar register is not the established one, because back-to-back chains read a
-   stale value.
+   stale value.  The producer's output confirms this exactly (2026-10-13): every
+   scalar compare it emits writes the condition - `s_cmp_lt.i32 scc, s0, s2`,
+   `s_cmp_eq.i32 scc, s0, s2` - and the value is then materialised with a select,
+   `s_select.b32 s1, s1, i32(1), zero, scc`.  No compare in that program names a
+   scalar register as its destination.
 
 ## Operations
 
