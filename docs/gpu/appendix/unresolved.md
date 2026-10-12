@@ -61,7 +61,7 @@ the ones that force a decision, ordered by how much they constrain the code:
 | The surface record's alignment code and base-layer meaning ([State Object](../graphics/state-object.md)) | Mip and layered attachment setup is guesswork outside the two established alignment cases. |
 | The modifier semantics `mod2`, `clmp1`, `bl1`, `bl2` ([Operands](../isa/operands.md)) | The fields are emitted at fixed values; changing one is unsupported. |
 | The interpolation phase arithmetic ([Interpolation family](../isa/family-interpolation.md)) | Only the payload move is usable; a varying must come from the stage interface instead. |
-| Whether the wave size of 32 is an architectural maximum ([Generation Profile](../chips/lg200.md)) | Occupancy and register-budgeting decisions rest on a measured size, not a limit. |
+| How many waves a unit can hold ([Generation Profile](../chips/lg200.md)) | Occupancy budgeting cannot be done from the ISA.  The wave size of 32 lanes IS settled as an architectural maximum: the lane mask is one 32-bit word (measured - an all-true run gives 0xffffffff), so a 33rd lane would have no representation. |
 
 ## Coverage gaps, which are not the same thing
 

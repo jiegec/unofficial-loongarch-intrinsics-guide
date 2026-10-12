@@ -138,8 +138,7 @@ for another:
 
 ## UNRESOLVED
 
-* Whether the wave size of 32 lanes is an architectural maximum, and how many
-  waves a unit can hold.
+* How many waves a unit can hold.  Whether 32 lanes is an architectural maximum is settled: **32 lanes is an architectural maximum by construction**: the wave lane set is carried in a single 32-bit lane mask - measured, an all-true run gives 0xffffffff while the 4, 8 and 16-lane runs give 0x000f, 0x00ff and 0xffff - so a 33rd lane would have no representation, and the producer .wave_size: 32 agrees with the ceil(lanes/32) group count.  How many waves a unit can hold is a separate question and stays UNRESOLVED.
 * Cache hierarchy parameters, sizes and associativity.
 * Issue width, dual-issue behaviour and per-instruction latency.
 * The number of vector units, their lane counts and the ALU/SFU/DPU/tensor ratio
