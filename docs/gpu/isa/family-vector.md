@@ -49,9 +49,13 @@ Two different mechanisms look similar and must not be confused:
 
 The selector modifiers are raw-bit operations: they act on the value's sign bit,
 not on its numeric interpretation, and they apply before the operation.  The
-instruction modifiers apply to the result.  Their exact encodings beyond the
-names are UNRESOLVED, and every established producer emits a fixed value for
-them.
+instruction modifiers apply to the result.  Their exact encodings beyond the names are UNRESOLVED - but the reason is now known
+to be structural rather than incidental.  In two whole linked programs (~30,000 lines
+each, runtime libraries included) the disassembler prints none of `mod2`, `clmp1`,
+`dmask` or `un`, so the producer emits them at ZERO everywhere; `mod2` and `clmp1` do
+not appear anywhere in its intrinsic layer either.  `bl1`/`bl2` are the exception -
+both are reachable as the buffer forms' two boolean parameters - and even there only
+`bl1` is used, on private spill traffic.
 
 ## Conditions and lane masks
 

@@ -236,9 +236,16 @@ is not, despite sitting in the same list and printing like the others.  A reader
 who takes the vendor's five-immediate list as a statement that all five are
 ordinary operands will size the resource tuple from the wrong bit.
 
-The exact arithmetic of `mod2`, `clmp1` and the `bl1`/`bl2` pair is
-UNRESOLVED beyond their names; they are emitted as fixed values by every
-established producer.
+The exact arithmetic of `mod2` and `clmp1` is UNRESOLVED beyond their names - and the
+reason is stronger than "every producer emits fixed values": neither appears anywhere
+in the producer's intrinsic layer, and in two whole linked programs (~30,000 lines
+each, runtime libraries included) the disassembler prints no `mod2`, `clmp1`, `dmask`
+or `un` at all, which means the producer emits all of them at ZERO.  The `bl1`/`bl2`
+pair is a different case and is now separated out: both ARE reachable, as the two
+boolean parameters of the buffer forms (ordered `bl2` first, then `bl1`), and the only
+use the producer makes of them is `bl1` on its private spill/reload traffic - 26
+occurrences and no `bl2`.  So what remains open is not their identity but what the
+bits mean to the hardware.
 
 The texture instructions take their resource as a register tuple whose width is
 part of the operand, not a property of the mnemonic: with `M.rsz1` clear the
