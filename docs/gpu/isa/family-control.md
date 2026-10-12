@@ -53,9 +53,18 @@ work within the invocation.  It is also not a lane rendezvous; that is
 assembly (`llc -march=lggpu`: `check k|vm|vs|sm(15)`, `check k(1)`,
 `check vm(2)`, `check vs(4)`), and its cached kernels carry the operand
 values 0x1, 0x2, 0x3, 0x4 and 0x8: each class is selected independently or in
-combination.  What a zero operand orders (nothing, or a conservative
-all-class wait) is UNRESOLVED; in the cached kernels it appears only where
-none of the listed work was pending.
+combination.  The class selection is now mapped to the fence scopes it comes from (2026-10-13,
+compiling one kernel per scope): `mem_fence(CLK_GLOBAL_MEM_FENCE)` emits
+`check k|vm|vs(7)` and `mem_fence(CLK_LOCAL_MEM_FENCE)` emits
+`check k|vm|vs|sm(15)`; the `barrier(CLK_LOCAL_MEM_FENCE)` form emits `barrier` followed
+by `check k|vm|vs|sm(15)`, and the global form the same with `(7)`.  So `sm` is selected
+exactly when the local side is named, and `k|vm|vs` is the global side.  A scope naming
+both emits both, in separate instructions (`check k(1)`, `check vm(2)`, `check vs(4)`).
+
+**No zero operand appeared in any of those five programs**, which is what the cached
+kernels already suggested.  So the open question is now narrower and specific: what
+makes the producer emit a zero at all, and what the hardware then orders - which needs a
+device.
 
 ## Termination
 
