@@ -4189,6 +4189,60 @@ std::optional<EnvelopeProgram> build_cs_bench_buff_store(
 //   tp  - the address stays fixed and the result goes to a separate tuple.
 // The window's first dword is preloaded with that same address low word, so the
 // chained address is stable and stays inside the carrier's window.
+
+// The scalar buffer loads chain the same way the flat ones do, and for the same
+// reason: their destination is an SGPR, so the word just loaded can BE the next
+// offset through one scalar move, adding no instruction to the chain.  The vector
+// forms cannot do this - their destination is a VGPR, and feeding it back to a
+// scalar offset would need v_readfirstlane, an instruction inside the measurement.
+std::optional<EnvelopeProgram> build_cs_bench_buff_sload(
+    const std::string& mnemonic, unsigned copies, bool chained, unsigned lanes,
+    std::string& error) {
+  unsigned width = 1;
+  if (mnemonic == "load_s_buff_w2") width = 2;
+  else if (mnemonic == "load_s_buff_w4") width = 4;
+  else if (mnemonic == "load_s_buff_w8") width = 8;
+  else if (mnemonic == "load_s_buff_w16") width = 16;
+  else if (mnemonic != "load_s_buff_w1") {
+    error = "scalar buffer load bench: unknown width";
+    return std::nullopt;
+  }
+  const CarrierEnv env = CarrierEnv::compute(lanes);
+  Builder builder;
+  emit_env_prelude(builder, env);
+  // This family's address operand is a 4-dword buffer descriptor, built the way the
+  // correctness carrier builds it.
+  const isa::Reg desc = isa::sgpr(4, 4);
+  emit_load_desc(builder, env, desc, env.arg_va + carrier::kLoadWindow);
+  const isa::Reg dst = isa::sgpr(8, width);
+  const isa::Reg offset = isa::sgpr(28);
+  const isa::Reg imm_temp = isa::sgpr(29);
+  EnvelopeProgram program;
+  program.probe = true;
+  // The window contents are chosen to be small offsets, so the loaded word is a valid
+  // next offset with no masking - which is what keeps the chain free of extra work.
+  for (unsigned p = 0; p < width; ++p) {
+    program.arg_preloads.emplace_back(4u * p, 4u * p);
+  }
+  builder.s_mov_imm_b32(offset, 0u);
+  for (unsigned copy = 0; copy < copies; ++copy) {
+    builder.sflat_load(mnemonic, dst, desc, offset, 0u);
+    if (chained) {
+      builder.s_mov_b32(offset, dst);
+    }
+  }
+  builder.s_mov_imm_b32(imm_temp, 0u);
+  builder.v_mov_b32(isa::vgpr(0), imm_temp, isa::predicate(0));
+  for (unsigned p = 0; p < (width < 4u ? width : 4u); ++p) {
+    builder.v_mov_b32(isa::vgpr(10 + p), isa::sgpr(8 + p), isa::predicate(0));
+    emit_result_store(builder, env, isa::vgpr(10 + p), isa::vgpr(0), 4 * p);
+  }
+  if (!finalize_program(builder, program, error)) {
+    return std::nullopt;
+  }
+  return program;
+}
+
 std::optional<EnvelopeProgram> build_cs_bench_flat_sload(
     const std::string& mnemonic, unsigned copies, bool chained, unsigned lanes,
     std::string& error) {
@@ -4310,8 +4364,9 @@ std::optional<EnvelopeProgram> build_cs_bench(const std::string& mnemonic,
   // The remaining buffer loads: their chain needs a LIVE index or offset register,
   // and nothing exercises one yet (hardware plan item 10).  Only the plain buffer
   // store and the buffer atomics avoid that - they chain through the data.
-  if (mnemonic.rfind("load_v_buff_", 0) == 0 ||
-      mnemonic.rfind("load_s_buff_", 0) == 0) {
+  if (mnemonic.rfind("load_s_buff_", 0) == 0)
+    return build_cs_bench_buff_sload(mnemonic, copies, chained, lanes, error);
+  if (mnemonic.rfind("load_v_buff_", 0) == 0) {
     error = "buffer load bench: the chain needs a live index or offset register "
             "(hardware plan item 10); only the plain buffer store and the buffer "
             "atomics avoid it";

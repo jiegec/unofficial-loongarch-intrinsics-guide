@@ -78,8 +78,8 @@ fourth:
 
 | correctness builds it | bench lat | bench tp | rows |
 |---|---|---|---|
-| yes | yes | yes | **610** |
-| yes | no | no | **73** |
+| yes | yes | yes | **615** |
+| yes | no | no | **68** |
 | no | no | no | **85** |
 
 There is no row in the missing fourth class: **nothing is benchable that the correctness
@@ -95,7 +95,7 @@ grouped, they are nine classes:
 
 | class | rows | what a template would need |
 |---|---|---|
-| buffer load | 21 | a **live index or offset register** to chain through - the loaded word
+| buffer load | 16 | a **live index or offset register** to chain through - the loaded word
   cannot be the address the way it is for the flat loads, so the next index must be derived
   from the value just loaded |
 | SIO / GS-prefix | 20 | semantics first: these run OBSERVED because the channel-file
