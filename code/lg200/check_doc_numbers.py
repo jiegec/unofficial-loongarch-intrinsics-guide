@@ -108,7 +108,7 @@ def main() -> int:
         # unresolved-status.md keeps a dated snapshot, so its current figures carry a
         # date and are anchored by it.  This file had no anchor at all until 2026-10-13:
         # it is the fourth page with count claims and the only one the check did not read.
-        ('unresolved-status.md', r'\*\*(\d+) as of 2026-10-13\*\*', 'rows-unresolved'),
+        ('case-boundaries.md', r'still \*\*(\d+)\*\*', 'targets'),
         ('case-boundaries.md', r'The \*\*(\d+)\*\* that remain are ' +
                                 r'\*\*launch-shape\*\*', 'launch-shape'),
         ('unresolved-status.md', r'\*\*(\d+) as of 2026-10-13\*\*', 'rows-unresolved'),
@@ -129,6 +129,19 @@ def main() -> int:
             print('ok       %-22s %s = %d' % (doc, key, live[key]))
     for k, v in live.items():
         print('  live %-16s %d' % (k, v))
+
+    # Every live measure must either be anchored above or be listed here as one that
+    # no page states.  The previous round claimed the anchored set was complete and it
+    # was not - gaps and vectors were computed and never compared with anything - which
+    # is the same failure as the missing anchor itself, one level up.  So the claim is
+    # checked rather than asserted.
+    UNSTATED = {'vectors', 'gaps'}   # no page quotes these; nothing to anchor them to
+    anchored_keys = {key for _doc, _pat, key in checks}
+    for key in live:
+        if key not in anchored_keys and key not in UNSTATED:
+            print('UNANCHORED  live measure %s has no anchor and is not listed as unstated'
+                  % key)
+            bad += 1
     bad += bold_census(live)
     print('drift: %d' % bad)
     return 1 if bad else 0
