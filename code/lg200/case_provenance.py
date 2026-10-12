@@ -33,6 +33,7 @@ from __future__ import annotations
 
 import csv
 import datetime
+import re
 import subprocess
 import sys
 from collections import Counter
@@ -75,6 +76,38 @@ def grid_commit_date() -> str:
     except Exception:
         return ""
 
+
+PAGE = HERE.parent.parent / "docs" / "gpu" / "appendix" / "status.md"
+
+
+def check_page(n_grown, extra) -> int:
+    """Compare the provenance figures with what the status page states.
+
+    The page calls this mechanically checkable and then quotes two of its numbers,
+    but nothing ran the tool, so those numbers were checked by nothing.  This is the
+    missing half of that sentence."""
+    text = PAGE.read_text(encoding="utf-8")
+    m = re.search(r"[*][*]([0-9]+) rows grew, [+]([0-9,]+) vectors", text)
+    bad = 0
+    if not m:
+        print("MISSING  the page no longer states the provenance figures")
+        bad += 1
+    else:
+        said_grown = int(m.group(1))
+        said_extra = int(m.group(2).replace(",", ""))
+        if said_grown != n_grown:
+            print("DRIFT    rows grew: page says %d, the matrix says %d"
+                  % (said_grown, n_grown))
+            bad += 1
+        if said_extra != extra:
+            print("DRIFT    unmeasured vectors: page says %d, the matrix says %d"
+                  % (said_extra, extra))
+            bad += 1
+    if bad:
+        return 1
+    print("case provenance: %d rows grew by %d unmeasured vectors, page agrees"
+          % (n_grown, extra))
+    return 0
 
 def main() -> int:
     if not MATRIX.exists():
@@ -127,6 +160,8 @@ def main() -> int:
     grown = sorted((m, measured[m], n) for m, n in now.items()
                    if m in measured and n > measured[m])
     extra = sum(b - a for _, a, b in grown)
+    if "--check" in sys.argv:
+        return check_page(len(grown), extra)
     print("  rows whose grid grew since the matrix: %d (+%d unmeasured vectors)"
           % (len(grown), extra))
     for m, a, b in grown[:8]:
