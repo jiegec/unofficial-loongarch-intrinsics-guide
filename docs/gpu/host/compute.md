@@ -74,8 +74,14 @@ gap that remains.
 ## UNRESOLVED
 
 * The mapping of the three dispatch dimension fields to axes.
-* The local-size bounds: whether a 10-bit field is an architecture limit or a
-  producer convention, and what an out-of-range value does.
+* The local-size bounds - **half settled**.  The 10-bit field is the launch
+  record's own width: the three sizes share one command word, `0x00100189` with
+  `xyz = 10 bits x 3`, so a workgroup axis cannot exceed **1023** through that
+  record.  That makes it an encoding limit rather than a producer convention.  The
+  kernarg record carries the same sizes in a **16-bit** container (the compiler reads
+  them masked with `0xffff`), so the two widths differ deliberately.  What the
+  hardware does with a value above 1023 - reject it, clamp it or wrap it - is NOT
+  established, and only the device can say.
 * The compute queue record as a user-mode driver sees it, and the doorbell's
   acknowledgement.
 * How a compute submission's completion relates to a graphics fence.
