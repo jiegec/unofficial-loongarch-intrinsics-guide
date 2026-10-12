@@ -33,8 +33,12 @@ applies to.  Closing one sentence closes every row that carries it.
 
 | 7 | "Whether a signalling NaN is quieted or raises a flag" | **30** | **hardware + ISA**: a compare yields a mask, not an FP value, and that mask is identical for sNaN and qNaN (measured); flag raising is *not observable* - no instruction reads the FP exception flags (`flag` only updates flag state, `getreg` reads environment registers). | 2026-10-12 |
 
-Rows 2 and 5 are *scoping/coverage* resolutions; rows 1, 3, 4, 6 and 7 are behaviour
-resolutions, all with hardware evidence except row 2 (a closed-producer census).
+| 8 | "the destination's upper 16 bits" / "whether the mask reads as an ordinary scalar" / "whether a signalling NaN compares differently" (seven wordings) | **39** | **hardware + the row's own Semantics**: the destination is a full 32-bit lane mask (one bit per lane, `0xffffffff` at 32 lanes), so bits 31:16 are *not* cleared; the mask *does* read as an ordinary scalar (the destination may name a scalar register, and the vendor backend encodes `RD8 = 6` for `s6`); and sNaN does not compare differently from qNaN. | 2026-10-12 |
+| 9 | "The encoded predicate is shared with another family member" | **14** | **static, disproved**: every member of the `v_cmp_o_*` / `v_cmp_u_*` / `v_cmp_tru_*` family has its own fixed encoding - 14 distinct fixed words, **0 collisions** - so the instruction word alone determines which behaviour executes. | 2026-10-12 |
+
+Rows 2 and 5 are *scoping/coverage* resolutions; rows 1, 3, 4, 6, 7, 8 and 9 are behaviour
+resolutions, all with hardware evidence except rows 2 (a closed-producer census) and 9
+(a fixed-encoding uniqueness proof).
 
 ## 2b. Executable-body writebacks (`code/lg200/*.h`)
 
