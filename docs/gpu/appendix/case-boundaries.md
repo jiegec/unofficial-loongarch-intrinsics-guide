@@ -35,7 +35,13 @@ operands admit.  After the generator gained per-format tables (f16/f64 included)
 the full signed value space (signalling NaN and negated NaN/limits/denormals
 included), fp64 pair operands and the four-dword binary-f64 shape: **499 of 768**.
 
-The vector count went 20,732 -> 46,966.
+A further step reaches the atomic families, which the generator had excluded
+along with the other memory rows.  Their carrier stages the cell and the operand
+straight from the case inputs - the address comes from the case index, not from a
+case value - so a boundary grid is stageable even though the bench cannot time
+them; @@case_targets()@@ adds those fifty rows without touching the bench's own
+target set.  Coverage: **531 of 768**, and the vector count went
+20,732 -> 46,966 -> 49,930.
 
 ## 4. The boundary cases changed the answer the hardware gives
 

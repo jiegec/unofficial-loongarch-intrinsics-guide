@@ -163,6 +163,29 @@ def targets() -> list:
     return out
 
 
+# The case generator reaches further than the bench does.  The atomic families
+# stage the cell and the operand straight from the case inputs - their address
+# comes from the case index, not from a case value - so a boundary grid is
+# stageable even though the bench cannot time them.
+ATOMIC_OK = re.compile(r"^atomic_(sm|v_buff|v_flat)_")
+
+
+def case_targets() -> list:
+    out = list(targets())
+    meta = {}
+    with open(TSV, encoding="utf-8") as f:
+        for row in csv.DictReader(f, delimiter="\t"):
+            meta[row["mnemonic"]] = row
+    for mnemonic in sorted(meta):
+        if not ATOMIC_OK.match(mnemonic):
+            continue
+        if IMM_SLOT.search(meta[mnemonic].get("operand_signature", "")):
+            continue
+        if nin_of(mnemonic) in (2, 3, 4):
+            out.append(mnemonic)
+    return out
+
+
 def main() -> int:
     meta = {}
     with open(TSV, encoding="utf-8") as f:
@@ -179,7 +202,7 @@ def main() -> int:
             return vals
         return list(row)
 
-    for mnemonic in targets():
+    for mnemonic in case_targets():
         sem = meta[mnemonic]["semantic_model"]
         nin = nin_of(mnemonic)
         fmt = input_format(mnemonic) if sem == "floating-point-value" else ""
