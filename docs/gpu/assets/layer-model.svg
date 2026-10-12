@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 340" width="720" height="340" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="12">
+<defs>
+<marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+<path d="M 0 0 L 10 5 L 0 10 z" fill="#666"/>
+</marker>
+</defs>
+<text x="8" y="16" fill="#111" font-size="13" font-weight="bold">Four layers between an API call and a shader instruction</text>
+
+<rect x="8" y="28" width="704" height="56" fill="#f5f5f5" stroke="#444" rx="3"/>
+<text x="20" y="48" fill="#111" font-weight="bold">Layer 0</text>
+<text x="86" y="48" fill="#111">kernel command word</text>
+<text x="20" y="70" fill="#555" font-size="11">producer: kernel &#183; configure a pipe, a queue, the MMU, an interrupt or a VRAM window</text>
+<text x="700" y="48" text-anchor="end" fill="#555" font-size="11">ICMD32</text>
+
+<rect x="8" y="100" width="704" height="56" fill="#dbe9ff" stroke="#444" rx="3"/>
+<text x="20" y="120" fill="#111" font-weight="bold">Layer 1</text>
+<text x="86" y="120" fill="#111">stream command word</text>
+<text x="20" y="142" fill="#555" font-size="11">producer: outer ring &#183; select a virtual-memory domain, execute an indirect buffer, poll or write memory</text>
+<text x="700" y="120" text-anchor="end" fill="#555" font-size="11">SCMD32</text>
+
+<rect x="8" y="172" width="704" height="56" fill="#e8f5e9" stroke="#444" rx="3"/>
+<text x="20" y="192" fill="#111" font-weight="bold">Layer 2</text>
+<text x="86" y="192" fill="#111">pipe command stream</text>
+<text x="20" y="214" fill="#555" font-size="11">producer: a pipe front end &#183; graphics, blit, transfer or compute records</text>
+<text x="700" y="192" text-anchor="end" fill="#555" font-size="11">state object / dispatch</text>
+
+<rect x="8" y="244" width="704" height="56" fill="#f3e5f5" stroke="#444" rx="3"/>
+<text x="20" y="264" fill="#111" font-weight="bold">Layer 3</text>
+<text x="86" y="264" fill="#111">two-word shader instruction</text>
+<text x="20" y="286" fill="#555" font-size="11">producer: shader front end &#183; execute instructions from the kernel entry</text>
+<text x="700" y="264" text-anchor="end" fill="#555" font-size="11">INST_LO / INST_HI</text>
+
+<line x1="360" y1="84" x2="360" y2="98" stroke="#666" marker-end="url(#a)"/>
+<line x1="360" y1="156" x2="360" y2="170" stroke="#666" marker-end="url(#a)"/>
+<line x1="360" y1="228" x2="360" y2="242" stroke="#666" marker-end="url(#a)"/>
+
+<text x="8" y="322" fill="#555" font-size="11">Each layer has its own word format and its own cursor domain.  The same numeric opcode can mean different</text>
+<text x="8" y="337" fill="#555" font-size="11">things in two layers, so a decoder carries the layer and the pipe along with a command word.</text>
+</svg>

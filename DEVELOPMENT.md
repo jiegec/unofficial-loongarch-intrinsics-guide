@@ -13,7 +13,8 @@
 ## Loongson GPU (LG200) section
 
 The LG200 (Loongson GPU gen-2) docs under `docs/gpu/` are driven by committed
-data, with no build-time generator:
+data.  `main.py` parses the table at build time and `code/lg200/gen_state_map.py`
+generates the state-object figure; nothing else is generated.
 
 - `code/lg200-instructions.tsv` — the vendored instruction table (description,
   encoding words, mask/layout columns) that `main.py` parses at build time.
@@ -51,8 +52,10 @@ data, with no build-time generator:
   a PS program, submits once on the GFX ring, reads the result BO back and
   compares with the expected dwords. No allowlist, gate, quarantine, or state
   ladder: a case passes, fails, or cannot-run.
-- Build: `make -C code/lg200/gpu` (uses `libdrm_loonggpu`; point `LIBDRMDIR`
-  at an uninstalled libdrm build directory, or install the package).
+- Build: `make -C code/lg200/gpu build/lgpu-gpu` (uses `libdrm_loonggpu`; point
+  `LIBDRMDIR` at an uninstalled libdrm build directory, or install the package).
+  The Makefile's default target is `matrix`, so a bare `make -C code/lg200/gpu`
+  builds the runner *and* dumps the matrix.
   `make -C code/lg200/gpu matrix` dumps the materializable subset per
   carrier; `python3 code/lg200/gpu/run_gpu.py` runs the entire
   768-instruction universe on the GPU (one process per instruction, fence
@@ -72,16 +75,45 @@ data, with no build-time generator:
   encodings are LG200 no-op holes (LG210 legacy), and the `v_rcp_f64`
   low-word mantissa model remains an empirical UNRESOLVED hardware artifact
   (`sf_rcp64` lo-map in `ops/oracle.cpp`).
-- `docs/gpu/` — the manual itself, in three parts.  Mechanisms that hold for
-  the family are described once per chapter (`concepts/`, `host/`, `graphics/`,
-  `shader/`, `isa/`, `tools/`); the values and limits of one chip
-  generation live in `chips/<generation>.md` and in the generation column of a
-  table, so a new generation adds a profile page and a column rather than a
-  second copy of the manual.  The instruction pages are generated from the
-  table and the pseudo-code files by `main.py` at build time.
+- `docs/gpu/` — the manual itself, grouped by the layer each chapter describes
+  (`concepts/`, `chips/`, `host/`, `host/pipes/`, `graphics/`, `shader/`,
+  `isa/`, `instructions/`, `appendix/`), in the order a command travels.  The
+  directory tree and the mkdocs navigation agree, so a page's place in the tree
+  is its place in the reading order.  Mechanisms that hold for the family are
+  described once per chapter; the values and limits of one chip generation live
+  in `chips/<generation>.md` and in the generation column of a table, so a new
+  generation adds a profile page and a column rather than a second copy of the
+  manual.  The instruction pages are generated from the table and the
+  pseudo-code files by `main.py` at build time; the state-object figure is
+  generated from the block list in `code/lg200/gen_state_map.py`.
+- `check_gpu.py` — the GPU chapter's structural checks: the five masks partition
+  every row, `opcode` is a subset of `fixed`, every base word satisfies
+  `base & fixed == base` and carries no operand bits, the 12 format and 7 family
+  row counts sum to 768 and match the chapters that state them, every mnemonic is
+  referenced by exactly one index and vice versa, the state map is contiguous and
+  agrees with its generator, every nav target and every link resolves, and every
+  figure is well-formed XML.  `--mesa <path-to-isa/lg200.xml>` additionally
+  compares the masks and base words against the open driver's table for all 768
+  rows, which catches a class of mask defect that no internal invariant can.
 - Microbench: `python3 code/lg200/run_bench.py` sweeps the register-pure
   targets on the PS carrier and writes `code/lg200/measure-lg200.csv`,
   which `main.py` renders into the per-instruction Latency sections
   (relative wall-clock slope values; rows below the ~17 ms submission floor
   render as "-").
 
+## GPU encoding and carrier checks
+
+Two checks cover the `code/lg200/gpu/` carrier, and both are expected to pass:
+
+    python3 check_gpu.py [--mesa PATH]   # catalog invariants, state map, nav,
+                                         # generated-table consistency, and the
+                                         # driver cross-check
+    cd code/lg200/gpu && python3 enc_probe.py
+                                         # this codec vs the vendor's assembler
+                                         # (CPU-only; needs the vendor tree)
+
+`check_gpu.py` verifies that `codec/generated/lg200_codec.inc` agrees with the
+catalog it claims to be generated from - the generator itself
+(`tools/gen_codec.py`) is not in the repository, so the two copies are otherwise
+synchronized by hand.  `enc_probe.py` compares encodings against the vendor's
+own LLVM, which is the only authority independent of both this table and Mesa's.

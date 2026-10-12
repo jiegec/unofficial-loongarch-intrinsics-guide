@@ -3,7 +3,7 @@
 > **Scope.** This page describes the kernel-side command layer. A user-mode
 > driver does not program it; it submits indirect buffers and waits for
 > fences, as described in [Host Interface](interface.md) and
-> [Graphics Submission](submission.md). The vocabulary here is kept for
+> [Graphics Submission](graphics-submission.md). The vocabulary here is kept for
 > orientation when reading kernel or firmware sources.
 
 ## The shared L1 word
@@ -12,7 +12,7 @@
 vocabulary each pipe consumes is different: a GPIPE ring executes `VMID`,
 `IB`, `WB32`, and `POLL`; an XDMA ring executes `STSCFG` and `SBMT`; the CPIPE
 HIQ executes `MAP_PROCESS`, `MAP_QUEUE`, and `DOORBELL`. The per-pipe pages
-([GPIPE](gpipe.md), [XDMA](xdma.md), [CPIPE](cpipe.md)) define which opcodes
+([GPIPE](pipes/gpipe.md), [XDMA](pipes/xdma.md), [CPIPE](pipes/cpipe.md)) define which opcodes
 each pipe accepts and what their payloads mean.
 
 ```text

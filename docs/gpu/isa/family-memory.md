@@ -1,6 +1,6 @@
 # Memory and Image Family
 
-The instruction index for this family is under [memory-image](../memory-image.md).
+The instruction index for this family is under [memory-image](../instructions/memory-image.md).
 
 The memory and image family moves data between memory and the vector and scalar
 register files.  Operand classes and the five addressing shapes are defined in
@@ -19,8 +19,10 @@ than an operand:
 | Image | an image descriptor plus a coordinate window | texture fetch and store, image loads and stores |
 | Shared memory | an offset relative to the workgroup's allocation | workgroup communication, interpolation coefficients |
 
-Scalar forms of the buffer and flat modes exist for the scalar register file.
-There is no scalar image mode.
+Scalar forms of the buffer and flat modes exist for the scalar register file, so
+five operand shapes occur in the encoding.  There is no scalar image mode.
+
+![The five addressing shapes](../assets/memory-addressing.svg)
 
 ## Buffer addressing
 
@@ -93,8 +95,13 @@ operand, and move between that memory and registers:
 * Loads and stores of 8, 16, 32 and 64 bits, with an explicit offset.
 * A coefficient load used by the fragment interpolation path, which reads one
   coefficient vector from a base register plus a slot index.
-* Matrix forms that read one, two or four planes, whose plane and lane layout is
-  UNRESOLVED.
+* Matrix forms — `load_sm_matrix_x1`, `x2` and `x4` — that read one, two or four
+  planes.  The single-plane form reads element `n` of a four-column matrix into
+  lane `n`, with the row pitch taken from the caller's per-lane address stride
+  rather than from each lane's own address; the encoded destination byte is the
+  tuple start and must be aligned to the tuple width.  The mapping of the planes
+  onto registers in the multi-plane forms, and the intra-plane layout, are
+  UNRESOLVED; `x4` was measured to write more than four registers.
 * Swizzle forms that load or store a 64-bit element with a permutation, where the
   unit of the offset, the permutation's action on address versus data, and
   whether it is an involution are UNRESOLVED.

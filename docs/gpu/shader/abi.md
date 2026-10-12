@@ -59,35 +59,6 @@ Size rules:
 * Code size must fit 16 bits, and a complete instruction stream is a multiple of
   eight bytes.
 
-## Launch registers
-
-The hardware provides these registers at stage entry.  A stage must not expect
-any other register to be pre-loaded.
-
-| Register | Contents | Stage |
-|----------|----------|-------|
-| `s4:s5` | constant root (record root 3) | vertex, geometry, fragment |
-| `s6:s7` | image and sampler descriptor root (root 4) | vertex, geometry, fragment |
-| `s8:s9` | vertex attribute descriptor table | vertex |
-| `s2` | fragment interpolation selector | fragment |
-| `s9` | fragment input window base | fragment |
-| `s0:s1` | read-write buffer root (root 1) | streamout |
-| `v0` | vertex index, with the draw's vertex bias already applied | vertex |
-| `v1` | instance identifier | vertex |
-| `v0` | packed input-vertex selectors: six 5-bit fields | geometry |
-| `v1` | primitive identifier | geometry |
-| `v2:v3` | barycentric pair, smooth interpolation | fragment |
-| `v8:v9` | barycentric pair, noperspective interpolation | fragment |
-| `v0:v1` | the barycentric pair when a sample mask is used | fragment |
-| `v12..v15` | fragment coordinate | fragment |
-| `v6` | coverage / sample mask | fragment |
-| `v12` or `v16` | front-facing flag | fragment |
-
-The scalar registers `s0..s3` double as a lane-mask allocation window, and the
-vertex attribute load also lands in that range, so a compiler must treat them as
-consumed.  Lane-mask values are read from the fixed selector `0x7c`; see
-[Operands and Execution Registers](../isa/operands.md#conditional-execution).
-
 ## Entry and exit
 
 `kernel_entry` is the address of the uploaded code: it points at the first
@@ -106,10 +77,12 @@ check                   order pending memory and interface work
 exit                    terminate the invocation
 ```
 
-There are no separate "sio check" or "sio exit" instructions: the ordering
-operation is the wait instruction and the terminator is the exit instruction.
+There are no separate "sio check" or "sio exit" instructions: `check` is the
+ordering operation and `exit` is the terminator, and both are the ordinary
+control-prefix forms described in
+[the control flow and ordering family](../isa/family-control.md).
 A discard or a demote instead restores the pre-quad mask, masks the active lanes
-and does **not** execute the exit instruction.
+and does **not** execute `exit`.
 
 ## Stage conventions
 
@@ -184,11 +157,12 @@ infer behaviour from them.
 
 ## Limits
 
+The register files, the reserved windows, the launch-supplied registers and the
+per-stage size rules are in [Registers and Allocation](registers.md).  The
+remaining limits of a stage are:
+
 | Limit | Value |
 |-------|-------|
-| Scalar registers | 102 |
-| Vector registers | 256 |
-| Minimum SGPR / VGPR per stage | 16 / 8 (vertex), 64 (geometry), 16 (fragment), 2 (streamout) |
 | Code size | 16-bit byte count |
 | Clip distances | 8 |
 | Vertex attributes | 16 |
@@ -202,13 +176,6 @@ infer behaviour from them.
 
 ## UNRESOLVED
 
-* The meaning of the "VGPR initial count" field: the name says count, the value
-  for the vertex role is 4 while the stage reads `v0` and `v1`, and the fragment
-  value is 15 while `v16` is read in one configuration.
-* Whether the lane-mask window and the descriptor-scratch use of `s0..s3` alias.
-* The hydration of `s10:s11`.
-* Whether `s9` is simultaneously the attribute-table high half and the fragment
-  input window base.
 * The geometry stage's uniform-buffer table placement.
 * The meaning of the extra high bit some hosts set in the geometry resource root.
 * The "generated" flag of a fragment attribute entry.

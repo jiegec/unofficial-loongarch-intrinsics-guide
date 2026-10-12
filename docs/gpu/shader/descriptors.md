@@ -80,7 +80,7 @@ shader can make.
 | `[63:62]` | Memory type low | not used |
 | `[77:64]` | Width | 14-bit extent of the base level |
 | `[91:78]` | Height | 14-bit extent of the base level |
-| `[94:92]` | Performance mode | producers write different values; the encoding is UNRESOLVED |
+| `[94:92]` | Performance mode | every established producer writes 4; the field's meaning is UNRESOLVED |
 | `[95]` | Interlaced | not used |
 | `[98:96]` | Destination select X | 3-bit channel selector |
 | `[101:99]` | Destination select Y | |
@@ -384,8 +384,8 @@ while depth and stencil resolve run through CPU transfers.
 
 ## UNRESOLVED
 
-* The performance mode field: producers write different values for the same
-  resource shape.
+* The performance mode field: every established producer writes 4, and what the
+  field selects is not established.
 * The 12-bit colour buffer swizzle: only the constant written per format is
   known, not the meaning of its subfields.
 * Buffer descriptor bits `[63:62]` and `[127:119]`: element size, index

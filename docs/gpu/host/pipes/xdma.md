@@ -2,8 +2,8 @@
 
 > **Scope.** This page describes the kernel-side command layer. A user-mode
 > driver does not program it; it submits indirect buffers and waits for
-> fences, as described in [Host Interface](interface.md) and
-> [Graphics Submission](submission.md). The vocabulary here is kept for
+> fences, as described in [Host Interface](../interface.md) and
+> [Graphics Submission](../graphics-submission.md). The vocabulary here is kept for
 > orientation when reading kernel or firmware sources.
 
 The transfer pipe: linear copy and fill. It uses `STSCFG`/`SBMT` on its own

@@ -2,8 +2,8 @@
 
 > **Scope.** This page describes the kernel-side command layer. A user-mode
 > driver does not program it; it submits indirect buffers and waits for
-> fences, as described in [Host Interface](interface.md) and
-> [Graphics Submission](submission.md). The vocabulary here is kept for
+> fences, as described in [Host Interface](../interface.md) and
+> [Graphics Submission](../graphics-submission.md). The vocabulary here is kept for
 > orientation when reading kernel or firmware sources.
 
 The compute pipe. LG200 compute queues are owned by KCD: the kernel creates a
@@ -84,7 +84,7 @@ The MQD length is in dwords, but a KCD user queue publishes byte `rptr/wptr`
 values. A producer must release-store a byte offset and submit through the HIQ
 `DOORBELL`. The user-ring front end is distinct from GPIPE. `WB32`, `POLL`,
 and status forms are observable control commands; the wave-launch payload and
-completion contract remain unresolved.
+completion contract remain UNRESOLVED.
 
 ## DPIPE and EPIPE
 

@@ -1,6 +1,6 @@
 # Memory and Image
 
-The addressing modes these rows use, the format conversion paths and the shared-memory model are described in [Memory and Image Family](isa/family-memory.md).
+The addressing modes these rows use, the format conversion paths and the shared-memory model are described in [Memory and Image Family](../isa/family-memory.md).
 
 ## Instruction index
 
@@ -375,7 +375,7 @@ exactly as `samp*_o` (`ivec2(1, -2)` becomes `0x3e01` in `v0`).  The offset opco
 (`0x2c`-`0x37`) is separate from the no-offset block (`0x20`-`0x2b`).  Both forms clear bit 27 of the
 sampler descriptor (`s_and_imm_b32 s4, s4, 0xf7ffffff`) before the gather.  The closed producer GLSL
 offers `textureGather*` only for `sampler2D`/`isampler2D`/`usampler2D`/`sampler2DArray` (no shadow
-entry point), so the shadow gather forms have no direct GLSL 330 oracle.and is marked accordingly.
+entry point), so the shadow gather forms have no direct GLSL 330 oracle and are marked accordingly.
 
 Texture: 16x16 RGBA8, texel (x,y) r = (x*16 + y) & 0xff (unique), NEAREST,
 single level.  Shader emits the four gathered r values into one RGBA output
@@ -418,3 +418,47 @@ pixel; one readback identifies the exact 2x2 block and channel order.
   (sampler2DShadow overload).  Hardware gather_b/cl/l/lz/c* variants need
   an entry point outside GLSL 330 (Vulkan, CL, or a direct shader binary) to be verified.
 
+
+
+## Flat-form encoding: the format tag and the zero base
+
+The flat forms (`load_v_flat_*`, `store_v_flat_*`, `atomic_v_flat_*`) carry two
+bits that the vendor's own assembler sets on **every** form it emits, and which
+the LG200 machine row must therefore treat as part of the encoding rather than
+as free bits:
+
+| bit | role |
+|---|---|
+| `INST_LO[30]` | the `bl1` modifier field, set on every flat form |
+| `INST_HI[28]` | set on every flat load/store form |
+| `INST_HI[29]` | additionally set on `load_v_flat_i16` and `load_v_flat_u16` |
+
+With those bits clear the words are not accepted by the vendor's own
+disassembler (they decode as the PHI pseudo-instruction), which is how the
+absence was established: `llvm-mc -arch=lggpu -mcpu=lg200 -show-encoding` on
+`store.v.flat.b32 p0, v10, v[0:1]` emits `lo=4000140a hi=70900000`, and the
+driver's decoder accepts only that form.
+
+The **address base pair is not spellable** in the vendor's assembly.  Its flat
+form takes three operands (`store.v.flat.b32 p0, v10, v[0:1]`) and always
+encodes the architectural zero source, `s20:s21` - the same pair this table
+records as `RA8x2`/`RK8x2` at `INST_LO[15:8]`, whose default encoding is `0x14`.
+A producer that assembles the pair itself must therefore pass `s20:s21` and keep
+both registers zero; anything else is a different address base.
+
+## Shared-memory atomics: assembly operand order
+
+`atomic_sm_*` takes four operands in the machine row as (predicate, `VJ8`,
+`VK8`, `VD8`), while the vendor's assembler spells the same instruction as
+(predicate, destination, address, data).  The **fields are identical**, so the
+two produce the same bytes for the same field assignment; only the assembly
+operand order differs.  A reader following the vendor's order on this table
+would assign the address and the destination to each other's fields.
+
+## Flat inventory: the b96 forms have no vendor counterpart
+
+The vendor backend's instruction table contains 38 flat rows (26
+`atomic_v_flat_*`, 7 `load_v_flat_*`, 5 `store_v_flat_*`).  It has no
+`LOAD_V_FLAT_B96` or `STORE_V_FLAT_B96`, and its assembler rejects both
+spellings, so the two `*_v_flat_b96` rows here come from the decoder artifact
+alone and cannot be cross-validated against the vendor toolchain.

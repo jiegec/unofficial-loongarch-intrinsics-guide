@@ -1,6 +1,6 @@
 # Vector ALU Family
 
-The instruction index for this family is under [vector-alu](../vector-alu.md).
+The instruction index for this family is under [vector-alu](../instructions/vector-alu.md).
 
 The vector ALU is the largest family: arithmetic, logic, shifts, conversions,
 comparisons and data movement over the vector register file.  The operand classes
@@ -99,6 +99,39 @@ instruction.  Several conversion encodings are inert on this generation — they
 decode and execute without changing the destination — which is documented per
 row.
 
+## Matrix multiply-accumulate
+
+Eight rows multiply a packed 8-bit matrix by a packed 8-bit matrix and add a
+32-bit accumulator: `v_mma_8816_*` is an 8x16 by 16x8 product accumulated into
+8x8, and `v_mma_323216_*` is 32x16 by 16x32 into 32x32. Each shape is a separate
+operation code, and the signedness of the two sources is a further field
+(`INST_HI[15:8]`), so shape and signedness are both decoded rather than carried
+by an operand.
+
+The fragments are a property of the wave, not of the operand syntax.  For the
+8816 shape the mapping is measured over the whole operand range: with `byte` the
+byte index inside a lane, `GJ11` holds an 8x16 operand with `row = lane/4` and
+`k = 4*(lane%4) + byte`, `GK11` holds 16x8 with the same `k` and `j = lane/4`,
+and the destination holds 8x8 i32 with `row = lane/4` and
+`j = 2*(lane%4) + word`.  For the 323216 shape the per-lane fragment counts
+follow from the vendor's declared operand types; its lane mapping has not been
+measured separately.
+
+These rows are wave-wide: the vendor declares them convergent, and the
+accumulator is an operand rather than the destination's incoming value, so a
+contraction is a chain of ordered steps from a defined start.  A lowering is not
+obliged to use them: because the fragments are fully determined, a
+cooperative-matrix operand can equally be assembled from ordinary per-lane loads
+and stores, and such a lowering has its own lane assignment.  The mapping above
+describes the instruction, not any particular producer.
+
+## Matrix reads
+
+`load_sm_matrix_x1`, `load_sm_matrix_x2` and `load_sm_matrix_x4` read a matrix
+plane from the workgroup allocation into a register tuple.  The single-plane
+form's per-lane layout is measured; the addressing they share is described with
+the [memory and image family](family-memory.md#shared-memory).
+
 ## Family map
 
 | Group | Examples |
@@ -112,6 +145,7 @@ row.
 | Conversions | integer to floating point and back, between floating-point widths, with rounding variants |
 | Comparisons | equal, not-equal, less, greater, ordered and unordered, over integers and floating point |
 | Data movement | move, swap halves, permute, lane broadcast, quad and byte permute |
+| Matrix | packed 8-bit multiply-accumulate, matrix plane read |
 | Special values | cube-face selection, exponent extraction, mantissa manipulation |
 
 ## UNRESOLVED
@@ -123,3 +157,7 @@ row.
 * The behaviour of the arithmetic rows for operand forms that were not measured.
 * Whether a lane-mask result is readable as an ordinary scalar value.
 * The interaction between the per-source sign modifiers and integer saturation.
+* Which of the two sources of a mixed-signedness matrix row carries the signed
+  reading, since the mnemonic's letter order and the operand order are not
+  established to agree.
+* The lane mapping of the 323216 matrix shape, which was measured only for 8816.

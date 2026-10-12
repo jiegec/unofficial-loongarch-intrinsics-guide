@@ -2,8 +2,8 @@
 
 > **Scope.** This page describes the kernel-side command layer. A user-mode
 > driver does not program it; it submits indirect buffers and waits for
-> fences, as described in [Host Interface](interface.md) and
-> [Graphics Submission](submission.md). The vocabulary here is kept for
+> fences, as described in [Host Interface](../interface.md) and
+> [Graphics Submission](../graphics-submission.md). The vocabulary here is kept for
 > orientation when reading kernel or firmware sources.
 
 The inner graphics command stream. BPIPE consumes the commands inside a GFX IB
@@ -30,14 +30,14 @@ BPIPE_CMD(cmd, op0, op1) = (cmd & 0xff) |
 | `WAIT` | `0x06` | wait at stage `op0` for an EOP message |
 | `SEND` | `0x07` | obsolete message form |
 | `CTXD`/`CTXL` | `0x08/09` | context dump/load address64 |
-| `CTXR`/`CTXS` | `0x0a/0b` | context reset/save; `CTXS` unresolved |
+| `CTXR`/`CTXS` | `0x0a/0b` | context reset/save; `CTXS` UNRESOLVED |
 | `STSD`/`STSR` | `0x0c/0d` | status dump/reset |
 | `VMID` | `0x0f` | pipe domain update; disabled for ordinary IBs |
 | `WR32`/`WR64` | `0x10/11` | address64 and data at EOP |
 | `EVNT`/`TIME` | `0x12/13` | event/clock sample address64 |
 | `INTR`/`MSIW` | `0x14/15` | interrupt/MSI at EOP |
 | `DBAR` | `0x16` | wait for writes and read back the last address |
-| `SEMI`/`SEMW`/`SEMR` | `0x18..1a` | semaphore forms; payload unresolved |
+| `SEMI`/`SEMW`/`SEMR` | `0x18..1a` | semaphore forms; payload UNRESOLVED |
 
 The normal BPIPE blit sequence:
 
@@ -56,7 +56,7 @@ The `CFGW` payload is a packed state object, not a shader ABI. Its leading
 fields:
 
 | Offset | Field | Meaning |
--------:|-------|---------|
+|-------:|-------|---------|
 | `0x00` | `draw_op` | `0=fill`, `1=clear` producer form, `2=blit` |
 | `0x00` | `ras_dir` | `0=left-bottom`, `1=left-top`, `2=right-bottom`, `3=right-top` |
 | `0x00` | `rot_xy/cst_fill/maskblit/tex_rot` | rotate/use constant/enable mask |

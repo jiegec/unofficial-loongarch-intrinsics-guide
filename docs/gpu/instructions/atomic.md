@@ -1,6 +1,6 @@
 # Atomic
 
-The read-modify-write contract, the counter rules and the four memory spaces are described in [Atomic Family](isa/family-atomic.md).
+The read-modify-write contract, the counter rules and the four memory spaces are described in [Atomic Family](../isa/family-atomic.md).
 
 ## Instruction index
 

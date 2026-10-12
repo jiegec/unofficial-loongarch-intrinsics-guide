@@ -3,7 +3,10 @@
 This chapter is the practical half of the [Shader ABI](abi.md): what a stage
 finds in its registers at entry, what it must export, and which state records
 must agree with it.  Record fields are in [Shader ABI](abi.md) and
-[The State Object](../graphics/state-object.md).
+[The State Object](../graphics/state-object.md); the registers a launch supplies
+are in [Registers and Allocation](registers.md).
+
+![Stage flow and the SIO rings](../assets/stage-flow.svg)
 
 ## Common shape
 

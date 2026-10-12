@@ -1,6 +1,6 @@
 # Control Prefix
 
-Branch encoding, the ordering operation, termination and the jump stack are described in [Control Flow and Ordering Family](isa/family-control.md).
+Branch encoding, the ordering operation, termination and the jump stack are described in [Control Flow and Ordering Family](../isa/family-control.md).
 
 ## Instruction index
 

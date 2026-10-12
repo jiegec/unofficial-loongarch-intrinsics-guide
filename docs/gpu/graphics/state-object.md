@@ -6,9 +6,13 @@ areas no producer writes.
 
 ![State object map](../assets/state-map.svg)
 
+The map above is generated from the table below, so the two cannot disagree.  It
+draws every block, including the regions nothing writes, because knowing which
+regions are unassigned is as much use to a driver as knowing the rest.
+
 State offsets are relative to the first dword of the object.  The packet byte
 offset is the state offset plus the 0x0c bytes of the
-[envelope](../host/submission.md) header.
+[envelope](../host/graphics-submission.md) header.
 
 ## State map
 

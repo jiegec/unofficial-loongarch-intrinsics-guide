@@ -1,6 +1,6 @@
 # Scalar ALU
 
-The operand forms, the condition register and the operation groups are described in [Scalar ALU Family](isa/family-scalar.md).
+The operand forms, the condition register and the operation groups are described in [Scalar ALU Family](../isa/family-scalar.md).
 
 ## Instruction index
 

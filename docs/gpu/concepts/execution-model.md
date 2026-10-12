@@ -21,23 +21,47 @@ different things in different layers:
 A decoder must carry the layer and the pipe along with a command word; the same
 value in two layers is two different commands.
 
+![The four command and execution layers](../assets/layer-model.svg)
+
 ## Pipes
 
-A *pipe* is a command-processing engine with its own ring, vocabulary and
-completion source.  The software-visible pipe set is:
-
-| Pipe | Role | Completion |
-|------|------|------------|
-| Graphics pipe | graphics ring; consumes indirect buffers holding a state object | end-of-pipe event |
-| Blit pipe | inner graphics commands and blits | end-of-pipe event |
-| Compute pipe | compute queues owned by the kernel compute driver | compute event |
-| Transfer pipe | linear copies and fills on its own ring | transfer event |
-| Decoder and encoder pipes | owned by a later generation; no launch contract here | not assigned |
+A *pipe* is a command-processing engine with its own ring, its own command
+vocabulary and its own completion source.  A pipe is provisioned and owned by the
+kernel; a user-mode driver reaches it by submitting an indirect buffer and
+waiting on a fence, never by programming registers.  The pipes of this
+generation, their cursors, their VMID assignment and their completion sources are
+tabulated in the [generation profile](../chips/lg200.md#pipes); the per-pipe
+command vocabularies are under [Host and Commands](../host/interface.md).
 
 Compute work has a different ownership model from graphics: the kernel creates a
 queue, the queue's user ring carries the compute command grammar, and submission
 happens through a doorbell on the management ring.  There is no user-visible BAR
-doorbell.
+doorbell.  [Compute](../host/compute.md) covers the dispatch itself.
+
+## The stream processor
+
+The pipes feed a *stream processor*: the unit that executes shader work.  It holds
+several vector units, each with its own scheduler and register file, a bank of
+ALU lanes plus special-function, transcendental and tensor units, a texture
+block, a workgroup shared-memory block and a data cache, all behind one
+instruction cache and the internal bus.
+
+![Stream processor structure](../assets/sp-architecture.svg)
+
+A wave is the unit of scheduling, and the smallest unit of work; a vector unit
+keeps several waves resident and selects among them for issue.  This is what makes
+the register model what it is: the vector registers are private to a lane, the
+scalar registers are shared by a wave, and a lane-mask register is exactly one
+wave wide.  [Registers and Allocation](../shader/registers.md) covers the
+consequences for a compiler.
+
+The block structure above is the one Loongson publishes for the streaming
+processor of this GPU family.  The values that this generation's own evidence
+establishes are on the [generation profile](../chips/lg200.md); figures such as
+the number of vector units, the issue width and the per-unit lane counts come
+from the published description of the family and are not independently
+established for LG200 here.  Issue width, dual-issue behaviour and per-instruction
+latency are `UNRESOLVED`.
 
 ## Shader execution
 
@@ -107,16 +131,20 @@ for another:
 
 | Scope | Mechanism |
 |-------|-----------|
-| Within an invocation | instruction ordering, the wait operation that orders pending memory work |
+| Within an invocation | instruction ordering, and `check`, which orders pending memory work |
 | Within a workgroup | barrier |
 | Between submissions | the submission's fence |
 | Host and device | buffer residency and the completion fence |
 
 ## UNRESOLVED
 
-* Wave size, and the number of waves a unit can hold.
+* Whether the wave size of 32 lanes is an architectural maximum, and how many
+  waves a unit can hold.
 * Cache hierarchy parameters, sizes and associativity.
 * Issue width, dual-issue behaviour and per-instruction latency.
+* The number of vector units, their lane counts and the ALU/SFU/DPU/tensor ratio
+  of this generation: the published family description states them, and LG200
+  evidence does not establish them independently.
 * Whether any launch state beyond the documented entry registers is provided.
 * The hardware behind a compute queue beyond its exposed interface.
 * The decoder and encoder pipes: no launch contract exists for this generation.

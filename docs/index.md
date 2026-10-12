@@ -11,7 +11,7 @@ This is the Unofficial LoongArch Intrinsics Guide by Jiajie Chen et al. The docu
 Beyond SIMD intrinsics, this guide also documents the **LBT** (LoongArch Binary Translation) instruction set, used for emulating x86, ARM, and MIPS ISAs. See the [LBT Basics](lbt_basics.md) page for an overview.
 
 The guide additionally covers the **Loongson GPU (LG200)** shader ISA and its
-graphical ABI in the [Loongson GPU (LG200)](gpu/overview.md) section: the
+graphical ABI in the [Loongson GPU (LG200)](gpu/index.md) section: the
 768-instruction machine rows with encoding visuals and reference pseudocode,
 the host interface and graphics state, and the shader ABI. Every instruction
 row is pinned by deterministic case vectors that run both on the CPU oracle

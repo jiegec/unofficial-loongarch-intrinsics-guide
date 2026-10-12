@@ -36,9 +36,14 @@ the format is a decoder grouping, not an instruction prefix.
 | 10 | `sio-imm` | `INST_HI[26:23]` | 4 | 6 | `M.chan12` LO[11:0], `IK16`/`IJ16` LO[31:16], remainder as format 9 |
 | 11 | `prefix` | `INST_HI[15:14]` | 2 | 3 | `IJ32` LO[31:0] |
 
-Rows do not have to use every position a format offers.  The row's operand
-layout is authoritative: a position that a row does not consume is classified by
-its masks as fixed, parameter, ignored or reserved.
+Rows do not have to use every position a format offers.  The operand layout
+declares the slots the row's form has; the masks say which of them this row
+actually encodes.  The two differ in 17 rows, where a slot is declared but its
+bits are classified `ignored`, so the operand belongs to the form's template
+without being encoded in that row; a row page prints those as inactive layout
+fields.  Where the two disagree the masks are authoritative: a decoder reads
+`parameter`, and a position the row does not consume is classified as fixed,
+ignored or reserved.
 
 ## Mask discipline
 
@@ -52,37 +57,45 @@ Five masks describe each row.  They are bit masks over the 64-bit instruction:
 | `ignored` | bits the hardware does not use for this row and that a disassembler does not print |
 | `reserved` | bits whose required value is not established |
 
-Three properties hold across the table and a decoder may rely on them:
+Four properties hold across the table and a decoder may rely on them:
 
 1. The opcode mask is a subset of the fixed mask in every row: an opcode bit is
-   always also a bit whose value is part of the row.  For the rows whose
-   encoding is established, the row's base value also satisfies
-   `base & fixed == base`.
-2. The four masks `fixed`, `parameter`, `ignored` and `reserved` cover all 64
+   always also a bit whose value is part of the row.
+2. Every row's base value satisfies `base & fixed == base`, and its base value
+   carries no operand: `base & parameter` is zero in every row.  The base word
+   is therefore a template for the row, not a captured example.
+3. The four masks `fixed`, `parameter`, `ignored` and `reserved` cover all 64
    bits in every row: there is no unclassified bit.
-3. `parameter`, `ignored` and `reserved` are pairwise disjoint in every row.
+4. `parameter`, `ignored` and `reserved` are pairwise disjoint in every row.
 
-Two exceptions are worth knowing rather than assuming away:
+One classification means a decoder has to read two masks together.  In 29 rows
+the `fixed` and `reserved` masks both cover the same bit, and the overlap is
+always inside `INST_HI[30:27]`: 27 rows at bit 27, three at bit 28, two at bits
+28 through 30.  The affected rows are in the tex-buffer, flat, sio-id and
+vop-imm formats.  A bit in both masks is part of the row's identity *and* of
+unestablished value at the same time.  The `fixed` classification is the
+operative one - the bit distinguishes this row from another - while the
+`reserved` entry records that the value the hardware requires there has not
+been established; an emitter writes the base value.
 
-* In 38 rows the `fixed` and `reserved` masks overlap, so a bit is both part of
-  the row and of unestablished value.  The overlap occurs in the flat,
-  tex-buffer, sio-id and one immediate row, not in the scalar and vector ALU
-  formats.
-* A few rows carry a seeded base word that is not a subset of its own fixed
-  mask, because the stored word was captured with operands already in it rather
-  than as a zero-operand template.  A decoder must therefore treat the base
-  word as a captured example, not as a canonical template, for those rows.
+The overlap is a property of this table's classification policy rather than of
+the encoding.  A bit is kept in `reserved` whenever its required value is not
+established, including bits the row's identity already depends on, and that is
+a wider set than a decoder strictly needs.  A consumer that recomputes the
+masks from this table must expect the overlap; a consumer that reads only
+`fixed` is unaffected by it.
 
 A row that emits a reserved bit must emit the row's base value for it; a row
 that ignores a bit does not use it to infer an operand.
 
 ## Encoding a row
 
-The base words are the encodings of a canonical assembly form.  Operand values
-are inserted at the row's field positions and every other bit keeps the base
-value.  Because the four masks partition the word, an assembler can verify its
-output by re-extracting the masks from the produced words and comparing them
-with the row.
+Each base word is its row's encoding with every operand field zero, so it is a
+template rather than a captured example.  Operand values are inserted at the
+row's field positions and every other bit keeps the base value.  Because the
+four masks partition the word, an assembler can verify its output by
+re-extracting the masks from the produced words and comparing them with the
+row.
 
 ## Branches
 

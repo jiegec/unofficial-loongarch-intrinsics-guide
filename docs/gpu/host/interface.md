@@ -1,7 +1,7 @@
 # Host Interface
 
 This chapter describes where a command comes from and who owns which layer.  The
-payload a graphics submission carries is in [Graphics Submission](submission.md);
+payload a graphics submission carries is in [Graphics Submission](graphics-submission.md);
 this page covers the layers around it.
 
 ## Ownership
@@ -19,15 +19,13 @@ driver submits work and waits for completion; it does not program registers.
 
 ## Layer model
 
-| Layer | Format | Producer | Role |
-|------:|--------|----------|------|
-| 0 | kernel command word | kernel | configure a pipe, a queue, the MMU, an interrupt or a VRAM window |
-| 1 | stream command word | outer ring | select a virtual-memory domain, execute an indirect buffer, poll or write memory |
-| 2 | pipe command stream | a pipe front end | graphics, blit, transfer or compute records |
-| 3 | two-word shader instruction | shader front end | execute instructions from the kernel entry |
-
-The same numeric opcode can appear in two layers with different meanings, so a
-decoder must always carry the layer and the pipe with a command word.
+Four layers sit between an API call and a shader instruction, each with its own
+word format and its own cursor domain.  The
+[execution model](../concepts/execution-model.md#command-and-execution-layers)
+tabulates them; the same numeric opcode can appear in two layers with different
+meanings, so a decoder must always carry the layer and the pipe with a command
+word.  This chapter covers layers 0 and 1, the pages beside it cover the pipe
+vocabularies, and the instruction chapters cover layer 3.
 
 ## Kernel interface
 
@@ -53,14 +51,13 @@ the producer writes words and advances the write cursor, and the command
 processor consumes up to the read cursor.  Each pipe has its own cursor pair and
 its own command vocabulary.
 
-Pipes are provisioned by the kernel; their ownership model is:
-
-| Pipe | Typical owner |
-|------|---------------|
-| Graphics | the graphics ring |
-| Blit | inner graphics commands and blits |
-| Compute | queues created by the kernel compute driver, submitted through a doorbell on the management ring |
-| Transfer | its own ring, linear copies and fills |
+Pipes are provisioned by the kernel.  Their roles, cursors, VMID assignment and
+completion sources are tabulated once in the
+[generation profile](../chips/lg200.md#pipes); two ownership details matter here:
+the graphics and blit pipes are driven by the graphics ring, while the compute
+pipe is driven by queues the kernel compute driver creates, submitted through a
+doorbell on the management ring.  The transfer pipe has its own ring for linear
+copies and fills.
 
 Virtual-memory domains are handed out by the kernel; a submission names one
 implicitly through the context it belongs to.
@@ -95,7 +92,7 @@ A user-mode driver's contract is:
 1. Allocate a buffer; the kernel returns a handle.
 2. Obtain a GPU virtual address for a range and map the buffer into it, with the
    access flags the consumer needs — an indirect buffer must be executable.
-3. Build the indirect buffer's contents (see [Graphics Submission](submission.md)).
+3. Build the indirect buffer's contents (see [Graphics Submission](graphics-submission.md)).
 4. Submit the buffer address and its length, together with a completion fence and
    the buffers that must be resident.
 5. Wait on the fence, or export it as a sync object.

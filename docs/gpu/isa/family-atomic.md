@@ -1,6 +1,6 @@
 # Atomic Family
 
-The instruction index for this family is under [atomic](../atomic.md).
+The instruction index for this family is under [atomic](../instructions/atomic.md).
 
 Atomics read a location, compute a new value from it and write the new value
 back, indivisibly with respect to other atomic operations on the same location.

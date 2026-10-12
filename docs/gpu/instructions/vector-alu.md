@@ -1,6 +1,6 @@
 # Vector ALU
 
-The semantics shared by these rows, their operand forms and their conditional-execution rules are described in [Vector ALU Family](isa/family-vector.md).
+The semantics shared by these rows, their operand forms and their conditional-execution rules are described in [Vector ALU Family](../isa/family-vector.md).
 
 ## Instruction index
 

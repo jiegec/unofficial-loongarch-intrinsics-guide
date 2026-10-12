@@ -176,7 +176,7 @@ Measured by the PS-carrier differential wall-clock bench (slope of
 wall-clock vs op count, code/lg200/run_bench.py); the fixed
 submission/readback overhead subtracts out. Numbers are **relative
 wall-clock nanoseconds**, not architectural cycles (no shader-visible GPU
-clock; see [Measurements](measurements.md)).{warn}
+clock; see [Measurements](../appendix/measurements.md)).{warn}
 """
 
 

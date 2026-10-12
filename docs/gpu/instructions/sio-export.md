@@ -1,6 +1,8 @@
 # SIO and Export
 
-The streams, the channel layout and the ordering rules are described in [SIO](shader/sio.md).
+The rows' forms and operand roles are described in
+[SIO and Export Family](../isa/family-sio.md); the streams, the channel layout and
+the ordering rules are described in [SIO](../shader/sio.md).
 
 ## Instruction index
 

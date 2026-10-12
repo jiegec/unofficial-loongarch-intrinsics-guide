@@ -54,4 +54,4 @@ profile under [Chips](../chips/lg200.md).
 Every statement in this section is either a property of the architecture, a
 property of the implementation, or marked `UNRESOLVED`.  There is no separate
 "evidence tier": an instruction page documents the behaviour of its machine
-row, and anything not established is called out as unresolved in place.
+row, and anything not established is called out as `UNRESOLVED` in place.

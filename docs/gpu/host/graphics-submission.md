@@ -73,7 +73,7 @@ configuration; the sizes are a host choice, not an architectural limit.
 Three packet families sit between state blocks.  They do not fit the fixed
 528-dword block and cannot be batched with other draws:
 
-| Purpose | Dwords | Placement |
+| Purpose | Packet words | Placement |
 |---------|--------|-----------|
 | Query begin (reset) | `selector << 8 \| 0x0d` | at the front of the buffer |
 | Query end (sample) | `0x00000003`, `selector << 8 \| 0x0c`, address low, address high | after the state terminator |

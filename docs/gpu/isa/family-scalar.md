@@ -1,6 +1,6 @@
 # Scalar ALU Family
 
-The instruction index for this family is under [scalar-alu](../scalar-alu.md).
+The instruction index for this family is under [scalar-alu](../instructions/scalar-alu.md).
 
 The scalar ALU operates on the scalar register file, which is shared by all lanes
 of a wave, and on the condition register.  The register file and the selector

@@ -97,32 +97,17 @@ a lane mask, so they really do act on the value and not on the operand kind.
 
 ## Register files
 
-| File | Extent | Notes |
-|------|--------|-------|
-| Scalar | `s0..s101`, 102 registers | ordinary allocation pool |
-| Vector | `v0..v255`, 256 registers | |
-| Lane mask | `p0..p3` | fixed selectors `0x7c..0x7f` |
-| Condition | SCC, selector `0x80` | single bit, not part of a pool |
+The register files and everything a compiler must respect about them — the file
+sizes, the reserved window at the bottom of the scalar file, the registers a
+launch supplies, and the per-stage size rules — are in
+[Registers and Allocation](../shader/registers.md).  Two facts belong here
+because they are operand encoding rather than allocation:
 
-Low scalar registers are reserved for values the launch supplies, so a compiler
-must not allocate them:
-
-| Registers | Reserved for |
-|-----------|--------------|
-| `s0..s3` | lane-mask results |
-| `s0..s11` | the vertex stage's descriptor and vertex inputs, when used |
-| `s0..s7` | the fragment and geometry stages' descriptors, when used |
-
-Registers the shader reads without writing them:
-
-| Register | Value |
-|----------|-------|
-| `v0` | vertex or fetch index |
-| `v1` | instance identifier |
-| `v2`, `v3` | the barycentric pair for smooth interpolation |
-| `v8`, `v9` | the barycentric pair for noperspective interpolation |
-| `s9` | basis of the fragment interpolation coefficient table |
-| `s12` | fragment exact mask |
+* the lane-mask registers `p0..p3` have the fixed selectors `0x7c..0x7f`, and the
+  condition register SCC the selector `0x80`, so both are reachable from any
+  general-source position;
+* a lane mask holds one bit per lane and a wave is 32 lanes wide, so one lane-mask
+  register covers exactly one wave.
 
 ## Conditional execution
 
@@ -271,17 +256,12 @@ vendor disassembler refuse the whole instruction rather than print an `na`
 operand, so whether the bit is merely unmodelled there or means something else
 is UNRESOLVED.
 
-`M.na1` also differs from the other modifiers in *kind*, and that is what explains its
-behaviour rather than leaving it as a curiosity.  Every texture instruction the vendor
-backend models carries exactly **five** immediate operands, and they are the ones named
-above as `dmask`, `un`, `rsz`, `bl1` and `bl2`; `na` is not among them.  Flipping each of
-the other five bits alone on a real operand pattern changes exactly one printed modifier
-and nothing else, while flipping `na` alone makes the instruction stop decoding at all -
-the signature of a bit that selects between instruction forms rather than one that fills
-an operand slot.  That the bit is not an operand is an A-domain fact about the vendor
-compiler's operand model; whether it switches, and what it switches to, is a hardware
-question this reference still leaves open.
-
+`M.na1` is the one modifier whose *kind* is a form bit rather than an operand, and
+that is what explains its behaviour instead of leaving it as a curiosity: it is
+the only bit in the layout that stops the instruction decoding when it is
+flipped.  That the bit is not an operand is a property of the vendor compiler's
+operand model; whether it switches between forms, and what it switches to, is a
+hardware question this reference leaves open.
 
 ## Addressing families
 

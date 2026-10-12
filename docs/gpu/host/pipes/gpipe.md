@@ -2,8 +2,8 @@
 
 > **Scope.** This page describes the kernel-side command layer. A user-mode
 > driver does not program it; it submits indirect buffers and waits for
-> fences, as described in [Host Interface](interface.md) and
-> [Graphics Submission](submission.md). The vocabulary here is kept for
+> fences, as described in [Host Interface](../interface.md) and
+> [Graphics Submission](../graphics-submission.md). The vocabulary here is kept for
 > orientation when reading kernel or firmware sources.
 
 The graphics ring. GPIPE receives `VMID + IB` wrappers and executes them as
