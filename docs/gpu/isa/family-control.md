@@ -107,8 +107,14 @@ registers.  **The identifier namespace is named, though not yet numbered** (clos
 `prefix_sw`, `prefix_tp4` and `prefix_tp8` carry a 32-bit literal in the low word
 and select their operation from two high-word bits.  The literal is consumed by
 the operation that the prefix defines; it does not turn a host packet or a
-second instruction word into a shader instruction.  The defined prefixes and
-their effects are UNRESOLVED beyond their names.
+second instruction word into a shader instruction.  The prefixes' EFFECTS are still UNRESOLVED, but their standing in the producer is not,
+and the mode is now known to be fusion rather than standalone use.  The closed backend
+exposes `prefix_tp4` and `prefix_tp8` as move builtins (`mov_i32`, `mov_u32`,
+`mov_f32`) - and not `prefix_sw` at all - while asking it to emit one by itself fails
+in the backend with `Cannot select: LGGPUISD::PREFIX_TP4`.  So a prefix is only
+selectable fused to the operation it defines, which is exactly what the paragraph above
+says about the literal.  The names (`tp4`, `tp8`) are not used to guess the effect, per
+this chapter's rule.
 
 ## Shared-memory copies
 
