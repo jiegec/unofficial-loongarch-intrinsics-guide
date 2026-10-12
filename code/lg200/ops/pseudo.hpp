@@ -31,48 +31,62 @@ inline u32 bytealign_b32(u32 lo, u32 hi, u32 n) { return lgpu::test::oracle_byte
 inline u32 byteperm_b32(u32 a, u32 b, u32 sel) { return lgpu::test::oracle_byteperm_b32(a, b, sel); }
 inline u32 clb_u32(u32 a) { return lgpu::test::oracle_clb_u32(a); }
 inline u32 clo_u32(u32 a) { return lgpu::test::oracle_clo_u32(a); }
-inline u32 cmp_eq_f16(u32 a, u32 b) { return lgpu::test::oracle_cmp_eq_f16(a, b); }
-inline u32 cmp_eq_f32(u32 a, u32 b) { return lgpu::test::oracle_cmp_eq_f32(a, b); }
-inline u32 cmp_eq_f64(u64 a, u64 b, const lgpu::test::FpPolicy& policy) { return lgpu::test::oracle_cmp_eq_f64(a, b, policy); }
+// The hardware's floating-point mode flushes denormal INPUTS to zero before a
+// comparison (measured: v_cmp_eq_f32(0.0, min_denormal) is true), so the
+// compare helpers take the case's policy and apply the flush it asks for.  The
+// bit test mirrors softfloat's DAZ rule: exponent all zero, mantissa non-zero.
+inline u32 daz_f16(u32 v, const lgpu::test::FpPolicy& p) {
+  return (p.daz && (v & 0x7c00u) == 0 && (v & 0x03ffu)) ? (v & 0x8000u) : v;
+}
+inline u32 daz_f32(u32 v, const lgpu::test::FpPolicy& p) {
+  return (p.daz && (v & 0x7f800000u) == 0 && (v & 0x007fffffu)) ? (v & 0x80000000u) : v;
+}
+inline u64 daz_f64(u64 v, const lgpu::test::FpPolicy& p) {
+  return (p.daz && (v & 0x7ff0000000000000ull) == 0 &&
+          (v & 0x000fffffffffffffull)) ? (v & 0x8000000000000000ull) : v;
+}
+inline u32 cmp_eq_f16(u32 a, u32 b, const lgpu::test::FpPolicy& p) { return lgpu::test::oracle_cmp_eq_f16(daz_f16(a, p), daz_f16(b, p)); }
+inline u32 cmp_eq_f32(u32 a, u32 b, const lgpu::test::FpPolicy& p) { return lgpu::test::oracle_cmp_eq_f32(daz_f32(a, p), daz_f32(b, p)); }
+inline u32 cmp_eq_f64(u64 a, u64 b, const lgpu::test::FpPolicy& policy) { return lgpu::test::oracle_cmp_eq_f64(daz_f64(a, policy), daz_f64(b, policy), policy); }
 inline u32 cmp_eq_i16(u32 a, u32 b) { return lgpu::test::oracle_cmp_eq_i16(a, b); }
 inline u32 cmp_eq_i32(u32 a, u32 b) { return lgpu::test::oracle_cmp_eq_i32(a, b); }
 inline u32 cmp_eq_i64(u64 a, u64 b, const lgpu::test::FpPolicy& policy) { return lgpu::test::oracle_cmp_eq_i64(a, b, policy); }
 inline u32 cmp_eq_u16(u32 a, u32 b) { return lgpu::test::oracle_cmp_eq_u16(a, b); }
 inline u32 cmp_eq_u32(u32 a, u32 b) { return lgpu::test::oracle_cmp_eq_u32(a, b); }
 inline u32 cmp_eq_u64(u64 a, u64 b, const lgpu::test::FpPolicy& policy) { return lgpu::test::oracle_cmp_eq_u64(a, b, policy); }
-inline u32 cmp_ge_f16(u32 a, u32 b) { return lgpu::test::oracle_cmp_ge_f16(a, b); }
-inline u32 cmp_ge_f32(u32 a, u32 b) { return lgpu::test::oracle_cmp_ge_f32(a, b); }
-inline u32 cmp_ge_f64(u64 a, u64 b, const lgpu::test::FpPolicy& policy) { return lgpu::test::oracle_cmp_ge_f64(a, b, policy); }
+inline u32 cmp_ge_f16(u32 a, u32 b, const lgpu::test::FpPolicy& p) { return lgpu::test::oracle_cmp_ge_f16(daz_f16(a, p), daz_f16(b, p)); }
+inline u32 cmp_ge_f32(u32 a, u32 b, const lgpu::test::FpPolicy& p) { return lgpu::test::oracle_cmp_ge_f32(daz_f32(a, p), daz_f32(b, p)); }
+inline u32 cmp_ge_f64(u64 a, u64 b, const lgpu::test::FpPolicy& policy) { return lgpu::test::oracle_cmp_ge_f64(daz_f64(a, policy), daz_f64(b, policy), policy); }
 inline u32 cmp_ge_i16(u32 a, u32 b) { return lgpu::test::oracle_cmp_ge_i16(a, b); }
 inline u32 cmp_ge_i32(u32 a, u32 b) { return lgpu::test::oracle_cmp_ge_i32(a, b); }
 inline u32 cmp_ge_i64(u64 a, u64 b, const lgpu::test::FpPolicy& policy) { return lgpu::test::oracle_cmp_ge_i64(a, b, policy); }
 inline u32 cmp_ge_u16(u32 a, u32 b) { return lgpu::test::oracle_cmp_ge_u16(a, b); }
 inline u32 cmp_ge_u32(u32 a, u32 b) { return lgpu::test::oracle_cmp_ge_u32(a, b); }
 inline u32 cmp_ge_u64(u64 a, u64 b, const lgpu::test::FpPolicy& policy) { return lgpu::test::oracle_cmp_ge_u64(a, b, policy); }
-inline u32 cmp_gt_f16(u32 a, u32 b) { return lgpu::test::oracle_cmp_gt_f16(a, b); }
-inline u32 cmp_gt_f32(u32 a, u32 b) { return lgpu::test::oracle_cmp_gt_f32(a, b); }
-inline u32 cmp_gt_f64(u64 a, u64 b, const lgpu::test::FpPolicy& policy) { return lgpu::test::oracle_cmp_gt_f64(a, b, policy); }
+inline u32 cmp_gt_f16(u32 a, u32 b, const lgpu::test::FpPolicy& p) { return lgpu::test::oracle_cmp_gt_f16(daz_f16(a, p), daz_f16(b, p)); }
+inline u32 cmp_gt_f32(u32 a, u32 b, const lgpu::test::FpPolicy& p) { return lgpu::test::oracle_cmp_gt_f32(daz_f32(a, p), daz_f32(b, p)); }
+inline u32 cmp_gt_f64(u64 a, u64 b, const lgpu::test::FpPolicy& policy) { return lgpu::test::oracle_cmp_gt_f64(daz_f64(a, policy), daz_f64(b, policy), policy); }
 inline u32 cmp_gt_i16(u32 a, u32 b) { return lgpu::test::oracle_cmp_gt_i16(a, b); }
 inline u32 cmp_gt_i32(u32 a, u32 b) { return lgpu::test::oracle_cmp_gt_i32(a, b); }
 inline u32 cmp_gt_i64(u64 a, u64 b, const lgpu::test::FpPolicy& policy) { return lgpu::test::oracle_cmp_gt_i64(a, b, policy); }
 inline u32 cmp_gt_u16(u32 a, u32 b) { return lgpu::test::oracle_cmp_gt_u16(a, b); }
 inline u32 cmp_gt_u32(u32 a, u32 b) { return lgpu::test::oracle_cmp_gt_u32(a, b); }
 inline u32 cmp_gt_u64(u64 a, u64 b, const lgpu::test::FpPolicy& policy) { return lgpu::test::oracle_cmp_gt_u64(a, b, policy); }
-inline u32 cmp_le_f16(u32 a, u32 b) { return lgpu::test::oracle_cmp_le_f16(a, b); }
-inline u32 cmp_le_f32(u32 a, u32 b) { return lgpu::test::oracle_cmp_le_f32(a, b); }
-inline u32 cmp_le_f64(u64 a, u64 b, const lgpu::test::FpPolicy& policy) { return lgpu::test::oracle_cmp_le_f64(a, b, policy); }
+inline u32 cmp_le_f16(u32 a, u32 b, const lgpu::test::FpPolicy& p) { return lgpu::test::oracle_cmp_le_f16(daz_f16(a, p), daz_f16(b, p)); }
+inline u32 cmp_le_f32(u32 a, u32 b, const lgpu::test::FpPolicy& p) { return lgpu::test::oracle_cmp_le_f32(daz_f32(a, p), daz_f32(b, p)); }
+inline u32 cmp_le_f64(u64 a, u64 b, const lgpu::test::FpPolicy& policy) { return lgpu::test::oracle_cmp_le_f64(daz_f64(a, policy), daz_f64(b, policy), policy); }
 inline u32 cmp_le_i16(u32 a, u32 b) { return lgpu::test::oracle_cmp_le_i16(a, b); }
 inline u32 cmp_le_i32(u32 a, u32 b) { return lgpu::test::oracle_cmp_le_i32(a, b); }
 inline u32 cmp_le_i64(u64 a, u64 b, const lgpu::test::FpPolicy& policy) { return lgpu::test::oracle_cmp_le_i64(a, b, policy); }
 inline u32 cmp_le_u16(u32 a, u32 b) { return lgpu::test::oracle_cmp_le_u16(a, b); }
 inline u32 cmp_le_u32(u32 a, u32 b) { return lgpu::test::oracle_cmp_le_u32(a, b); }
 inline u32 cmp_le_u64(u64 a, u64 b, const lgpu::test::FpPolicy& policy) { return lgpu::test::oracle_cmp_le_u64(a, b, policy); }
-inline u32 cmp_lg_f16(u32 a, u32 b) { return lgpu::test::oracle_cmp_lg_f16(a, b); }
-inline u32 cmp_lg_f32(u32 a, u32 b) { return lgpu::test::oracle_cmp_lg_f32(a, b); }
-inline u32 cmp_lg_f64(u64 a, u64 b, const lgpu::test::FpPolicy& policy) { return lgpu::test::oracle_cmp_lg_f64(a, b, policy); }
-inline u32 cmp_lt_f16(u32 a, u32 b) { return lgpu::test::oracle_cmp_lt_f16(a, b); }
-inline u32 cmp_lt_f32(u32 a, u32 b) { return lgpu::test::oracle_cmp_lt_f32(a, b); }
-inline u32 cmp_lt_f64(u64 a, u64 b, const lgpu::test::FpPolicy& policy) { return lgpu::test::oracle_cmp_lt_f64(a, b, policy); }
+inline u32 cmp_lg_f16(u32 a, u32 b, const lgpu::test::FpPolicy& p) { return lgpu::test::oracle_cmp_lg_f16(daz_f16(a, p), daz_f16(b, p)); }
+inline u32 cmp_lg_f32(u32 a, u32 b, const lgpu::test::FpPolicy& p) { return lgpu::test::oracle_cmp_lg_f32(daz_f32(a, p), daz_f32(b, p)); }
+inline u32 cmp_lg_f64(u64 a, u64 b, const lgpu::test::FpPolicy& policy) { return lgpu::test::oracle_cmp_lg_f64(daz_f64(a, policy), daz_f64(b, policy), policy); }
+inline u32 cmp_lt_f16(u32 a, u32 b, const lgpu::test::FpPolicy& p) { return lgpu::test::oracle_cmp_lt_f16(daz_f16(a, p), daz_f16(b, p)); }
+inline u32 cmp_lt_f32(u32 a, u32 b, const lgpu::test::FpPolicy& p) { return lgpu::test::oracle_cmp_lt_f32(daz_f32(a, p), daz_f32(b, p)); }
+inline u32 cmp_lt_f64(u64 a, u64 b, const lgpu::test::FpPolicy& policy) { return lgpu::test::oracle_cmp_lt_f64(daz_f64(a, policy), daz_f64(b, policy), policy); }
 inline u32 cmp_lt_i16(u32 a, u32 b) { return lgpu::test::oracle_cmp_lt_i16(a, b); }
 inline u32 cmp_lt_i32(u32 a, u32 b) { return lgpu::test::oracle_cmp_lt_i32(a, b); }
 inline u32 cmp_lt_i64(u64 a, u64 b, const lgpu::test::FpPolicy& policy) { return lgpu::test::oracle_cmp_lt_i64(a, b, policy); }
@@ -81,40 +95,40 @@ inline u32 cmp_lt_u32(u32 a, u32 b) { return lgpu::test::oracle_cmp_lt_u32(a, b)
 inline u32 cmp_lt_u64(u64 a, u64 b, const lgpu::test::FpPolicy& policy) { return lgpu::test::oracle_cmp_lt_u64(a, b, policy); }
 inline u32 cmp_ne_u32(u32 a, u32 b) { return lgpu::test::oracle_cmp_ne_u32(a, b); }
 inline u32 cmp_ne_u64(u64 a, u64 b, const lgpu::test::FpPolicy& policy) { return lgpu::test::oracle_cmp_ne_u64(a, b, policy); }
-inline u32 cmp_neq_f16(u32 a, u32 b) { return lgpu::test::oracle_cmp_neq_f16(a, b); }
-inline u32 cmp_neq_f32(u32 a, u32 b) { return lgpu::test::oracle_cmp_neq_f32(a, b); }
-inline u32 cmp_neq_f64(u64 a, u64 b, const lgpu::test::FpPolicy& policy) { return lgpu::test::oracle_cmp_neq_f64(a, b, policy); }
+inline u32 cmp_neq_f16(u32 a, u32 b, const lgpu::test::FpPolicy& p) { return lgpu::test::oracle_cmp_neq_f16(daz_f16(a, p), daz_f16(b, p)); }
+inline u32 cmp_neq_f32(u32 a, u32 b, const lgpu::test::FpPolicy& p) { return lgpu::test::oracle_cmp_neq_f32(daz_f32(a, p), daz_f32(b, p)); }
+inline u32 cmp_neq_f64(u64 a, u64 b, const lgpu::test::FpPolicy& policy) { return lgpu::test::oracle_cmp_neq_f64(daz_f64(a, policy), daz_f64(b, policy), policy); }
 inline u32 cmp_neq_i16(u32 a, u32 b) { return lgpu::test::oracle_cmp_neq_i16(a, b); }
 inline u32 cmp_neq_i32(u32 a, u32 b) { return lgpu::test::oracle_cmp_neq_i32(a, b); }
 inline u32 cmp_neq_i64(u64 a, u64 b, const lgpu::test::FpPolicy& policy) { return lgpu::test::oracle_cmp_neq_i64(a, b, policy); }
 inline u32 cmp_neq_u16(u32 a, u32 b) { return lgpu::test::oracle_cmp_neq_u16(a, b); }
 inline u32 cmp_neq_u32(u32 a, u32 b) { return lgpu::test::oracle_cmp_neq_u32(a, b); }
 inline u32 cmp_neq_u64(u64 a, u64 b, const lgpu::test::FpPolicy& policy) { return lgpu::test::oracle_cmp_neq_u64(a, b, policy); }
-inline u32 cmp_nge_f16(u32 a, u32 b) { return lgpu::test::oracle_cmp_nge_f16(a, b); }
-inline u32 cmp_nge_f32(u32 a, u32 b) { return lgpu::test::oracle_cmp_nge_f32(a, b); }
-inline u32 cmp_nge_f64(u64 a, u64 b, const lgpu::test::FpPolicy& policy) { return lgpu::test::oracle_cmp_nge_f64(a, b, policy); }
-inline u32 cmp_ngt_f16(u32 a, u32 b) { return lgpu::test::oracle_cmp_ngt_f16(a, b); }
-inline u32 cmp_ngt_f32(u32 a, u32 b) { return lgpu::test::oracle_cmp_ngt_f32(a, b); }
+inline u32 cmp_nge_f16(u32 a, u32 b, const lgpu::test::FpPolicy& p) { return lgpu::test::oracle_cmp_nge_f16(daz_f16(a, p), daz_f16(b, p)); }
+inline u32 cmp_nge_f32(u32 a, u32 b, const lgpu::test::FpPolicy& p) { return lgpu::test::oracle_cmp_nge_f32(daz_f32(a, p), daz_f32(b, p)); }
+inline u32 cmp_nge_f64(u64 a, u64 b, const lgpu::test::FpPolicy& policy) { return lgpu::test::oracle_cmp_nge_f64(daz_f64(a, policy), daz_f64(b, policy), policy); }
+inline u32 cmp_ngt_f16(u32 a, u32 b, const lgpu::test::FpPolicy& p) { return lgpu::test::oracle_cmp_ngt_f16(daz_f16(a, p), daz_f16(b, p)); }
+inline u32 cmp_ngt_f32(u32 a, u32 b, const lgpu::test::FpPolicy& p) { return lgpu::test::oracle_cmp_ngt_f32(daz_f32(a, p), daz_f32(b, p)); }
 inline u32 cmp_ngt_f32_std(u32 a, u32 b) { return lgpu::test::oracle_cmp_ngt_f32_std(a, b); }
-inline u32 cmp_ngt_f64(u64 a, u64 b, const lgpu::test::FpPolicy& policy) { return lgpu::test::oracle_cmp_ngt_f64(a, b, policy); }
-inline u32 cmp_nle_f16(u32 a, u32 b) { return lgpu::test::oracle_cmp_nle_f16(a, b); }
-inline u32 cmp_nle_f32(u32 a, u32 b) { return lgpu::test::oracle_cmp_nle_f32(a, b); }
+inline u32 cmp_ngt_f64(u64 a, u64 b, const lgpu::test::FpPolicy& policy) { return lgpu::test::oracle_cmp_ngt_f64(daz_f64(a, policy), daz_f64(b, policy), policy); }
+inline u32 cmp_nle_f16(u32 a, u32 b, const lgpu::test::FpPolicy& p) { return lgpu::test::oracle_cmp_nle_f16(daz_f16(a, p), daz_f16(b, p)); }
+inline u32 cmp_nle_f32(u32 a, u32 b, const lgpu::test::FpPolicy& p) { return lgpu::test::oracle_cmp_nle_f32(daz_f32(a, p), daz_f32(b, p)); }
 inline u32 cmp_nle_f32_std(u32 a, u32 b) { return lgpu::test::oracle_cmp_nle_f32_std(a, b); }
-inline u32 cmp_nle_f64(u64 a, u64 b, const lgpu::test::FpPolicy& policy) { return lgpu::test::oracle_cmp_nle_f64(a, b, policy); }
-inline u32 cmp_nlg_f16(u32 a, u32 b) { return lgpu::test::oracle_cmp_nlg_f16(a, b); }
-inline u32 cmp_nlg_f32(u32 a, u32 b) { return lgpu::test::oracle_cmp_nlg_f32(a, b); }
-inline u32 cmp_nlg_f64(u64 a, u64 b, const lgpu::test::FpPolicy& policy) { return lgpu::test::oracle_cmp_nlg_f64(a, b, policy); }
-inline u32 cmp_nlt_f16(u32 a, u32 b) { return lgpu::test::oracle_cmp_nlt_f16(a, b); }
-inline u32 cmp_nlt_f32(u32 a, u32 b) { return lgpu::test::oracle_cmp_nlt_f32(a, b); }
-inline u32 cmp_nlt_f64(u64 a, u64 b, const lgpu::test::FpPolicy& policy) { return lgpu::test::oracle_cmp_nlt_f64(a, b, policy); }
-inline u32 cmp_o_f16(u32 a, u32 b) { return lgpu::test::oracle_cmp_o_f16(a, b); }
-inline u32 cmp_o_f32(u32 a, u32 b) { return lgpu::test::oracle_cmp_o_f32(a, b); }
-inline u32 cmp_o_f64(u64 a, u64 b, const lgpu::test::FpPolicy& policy) { return lgpu::test::oracle_cmp_o_f64(a, b, policy); }
+inline u32 cmp_nle_f64(u64 a, u64 b, const lgpu::test::FpPolicy& policy) { return lgpu::test::oracle_cmp_nle_f64(daz_f64(a, policy), daz_f64(b, policy), policy); }
+inline u32 cmp_nlg_f16(u32 a, u32 b, const lgpu::test::FpPolicy& p) { return lgpu::test::oracle_cmp_nlg_f16(daz_f16(a, p), daz_f16(b, p)); }
+inline u32 cmp_nlg_f32(u32 a, u32 b, const lgpu::test::FpPolicy& p) { return lgpu::test::oracle_cmp_nlg_f32(daz_f32(a, p), daz_f32(b, p)); }
+inline u32 cmp_nlg_f64(u64 a, u64 b, const lgpu::test::FpPolicy& policy) { return lgpu::test::oracle_cmp_nlg_f64(daz_f64(a, policy), daz_f64(b, policy), policy); }
+inline u32 cmp_nlt_f16(u32 a, u32 b, const lgpu::test::FpPolicy& p) { return lgpu::test::oracle_cmp_nlt_f16(daz_f16(a, p), daz_f16(b, p)); }
+inline u32 cmp_nlt_f32(u32 a, u32 b, const lgpu::test::FpPolicy& p) { return lgpu::test::oracle_cmp_nlt_f32(daz_f32(a, p), daz_f32(b, p)); }
+inline u32 cmp_nlt_f64(u64 a, u64 b, const lgpu::test::FpPolicy& policy) { return lgpu::test::oracle_cmp_nlt_f64(daz_f64(a, policy), daz_f64(b, policy), policy); }
+inline u32 cmp_o_f16(u32 a, u32 b, const lgpu::test::FpPolicy& p) { return lgpu::test::oracle_cmp_o_f16(daz_f16(a, p), daz_f16(b, p)); }
+inline u32 cmp_o_f32(u32 a, u32 b, const lgpu::test::FpPolicy& p) { return lgpu::test::oracle_cmp_o_f32(daz_f32(a, p), daz_f32(b, p)); }
+inline u32 cmp_o_f64(u64 a, u64 b, const lgpu::test::FpPolicy& policy) { return lgpu::test::oracle_cmp_o_f64(daz_f64(a, policy), daz_f64(b, policy), policy); }
 inline u32 cmp_tru(u32 a, u32 b) { return lgpu::test::oracle_cmp_tru(a, b); }
 inline u32 cmp_tru(u64 a, u64 b, const lgpu::test::FpPolicy& policy) { return lgpu::test::oracle_cmp_tru(a, b, policy); }
-inline u32 cmp_u_f16(u32 a, u32 b) { return lgpu::test::oracle_cmp_u_f16(a, b); }
-inline u32 cmp_u_f32(u32 a, u32 b) { return lgpu::test::oracle_cmp_u_f32(a, b); }
-inline u32 cmp_u_f64(u64 a, u64 b, const lgpu::test::FpPolicy& policy) { return lgpu::test::oracle_cmp_u_f64(a, b, policy); }
+inline u32 cmp_u_f16(u32 a, u32 b, const lgpu::test::FpPolicy& p) { return lgpu::test::oracle_cmp_u_f16(daz_f16(a, p), daz_f16(b, p)); }
+inline u32 cmp_u_f32(u32 a, u32 b, const lgpu::test::FpPolicy& p) { return lgpu::test::oracle_cmp_u_f32(daz_f32(a, p), daz_f32(b, p)); }
+inline u32 cmp_u_f64(u64 a, u64 b, const lgpu::test::FpPolicy& policy) { return lgpu::test::oracle_cmp_u_f64(daz_f64(a, policy), daz_f64(b, policy), policy); }
 inline u32 cmpclass_f16(u32 mask, u32 v) { return lgpu::test::oracle_cmpclass_f16(mask, v); }
 inline u32 cmpclass_f32(u32 mask, u32 v) { return lgpu::test::oracle_cmpclass_f32(mask, v); }
 inline u64 cmpclass_f64(u64 mask, u64 v) { return lgpu::test::oracle_cmpclass_f64(mask, v); }

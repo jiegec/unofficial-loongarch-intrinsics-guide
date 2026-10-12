@@ -192,19 +192,19 @@ def main() -> int:
             if fmt == "f64":
                 for row in grids(F64, (nin - 1) // 2):
                     for e in INT:
-                        out.append(mnemonic + "\t\t" +
+                        out.append(mnemonic + "\t" + FP_POLICY + "\t" +
                                    " ".join(hex(v) for v in flat(row)) + " " +
                                    hex(e))
             else:  # f32: (mantissa, exponent)
                 for a in base:
                     for e in INT:
-                        out.append(mnemonic + "\t\t" +
+                        out.append(mnemonic + "\t" + FP_POLICY + "\t" +
                                    hex(a) + " " + hex(e))
             continue
         if fmt == "f64":
             # every source operand is a word pair, so the grid is over pairs
             for row in grids(F64, nin // 2):
-                out.append(mnemonic + "\t\t" +
+                out.append(mnemonic + "\t" + FP_POLICY + "\t" +
                            " ".join(hex(v) for v in flat(row)))
             continue
         pol = FP_POLICY if sem == "floating-point-value" else ""

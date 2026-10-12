@@ -1,4 +1,4 @@
 // v_cmp_imm_nlt_f16 -- Compares each f16 lane with the literal for not-less-than, unordered included; writes a lane mask.
 //
 
-dst[0] = cmp_nlt_f16(src[0], src[1]);
+dst[0] = cmp_nlt_f16(src[0], src[1], policy);
