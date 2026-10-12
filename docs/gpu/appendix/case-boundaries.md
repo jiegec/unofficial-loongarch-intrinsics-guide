@@ -45,8 +45,15 @@ target set.
 A second exclusion turned out to be a false positive: the "immediate slot" test
 matched @@X0_16@@, the modifier field the atomic layouts carry and no case supplies
 a value for.  Distinguishing it from a real immediate admits a further 32 atomic
-rows and leaves the bench's target set at 308 unchanged.  Coverage is now
-**550 of 768**, and the vector count went 20,732 -> 46,966 -> 49,930 -> 51,754.
+rows and leaves the bench's target set at 308 unchanged.
+
+The last large exclusion was rows whose last input is an **immediate**.  Their
+register columns belong in the value grid and the immediate column belongs in its
+own - the immediate is the operand the ISA prints last, and it carries the row's
+own type, so it takes that type's boundary list.  @@grid_cols()@@ expresses a grid
+over per-column lists (with @@grids()@@ as the single-list case), and
+@@case_targets()@@ now admits 156 such rows.  Coverage is **678 of 768**, and the
+vector count went 20,732 -> 46,966 -> 49,930 -> 51,754 -> **72,910**.
 
 ## 4. The boundary cases changed the answer the hardware gives
 

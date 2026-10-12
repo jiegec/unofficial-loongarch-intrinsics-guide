@@ -97,36 +97,47 @@ def nin_of(mnemonic: str) -> int:
     return int(m.group(1)) if m else -1
 
 
-def grids(patterns, nin: int):
-    if nin == 1:
-        for a in patterns:
+def grid_cols(cols):
+    """Boundary grid over per-column pattern lists.
+
+    cols[i] is the list of values column i takes, so a row whose last input is an
+    immediate gets register boundaries crossed with immediate boundaries rather
+    than the immediate being gridded as if it were a value.
+    """
+    n = len(cols)
+    if n == 1:
+        for a in cols[0]:
             yield [a]
         return
-    if nin == 2:
-        for a in patterns:
-            for b in patterns:
+    if n == 2:
+        for a in cols[0]:
+            for b in cols[1]:
                 yield [a, b]
         return
     anchors = [0, 1, 0x80000000]
-    if nin == 4:
-        # Four sources (a binary f64 row is four dwords).  A full grid would be
-        # |patterns|^4, so take the two natural pairs plus the all-equal
-        # diagonal: enough to cross every boundary value with every other.
-        for a in patterns:
-            for b in patterns:
+    if n == 4:
+        # Four sources (a binary f64 row, or a 64-bit atomic pair): a full grid
+        # would be |cols|^4, so take the two natural pairs plus the diagonal.
+        for a in cols[0]:
+            for b in cols[1]:
                 yield [a, b, anchors[0], anchors[0]]
                 yield [anchors[0], anchors[0], a, b]
-        for x in patterns:
+        for x in cols[0]:
             yield [x, x, x, x]
         return
-    # nin == 3
-    for a in patterns:
-        for b in patterns:
+    # n == 3
+    for a in cols[0]:
+        for b in cols[1]:
             yield [a, b, anchors[0]]
             yield [a, anchors[1], b]
             yield [anchors[0], a, b]
-    for x in patterns:
+    for x in cols[0]:
         yield [x, x, x]
+
+
+def grids(patterns, nin: int):
+    """The single-pattern-list case of grid_cols (every column the same)."""
+    return grid_cols([patterns] * nin)
 
 
 def targets() -> list:
@@ -180,13 +191,27 @@ def case_targets() -> list:
         for row in csv.DictReader(f, delimiter="\t"):
             meta[row["mnemonic"]] = row
     for mnemonic in sorted(meta):
-        if not ATOMIC_OK.match(mnemonic):
+        sig = meta[mnemonic].get("operand_signature", "")
+        if ATOMIC_OK.match(mnemonic):
+            if not IMM_SLOT.search(sig) and nin_of(mnemonic) in (2, 3, 4):
+                out.append(mnemonic)
             continue
-        if IMM_SLOT.search(meta[mnemonic].get("operand_signature", "")):
+        # Rows whose last input is an immediate: the register columns keep the
+        # value grid and the immediate column gets its own, which is what the
+        # bench's target set has never been able to express.
+        if not IMM_SLOT.search(sig):
             continue
-        if nin_of(mnemonic) in (2, 3, 4):
+        if mnemonic.startswith(("load_", "store_", "samp", "gather", "get",
+                                "copy_sm_", "jirl", "jpush", "jpop", "nop",
+                                "exit", "trap", "barrier", "cb", "czb", "flag",
+                                "prefix_", "sio")):
+            continue
+        if meta[mnemonic].get("semantic_model") not in ("integer-value",
+                                                        "floating-point-value"):
+            continue
+        if nin_of(mnemonic) in (1, 2, 3):
             out.append(mnemonic)
-    return out
+    return list(dict.fromkeys(out))
 
 
 def main() -> int:
@@ -234,7 +259,14 @@ def main() -> int:
                            " ".join(hex(v) for v in flat(row)))
             continue
         pol = FP_POLICY if sem == "floating-point-value" else ""
-        for row in grids(base, nin):
+        if IMM_SLOT.search(meta[mnemonic].get("operand_signature", "")) and nin > 1:
+            # The immediate is the last input (the ISA prints it last and the
+            # seed reads v_cmp_imm_eq_f16 p0, s0, v0, 0x00000000).
+            cols = [base] * (nin - 1) + [base]
+            gen = grid_cols(cols)
+        else:
+            gen = grids(base, nin)
+        for row in gen:
             out.append(mnemonic + "\t" + pol + "\t" +
                        " ".join(hex(v) for v in row))
     print("\n".join(out))
