@@ -107,6 +107,16 @@ pair) and preloads a small value, then:
   therefore includes that add**, and the staged value is small so the chained
   address stays inside the carrier window.
 
+**The shared-memory LOADS are in too** (7 rows - the matrix and interpolator forms
+are refused, because their addressing is exactly what the chapter leaves
+UNRESOLVED and the correctness carrier runs them observed for the same reason).  A
+load result is the loaded value and its only operand is the address, so `lat` can
+make the DESTINATION the address register: the value just loaded becomes the next
+access address, chaining the copies with no extra instruction.  The staged content
+is 0x20 - the cell's own base - so the chained address stays on the same
+in-window cell.  As with the shared-memory atomics, the cell store needs one
+ordering fence and only one.
+
 **The buffer ATOMICS are in too** (24 of the 26 `atomic_v_buff_*` rows).  Their
 operand IS their destination - the buffer form stages one register that is both
 read and written - which decides the two kinds: `lat` stages the operand once and
@@ -170,12 +180,13 @@ few seconds - and reports the outcome and the reason:
 
 | | rows |
 |---|---|
-| buildable for both kinds | **579** |
-| no canonical variant | 155 |
-| not materializable on the generic carrier | 17 |
+| buildable for both kinds | **582** |
+| no canonical variant | 149 |
+| not materializable on the generic carrier | 16 |
 | no semantic specification | 6 |
 | flat atomic bench: cmpswap stages a compare pair this template does not build | 2 |
 | buff atomic bench: cmpswap stages a compare pair this template does not build | 2 |
+| sm load bench: the matrix and interpolator forms address UNRESOLVED state | 4 |
 | sm atomic bench: cmpswap stages a compare value this template does not build | 6 |
 | refused on the compute pipe (known to wedge) | 1 |
 
@@ -196,8 +207,8 @@ A family template therefore has to do one of two things: derive the classes from
 the rows layout instead of from a decoded variant, or give the family variant
 entries.  Either way the template is what is missing; the reason string names the
 first symptom.
-579 is 497 (the last hardware run's OK) plus the eight flat load rows, the 24 flat atomic rows and the 26 shared-memory
-atomic rows, the 24 buffer atomic rows this work added - i.e. the offline number and the device number agree, which is
+582 is 497 (the last hardware run's OK) plus the eight flat load rows, the 24 flat atomic rows and the 26 shared-memory
+atomic rows, the 24 buffer atomic rows and the 7 shared-memory load rows this work added - i.e. the offline number and the device number agree, which is
 what makes it usable as a target before a session.  The reasons are the same
 per-family gaps the sections above describe.
 

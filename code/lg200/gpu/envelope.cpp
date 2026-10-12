@@ -3842,6 +3842,61 @@ std::optional<EnvelopeProgram> build_cs_bench_buff_atomic(
   return program;
 }
 
+// The shared-memory LOAD family's bench template.  A load's only operand is its
+// address and its result is the loaded value, so the two kinds are:
+//   tp  - one fixed address, result in a separate register: independent accesses;
+//   lat - the destination IS the address register, so the value just loaded
+//         becomes the next access's address and the copies chain through it with
+//         no extra instruction.  The staged content is 0x20 - the cell's own base
+//         - so the chained address stays on the same in-window cell.
+// The cell has to be stored first (shared memory starts undefined), and that
+// in-program store needs one ordering fence.  The matrix and interpolator loads
+// are not built: their addressing is the part the chapter leaves UNRESOLVED, and
+// the correctness carrier runs them observed for the same reason.
+std::optional<EnvelopeProgram> build_cs_bench_sm_load(
+    const std::string& mnemonic, unsigned copies, bool chained, unsigned lanes,
+    std::string& error) {
+  if (mnemonic.find("matrix") != std::string::npos ||
+      mnemonic.find("interp") != std::string::npos) {
+    error = "sm load bench: the matrix and interpolator forms address state the "
+            "chapter leaves UNRESOLVED";
+    return std::nullopt;
+  }
+  const unsigned width =
+      (mnemonic.find("b64") != std::string::npos) ? 2u : 1u;
+  const CarrierEnv env = CarrierEnv::compute(lanes);
+  Builder builder;
+  emit_env_prelude(builder, env);
+  const isa::Reg addr_v = isa::vgpr(8);
+  const isa::Reg cell_v = isa::vgpr(10, width);
+  const isa::Reg imm_temp = isa::sgpr(16);
+  builder.s_mov_imm_b32(imm_temp, 0u);
+  builder.v_mov_b32(isa::vgpr(0), imm_temp, isa::predicate(0));
+  builder.s_mov_imm_b32(imm_temp, 0x20u);
+  builder.v_mov_b32(addr_v, imm_temp, isa::predicate(0));
+  EnvelopeProgram program;
+  program.probe = true;
+  for (unsigned p = 0; p < width; ++p) {
+    builder.s_mov_imm_b32(imm_temp, 0x20u);
+    builder.v_mov_b32(isa::vgpr(10 + p), imm_temp, isa::predicate(0));
+  }
+  builder.sm_op(width == 2 ? "store_sm_b64" : "store_sm_b32",
+                isa::predicate(0), cell_v, addr_v);
+  builder.check_k_vm_vs_sm();
+  for (unsigned copy = 0; copy < copies; ++copy) {
+    builder.sm_op(mnemonic, isa::predicate(0),
+                  chained ? isa::vgpr(8, width) : isa::vgpr(12, width), addr_v);
+  }
+  for (unsigned p = 0; p < width; ++p)
+    emit_result_store(builder, env,
+                      chained ? isa::vgpr(8 + p) : isa::vgpr(12 + p),
+                      isa::vgpr(0), 4 * p);
+  if (!finalize_program(builder, program, error)) {
+    return std::nullopt;
+  }
+  return program;
+}
+
 std::optional<EnvelopeProgram> build_cs_bench(const std::string& mnemonic,
                                               unsigned copies, bool chained,
                                               unsigned lanes,
@@ -3856,6 +3911,8 @@ std::optional<EnvelopeProgram> build_cs_bench(const std::string& mnemonic,
     return build_cs_bench_sm_atomic(mnemonic, copies, chained, lanes, error);
   if (mnemonic.rfind("atomic_v_buff_", 0) == 0)
     return build_cs_bench_buff_atomic(mnemonic, copies, chained, lanes, error);
+  if (mnemonic.rfind("load_sm_", 0) == 0)
+    return build_cs_bench_sm_load(mnemonic, copies, chained, lanes, error);
   if (copies == 0) {
     error = "copies must be positive";
     return std::nullopt;
