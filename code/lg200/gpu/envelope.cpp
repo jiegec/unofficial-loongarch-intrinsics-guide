@@ -3900,11 +3900,10 @@ std::optional<EnvelopeProgram> build_cs_bench_buff_atomic(
     const std::string& mnemonic, unsigned copies, bool chained, unsigned lanes,
     std::string& error) {
   const bool cmpswap = mnemonic.find("cmpswap") != std::string::npos;
-  if (cmpswap && mnemonic.find("b64") != std::string::npos) {
-    error = "buff atomic bench: the 64-bit cmpswap stages a compare PAIR as well "
-            "as a value pair";
-    return std::nullopt;
-  }
+  // The 64-bit cmpswap is staged the way the correctness carrier stages it:
+  // the value pair in v8:v9 and the compare pair in v10:v11, emitted as one
+  // operand.  The returned old value lands in the same pair, so the chain needs
+  // nothing extra.
   const bool wide64 = mnemonic.find("_i64") != std::string::npos ||
                       mnemonic.find("_u64") != std::string::npos ||
                       mnemonic.find("_b64") != std::string::npos;
@@ -3926,10 +3925,14 @@ std::optional<EnvelopeProgram> build_cs_bench_buff_atomic(
     builder.v_mov_b32(isa::vgpr(8 + p), imm_temp, isa::predicate(0));
   }
   if (cmpswap) {
-    // The compare sits in the dword above the value: one register pair that the
-    // instruction both reads and writes.
-    builder.s_mov_imm_b32(imm_temp, 1u);
-    builder.v_mov_b32(isa::vgpr(9), imm_temp, isa::predicate(0));
+    // 32-bit: the compare sits in the dword above the value, so value and compare
+    // are v8:v9.  64-bit: the value is already the v8:v9 pair, and the compare is
+    // the v10:v11 pair above it - the layout the correctness carrier uses.
+    for (unsigned p = 0; p < (wide64 ? 2u : 1u); ++p) {
+      builder.s_mov_imm_b32(imm_temp, 1u);
+      builder.v_mov_b32(isa::vgpr((wide64 ? 10u : 9u) + p), imm_temp,
+                         isa::predicate(0));
+    }
   }
   for (unsigned copy = 0; copy < copies; ++copy) {
     if (!chained) {
