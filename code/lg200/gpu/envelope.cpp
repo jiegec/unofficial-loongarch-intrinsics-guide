@@ -3377,6 +3377,22 @@ std::optional<EnvelopeProgram> build_ps(const std::string& mnemonic,
 std::optional<EnvelopeProgram> build_cs(const std::string& mnemonic,
                                         const std::vector<EnvelopeCase>& rows,
                                         std::string& error, unsigned lanes) {
+  // The one row that must never reach the compute pipe.  `build_cs_bench` has
+  // refused `trap` since it wedged the pipe on 2026-10-12 and parked the device,
+  // but the CORRECTNESS builder did not - and the correctness run is where the
+  // wedge actually happened, so a plain `run_gpu.py --pipe cs` would submit it
+  // again.  A per-case isolation rule that only one of two builders honours is
+  // not an isolation rule.  The PS carrier is unaffected: trap passes there, and
+  // this guard is deliberately in build_cs, not in the shared builder.
+  //
+  // Its correctness therefore stays unestablished rather than being retried
+  // blindly.  Attempting it deliberately is a separate act, on a watched device,
+  // by editing this guard under review - not something a default run can do.
+  if (mnemonic == "trap") {
+    error = "compute carrier refuses trap: this row wedged the pipe and parked "
+            "the device (2026-10-12); it is excluded from every compute run";
+    return std::nullopt;
+  }
   return build_carrier(mnemonic, rows, LaunchEnvironment::Compute, error,
                        lanes);
 }
