@@ -64,7 +64,10 @@ def main() -> int:
     print()
     print("%-42s %s" % ("reason (rows)", "count"))
     for reason, n in sorted(why.items(), key=lambda kv: -kv[1]):
-        print("  %-40s %d" % (reason[:40], n))
+        # The full reason.  Truncating it to 40 columns cut off exactly the part that
+        # says why, which is the same defect fixed in audit.py on 2026-10-13: a record
+        # whose reason is unreadable cannot be acted on.
+        print("  %-40s %d" % (reason, n))
     if args.tsv:
         with open(args.tsv, "w", encoding="utf-8") as f:
             f.write("mnemonic\tlat\ttp\treason\n")

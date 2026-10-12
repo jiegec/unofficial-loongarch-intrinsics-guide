@@ -72,7 +72,7 @@ def main() -> int:
             over += 1
         if only_page or only_rows:
             print("%-16s rows=%3d  PAGE-ONLY: %-24s row-only: %s"
-                  % (f, counts[f], ",".join(only_page) or "-", ",".join(only_rows)[:56]))
+                  % (f, counts[f], ",".join(only_page) or "-", ",".join(only_rows)))
     print()
     print("formats where the table over-claims: %d" % over)
     return 0

@@ -186,7 +186,9 @@ def main():
     print()
     print("worst rows:")
     for m, nreq, nmiss, miss in sorted(rows, key=lambda r: -r[2])[:12]:
-        print("  %-26s %2d/%2d missing: %s" % (m, nmiss, nreq, miss[:70]))
+        # The whole missing-class list, not the first 70 columns of it: WHICH classes
+        # are missing is the actionable part.
+        print("  %-26s %2d/%2d missing: %s" % (m, nmiss, nreq, miss))
 
     if args.tsv:
         with open(args.tsv, "w") as f:
