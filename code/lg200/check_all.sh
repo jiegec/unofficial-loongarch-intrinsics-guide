@@ -41,6 +41,8 @@ echo "== format_audit"
 python3 format_audit.py | tail -1
 echo "== rule_dupe_check"
 python3 rule_dupe_check.py
+echo "== bench_doc_check"
+python3 bench_doc_check.py
 echo "== md_table_check"
 cd "$REPO" && python3 code/lg200/md_table_check.py | tail -1
 echo "== check_gpu"

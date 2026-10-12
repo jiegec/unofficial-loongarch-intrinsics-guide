@@ -333,17 +333,17 @@ few seconds - and reports the outcome and the reason:
 
 | | rows |
 |---|---|
-| buildable for both kinds | **610** |
+| buildable for both kinds | **626** |
 | texture bench: the correctness carrier refuses the family (SKIP-ENVELOPE) | 79 |
-| buffer load bench: the chain needs a live index or offset register (item 10) | 21 |
 | sio bench: run OBSERVED, and their chain is not a chain of independent work | 20 |
+| buffer load bench: the chain needs a live index or offset register (item 10) | 16 |
 | control bench: control and geometry-stream rows, nothing to chain | 14 |
-| buff store bench: only the plain b32/b64/b96/b128 forms share this shape | 10 |
 | environment bench: the row returns launch state, not a computed value | 4 |
 | sm load bench: the matrix and interpolator forms address UNRESOLVED state | 4 |
-| copy bench: the global<->LDS copy is a control-path op (predicate-only) | 2 |
-| 64-bit cmpswap: stages a compare pair as well as a value pair (flat, buff) | 2 |
-| refused on the compute pipe (known to wedge) | 1 |
+| copy bench: the global-to-LDS copy is a control-path op (predicate-only) | 2 |
+| flat atomic bench: the 64-bit cmpswap stages a compare pair and a value pair | 1 |
+| trap bench: the row wedged the pipe on 2026-10-12 | 1 |
+| v_movindex_b32: refused on the compute pipe (it wedged once) | 1 |
 
 
 
