@@ -65,8 +65,14 @@ Two more corrections came from looking at what the remaining gaps actually were:
 the boundary set is chosen by the **name's** type token even when the row's
 semantic model is not a value class (an f32 compare-and-swap is an atomic, but its
 operands are still f32), and the texture-atomic family belongs in the same
-group as the other atomics.  Coverage is **692 of 768**, and the vector count went
-20,732 -> 46,966 -> 49,930 -> 51,754 -> 72,910 -> 76,426 -> **78,188**.
+group as the other atomics.
+
+The 64-bit integer compares are two pair operands, exactly like a binary f64, but
+the bench's own set is f64-only for the four-dword shape.  @@case_targets()@@
+therefore admits them without moving @@targets()@@ (still 308) - which is the reason
+the two functions exist separately.  Coverage is **710 of 768**, and the vector
+count went 20,732 -> 46,966 -> 49,930 -> 51,754 -> 72,910 -> 76,426 -> 78,188 ->
+**79,592**.
 
 ## 4. The boundary cases changed the answer the hardware gives
 

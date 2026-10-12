@@ -178,8 +178,9 @@ def targets() -> list:
         nin = nin_of(mnemonic)
         if nin not in (1, 2, 3, 4):
             continue
-        # A four-dword row is a binary f64 (two pair operands); nothing else
-        # has a four-source pure-register shape.
+        # A four-dword row is two pair operands (a binary f64; the bench's own
+        # set stays f64-only).  The case generator admits the 64-bit integer
+        # compares too, in case_targets below.
         if nin == 4 and input_format(mnemonic) != "f64":
             continue
         out.append(mnemonic)
@@ -219,6 +220,13 @@ def case_targets() -> list:
                                                         "floating-point-value"):
             continue
         if nin_of(mnemonic) in (1, 2, 3):
+            out.append(mnemonic)
+    # The 64-bit integer compares are two pair operands, like a binary f64; they
+    # are outside the bench's set but want the same pair grid.
+    for mnemonic in sorted(meta):
+        if mnemonic.startswith(("load_", "store_", "atomic_", "samp", "gather")):
+            continue
+        if nin_of(mnemonic) == 4 and input_format(mnemonic) in ("i64", "u64"):
             out.append(mnemonic)
     return list(dict.fromkeys(out))
 
