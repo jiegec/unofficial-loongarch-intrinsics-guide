@@ -118,6 +118,29 @@ file: `build_cs_bench_flat_sload` shows the pattern for a live address (the load
 IS the next address low word), and `build_cs_bench_buff_store` shows how a descriptor is
 staged: `emit_load_desc(builder, env, desc, env.arg_va + carrier::kLoadWindow)`. A buffer load
 needs both, plus an index whose next value comes from the loaded result.
+
+### The buffer-load builder: what is already known (2026-10-13)
+
+Reconnaissance only - the chain's meaning is not settled, so nothing was implemented.
+
+* The emit is `buff_mem(mne, pred, dst, address, descriptor_base, offset, immediate,
+  offen, idxen, bl1, bl2)`, and the `offset` argument is an `isa::Reg`, not an immediate.
+* The row layout agrees: `load_v_buff_b32` is `RK8, RJ8x4, VQ8, VD8, UO12, M.offen1,
+  M.idxen1, ...`, so the offset field can hold a live register - that is the live index the
+  refusal asks for.
+* The correctness carrier calls it with the offset register set to `zero_reg()` and the
+  offset carried in the immediate with `offen` true (`envelope.cpp:1597`).
+* The descriptor is staged by `emit_load_desc(builder, env, load_desc,
+  env.arg_va + carrier::kLoadWindow)`, as `build_cs_bench_buff_store` does.
+
+What is unresolved is the chain, and it is worth stating precisely rather than guessing:
+a **vector** buffer load writes a VGPR, and feeding that back into a scalar offset needs
+`v_readfirstlane`, which adds an instruction to the very thing being timed.  A **scalar**
+buffer load (`load_s_buff_*`, also in the refused set) writes an SGPR, so it can chain
+exactly the way `build_cs_bench_flat_sload` does - the loaded word becoming the next offset
+through a single scalar move, with no instruction added.  So the scalar forms are the ones
+to do first, and the vector forms need a stated decision about what the measured chain then
+includes.
 - which is what this report did - makes the split depend on the matrix being a
 clean run, and the matrix on disk is **the run that wedged** (307 PASS / 84
 SKIP-ENVELOPE / 377 HANG-FAULT).  That last number is not 377 faults: 376 of those
