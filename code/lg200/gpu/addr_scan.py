@@ -36,47 +36,82 @@ def regs(spec):
     m = re.match(r'v(\d+)$', spec)
     return [int(m.group(1))] if m else []
 
+def scan_lines(lines):
+    """Which lines of one emitted program store through a register holding case data?
+
+    Pure text, so it can be tested without a rebuilt runner.  The detection half of this
+    check used to be unprovable and only its exit code was covered."""
+    imm, tainted, hits = {}, set(), []
+    for line in lines:
+        line = line.strip()
+        mm = re.match(r's_mov_imm_b32 [(]scc[)] s([0-9]+), 0x([0-9a-f]+)$', line)
+        if mm:
+            imm['s' + mm.group(1)] = int(mm.group(2), 16); continue
+        # a move decides the register's value outright - check it FIRST, or
+        # the zeroing that clears a staging register looks like a producer
+        mm = re.match(r'v_mov_b32 p0, (v\[?[0-9]+[:0-9]*\]?), (zero|s[0-9]+|v\[?[0-9]+[:0-9]*\]?)$', line)
+        if mm:
+            dst = regs(mm.group(1)); src = mm.group(2)
+            if src == 'zero':
+                for v in dst: tainted.discard(v)
+            elif src.startswith('s') and imm.get(src) != DATA:
+                for v in dst: tainted.discard(v)
+            continue
+        mm = re.match(r'(?:load_v_[A-Za-z0-9_]+|getreg|v_[A-Za-z0-9_]+) p0, (v\[?[0-9]+[:0-9]*\]?),', line)
+        # any load/multi-register producer makes its destination pair data
+        if mm:
+            for v in regs(mm.group(1)): tainted.add(v)
+            continue
+        mm = re.match(r'store_v_buff_b32 p0, [^,]+, v([0-9]+),', line)
+        if mm is None:
+            mm2 = re.match(r'store_v_flat_b32 p0, [^,]+, v\[([0-9]+):[0-9]+\],', line)
+            addr = int(mm2.group(1)) if mm2 else None
+        else:
+            addr = int(mm.group(1))
+        if addr is not None and addr in tainted:
+            hits.append(line)
+    return hits
+
+
+# A listing that must be flagged: the address register is the SECOND dword of a wide
+# load, which is the shape a register-by-register fix cannot see.
+SELFTEST_TAINTED = [
+    's_mov_imm_b32 (scc) s6, 0x12345678',
+    'load_v_flat_b64 p0, v[14:15], s[6:7], 0x0',
+    'store_v_buff_b32 p0, v0, v15, 0x0',
+]
+SELFTEST_CLEAN = [
+    'v_mov_b32 p0, v9, zero',
+    'store_v_buff_b32 p0, v0, v9, 0x0',
+]
+
+
+def selftest() -> int:
+    if not scan_lines(SELFTEST_TAINTED):
+        print('selftest FAILED: a store through the second dword of a wide load went unflagged')
+        return 1
+    if scan_lines(SELFTEST_CLEAN):
+        print('selftest FAILED: a store through a zeroed register was flagged')
+        return 1
+    print('addr scan selftest: the tainted shape is flagged, the clean one is not')
+    return 0
+
+
+if '--selftest' in sys.argv:
+    sys.exit(selftest())
+
 total = 0
 for pipe in ('ps', 'cs'):
     hits = {}
     for m in rows:
-        cmd = [R,'run',m,'--dry-run'] if pipe=='ps' else [R,'csrun',m,'--dry-run']
+        cmd = [R, 'run', m, '--dry-run'] if pipe == 'ps' else [R, 'csrun', m, '--dry-run']
         r = subprocess.run(cmd, input='x\t\t0x12345678 0x12345678 0x12345678 0x12345678\t0x12345678\n',
                            text=True, capture_output=True)
-        imm, tainted = {}, set()
-        for line in r.stdout.splitlines():
-            line = line.strip()
-            mm = re.match(r's_mov_imm_b32 \(scc\) s(\d+), 0x([0-9a-f]+)$', line)
-            if mm: imm['s'+mm.group(1)] = int(mm.group(2), 16); continue
-            # a move decides the register's value outright - check it FIRST, or
-            # the zeroing that clears a staging register looks like a producer
-            mm = re.match(r'v_mov_b32 p0, (v\[?\d+[:\d]*\]?), (zero|s\d+|v\[?\d+[:\d]*\]?)$', line)
-            if mm:
-                dst = regs(mm.group(1)); src = mm.group(2)
-                if src == 'zero':
-                    for v in dst: tainted.discard(v)
-                elif src.startswith('s') and imm.get(src) != DATA:
-                    for v in dst: tainted.discard(v)
-                continue
-            mm = re.match(r'(?:load_v_\w+|getreg|v_\w+) p0, (v\[?\d+[:\d]*\]?),', line)
-            # any load/multi-register producer makes its destination pair data
-            if mm:
-                for v in regs(mm.group(1)): tainted.add(v)
-                continue
-            mm = re.match(r'store_v_buff_b32 p0, [^,]+, v(\d+),', line)
-            if mm is None:
-                mm2 = re.match(r'store_v_flat_b32 p0, [^,]+, v\[(\d+):\d+\],', line)
-                addr = int(mm2.group(1)) if mm2 else None
-            else:
-                addr = int(mm.group(1))
-            if addr is not None and addr in tainted:
-                hits.setdefault(m, []).append(line)
+        found = scan_lines(r.stdout.splitlines())
+        if found:
+            hits[m] = found
     total += len(hits)
-    print(f"=== {pipe}: {len(hits)} mnemonics store results through a register holding case data")
-    for m in sorted(hits)[:6]: print(f"    {m:24s} {hits[m][0][:80]}")
-print(f"addr scan: {total} mnemonics store results through a register holding case data")
-# This guarded the fault that wedged the platform, and it could not fail: it
-# printed a count and exited 0 for every count, so wiring it into the suite
-# would have been theatre.  The exit code is the gate.
+    print(f'=== {pipe}: {len(hits)} mnemonics store results through a register holding case data')
+    for m in sorted(hits)[:6]: print(f'    {m:24s} {hits[m][0][:80]}')
+print(f'addr scan: {total} mnemonics store results through a register holding case data')
 sys.exit(1 if total else 0)
-

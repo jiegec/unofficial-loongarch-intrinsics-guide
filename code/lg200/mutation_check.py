@@ -29,8 +29,9 @@ THE ELEVEN GATES, ACCOUNTED FOR (2026-10-13):
                             run_cases, format_audit, bench_doc_check,
                             rule_dupe_check, md_table_check, check_all.sh,
                             fp_mode_audit, case_provenance, addr_scan, gate_check
-  note: addr_scan's case proves the EXIT CODE, by forcing a hit.  Detecting a real
-        hit needs a rebuilt lgpu-gpu, so that half is not covered here.
+  note: addr_scan has two cases.  One forces a hit and proves the EXIT CODE; the
+        other breaks the detector, which the tool's --selftest catches over a
+        crafted listing, including the v[14:15] shape a register scan misses.
   reports by design (2):    prose_audit, doc_register_audit
 
 The last two have no failing mode to prove: prose_audit findings include three expected
@@ -188,6 +189,10 @@ def mutate_gate_file(text):
     """Take a gate's failure path away, so gate_check should report it."""
     return text.replace('return 1', 'return 0', 1)
 
+def mutate_addr_detect(text):
+    """Break the detector rather than the exit code, so the selftest should notice."""
+    return text.replace('    return hits', '    return []', 1)
+
 CASES = [
     ("set_desc.py --check", "code/lg200-instructions.tsv", mutate_tsv,
      "cd code/lg200 && python3 set_desc.py --check"),
@@ -216,7 +221,9 @@ CASES = [
     ("addr_scan.py", "code/lg200/gpu/addr_scan.py", mutate_addr_scan,
      "python3 code/lg200/gpu/addr_scan.py"),
     ("gate_check.py", "code/lg200/md_table_check.py", mutate_gate_file,
-     "python3 code/lg200/gate_check.py"),]
+     "python3 code/lg200/gate_check.py"),
+    ("addr_scan.py", "code/lg200/gpu/addr_scan.py", mutate_addr_detect,
+     "python3 code/lg200/gpu/addr_scan.py --selftest"),]
 
 
 def main() -> int:
