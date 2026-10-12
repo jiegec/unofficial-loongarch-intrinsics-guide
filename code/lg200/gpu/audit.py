@@ -408,6 +408,31 @@ def audit(path, pipe):
     agg = collections.Counter((tag, reason) for tag, _m, reason in notes)
     for (tag, reason), count in sorted(agg.items()):
         print(f"    [{tag} note] {count:3d} rows: {reason}")
+
+    # The universe-level half of the F question.  F audits the LISTINGS, so it can only see
+    # rows that were built, and "no rule class and nothing built it" is invisible there - a
+    # bound discovered on 2026-10-13 while writing a branch that turned out to be dead.
+    # This is that branch's real home: it compares the driver table against what this pipe
+    # actually built.  Measured on the compute listings, 2026-10-13: 683 built, 85 refused
+    # (the texture and sampler families, the matrix's SKIP-ENVELOPE), and all 85 unbuilt
+    # rows DO have a rule class - so "no rule and nothing built it" is not what the unbuilt
+    # set looks like.  It was tempting to name the control family here, and wrong: the
+    # correctness carrier builds every one of them.  What refuses them is the BENCH
+    # builder's own semantic lookup - a different table - which is why their benchmark says
+    # "no semantic specification" while their correctness rows pass.
+    built_set = set(built_names)
+    unbuilt = [m for m in sorted(DRIVER_ROWS) if m not in built_set]
+    unbuilt_with_layout = [m for m in unbuilt
+                           if (DRIVER_ROWS[m].get('operand_layout') or '').strip()
+                           and (DRIVER_ROWS[m].get('operand_layout') or '').strip() != '-']
+    no_rule = [m for m in unbuilt_with_layout
+               if SPECS is not None and SPECS.get(m) is None]
+    print(f"    [universe] {len(DRIVER_ROWS)} rows declared; {len(built_set)} built by "
+          f"this pipe; {len(unbuilt)} not built")
+    print(f"    [universe] of the unbuilt, {len(unbuilt_with_layout)} declare an operand "
+          f"layout and {len(no_rule)} have no semantic rule class either")
+    if no_rule:
+        print(f"    [universe]   e.g. {' '.join(no_rule[:12])}")
     return len(problems)
 
 
