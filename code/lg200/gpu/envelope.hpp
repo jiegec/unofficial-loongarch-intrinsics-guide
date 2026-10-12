@@ -86,6 +86,10 @@ std::optional<EnvelopeProgram> build_cs_bench(const std::string& mnemonic,
                                               unsigned lanes,
                                               std::string& error);
 
+// A per-mnemonic note for the bench CSV, for rows whose measurement is not what
+// the column name implies (a store's lat column is a store+load round trip).
+const char* bench_note(const std::string& mnemonic);
+
 // Builds the generic PS program for one mnemonic and its case rows.
 // Results must be 1-2 dwords and inputs must cover the operand template.
 // VCC-output mnemonics keep only the primary destination dword. Returns

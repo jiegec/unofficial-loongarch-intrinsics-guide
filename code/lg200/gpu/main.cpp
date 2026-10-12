@@ -1027,12 +1027,13 @@ int csbench_run(const std::string& mnemonic, const std::string& kind,
   // columns: mnemonic kind copies reps wall_ms_med win_ticks ticks_per_op
   //          d20 d28 d30 d38
   std::printf("CSBENCH\t%s\t%s\t%u\t%u\t%.4f\t%llu\t%.3f\t%llu\t%llu\t"
-              "%llu\t%llu\n",
+              "%llu\t%llu\t%s\n",
               mnemonic.c_str(), kind.c_str(), copies, reps, wall[wall.size() / 2],
               (unsigned long long)med(win),
               static_cast<double>(med(win)) / static_cast<double>(copies),
               (unsigned long long)med(d[0]), (unsigned long long)med(d[1]),
-              (unsigned long long)med(d[2]), (unsigned long long)med(d[3]));
+              (unsigned long long)med(d[2]), (unsigned long long)med(d[3]),
+              lgpu::envelope::bench_note(mnemonic));
   return 0;
 #endif
 }

@@ -37,8 +37,15 @@ loonggpu_bo_va_op` and leaves no binary behind.  Pass the two variables
 explicitly in that case:
 
     P=/path/to/prefix
-    make LGPU_LIBS="-L$P/lib -ldrm_loonggpu" \
-         LGPU_RPATH="-Wl,-rpath,$P/lib" build/lgpu-gpu
+    make LGPU_CFLAGS="-I$P/include" \
+         LGPU_LIBS="-L$P/lib -ldrm_loonggpu" \
+         LGPU_RPATH="-Wl,-rpath,$P/lib" \
+         LGPU_DEF="-DLGPU_HAVE_LIBDRM -DLGPU_HAVE_DRM" build/lgpu-gpu
+
+Pass all four.  `LGPU_LIBS`/`LGPU_RPATH` alone only fix the LINK: any source that
+has to be recompiled still needs `LGPU_CFLAGS` and `LGPU_DEF`, and without the
+defines a DRM source compiles against the no-DRM stubs and fails with errors like
+`variable or field 'cs_fill_request' declared void`.
     
 Options
     make matrix                     # dump mnemonic / materializable / form

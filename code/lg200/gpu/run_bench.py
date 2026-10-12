@@ -46,19 +46,21 @@ def run_batch(ms: list[str]):
             lines.append(m + " " + kind + " " + str(K_LARGE) + " " + str(REPS))
     p = subprocess.run([str(RUNNER), "csbench-batch"], input="\n".join(lines) + "\n",
                        text=True, capture_output=True)
-    wins, skipped, faulted = {}, set(), set()
+    wins, skipped, faulted, notes = {}, set(), set(), {}
     for line in p.stdout.splitlines():
         f = line.split("\t")
         if f[0] == "CSBENCH" and len(f) >= 12:
             wins[(f[1], f[2], int(f[3]))] = int(f[6])
+            if len(f) >= 13 and f[12]:
+                notes[f[1]] = f[12]
         elif f[0] == "CSBENCH-SKIP":
             skipped.add((f[1], f[2]))
         elif f[0] == "CSBENCH-FAULT":
             faulted.add(f[1])
-    return wins, skipped, faulted
+    return wins, skipped, faulted, notes
 
 
-def verdict(m, wins, skipped):
+def verdict(m, wins, skipped, notes=None):
     if any((m, k) in skipped for k in ("lat", "tp")):
         return ("SKIP", "", "", "not benchable on the compute carrier")
     got = {}
@@ -68,8 +70,14 @@ def verdict(m, wins, skipped):
             return ("NO-DATA", "", "", "no timestamp line")
         got[kind] = (b - a) / (K_LARGE - K_SMALL)
     lat, tp = got["lat"], got["tp"]
-    return ("OK", "%.3f" % lat, "%.3f" % tp,
-            "lat/tp=%.2f" % (lat / tp) if tp else "lat/tp=inf")
+    # The runner knows when a row's measurement is not what the column name
+    # implies (a store's lat is a store+load round trip); carry that into the CSV
+    # note so the number cannot be read as something it is not.
+    extra = (notes or {}).get(m, "")
+    note = "lat/tp=%.2f" % (lat / tp) if tp else "lat/tp=inf"
+    if extra:
+        note = extra + "; " + note
+    return ("OK", "%.3f" % lat, "%.3f" % tp, note)
 
 
 def main() -> int:
@@ -82,21 +90,21 @@ def main() -> int:
     verdicts, retry = {}, []
     for i in range(0, len(ms), CHUNK):
         chunk = ms[i:i + CHUNK]
-        wins, skipped, faulted = run_batch(chunk)
+        wins, skipped, faulted, notes = run_batch(chunk)
         for m in chunk:
             if m not in faulted:
-                verdicts[m] = verdict(m, wins, skipped)
+                verdicts[m] = verdict(m, wins, skipped, notes)
         if faulted:
             print("  chunk %d: transient fault on %s" % (i, sorted(faulted)),
                   file=sys.stderr)
             retry.extend(sorted(faulted))
         print("  %d/%d" % (min(i + CHUNK, len(ms)), len(ms)), file=sys.stderr)
     for m in retry:
-        wins, skipped, faulted = run_batch([m])
+        wins, skipped, faulted, notes = run_batch([m])
         if m in faulted:
             verdicts[m] = ("FAULT", "", "", "submission failed twice, in isolated processes")
         else:
-            verdicts[m] = verdict(m, wins, skipped)
+            verdicts[m] = verdict(m, wins, skipped, notes)
         print("  retry %s -> %s" % (m, verdicts[m][0]), file=sys.stderr)
     rows = [(m,) + verdicts.get(m, ("NO-DATA", "", "", "not measured")) for m in ms]
     out.write_text("mnemonic\tstatus\tlat_ticks_per_op\ttp_ticks_per_op\tnote\n"

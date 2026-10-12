@@ -3897,6 +3897,128 @@ std::optional<EnvelopeProgram> build_cs_bench_sm_load(
   return program;
 }
 
+// A STORE has no result, so there is no register to chain through: the only
+// construction that makes one copy depend on the previous one is to READ BACK what
+// was just written and store that value next.  The two kinds are therefore:
+//   tp  - K independent stores of one staged datum;
+//   lat - store, read back, store the read value: a ROUND TRIP whose window
+//         contains the readback access as well as the store.  It is not a store
+//         latency, and bench_note() labels those rows so the CSV says so.
+std::optional<EnvelopeProgram> build_cs_bench_flat_store(
+    const std::string& mnemonic, unsigned copies, bool chained, unsigned lanes,
+    std::string& error) {
+  const std::string suffix = mnemonic.substr(std::string("store_v_flat_").size());
+  unsigned width = 1;
+  if (suffix == "b128") width = 4;
+  else if (suffix == "b96") width = 3;
+  else if (suffix == "b64") width = 2;
+  else if (suffix != "b8" && suffix != "b16" && suffix != "b32") {
+    error = "flat store bench: unknown access width";
+    return std::nullopt;
+  }
+  // b8/b16 have no load form; the readback uses b32 and lifts the whole dword.
+  const std::string readback =
+      (suffix == "b8" || suffix == "b16") ? "load_v_flat_b32"
+      : (width == 4 ? "load_v_flat_b128"
+         : (width == 3 ? "load_v_flat_b96"
+            : (width == 2 ? "load_v_flat_b64" : "load_v_flat_b32")));
+  const unsigned rb_width = (suffix == "b8" || suffix == "b16") ? 1u : width;
+  const CarrierEnv env = CarrierEnv::compute(lanes);
+  Builder builder;
+  emit_env_prelude(builder, env);
+  const isa::Reg flat_base = isa::sgpr(20, 2);
+  const isa::Reg addr_pair = isa::vgpr(0, 2);
+  const isa::Reg addr_lo = isa::vgpr(0);
+  const isa::Reg data_v = isa::vgpr(8, width);
+  const isa::Reg imm_temp = isa::sgpr(16);
+  const std::uint32_t addr = carrier::kLoadWindow;
+  const std::uint64_t full_va = env.arg_va + addr;
+  builder.s_mov_imm_b32(imm_temp, static_cast<std::uint32_t>(full_va));
+  builder.v_mov_b32(addr_lo, imm_temp, isa::predicate(0));
+  builder.s_mov_imm_b32(imm_temp, static_cast<std::uint32_t>(full_va >> 32));
+  builder.v_mov_b32(isa::vgpr(1), imm_temp, isa::predicate(0));
+  EnvelopeProgram program;
+  program.probe = true;
+  for (unsigned p = 0; p < width; ++p) {
+    builder.s_mov_imm_b32(imm_temp, 0x20u);
+    builder.v_mov_b32(isa::vgpr(8 + p), imm_temp, isa::predicate(0));
+  }
+  for (unsigned copy = 0; copy < copies; ++copy) {
+    builder.store_v_flat(mnemonic, isa::predicate(0), data_v, addr_pair,
+                         flat_base);
+    if (chained) {
+      builder.load_v_flat(readback, isa::predicate(0), isa::vgpr(8, rb_width),
+                          addr_pair, flat_base);
+    }
+  }
+  const isa::Reg zero_address = isa::vgpr(9);
+  builder.v_mov_b32(zero_address, isa::zero_reg(), isa::predicate(0));
+  builder.s_mov_imm_b32(isa::sgpr(4), 0u);
+  for (unsigned p = 0; p < width; ++p)
+    emit_result_store(builder, env, isa::vgpr(8 + p), zero_address, 4 * p);
+  if (!finalize_program(builder, program, error)) {
+    return std::nullopt;
+  }
+  return program;
+}
+
+// The note the CSV carries for a row whose measurement is not what its column name
+// implies.  A store's lat column is a store+load round trip (see above); everything
+// else is empty.
+const char* bench_note(const std::string& mnemonic) {
+  if (mnemonic.rfind("store_v_flat_", 0) == 0 ||
+      mnemonic.rfind("store_sm_", 0) == 0)
+    return "lat is a store+load round trip, not a store latency";
+  return "";
+}
+
+// The shared-memory STORE twin of the flat one, with the same round-trip caveat.
+// The readback uses the matching sub-word load for b8/b16 (shared memory does have
+// those forms, unlike the flat family) and b32/b64 otherwise.
+std::optional<EnvelopeProgram> build_cs_bench_sm_store(
+    const std::string& mnemonic, unsigned copies, bool chained, unsigned lanes,
+    std::string& error) {
+  const std::string suffix = mnemonic.substr(std::string("store_sm_").size());
+  unsigned width = 1;
+  if (suffix == "b64" || suffix == "swizzle_b64") width = 2;
+  else if (suffix != "b8" && suffix != "b16" && suffix != "b32") {
+    error = "sm store bench: unknown access width";
+    return std::nullopt;
+  }
+  const std::string readback =
+      suffix == "b8" ? "load_sm_u8"
+      : (suffix == "b16" ? "load_sm_u16"
+         : (width == 2 ? "load_sm_b64" : "load_sm_b32"));
+  const CarrierEnv env = CarrierEnv::compute(lanes);
+  Builder builder;
+  emit_env_prelude(builder, env);
+  const isa::Reg addr_v = isa::vgpr(8);
+  const isa::Reg data_v = isa::vgpr(9, width);
+  const isa::Reg imm_temp = isa::sgpr(16);
+  builder.s_mov_imm_b32(imm_temp, 0u);
+  builder.v_mov_b32(isa::vgpr(0), imm_temp, isa::predicate(0));
+  builder.s_mov_imm_b32(imm_temp, 0x20u);
+  builder.v_mov_b32(addr_v, imm_temp, isa::predicate(0));
+  EnvelopeProgram program;
+  program.probe = true;
+  for (unsigned p = 0; p < width; ++p) {
+    builder.s_mov_imm_b32(imm_temp, 0x20u);
+    builder.v_mov_b32(isa::vgpr(9 + p), imm_temp, isa::predicate(0));
+  }
+  for (unsigned copy = 0; copy < copies; ++copy) {
+    builder.sm_op(mnemonic, isa::predicate(0), data_v, addr_v);
+    if (chained) {
+      builder.sm_op(readback, isa::predicate(0), data_v, addr_v);
+    }
+  }
+  for (unsigned p = 0; p < width; ++p)
+    emit_result_store(builder, env, isa::vgpr(9 + p), isa::vgpr(0), 4 * p);
+  if (!finalize_program(builder, program, error)) {
+    return std::nullopt;
+  }
+  return program;
+}
+
 std::optional<EnvelopeProgram> build_cs_bench(const std::string& mnemonic,
                                               unsigned copies, bool chained,
                                               unsigned lanes,
@@ -3913,6 +4035,10 @@ std::optional<EnvelopeProgram> build_cs_bench(const std::string& mnemonic,
     return build_cs_bench_buff_atomic(mnemonic, copies, chained, lanes, error);
   if (mnemonic.rfind("load_sm_", 0) == 0)
     return build_cs_bench_sm_load(mnemonic, copies, chained, lanes, error);
+  if (mnemonic.rfind("store_v_flat_", 0) == 0)
+    return build_cs_bench_flat_store(mnemonic, copies, chained, lanes, error);
+  if (mnemonic.rfind("store_sm_", 0) == 0)
+    return build_cs_bench_sm_store(mnemonic, copies, chained, lanes, error);
   if (copies == 0) {
     error = "copies must be positive";
     return std::nullopt;
