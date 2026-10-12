@@ -27,14 +27,21 @@ diverts control, and it must not be treated like the others.
 
 ## 1. Preconditions before any submission
 
-    grep -c parked /proc/... (or dmesg | grep -c parked)   # must be 0
-    ls /dev/dri/renderD128                                  # must exist
-    make -C code/lg200/gpu build/lgpu-gpu                   # must be up to date
-    ./build/lgpu-gpu csverify                               # host-only, must pass
+    dmesg | grep -c parked                                # must be 0
+    ls /dev/dri/renderD128                                # must exist
+    PKG_CONFIG_PATH=/home/lin/work/build/libdrm-loonggpu-prefix/lib/pkgconfig \
+      make -C code/lg200/gpu build/lgpu-gpu                # must be up to date
+    ./code/lg200/gpu/build/lgpu-gpu csverify              # host-only, must pass
     printf 'x\t\t0x1\t0x1\n' > /tmp/one.txt
-    ./build/lgpu-gpu csrun s_abs_i32 < /tmp/one.txt         # must PASS first
+    ./code/lg200/gpu/build/lgpu-gpu csrun s_abs_i32 < /tmp/one.txt   # must PASS first
 
 If the one-case smoke test fails, stop - the device is not usable.
+
+Two of those lines were wrong as first written, and both would have failed at the
+session: the parked check pointed at `/proc/...`, a placeholder, and the build line
+omitted the `PKG_CONFIG_PATH` that `code/lg200/gpu/README.md` records as necessary
+(the deb-staged library is older and lacks `loonggpu_userq_free`, so a plain `make`
+fails at link and removes the binary).
 
 ## 2. Recovery ladder
 
