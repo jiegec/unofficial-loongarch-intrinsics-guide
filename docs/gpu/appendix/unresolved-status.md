@@ -36,9 +36,12 @@ applies to.  Closing one sentence closes every row that carries it.
 | 8 | "the destination's upper 16 bits" / "whether the mask reads as an ordinary scalar" / "whether a signalling NaN compares differently" (seven wordings) | **39** | **hardware + the row's own Semantics**: the destination is a full 32-bit lane mask (one bit per lane, `0xffffffff` at 32 lanes), so bits 31:16 are *not* cleared; the mask *does* read as an ordinary scalar (the destination may name a scalar register, and the vendor backend encodes `RD8 = 6` for `s6`); and sNaN does not compare differently from qNaN. | 2026-10-12 |
 | 9 | "The encoded predicate is shared with another family member" | **14** | **static, disproved**: every member of the `v_cmp_o_*` / `v_cmp_u_*` / `v_cmp_tru_*` family has its own fixed encoding - 14 distinct fixed words, **0 collisions** - so the instruction word alone determines which behaviour executes. | 2026-10-12 |
 
-Rows 2 and 5 are *scoping/coverage* resolutions; rows 1, 3, 4, 6, 7, 8 and 9 are behaviour
-resolutions, all with hardware evidence except rows 2 (a closed-producer census) and 9
-(a fixed-encoding uniqueness proof).
+| 10 | "Whether the source value comes from the destination registers or from the encoded index field" | **17** | **static, from the seed**: the buffer form is two-address (`atomic_v_buff_sub_i32 p0, v0, s[16:19], s4, 0x40f` carries no separate data operand) and the row itself says so; the texture form names a distinct source tuple (`atomic_v_tex_add_i32 p0, v0, v[2:9], s[16:23]`), i.e. the `VJ8x8` operand.  Neither is an index field. | 2026-10-12 |
+| 11 | "the false result's width above the low word" / "whether the predicate decides by a subtraction borrow or a magnitude comparison" | **26** | **measured + unobservable**: the false result is zero across the whole 32-bit destination (the family's `false` case passes 39/39 on both pipes); the borrow-vs-comparison question is not observable - the ISA exposes only the predicate and both mechanisms produce the same one. | 2026-10-12 |
+| 12 | "Which of the mnemonics sharing this negation an encoding stands for" | **8** | **static, disproved**: the eight `v_cmp_imm_n*` rows have pairwise distinct fixed encodings (8 distinct fixed words, 0 collisions). | 2026-10-12 |
+
+Rows 2, 5, 9, 10 and 12 are *static* resolutions (a census, a seed reading, or an
+encoding-uniqueness proof); rows 1, 3, 4, 6, 7, 8 and 11 carry hardware evidence.
 
 ## 2b. Executable-body writebacks (`code/lg200/*.h`)
 
