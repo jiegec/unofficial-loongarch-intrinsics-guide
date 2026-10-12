@@ -67,17 +67,31 @@ def run_batch(ms: list[str]):
 
 
 def verdict(m, wins, skipped, notes=None):
-    if any((m, k) in skipped for k in ("lat", "tp")):
-        _fam, _why = _bench_reason(m)
-        reason = ("not benchable on the compute carrier"
-                  if not _why else "%s: %s" % (_fam, _why))
-        return ("SKIP", "", "", reason)
-    got = {}
+    # The two kinds are decided separately, because they are skipped for different
+    # reasons.  A control row cannot be chained - there is no cost to accumulate - so
+    # its LATENCY is undefined while its THROUGHPUT through independent streams is
+    # measurable.  Returning SKIP for the whole row, which this did until 2026-10-13,
+    # threw that number away and made 20 control rows look unmeasurable in both
+    # columns.  A row measured in one kind is now PARTIAL and reports what it has.
+    _fam, _why = _bench_reason(m)
+    reason = ("not benchable on the compute carrier"
+              if not _why else "%s: %s" % (_fam, _why))
+    got, missing = {}, []
     for kind in ("lat", "tp"):
+        if (m, kind) in skipped:
+            missing.append(kind)
+            continue
         a, b = wins.get((m, kind, K_SMALL)), wins.get((m, kind, K_LARGE))
         if a is None or b is None:
-            return ("NO-DATA", "", "", "no timestamp line")
+            missing.append(kind)
+            continue
         got[kind] = (b - a) / (K_LARGE - K_SMALL)
+    if not got:
+        return ("SKIP", "", "", reason)
+    if missing:
+        note = "%s (skipped %s)" % (reason, "/".join(missing))
+        cell = lambda k: ("%.3f" % got[k]) if k in got else ""
+        return ("PARTIAL", cell("lat"), cell("tp"), note)
     lat, tp = got["lat"], got["tp"]
     # The runner knows when a row's measurement is not what the column name
     # implies (a store's lat is a store+load round trip); carry that into the CSV
