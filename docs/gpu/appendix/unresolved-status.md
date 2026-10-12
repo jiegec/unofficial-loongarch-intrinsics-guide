@@ -5,6 +5,27 @@ that is not established is still written as `UNRESOLVED` in place; the rule is
 unchanged (DEVELOPMENT.md).  What changes is that an entry leaves the set only
 with **evidence**, and the evidence is named here.
 
+### How the closed classes were settled
+
+Thirty of the thirty-one entries below are closed; **entry 31 is reopened** and
+is listed so the correction stays visible rather than silent.  By the kind of
+evidence that settles them:
+
+| evidence | classes | meaning |
+|---|---|---|
+| static / encoding | 13 | the row own layout, seed or a uniqueness proof - no device needed |
+| hardware (measured, recorded) | 11 | a reading taken on the device |
+| by design | 2 | the question dissolves once the model is stated |
+| recorded vectors / rule | 3 | the row own case vectors, or a rule already established for the family |
+| documentation | 1 | two of the chapter own statements disagreed and the conflict was the defect |
+| partly established | 1 | part settled, part still open |
+| **reopened** | 1 | settled by an argument that did not survive checking (entry 31) |
+
+The classification is worth reading as a warning: the weakest arguments are the
+ones that reason from a field being ABSENT.  Entry 31 was closed that way and had
+to be reopened, because the scalar compare forms carry no condition-register
+operand either and still write it.
+
 ## 1. Inventory (2026-10-12)
 
 | carrier | markers | note |

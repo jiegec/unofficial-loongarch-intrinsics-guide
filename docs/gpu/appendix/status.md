@@ -65,7 +65,7 @@ the hardware-plan item that would settle each:
 | modifier semantics (mod2, clmp1) | 4 | plan 3 |
 | smaller, ungrouped questions | 227 | mostly hardware, one row at a time |
 
-Twenty-six classes are closed, each with its evidence named on
+Thirty classes are closed, each with its evidence named on
 [UNRESOLVED Status](unresolved-status.md) - hardware measurements for the
 behavioural ones, closed-producer censuses and encoding-uniqueness proofs for the
 static ones.  What remains is dominated by **memory-access semantics** (address
