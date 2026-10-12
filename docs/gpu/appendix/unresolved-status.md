@@ -51,9 +51,12 @@ applies to.  Closing one sentence closes every row that carries it.
 | 18 | "An odd pair base ... whether an unaligned index is rejected or silently aligned" | **7** | **encoding-contract**: the pair base goes in the same selector field a single register would (`x2` names the width, it is not an encoding bit), so nothing in the instruction rejects an odd base - even alignment is a register-allocation constraint on the producer, and an out-of-contract base is not observable from a conforming producer's output. | 2026-10-12 |
 | 19 | lane ordering / visibility ("Lanes that share an address ...", "the order of two lanes naming one location", ...) | **20** | **by design**: the order is architecturally undefined and fixes no intermediate value - the reference carrier leaves the per-lane old value unverified and compares only the post-atomic cell. | 2026-10-12 |
 
-Rows 2, 5, 9, 10, 12, 13, 15, 16, 17, 18 and 19 are *static or recorded-evidence*
-resolutions; rows 1, 3, 4, 6, 7, 8 and 11 carry direct hardware measurements;
-row 14 is a partial resolution that names exactly what remains and why.
+| 20 | "any reinterpretation at encoding time" of the immediate literal | **6** | **static**: the field is `IK32@INST_LO[31:0]`, emitted verbatim - the vendor seed prints the raw value - so the comparison uses the raw bits. | 2026-10-12 |
+| 21 | "no row follows another by complementing; generalisation is UNRESOLVED" (five wordings) | **21** | **static**: each compare row is its own encoding (the f64 set alone is 16 rows with 16 pairwise-distinct fixed words, 0 collisions), so nothing is derived by complementing. | 2026-10-12 |
+
+Rows 2, 5, 9, 10, 12, 13, 15, 16, 17, 18, 19, 20 and 21 are *static or
+recorded-evidence* resolutions; rows 1, 3, 4, 6, 7, 8 and 11 carry direct hardware
+measurements; row 14 is a partial resolution that names what remains and why.
 
 ## 2b. Executable-body writebacks (`code/lg200/*.h`)
 
