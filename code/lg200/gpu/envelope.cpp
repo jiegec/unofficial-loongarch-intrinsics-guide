@@ -3967,7 +3967,8 @@ std::optional<EnvelopeProgram> build_cs_bench_flat_store(
 // else is empty.
 const char* bench_note(const std::string& mnemonic) {
   if (mnemonic.rfind("store_v_flat_", 0) == 0 ||
-      mnemonic.rfind("store_sm_", 0) == 0)
+      mnemonic.rfind("store_sm_", 0) == 0 ||
+      mnemonic.rfind("store_v_buff_", 0) == 0)
     return "lat is a store+load round trip, not a store latency";
   return "";
 }
@@ -4019,6 +4020,65 @@ std::optional<EnvelopeProgram> build_cs_bench_sm_store(
   return program;
 }
 
+// The buffer STORE family's bench template, for the plain widths only.  b8/b16 and
+// the fmtdesc/fmtinst forms have a different operand shape (the subword/format
+// branch of the correctness carrier), and this template does not build them.
+//
+// As with the other stores there is no result to chain through, so lat is a
+// store+readback ROUND TRIP; the readback is the ordinary buffer load the
+// correctness carrier already uses, and it writes straight into the register the
+// next store stores, so the trip needs no extra instruction.
+std::optional<EnvelopeProgram> build_cs_bench_buff_store(
+    const std::string& mnemonic, unsigned copies, bool chained, unsigned lanes,
+    std::string& error) {
+  const std::string suffix = mnemonic.substr(std::string("store_v_buff_").size());
+  unsigned width = 1;
+  if (suffix == "b128") width = 4;
+  else if (suffix == "b96") width = 3;
+  else if (suffix == "b64") width = 2;
+  else if (suffix != "b32") {
+    error = "buff store bench: only the plain b32/b64/b96/b128 forms share this "
+            "shape";
+    return std::nullopt;
+  }
+  const CarrierEnv env = CarrierEnv::compute(lanes);
+  Builder builder;
+  emit_env_prelude(builder, env);
+  const isa::Reg store_desc = carrier::kStoreDesc();
+  const isa::Reg load_desc = isa::sgpr(4, 4);
+  emit_load_desc(builder, env, load_desc, env.arg_va + carrier::kLoadWindow);
+  const isa::Reg zero_address = isa::vgpr(0);
+  const isa::Reg data_v = isa::vgpr(8, width);
+  const isa::Reg imm_temp = isa::sgpr(16);
+  const std::uint32_t off = 0u;
+  builder.v_mov_b32(zero_address, isa::zero_reg(), isa::predicate(0));
+  EnvelopeProgram program;
+  program.probe = true;
+  for (unsigned p = 0; p < width; ++p) {
+    builder.s_mov_imm_b32(imm_temp, 0x20u);
+    builder.v_mov_b32(isa::vgpr(8 + p), imm_temp, isa::predicate(0));
+  }
+  for (unsigned copy = 0; copy < copies; ++copy) {
+    builder.buff_mem(mnemonic, isa::predicate(0), data_v, zero_address,
+                     store_desc, isa::zero_reg(), carrier::kLoadWindow + off,
+                     false, true, false, false);
+    if (chained) {
+      // The readback lands in the store's own data register, so the next copy's
+      // operand is what this copy wrote with nothing in between.
+      builder.buff_mem("load_v_buff_b32", isa::predicate(0), data_v,
+                       zero_address, load_desc, isa::zero_reg(), off, true,
+                       false, false, false);
+    }
+  }
+  builder.check_k_vm_vs_sm();
+  for (unsigned p = 0; p < width; ++p)
+    emit_result_store(builder, env, isa::vgpr(8 + p), isa::zero_reg(), 4 * p);
+  if (!finalize_program(builder, program, error)) {
+    return std::nullopt;
+  }
+  return program;
+}
+
 std::optional<EnvelopeProgram> build_cs_bench(const std::string& mnemonic,
                                               unsigned copies, bool chained,
                                               unsigned lanes,
@@ -4039,6 +4099,8 @@ std::optional<EnvelopeProgram> build_cs_bench(const std::string& mnemonic,
     return build_cs_bench_flat_store(mnemonic, copies, chained, lanes, error);
   if (mnemonic.rfind("store_sm_", 0) == 0)
     return build_cs_bench_sm_store(mnemonic, copies, chained, lanes, error);
+  if (mnemonic.rfind("store_v_buff_", 0) == 0)
+    return build_cs_bench_buff_store(mnemonic, copies, chained, lanes, error);
   if (copies == 0) {
     error = "copies must be positive";
     return std::nullopt;

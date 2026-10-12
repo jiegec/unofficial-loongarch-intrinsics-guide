@@ -107,6 +107,13 @@ pair) and preloads a small value, then:
   therefore includes that add**, and the staged value is small so the chained
   address stays inside the carrier window.
 
+**The plain BUFFER stores are in too** (4 rows: b32/b64/b96/b128).  Their
+latency is the same round trip, and the readback is the ordinary buffer load the
+correctness carrier already uses - it writes straight into the register the next
+store stores, so the trip needs no extra instruction.  The b8/b16 and
+fmtdesc/fmtinst forms are refused explicitly: they take the subword/format branch
+of the correctness carrier and have a different operand shape.
+
 **The STORES are in too, with a caveat the CSV now carries** (6 `store_v_flat_*`
 and 5 `store_sm_*`).  A store has no result, so there is no register to chain
 through; the only way to make one copy depend on the previous one is to READ BACK
@@ -190,9 +197,9 @@ few seconds - and reports the outcome and the reason:
 
 | | rows |
 |---|---|
-| buildable for both kinds | **593** |
-| no canonical variant | 139 |
-| not materializable on the generic carrier | 15 |
+| buildable for both kinds | **597** |
+| no canonical variant | 129 |
+| not materializable on the generic carrier | 11 |
 | no semantic specification | 6 |
 | flat atomic bench: cmpswap stages a compare pair this template does not build | 2 |
 | buff atomic bench: cmpswap stages a compare pair this template does not build | 2 |
@@ -217,8 +224,8 @@ A family template therefore has to do one of two things: derive the classes from
 the rows layout instead of from a decoded variant, or give the family variant
 entries.  Either way the template is what is missing; the reason string names the
 first symptom.
-593 is 497 (the last hardware run's OK) plus the eight flat load rows, the 24 flat atomic rows and the 26 shared-memory
-atomic rows, the 24 buffer atomic rows the 7 shared-memory load rows and the 11 store rows this work added - i.e. the offline number and the device number agree, which is
+597 is 497 (the last hardware run's OK) plus the eight flat load rows, the 24 flat atomic rows and the 26 shared-memory
+atomic rows, the 24 buffer atomic rows the 7 shared-memory load rows the 11 store rows and the 4 plain buffer store rows this work added - i.e. the offline number and the device number agree, which is
 what makes it usable as a target before a session.  The reasons are the same
 per-family gaps the sections above describe.
 
