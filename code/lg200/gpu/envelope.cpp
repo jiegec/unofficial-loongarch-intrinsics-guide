@@ -4160,6 +4160,64 @@ std::optional<EnvelopeProgram> build_cs_bench(const std::string& mnemonic,
                                               unsigned copies, bool chained,
                                               unsigned lanes,
                                               std::string& error) {
+  // Control and geometry-stream rows: checked BEFORE the semantic lookup, because
+  // for several of them the lookup fails first and its "no semantic
+  // specification" hides the real reason.  There is no cost to chain and no
+  // operand to chain it through.
+  if (mnemonic == "nop" || mnemonic == "exit" || mnemonic == "check" ||
+      mnemonic == "barrier" || mnemonic == "b" || mnemonic == "cb" ||
+      mnemonic == "rfe" || mnemonic == "v_emit2" || mnemonic == "v_emit3" ||
+      mnemonic == "jirl" || mnemonic == "jpop" || mnemonic == "jpush" ||
+      mnemonic == "czb" || mnemonic == "flag") {
+    error = "control bench: the control and geometry-stream rows are excluded - "
+            "there is no cost to chain and no operand to chain it through";
+    return std::nullopt;
+  }
+  // The environment reads return launch state rather than a computed value, so
+  // there is no instruction cost to measure.
+  if (mnemonic == "getpc" || mnemonic == "getreg" || mnemonic == "getlod" ||
+      mnemonic == "getresinfo") {
+    error = "environment bench: the row returns launch state rather than a "
+            "computed value, so there is no instruction cost to measure";
+    return std::nullopt;
+  }
+  // The one row that must never enter a batch: it wedged the pipe on 2026-10-12
+  // (the device is parked because of it), so a benchmark must refuse it outright
+  // rather than inherit the risk.
+  if (mnemonic == "trap") {
+    error = "trap bench: this row wedged the pipe and parked the device "
+            "(2026-10-12); it is excluded from every batch";
+    return std::nullopt;
+  }
+  // Texture: the correctness carrier refuses the whole family, and the CS matrix
+  // records it as SKIP-ENVELOPE.  A bench must not exercise a stream the
+  // validation path rejects.
+  if (mnemonic.rfind("samp", 0) == 0 || mnemonic.rfind("gather", 0) == 0 ||
+      mnemonic.rfind("atomic_v_tex_", 0) == 0 ||
+      mnemonic.rfind("store_v_tex", 0) == 0 ||
+      mnemonic.rfind("load_v_tex", 0) == 0 ||
+      mnemonic.rfind("image_", 0) == 0) {
+    error = "texture bench: the correctness carrier refuses the texture family "
+            "(SKIP-ENVELOPE in the CS matrix); a bench must not exercise a stream "
+            "the validation path rejects";
+    return std::nullopt;
+  }
+  // The remaining buffer loads: their chain needs a LIVE index or offset register,
+  // and nothing exercises one yet (hardware plan item 10).  Only the plain buffer
+  // store and the buffer atomics avoid that - they chain through the data.
+  if (mnemonic.rfind("load_v_buff_", 0) == 0 ||
+      mnemonic.rfind("load_s_buff_", 0) == 0) {
+    error = "buffer load bench: the chain needs a live index or offset register "
+            "(hardware plan item 10); only the plain buffer store and the buffer "
+            "atomics avoid it";
+    return std::nullopt;
+  }
+  if (mnemonic.rfind("copy_sm_", 0) == 0) {
+    error = "copy bench: the global<->LDS copy is a control-path op in the "
+            "correctness carrier (predicate-only), so it has no operand to chain "
+            "through";
+    return std::nullopt;
+  }
   // The SIO and GS-prefix rows are refused for a reason that is about evidence,
   // not shape: the correctness carrier runs them OBSERVED because the channel-file
   // content they return is launch state and not oracle-able, and their chain would

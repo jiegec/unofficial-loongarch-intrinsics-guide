@@ -227,16 +227,30 @@ few seconds - and reports the outcome and the reason:
 | | rows |
 |---|---|
 | buildable for both kinds | **605** |
-| no canonical variant | 129 |
-| not materializable on the generic carrier | 11 |
+| texture bench: the correctness carrier refuses the family (SKIP-ENVELOPE) | 79 |
+| buffer load bench: the chain needs a live index or offset register (item 10) | 21 |
+| sio bench: run OBSERVED, and their chain is not a chain of independent work | 20 |
+| control bench: control and geometry-stream rows, nothing to chain | 14 |
 | buff store bench: only the plain b32/b64/b96/b128 forms share this shape | 10 |
-| no semantic specification | 6 |
-| flat atomic bench: the 64-bit cmpswap stages a compare pair as well as a value pair | 1 |
-| buff atomic bench: the 64-bit cmpswap stages a compare pair as well as a value pair | 1 |
+| no canonical variant | 5 |
+| environment bench: the row returns launch state, not a computed value | 4 |
 | sm load bench: the matrix and interpolator forms address UNRESOLVED state | 4 |
+| copy bench: the global<->LDS copy is a control-path op (predicate-only) | 2 |
+| 64-bit cmpswap: stages a compare pair as well as a value pair (flat, buff) | 2 |
+| not materializable on the generic carrier | 1 |
 | refused on the compute pipe (known to wedge) | 1 |
 
 
+
+Only five rows are still on a GENERIC reason - the scalar flat loads - and
+every other refusal now names the evidence behind it: the texture family is the
+one the correctness carrier refuses (SKIP-ENVELOPE), the buffer loads are the ones
+whose chain needs a register nothing exercises yet, the control and
+geometry-stream rows have nothing to chain, the environment reads return launch
+state, and the SIO rows run OBSERVED.  Two of them are worth reading on their own:
+the **trap** row says it wedged the pipe on 2026-10-12 and is excluded from every
+batch, and the subword/format buffer stores say a measured fault is on record for
+the b16 shape.
 
 The "no canonical variant" reason is worth spelling out: it is a gap in the
 codecs *variant* table, not in the encode table or in a template.
