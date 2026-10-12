@@ -124,3 +124,4 @@ nav:
           - UNRESOLVED Register: gpu/appendix/unresolved.md
           - UNRESOLVED Status: gpu/appendix/unresolved-status.md
           - Case Boundary Coverage: gpu/appendix/case-boundaries.md
+          - Carrier and Coverage Status: gpu/appendix/status.md
