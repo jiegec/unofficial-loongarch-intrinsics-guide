@@ -153,6 +153,20 @@ hardware value does not match any instruction's (the v_sqrt approximation) still
 works around it by choosing the policy whose reference result equals the observed
 value.  What `mod2` means when it is NOT zero remains a hardware item.
 
+The policy TOKENS are a third thing, and they are measured rather than assumed
+(`code/lg200/fp_mode_audit.py`, 2026-10-13): of the 173 rows with `CASE_FP` vectors,
+`rtne` appears in all 173, `ftz` in 92, `daz` in 91, `rtz` in 1 and `rtup` in 1, with
+`rtdn` absent - so 172 rows have no non-default rounding case and 81 no flush case.
+
+Those missing tokens are deliberately **not** counted as gaps, and the reason is a
+carrier boundary rather than an oversight: the PS carrier runs a fixed floating-point
+default (RN + denormal-flush + positive NaN) and ignores the tokens - stated in its own
+rows (`v_add_f32.cpp`, `v_mul_f32.cpp`) - so a case that changed only the token could
+not produce a different result there.  Filling them in would add cases that cannot
+differ, which is the opposite of coverage.  Where a carrier CAN set the mode - the
+compute path - is an open question and needs a device; it is the same question as
+`mod2` above, seen from the policy side.
+
 ## 6. Status
 
 | measure | value |
