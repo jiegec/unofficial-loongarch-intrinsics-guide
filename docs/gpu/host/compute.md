@@ -27,11 +27,16 @@ workgroups to launch:
 | Dispatch | 16 bytes | a fixed command word, then three 32-bit dimension fields |
 
 The fixed command words are `0x00100189` for the local-size record and
-`0x00000787` for the dispatch record, as emitted by the open driver.  Which axis
-each of the three dispatch dimensions maps to is not independently established:
-the schema records the roles as `UNRESOLVED` and notes that probes are needed to pin
-them.  A driver must therefore not assume that the dimension fields are ordered
-X, Y, Z.
+`0x00000787` for the dispatch record, as emitted by the open driver.
+
+**The dispatch record is INERT on every established path.**  The recovery work on
+the driver side found that a record carrying it is consumed and has no effect - it
+never runs as a dispatch - so the three dimension fields cannot be pinned by launch
+behaviour at all: there is nothing to observe.  The workgroup count is carried by a
+different member of the `0x89` family, the variable record `(count << 20) | 0x1089`.
+A driver must still not assume the three fields are ordered X, Y, Z: they are not
+established, and now it is known why - the record is inert rather than merely
+unmeasured.
 
 ## Completion
 
