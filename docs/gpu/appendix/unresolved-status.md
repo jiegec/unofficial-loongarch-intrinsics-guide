@@ -7,7 +7,7 @@ with **evidence**, and the evidence is named here.
 
 ### How the closed classes were settled
 
-Thirty of the thirty-one entries below are closed; **entry 31 is reopened** and
+Thirty-two of the thirty-three entries below are closed; **entry 31 is reopened** and
 is listed so the correction stays visible rather than silent.  By the kind of
 evidence that settles them:
 
@@ -87,7 +87,9 @@ applies to.  Closing one sentence closes every row that carries it.
 | 29 | "whether the literal is reduced like the register source; two recorded statements conflict" | **4** | **documentation, resolved**: this row's own Semantics says the high byte is discarded and the reference helper sign-extends BOTH operands from bit 23, so the two agree.  The conflict was between this row and the general "literal used whole" statement, which belongs to the non-reducing immediate forms.  The generated grid now carries literals with non-zero high bytes, so a hardware run settles the remaining half. | 2026-10-13 |
 | 30 | "which of GJ11 and GK11 receives the signed reading" | **4** | **recorded vectors**: the `neg-signed` case gives 0x7f0 = 4 x (254 x 2) on the i8_u8 rows and 0xfffffff0 = 4 x (-2 x 2) on the u8_i8 rows.  The signed operand is therefore the one the name's SECOND letter names - the mnemonic's letter order is the reverse of the operand order. | 2026-10-13 |
 | 31 | "any condition-register effect of the wrapped shared-memory atomic" | **4** | **REOPENED after a wrong resolution.**  It was recorded as settled by the encoding (the form carries no condition-register operand); that argument is unsound, because the scalar compare forms carry no such operand either and still write the condition register as their destination - `s_cmp_imm`'s fields are only IK32 and RJ8 - and the sibling bitwise rows ask which condition bit they write.  The absence proves nothing; the effect stays open, and only a hardware read-back settles it. | 2026-10-13 |
-Rows 2, 5, 9, 10, 12, 13, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30 and 31 are
+| 32 | "whether a denormal input is flushed" (the f32 rows) | **7** | **measured + the chapter itself**: a denormal input reads as zero - `v_abs_f32(min_denormal)` is 0 and `v_cmp_eq_f32(0.0, min_denormal)` is true - and the sibling arithmetic rows already state the same flush as established.  The 64-bit member is different: its flush is the PENDING measurement (the fp64 policy repair landed but was never run), so `v_sqrt_f64` keeps an UNRESOLVED that names hardware plan item 1. | 2026-10-13 |
+| 33 | "whether the destination may overlap the source" (one more row, `v_frexp_mant_f64`) | **1** | **encoding**: same class as entry 15's neighbours - independent selectors, and the instruction reads its sources before writing its destination. | 2026-10-13 |
+Rows 2, 5, 9, 10, 12, 13, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32 and 33 are
 *static or recorded-evidence* resolutions; rows 1, 3, 4, 6, 7, 8 and 11 carry
 direct hardware measurements; row 14 is a partial resolution that names what
 remains and why.
