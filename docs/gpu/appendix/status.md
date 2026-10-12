@@ -86,9 +86,17 @@ concrete consequences, both checked by hand:
 
 ### What the remaining sentences are about
 
-The 792 remaining sentences are no longer a documentation problem: settled from
+The remaining sentences are no longer a documentation problem: settled from
 recorded facts, they would be.  Grouped by the kind of question they are, and by
 the hardware-plan item that would settle each:
+
+Measured 2026-10-13: **786 distinct sentences, 1048 occurrences** across the 580
+rows that still carry the word.  The split below is by keyword with first-match, so
+the counts are indicative rather than exact - a sentence is attributed to the first
+kind it mentions - and the last row is what no keyword claimed.  Its 192 distinct
+sentences are one-off behavioural questions (a single encoding bit, whether a wrap
+carries, what a flag holds), which is why they are grouped rather than listed: they
+are the same kind of question as the rows above, answered one at a time.
 
 | kind | occurrences | settled by |
 |---|---|---|
