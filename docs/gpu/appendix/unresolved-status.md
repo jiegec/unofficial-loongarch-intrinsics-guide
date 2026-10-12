@@ -7,7 +7,7 @@ with **evidence**, and the evidence is named here.
 
 ### How the closed classes were settled
 
-Thirty-three of the thirty-four entries below are closed; **entry 31 is reopened** and
+Thirty-four of the thirty-five entries below are closed; **entry 31 is reopened** and
 is listed so the correction stays visible rather than silent.  By the kind of
 evidence that settles them:
 
@@ -90,7 +90,8 @@ applies to.  Closing one sentence closes every row that carries it.
 | 32 | "whether a denormal input is flushed" (the f32 rows) | **7** | **measured + the chapter itself**: a denormal input reads as zero - `v_abs_f32(min_denormal)` is 0 and `v_cmp_eq_f32(0.0, min_denormal)` is true - and the sibling arithmetic rows already state the same flush as established.  The 64-bit member is different: its flush is the PENDING measurement (the fp64 policy repair landed but was never run), so `v_sqrt_f64` keeps an UNRESOLVED that names hardware plan item 1. | 2026-10-13 |
 | 33 | "whether the destination may overlap the source" (one more row, `v_frexp_mant_f64`) | **1** | **encoding**: same class as entry 15's neighbours - independent selectors, and the instruction reads its sources before writing its destination. | 2026-10-13 |
 | 34 | the remaining denormal-flush clauses (three f32 rows) and the halfway tie-break | **5** | **measured + the family rule**: the f32 flush is the measured mode, and the convert-to-integer tie goes to even because the family mode is rtne and the sibling rndne rows state the rule with worked examples.  The five 64-bit members are kept DIFFERENT: their flush is the pending measurement (hardware plan item 1), not the f32 answer. | 2026-10-13 |
-Rows 2, 5, 9, 10, 12, 13, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33 and 34 are
+| 35 | the sign of a zero result (five rows: the two-source add, the three-source max/min/med and the 64-bit ceiling) | **5** | **measured hardware vectors, and they give the RULES, not just "settled"**: the PS matrix is 768 PASS over the pre-phase-4 grid, and that grid carries the zero cases - `v_add_f32` has `0x80000000 0x80000000 -> 0x80000000` (the sign follows the operands), `v_ceil_f64` has `0x0 0x80000000 -> 0x00000000 0x80000000` (ceil(-0.0) is -0.0), `v_max3_f32` gives POSITIVE zero for a mixed pair, `v_min3_f32` NEGATIVE zero, and `v_med3_f32` takes the majority sign. | 2026-10-13 |
+Rows 2, 5, 9, 10, 12, 13, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34 and 35 are
 *static or recorded-evidence* resolutions; rows 1, 3, 4, 6, 7, 8 and 11 carry
 direct hardware measurements; row 14 is a partial resolution that names what
 remains and why.
