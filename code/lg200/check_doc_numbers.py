@@ -1,0 +1,96 @@
+#!/usr/bin/env python3
+"""Check the pages' headline numbers against the live tools.
+
+The same figures are quoted in status.md, unresolved.md, case-boundaries.md and
+MICROBENCH.md, and they move whenever the generator, the audit or the bench
+changes.  This recomputes each one and fails loudly on a mismatch, so a stale
+number cannot survive a round.
+
+    python3 check_doc_numbers.py
+"""
+from __future__ import annotations
+
+import csv
+import re
+import subprocess
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent
+DOCS = ROOT.parent.parent / 'docs' / 'gpu' / 'appendix'
+TSV = ROOT.parent / 'lg200-instructions.tsv'
+
+
+def table():
+    with open(TSV, encoding='utf-8') as f:
+        return list(csv.DictReader(f, delimiter=chr(9)))
+
+
+def unresolved_counts():
+    rows = table()
+    s = set()
+    occ = 0
+    for r in rows:
+        d = r.get('description', '')
+        if 'UNRESOLVED' not in d:
+            continue
+        for x in re.split(r'(?<=[.!?])\s+', d):
+            if 'UNRESOLVED' in x:
+                s.add(x.strip())
+                occ += 1
+    return sum(1 for r in rows if 'UNRESOLVED' in r.get('description', '')), len(s), occ
+
+
+def run(script, cwd):
+    p = subprocess.run([sys.executable, script], cwd=cwd, text=True,
+                       capture_output=True, timeout=1800)
+    return p.stdout + p.stderr
+
+
+def main() -> int:
+    rows, sents, occ = unresolved_counts()
+    cov = run('case_coverage.py', ROOT)
+    m = re.search(r'with all required boundary classes: (\d+)\s+with gaps: (\d+)', cov)
+    launch = re.search(r'\((\d+) launch-shape\)', cov)
+    vec = run('run_cases.py', ROOT)
+    nvec = re.search(r'\d+ instructions, (\d+) vectors', vec)
+    if not (m and launch and nvec):
+        print('could not read the live tools:'); print(cov[-300:]); print(vec[-300:])
+        return 2
+    live = {
+        'rows-unresolved': rows,
+        'sentences': sents,
+        'occurrences': occ,
+        'covered': int(m.group(1)),
+        'gaps': int(m.group(2)),
+        'launch-shape': int(launch.group(1)),
+        'vectors': int(nvec.group(1)),
+    }
+    checks = [
+        ('unresolved.md', r'(\d+) of the 768', 'rows-unresolved'),
+        ('status.md', r'\\?\| rows stating an .UNRESOLVED. \| \d+ \| \*\*(\d+)\*\*', 'rows-unresolved'),
+        ('status.md', r'distinct UNRESOLVED sentences \| \d+ \| \*\*(\d+)\*\*', 'sentences'),
+        ('status.md', r'(1,\d+) occurrences', 'occurrences'),
+        ('case-boundaries.md', r'\*\*(\d+) of \d+ value-expressible', 'covered'),
+        ('status.md', r'(\d+) of \d+ value-expressible', 'covered'),
+    ]
+    bad = 0
+    for doc, pat, key in checks:
+        text = (DOCS / doc).read_text()
+        got = re.search(pat, text)
+        if not got:
+            print('MISSING  %-22s %s' % (doc, pat)); bad += 1; continue
+        value = got.group(1).replace(',', '')
+        if int(value) != live[key]:
+            print('DRIFT    %-22s %s: doc %s vs live %d' % (doc, key, value, live[key]))
+            bad += 1
+        else:
+            print('ok       %-22s %s = %d' % (doc, key, live[key]))
+    for k, v in live.items():
+        print('  live %-16s %d' % (k, v))
+    print('drift: %d' % bad)
+    return 1 if bad else 0
+
+
+if __name__ == '__main__':
+    sys.exit(main())
