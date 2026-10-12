@@ -4235,13 +4235,29 @@ std::optional<EnvelopeProgram> build_cs_bench(const std::string& mnemonic,
   // for several of them the lookup fails first and its "no semantic
   // specification" hides the real reason.  There is no cost to chain and no
   // operand to chain it through.
-  if (mnemonic == "nop" || mnemonic == "exit" || mnemonic == "check" ||
-      mnemonic == "barrier" || mnemonic == "b" || mnemonic == "cb" ||
-      mnemonic == "rfe" || mnemonic == "v_emit2" || mnemonic == "v_emit3" ||
-      mnemonic == "jirl" || mnemonic == "jpop" || mnemonic == "jpush" ||
-      mnemonic == "czb" || mnemonic == "flag") {
-    error = "control bench: the control and geometry-stream rows are excluded - "
-            "there is no cost to chain and no operand to chain it through";
+  // MEASURED 2026-10-13: scoping this to `chained` was necessary but NOT sufficient.  A
+  // throughput program for `nop` still fails, one step earlier, with "no semantic
+  // specification" - which is what the comment above warned about, and it means the
+  // remaining work for these rows is a semantic-rule entry, not a bench template.  The
+  // scoping is kept because it is correct and because the latency message was hiding the
+  // throughput question; the count stays at 610 buildable for both kinds.
+  //
+  // Only the CHAINED kind is impossible for these.  The reason the comment above gives -
+  // "no cost to chain and no operand to chain it through" - is a statement about
+  // chaining, and the throughput kind does not chain: it repeats the row in independent
+  // streams.  Refusing both kinds meant twenty rows looked unmeasurable in both columns
+  // when one of them is measurable, which is the objective's "independent streams measure
+  // throughput" going unexercised.  Scoped to `chained` on 2026-10-13; the throughput
+  // program is built like any other, and run_bench.py records the row as PARTIAL with the
+  // number it got and the reason it has no latency.
+  if (chained && (mnemonic == "nop" || mnemonic == "exit" || mnemonic == "check" ||
+                  mnemonic == "barrier" || mnemonic == "b" || mnemonic == "cb" ||
+                  mnemonic == "rfe" || mnemonic == "v_emit2" || mnemonic == "v_emit3" ||
+                  mnemonic == "jirl" || mnemonic == "jpop" || mnemonic == "jpush" ||
+                  mnemonic == "czb" || mnemonic == "flag")) {
+    error = "control bench: the control and geometry-stream rows have no cost to chain "
+            "and no operand to chain it through; their throughput is measurable, their "
+            "latency is not";
     return std::nullopt;
   }
   // The environment reads return launch state rather than a computed value, so
