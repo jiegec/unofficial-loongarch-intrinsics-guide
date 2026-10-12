@@ -62,7 +62,8 @@ applies to.  Closing one sentence closes every row that carries it.
 
 | 26 | "whether the upper half of the destination word is cleared" | **6** | **recorded hardware**: the WHOLE 32-bit word is written - a 32-lane all-true mask is 0xffffffff, so the lane mask is produced by the instruction rather than left over.  The clause was about wanting a second result word from an instruction that produces exactly one. | 2026-10-13 |
 | 27 | "whether the destination holds one bit per lane or repeated all ones" | **5** | **recorded hardware**: one bit per lane.  The mask is (1 << lanes) - 1 - an all-true run gives 0x000f, 0x00ff, 0xffff, 0xffffffff at 4, 8, 16 and 32 lanes - so it is not a repeated-ones encoding. | 2026-10-13 |
-Rows 2, 5, 9, 10, 12, 13, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26 and 27 are
+| 28 | "how the first operand supplies its full 64 bits, and the alignment of a two-register pair" | **8** | **recorded rule + discriminating vectors**: both sources are pairs.  The chapter already records the 64-bit operand rule on 95 other rows - two consecutive registers, even-aligned base, the pair base in the same selector field a single register would use - and the vectors settle it rather than assume it: `CASE(neg, 0xffffffff, 0xffffffff, 0x0, 0x0, 0x0)` carries a non-zero high word. | 2026-10-13 |
+Rows 2, 5, 9, 10, 12, 13, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27 and 28 are
 *static or recorded-evidence* resolutions; rows 1, 3, 4, 6, 7, 8 and 11 carry
 direct hardware measurements; row 14 is a partial resolution that names what
 remains and why.
