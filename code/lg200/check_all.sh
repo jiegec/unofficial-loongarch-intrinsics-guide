@@ -36,6 +36,9 @@ python3 format_audit.py | tail -1
 echo "== rule_dupe_check"
 python3 rule_dupe_check.py
 cd "$REPO"
+echo "== md_table_check"
+cd "$REPO" && python3 code/lg200/md_table_check.py | tail -1
+cd "$REPO/code/lg200"
 echo "== check_gpu"
 python3 check_gpu.py | tail -1
 echo "ALL CHECKS PASSED"

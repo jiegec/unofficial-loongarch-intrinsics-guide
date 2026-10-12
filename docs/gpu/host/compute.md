@@ -130,7 +130,9 @@ gap that remains.
   number is a property of the KERNEL, not of the instruction, so a driver must set
   `kernel_sgpr_cnt` (and the matching `en_sgpr_group_id_*`) to place them.  The local
   ids are the opposite case: they are always `v0 / v1 / v2`, per lane.
-  | num_groups_* | NOTHING is emitted at all: the closed backend does not implement it |
+
+  The `num_groups_*` fields are the opposite extreme: NOTHING is emitted at all,
+  because the closed backend does not implement them.
 
   So the compute identifiers do NOT come from getreg indices: they come from a
   packed launch-state record addressed through the kernarg pair s[0:1], plus
