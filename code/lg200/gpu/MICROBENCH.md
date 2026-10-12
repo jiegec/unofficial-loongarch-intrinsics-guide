@@ -68,12 +68,42 @@ ticks; `bench_ns.py` derives `lat_ns`/`tp_ns`.
 | SKIP but correctness **PASS** | 187 | the CS carrier builds and passes them; only the bench lacks a template |
 | SKIP and correctness **SKIP** | 84 | the carrier itself refuses them (descriptor / sampler / texture) |
 
-Of the 187, twenty are control/flow ("no cost to chain"), so the actionable
-remaining bench work is **~167 rows**: buffer memory 61, flat memory 45, shared
-memory (LDS) 44, SIO 17.  Each needs a per-family bench template built on the
-template the correctness carrier already has (`build_buff`, `build_lds`,
-`build_flat`, `build_tex`, `build_samp`).  The 84 carrier-limited rows are
-the same limitation the correctness matrix records, not a bench gap.
+Of those, twenty are control/flow ("no cost to chain"), so the actionable
+remaining bench work is the memory and SIO families: buffer memory 61, flat memory
+45, shared memory (LDS) 44, SIO 17.  Each needs a per-family bench template built
+on the setup the correctness carrier already has (`build_buff`, `build_lds`,
+`build_flat`).  The 84 carrier-limited rows are the same limitation the
+correctness matrix records, not a bench gap.
+
+### 5.1 Why the memory templates are a design problem, not just plumbing
+
+The generic template measures latency by **register chaining**: copy *i*'s
+destination is copy *i+1*'s source, so the K copies are one dependency chain and
+the window is latency x copies.  A memory access has no such source: a load's only
+inputs are an address and a descriptor, and neither depends on the previous load's
+*result* unless the template makes it so.  Three constructions are possible, and
+they do not measure the same thing:
+
+| construction | measures | caveat |
+|---|---|---|
+| K independent accesses from one staged address | throughput | not a latency number; report it as `tp` only |
+| address chaining: the loaded value becomes the next address | latency | the addresses must stay inside the carrier's window, so the loaded value needs masking; the mask is part of the measurement |
+| store/load ping-pong | a round trip, not the load | includes the store's cost - only honest if both are reported |
+
+The correctness carrier already stages everything the first construction needs:
+`build_flat` preloads the window and holds the address pair, `build_buff`
+hydrates the descriptor, and `build_lds` stores the content before the load.  So
+**throughput** for the three memory families is reachable by reusing that setup and
+repeating the access; **latency** needs the address-chaining construction and its
+mask, which is a new program shape rather than a template.
+
+Until a construction is chosen and measured, the honest state for these 150 rows
+is `tp`-only or benchmarked, and neither should be reported as a latency.
+
+SIO is a different case: the rows have no canonical codec variant, so the bench
+template would have to emit them per mnemonic the way the correctness carrier's
+SIO path does.  Their "cost to chain" is also questionable - the SIO rows read and
+write lane-crossing state, so a chain of them is not a chain of independent work.
 
 One OK row is **not** a valid timing: `v_mbcnt_u32` fails the CS correctness
 matrix (see §7).
