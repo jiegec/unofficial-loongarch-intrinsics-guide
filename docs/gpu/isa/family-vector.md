@@ -44,11 +44,15 @@ Two different mechanisms look similar and must not be confused:
 
 | Mechanism | Where | Effect |
 |-----------|-------|--------|
-| Selector bits 9 and 10 | on each source | clears or flips the sign bit of that source's value |
+| Selector bits 9 and 10 (`0x200` and `0x400` of the selector value) | on each source | clears or flips the sign bit of that source's value |
 | `M.mod2` and `M.clmp1` | on the instruction | select an operation mode and clamp the result |
 
 The selector modifiers are raw-bit operations: they act on the value's sign bit,
-not on its numeric interpretation, and they apply before the operation.  The
+not on its numeric interpretation, and they apply before the operation.  The two bits
+the page above calls `0x200` and `0x400` are exactly bits 9 and 10 of the selector
+value, and a general source field is 11 bits wide (`LO[7:0]` plus `HI[2:0]`), so the
+number, the clear bit and the flip bit fill it exactly.  Verified against the operand
+encodings 2026-10-13.  The
 instruction modifiers apply to the result.  Their exact encodings beyond the names are UNRESOLVED - but the reason is now known
 to be structural rather than incidental.  In two whole linked programs (~30,000 lines
 each, runtime libraries included) the disassembler prints none of `mod2`, `clmp1`,
