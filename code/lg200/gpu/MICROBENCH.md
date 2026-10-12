@@ -140,6 +140,15 @@ buffer load (`load_s_buff_*`, also in the refused set) writes an SGPR, so it can
 exactly the way `build_cs_bench_flat_sload` does - the loaded word becoming the next offset
 through a single scalar move, with no instruction added.  So the scalar forms are the ones
 to do first, and the vector forms need a stated decision about what the measured chain then
+**Done (2026-10-13):** the five scalar buffer loads (`load_s_buff_w1/w2/w4/w8/w16`) now
+build, which is what moved both classes by five. Their destination is an SGPR, so the word
+just loaded becomes the next offset through one scalar move - the same chain the flat scalar
+loads use, with nothing added to the measurement. The window contents are chosen to be small
+offsets so the loaded word is a valid next offset without masking. The **vector** buffer loads
+stay refused, and the reason is worth keeping rather than hiding: their destination is a VGPR,
+and feeding it back into a scalar offset needs `v_readfirstlane`, an instruction inside the
+thing being timed. That is a decision about what their measured chain includes, and it has not
+been made.
 includes.
 - which is what this report did - makes the split depend on the matrix being a
 clean run, and the matrix on disk is **the run that wedged** (307 PASS / 84
