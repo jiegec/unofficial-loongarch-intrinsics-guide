@@ -40,9 +40,12 @@ The rows use the vector ALU layout, not a family-specific one:
 | `PJ2` | predicate position |
 
 The third general-source position of the vector layout is unread by all three
-rows, and every established producer writes it as `zero`.  Which of the two read
-selectors addresses the coefficient and which the barycentric value is
-UNRESOLVED.
+rows, and every established producer writes it as `zero`.  The two read selectors
+were assigned on 2026-10-13 and are no longer open: the rows give the arithmetic
+(the result is the SECOND source times the sum of the FIRST plus one) and the
+driver-side disassembly reads `v_interp_1_f32 result, v2, coefficient`, so the
+**coefficient is the second source** (`GK11`) and the barycentric value the first
+(`GJ11`).
 
 ## Coverage
 

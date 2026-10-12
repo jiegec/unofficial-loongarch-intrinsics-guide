@@ -133,4 +133,10 @@ other instructions in the same invocation are UNRESOLVED.
   2026-10-12): the flat, atomic and shared forms do not clear the lane mask.  Closed
   2026-10-13 by reference.
 * Whether a 64-bit update is one 64-bit access or two 32-bit steps.
-* The cause of the ordered 64-bit floating-point forms not updating.
+* The cause of the ordered 64-bit floating-point forms not updating is narrowed, not
+  open: those forms have only two 64-bit operands in the layout and no `VA8` field, so
+  the expected value must be **two-address** - it comes from the destination register,
+  as the buffer atomics' data operand does.  A carrier that placed the expected value in
+  a register of its own would compare against whatever the destination happened to hold,
+  which would fail on nearly every pair and leave the element unchanged: exactly what was
+  measured.  The row states this; what is still unproven is that this is the whole story.
