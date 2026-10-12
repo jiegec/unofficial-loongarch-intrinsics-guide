@@ -70,11 +70,17 @@ def main():
             "correctness": c.get("status", "NO-ROW"),
             "family": fam,
             "reason": why if b.get("status", "NO-ROW") != "OK" else "",
+            # Carried through because a status alone does not say whether the row was
+            # OBSERVED.  376 of the 377 HANG/FAULT rows share one detail - the device
+            # node was gone - so they never ran, and reading them as faults of those
+            # instructions is wrong.
+            "detail": (c.get("detail") or "").strip(),
         })
     out = Path(sys.argv[sys.argv.index("--out") + 1]) if "--out" in sys.argv else OUT
     with open(out, "w", newline="") as f:
         w = csv.DictWriter(f, fieldnames=["mnemonic", "bench", "correctness",
-                                          "family", "reason"], delimiter="\t")
+                                          "family", "reason", "detail"],
+                           delimiter="\t")
         w.writeheader()
         w.writerows(rows)
 
@@ -101,6 +107,19 @@ def main():
               % ", ".join("%s=%d" % kv for kv in sorted(dirty.items())))
         print("           that mentions correctness beyond the carrier's own SKIP"
               " is unreliable.")
+        # Say WHICH rows are unobserved rather than calling all of them unreliable.
+        # A dirty status with the device node gone means the row never ran.
+        gone = [r for r in rows if "cannot open /dev/dri" in r["detail"]]
+        faulted = [r for r in rows
+                   if r["correctness"] in dirty and "cannot open /dev/dri" not in r["detail"]]
+        if gone:
+            print("           %d of those share one detail - the device node was gone,"
+                  % len(gone))
+            print("           so they NEVER RAN and are not observations of those rows.")
+            print("           first unrun row: %s" % gone[0]["mnemonic"])
+        if faulted:
+            print("           %d other row(s) carry a submission detail: %s"
+                  % (len(faulted), ", ".join(r["mnemonic"] for r in faulted[:4])))
     print("  -> %s" % out)
     print()
     agg = collections.Counter((r["family"], r["reason"]) for r in tmpl)
