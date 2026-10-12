@@ -29,6 +29,8 @@ echo "== check_doc_numbers"
 python3 check_doc_numbers.py | tail -1
 echo "== prose_audit"
 python3 prose_audit.py | head -1
+echo "== doc_register_audit"
+python3 doc_register_audit.py | tail -1
 echo "== format_audit"
 python3 format_audit.py | tail -1
 cd "$REPO"
