@@ -143,3 +143,35 @@ source NaN propagates its sign.  The arithmetic rows are fixed by the emitted
 policy; the FP compare oracles' flush is landed but **not yet measured**, because
 the device parked during the run.  That measurement is the first item in the
 hardware plan.
+
+### The safety and field audit, and how it fails safe  (2026-10-13)
+
+`code/lg200/gpu/audit.py` reads the runner's own listings, not the source, so it audits
+the programs that were actually assembled.  Over a freshly regenerated corpus
+(`run_gpu.py --dry`, host only, 768 PASS / 85,645 rows in 23.4 s) it reports **768
+programs audited, 0 refused, 0 problems**.
+
+Two properties are worth recording, because they are why the number means something.
+First, the audit **refuses a stale corpus** rather than passing it: before regeneration
+it said `STALE LOGS: no auditable programs ... (768 unusable) - re-run run_gpu.py --dry
+first`.  A log from an older carrier would otherwise be audited as if it were today's
+program.  Second, its three hard classes are the ones that have wedged this GPU and cost
+a power cycle - control flow, address registers, and the VA window - so a clean run is a
+safety statement, not a style check.
+
+Its **F class is the field-coverage check** the carrier work asked for: every field a
+driver row declares must be modelled by the codec's semantic rule class, no field may be
+invented, tuple widths are compared, and the rows' optional `X` parameter bits are
+allowed to stay at the template.  The run records **16 note classes**: one E (2 rows -
+`X2_23` prints as a register in the driver seed and the catalog marks its role
+UNRESOLVED) and fifteen F - `X0_16` unmodelled on 42 rows, and tuple-width differences
+such as `VJ8x8` against a codec tuple of 3 on 64 rows.
+
+The tuple differences are recorded rather than failed, and the reason is structural: the
+per-mnemonic tuple override lives outside this repository, so the audit can name the
+disagreement but the fix belongs with the catalog.  Naming them is the deliverable;
+silently passing them would not be.
+
+One tool defect was fixed while doing this: the note detail was truncated to 66
+characters, which cut off exactly the part that says WHY.  The E note now reads in full,
+and that reason is what points back at the catalog's UNRESOLVED.

@@ -385,10 +385,13 @@ def audit(path, pipe):
         return 1
     print(f"=== {pipe}: {built} programs audited, {refused} refused, {len(problems)} problems")
     for m, kind, detail in problems[:10]:
-        print(f"    [{kind}] {m:24s} {detail[:74]}")
+        # Full detail, not truncated.  A note or problem whose reason is cut off
+        # cannot be acted on, and these print once per row or per class, so length
+        # is not a reason to hide it.
+        print(f"    [{kind}] {m:24s} {detail}")
     agg = collections.Counter((tag, reason) for tag, _m, reason in notes)
     for (tag, reason), count in sorted(agg.items()):
-        print(f"    [{tag} note] {count:3d} rows: {reason[:66]}")
+        print(f"    [{tag} note] {count:3d} rows: {reason}")
     return len(problems)
 
 
