@@ -48,7 +48,10 @@ applies to.  Closing one sentence closes every row that carries it.
 | 16 | "whether a long chain wraps modulo two to the thirty-second, saturates or faults" | **8** | **recorded hardware**: the pre-phase-4 grid (matrix 683 PASS / 1 FAIL) contains overflow cases only a wrapping model satisfies - `v_mma_323216_i8_i8_i32(0x7fffffff, 0x1, 0x80000000)` is `0x7ffffffc`, the wrapped `0x80000000 - 4`, where saturation would leave `0x80000000` - and the dependent-chain bench runs 2048 accumulations without faulting. | 2026-10-12 |
 | 17 | "the conversion rules for normalized scaling, signed clamping and float representation" | **8** | **static**: the conversion classes are the Vulkan ones, which is what `number_format` names (mesa maps each Vulkan texel class onto it, `loong_descriptor.c`).  What remains is coverage, not a rule: the formatted rows are observed-mode, so no case yet separates a conversion from a copy. | 2026-10-12 |
 
-Rows 2, 5, 9, 10, 12, 13, 15, 16 and 17 are *static or recorded-evidence*
+| 18 | "An odd pair base ... whether an unaligned index is rejected or silently aligned" | **7** | **encoding-contract**: the pair base goes in the same selector field a single register would (`x2` names the width, it is not an encoding bit), so nothing in the instruction rejects an odd base - even alignment is a register-allocation constraint on the producer, and an out-of-contract base is not observable from a conforming producer's output. | 2026-10-12 |
+| 19 | lane ordering / visibility ("Lanes that share an address ...", "the order of two lanes naming one location", ...) | **20** | **by design**: the order is architecturally undefined and fixes no intermediate value - the reference carrier leaves the per-lane old value unverified and compares only the post-atomic cell. | 2026-10-12 |
+
+Rows 2, 5, 9, 10, 12, 13, 15, 16, 17, 18 and 19 are *static or recorded-evidence*
 resolutions; rows 1, 3, 4, 6, 7, 8 and 11 carry direct hardware measurements;
 row 14 is a partial resolution that names exactly what remains and why.
 
