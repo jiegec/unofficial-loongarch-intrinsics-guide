@@ -15,7 +15,14 @@ import subprocess
 import sys
 
 HERE = pathlib.Path(__file__).resolve().parent
-DOC = HERE / "gpu" / "MICROBENCH.md"
+# Two pages state this number: the bench page and the hardware-session plan, which
+# said 605 for two weeks of work after that was no longer true.  A check over one
+# copy is how the other drifts, so both are read.
+PAGES = [
+    (HERE / "gpu" / "MICROBENCH.md", r"buildable for both kinds \| \*\*(\d+)\*\*"),
+    (HERE / "gpu" / "HARDWARE-SESSION-PLAN.md",
+     r"\*\*(\d+) of 768 rows build now\*\*"),
+]
 TOOL = HERE / "gpu" / "bench_buildable.py"
 
 
@@ -26,18 +33,22 @@ def main() -> int:
     if not m:
         print("could not read the tool:"); print(run.stdout[-300:]); return 2
     live = int(m.group(1))
-    text = DOC.read_text(encoding="utf-8")
-    start = text.index("### 5.2 Buildable now")
-    block = text[start:start + 3000]
-    d = re.search(r"buildable for both kinds \| \*\*(\d+)\*\*", block)
-    if not d:
-        print("the page does not state a buildable-for-both-kinds number")
-        return 2
-    doc = int(d.group(1))
-    if doc != live:
-        print("DRIFT  MICROBENCH.md says %d, bench_buildable.py says %d" % (doc, live))
+    bad = 0
+    for path, pat in PAGES:
+        d = re.search(pat, path.read_text(encoding="utf-8"))
+        if not d:
+            print("MISSING  %s does not state a buildable count" % path.name)
+            bad += 1
+            continue
+        doc = int(d.group(1))
+        if doc != live:
+            print("DRIFT  %s says %d, bench_buildable.py says %d"
+                  % (path.name, doc, live))
+            bad += 1
+    if bad:
         return 1
-    print("bench page: %d buildable for both kinds, agrees with the tool" % live)
+    print("%d buildable for both kinds, and %d pages agree with the tool"
+          % (live, len(PAGES)))
     return 0
 
 

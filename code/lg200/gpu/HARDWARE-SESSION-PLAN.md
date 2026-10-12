@@ -77,16 +77,25 @@ SIO reads, the stream emits, the interpolators and the index read - so they need
 launch state, not a case).
 
 The microbench templates are done for every family this side of the hardware
-questions: **605 of 768 rows build now** (`bench_buildable.py`), against 497 in
-the last hardware CSV.  What is left falls into three named piles rather than one:
+questions: **626 of 768 rows build now** (`bench_buildable.py`), against 497 in the
+last hardware CSV and 605 when this section was first written.  The 605 was stale by
+the time it was read, because two piles on it were closed after it was written, and
+the texture pile was undercounted - it listed `samp` and `gather` only, leaving out
+`atomic_v_tex_*`, `store_v_tex*`, `load_v_tex*` and `image_*`, which the same refusal
+covers.  What is left is four piles rather than five:
 
 | pile | rows | why it waits |
 |---|---|---|
-| texture (`samp` 32, `gather` 24) | 56 | the correctness carrier refuses them (SKIP-ENVELOPE); a bench must not exercise a stream the validation path rejects |
-| buffer and scalar-buffer loads | 27 | the chain needs a live index or offset register - item 10 |
-| subword/format buffer stores | 10 | the carrier records a measured fault for the b16 shape; a bench must not re-derive it |
-| SIO and GS-prefix | 20 | their correctness carrier runs them OBSERVED and their chain is not a chain of independent work; U8 is open |
-| `copy_sm_*`, and rows with no semantic spec | 8 | the same kind of gap, not yet classified further |
+| texture (`samp`, `gather`, `*_v_tex_*`, `image_*`) | 79 | the correctness carrier refuses them (SKIP-ENVELOPE); a bench must not exercise a stream the validation path rejects |
+| SIO and GS-prefix | 20 | their correctness carrier runs them OBSERVED and their chain is not a chain of independent work; 13 of the 17 SIO rows still carry UNRESOLVED |
+| buffer and scalar-buffer loads | 16 | the vector forms' chain needs a live index whose next value comes from the loaded result; the scalar forms are staged |
+| control, environment, sm load, copy, flat cmpswap, trap, movindex | 27 | four of these need nothing (control, environment) and the rest need semantics or a device |
+
+Two piles from the previous version are **closed**: the scalar buffer loads (all five
+widths chain through the loaded word the way the flat scalar loads do) and the
+sub-word and formatted buffer stores (b8, b16, and the eight fmtdesc/fmtinst forms,
+which stage the compare pair the way the correctness carrier does).
 
 `check_doc_numbers.py` keeps the pages' figures honest in the meantime, and
-`bench_buildable.py` keeps the buildable count measurable without a device.
+`bench_doc_check.py` compares this section and the bench page against
+`bench_buildable.py`, because this is the second copy of one number.
