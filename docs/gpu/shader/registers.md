@@ -80,6 +80,23 @@ The size fields are the *allocation* a stage asks for, not the architecture
 maximum; the vector file's 256 registers are the file size, and the field that
 carries a size encodes 256 as 255.
 
+**Cross-checked against the driver's code (2026-10-13)**, in
+`loong_shader_abi.c` in the LoongVK tree.  Two of these rules are visible there
+verbatim and now rest on two independent sources rather than one: the 256-as-255
+encoding is `MIN2(count, UINT8_MAX)` under the comment *"v255 is valid although the
+direct count field itself is only 8 bits"*, and the multiple-of-four rounding is
+`ALIGN_POT(count, 4)`.  Both sit in `loong_shader_vgpr_size_field`.
+
+The geometry figure is a **floor**, not a ceiling: the driver raises geometry VGPRs
+to 120 or 168 when the stage exports two or three varyings, because the closed
+producers reserve the fixed SIO0 read and SIO1 payload through `v119`/`v167`.  So
+"at least 64 for geometry" and "120 for a two-varying geometry stage" are both true
+and describe different things.
+
+The SGPR bounds (16..102) and the 16-bit code-size limit are **not** cross-checked
+here - the driver computes an SGPR count but the bounds themselves were not found in
+it - so those two remain single-sourced.
+
 ## UNRESOLVED
 
 * The meaning of the record's "VGPR initial count" field: the name says count, the
