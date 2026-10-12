@@ -75,11 +75,16 @@ not a memory fence for global memory.
 
 ## Jump stack
 
-`jpush` and `jpop` push and pop a return address, with a displacement carried in
-the low word and a predicate in the high word.  The displacement is an unsigned
-field in the machine encoding, and the operand layout also reserves a scalar
-position and a row-defined byte.  The exact meaning of the predicate and the
-interaction with the scalar operand are UNRESOLVED.
+`jpush` and `jpop` push and pop a control-flow record, with the record value carried in
+the low word and a predicate in the high word.  Calling that value a displacement was
+wrong and is corrected here: the rows say the resume consumes **saved operand state, not
+a displacement**, and the field is unsigned in the machine encoding while the operand
+layout also reserves a scalar position and a row-defined byte.
+
+The record's encoding half is verified in both carriers - `jumpstack_check.py` runs clean
+(problems 0): `PJ2` is the predicate, `RA8` the scalar operand, and the two opcodes
+differ only in `0x40000`.  What the predicate MEANS, and how it interacts with that
+scalar operand, needs a device.
 
 ## Traps
 
