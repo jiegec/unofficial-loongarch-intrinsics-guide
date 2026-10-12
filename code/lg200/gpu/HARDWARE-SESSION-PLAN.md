@@ -60,6 +60,7 @@ In priority order, each with its safety note.
 | 6 | two-lane ordering / fence-less visibility | the visibility clauses | needs a two-instruction program the carrier cannot build today |
 | 7 | texture out-of-bounds and wrap | the gather/samp boundary class | single rows |
 | 8 | the atomic counter bound | where the increment/decrement forms read their bound - no encoded field carries it in the narrow form | single rows |
+| 10 | the buffer index/offset registers with `idxen`/`offen` live | whether the buffer form addresses the way the descriptor stride implies.  The correctness carrier never exercises these: its load keeps the index and offset registers at zero and puts the offset in the immediate.  The memory bench templates cannot be built without this - and a wrong index register is an out-of-window access, so it is also a wedge risk | single rows, its own process, one access before any chain |
 | 9 | `load_sm_matrix_x{1,2,4}` plane/lane layout | the last three code-layer UNRESOLVED markers | observed mode today; a real measurement needs the matrix file staged |
 
 Anything in row 5 or 6 must be designed as a **new carrier shape** first (the

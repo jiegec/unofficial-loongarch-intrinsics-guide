@@ -112,6 +112,21 @@ through, so what its latency would measure is the address computation rather tha
 the store.  Buffer and LDS still need the same treatment on top of their descriptor
 and window setup.
 
+**Buffer and LDS: the chain needs an operand form nothing has exercised.**  Their
+latency link has to go through an operand that can depend on the previous access,
+and the two candidates are the buffer form's index register (with `idxen`) and its
+offset register.  The correctness carrier does not exercise either: its buffer load
+is `buff_mem(..., address = v0, offset = zero_reg, immediate = off, offen = true)`,
+i.e. the offset travels in the *immediate*, and the index and offset registers are
+left at zero.  Building a bench chain on an operand form the validation path never
+touched would produce a number whose construction is unverified - and a wedge risk
+on top, since a wrong index register is an out-of-window access.
+
+The first hardware session therefore has to answer this before those rows can be
+benchmarked at all: does `idxen`/`offen` with a live index or offset register
+address the way the descriptor's stride implies?  That is now an item in
+HARDWARE-SESSION-PLAN.md, not an assumption in a template.
+
 Until a construction is chosen and measured, the honest state for these 150 rows
 is `tp`-only or benchmarked, and neither should be reported as a latency.
 
