@@ -87,6 +87,20 @@ TYPE_TOKENS = ("f64", "f32", "f16", "i64", "u64", "i32", "u32",
                "i16", "u16", "i8", "u8")
 
 
+def union_base(mnemonic: str, fmt: str):
+    """The boundary list for a row, unioned over every type tag its name carries."""
+    seen, out = set(), []
+    for t in TYPE_TOKENS:
+        if t not in mnemonic:
+            continue
+        lst = {"f64": F64, "f32": F32, "f16": F16}.get(t) or INT_TBL.get(t, INT)
+        for v in lst:
+            if v not in seen:
+                seen.add(v)
+                out.append(v)
+    return out or INT_TBL.get(fmt, INT)
+
+
 def input_format(mnemonic: str) -> str:
     """The format of the mnemonic's SOURCE operands.
 
@@ -265,8 +279,11 @@ def main() -> int:
         # semantic model is not a value class (an f32 compare-and-swap is an
         # atomic, but its operands are still f32 and want the f32 boundaries).
         fmt = input_format(mnemonic)
-        base = ({"f64": F64, "f16": F16, "f32": F32}.get(fmt) or
-                INT_TBL.get(fmt, INT))
+        # A row may name more than one width (v_fcvt_f32_f16, v_dp4a_i8_i8_i32):
+        # the audit asks for every tag's classes, and a union list carries them
+        # all in the same column, since a 32-bit class is matched on the whole
+        # word and a 16-bit one on either half.
+        base = union_base(mnemonic, fmt)
         # [HW 2026-08-24] ldexp carries an integer exponent in the last
         # slot: bit-pattern floats there are meaningless (and the generic
         # grid made most v_ldexp rows unverifiable).  Use the INT grid
@@ -304,7 +321,7 @@ def main() -> int:
             gen = grids(base, nin)
         for row in gen:
             out.append(mnemonic + "\t" + pol + "\t" +
-                       " ".join(hex(v) for v in row))
+                       " ".join(hex(v) for v in flat(row)))
     print("\n".join(out))
     return 0
 

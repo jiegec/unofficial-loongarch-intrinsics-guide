@@ -76,7 +76,12 @@ The last shapes are the six-dword rows - a 64-bit compare-and-swap or a binary
 f64 multiply-add, i.e. three pair operands.  The grid now anchors on PAIRS when
 its column list is tuple-valued, and a 64-bit operand routes through the pair path
 in every family (including the @@b64@@ atomics, whose names carry no type token).
-Coverage is **712 of 768**.
+
+A row may also name **more than one width** (@@v_fcvt_f32_f16@@,
+@@v_dp4a_i8_i8_i32@@).  The audit asks for every tag's classes, so the boundary
+list is a UNION over the row's type tags rather than the last tag's list alone: a
+32-bit class is matched on the whole word and a 16-bit one on either half, so one
+column can carry both.  Coverage is **749 of 768**.
 
 ## 4. The boundary cases changed the answer the hardware gives
 
