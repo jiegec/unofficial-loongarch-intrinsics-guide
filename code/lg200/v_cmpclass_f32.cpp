@@ -14,4 +14,6 @@ CASE_FP(sub-mask, rtne|daz|ftz, 0x80000, 0x108, 0x0)
 CASE_FP(finite-nan, rtne|daz|ftz, 0x7fc00000, 0x1f8, 0x0)
 CASE_FP(finite-inf, rtne|daz|ftz, 0x7f800000, 0x1f8, 0x0)
 CASE_FP(finite-norm, rtne|daz|ftz, 0x3f800000, 0x1f8, 0xffff)
+CASE_FP(zero-neg, rtne, 0x80000000 0x3f800000, 0x00000000)
+CASE_FP(zero-pos, rtne, 0x0 0x3f800000, 0x00000000)
 LG200_CASE_END

@@ -12,4 +12,6 @@ CASE_FP(negative, rtne, 0xffffffff, 0xbf800000)
 CASE_FP(max, rtne, 0x7fffffff, 0x4f000000)
 CASE_FP(min, rtne, 0x80000000, 0xcf000000)
 CASE_FP(forty-two, rtne, 0x2a, 0x42280000)
+CASE_FP(inf-pos, rtne, 0x7f800000, 0x4eff0000)
+CASE_FP(inf-neg, rtne, 0xff800000, 0xcb000000)
 LG200_CASE_END

@@ -12,4 +12,7 @@ CASE_FP(two, rtne, 0x2, 0x40000000)
 CASE_FP(forty-two, rtne, 0x2a, 0x42280000)
 CASE_FP(max, rtne, 0xffffffff, 0x4f800000)
 CASE_FP(full-mantissa, rtne, 0x7fffff, 0x4afffffe)
+CASE_FP(inf-pos, rtne, 0x7f800000, 0x4eff0000)
+CASE_FP(inf-neg, rtne, 0xff800000, 0x4f7f8000)
+CASE_FP(zero-neg, rtne, 0x80000000, 0x4f000000)
 LG200_CASE_END

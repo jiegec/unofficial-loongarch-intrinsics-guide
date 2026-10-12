@@ -20,4 +20,10 @@ CASE_FP(negative, rtne, 0xc0800000, 0xffc00014)  // [HW] fixed neg-NaN
 CASE_FP(subnormal, rtne, 0x800000, 0x20000000)
 CASE_FP(rtz, rtz, 0x40000000, 0x3fb504f3)
 CASE_FP(rtup, rtup, 0x40000000, 0x3fb504f4)
+CASE_FP(nan-pos, rtne, 0x7fc00000, 0x7fc00000)
+CASE_FP(nan-neg, rtne, 0xffc00000, 0xffc00000)
+CASE_FP(inf-pos, rtne, 0x7f800000, 0x7f800000)
+CASE_FP(inf-neg, rtne, 0xff800000, 0xffc00014)
+CASE_FP(subnormal-min, rtne, 0x1, 0x1a3504f3)
+CASE_FP(subnormal-neg, rtne, 0x807fffff, 0xffc00014)
 LG200_CASE_END

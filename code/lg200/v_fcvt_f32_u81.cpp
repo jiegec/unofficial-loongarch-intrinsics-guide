@@ -11,4 +11,7 @@ CASE_FP(lsb-only, rtne, 0x1, 0x0)
 CASE_FP(byte1-one, rtne, 0x100, 0x3f800000)
 CASE_FP(byte1-255, rtne, 0xff00, 0x437f0000)
 CASE_FP(all-ones, rtne, 0xffffffff, 0x437f0000)
+CASE_FP(inf-pos, rtne, 0x7f800000, 0x00000000)
+CASE_FP(inf-neg, rtne, 0xff800000, 0x00000000)
+CASE_FP(zero-neg, rtne, 0x80000000, 0x00000000)
 LG200_CASE_END

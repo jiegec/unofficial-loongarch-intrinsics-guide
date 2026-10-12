@@ -12,4 +12,11 @@ CASE_FP(zero, rtne, 0x0, 0x0)
 // the CPU suite stays green); the hardware v_sin approximation returns the
 // 1-ulp-higher 0xbedc507a (recorded hardware divergence).
 CASE_FP(half-pi, rtne, 0x3fc90fdb, 0xbedc5079)
+CASE_FP(nan-pos, rtne, 0x7fc00000, 0x7fc00000)
+CASE_FP(nan-neg, rtne, 0xffc00000, 0xffc00000)
+CASE_FP(inf-pos, rtne, 0x7f800000, 0x7fc00015)
+CASE_FP(inf-neg, rtne, 0xff800000, 0xffc00015)
+CASE_FP(subnormal-min, rtne, 0x1, 0x00000000)
+CASE_FP(subnormal-neg, rtne, 0x807fffff, 0x80000000)
+CASE_FP(zero-neg, rtne, 0x80000000, 0x80000000)
 LG200_CASE_END
