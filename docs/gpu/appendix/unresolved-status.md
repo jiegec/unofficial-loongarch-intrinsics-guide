@@ -127,6 +127,19 @@ and the backend's histogram over the linked assembly has no zero entry), and the
 producer emits check **convergently**, before the block's execution mask is
 narrowed - consistent with check not being a lane rendezvous.
 
+**U12** - the R1-NIR-1 run-shape residual - is a compiler-side conclusion and is
+recorded here only so the item is not left implicit: the reproducer is the LCO
+repository own `tests/corpus/run_shape.geom`, and its comments name the shape
+(a `while(true)` with the exit test at the top of the block, a per-primitive
+divergent bound, and a loop-carried value).  The generated geometry IR puts the exit
+test in BB4, before the body, the loop-carried increment in the latch BB7 outside the
+guard, and an unconditional back edge from BB4 - which is structurally what the shape
+calls for, so the residual does not reproduce on the shapes that repository can
+reach.  What remains is bit-exact semantics, which needs a device and CTS.  The
+evidence, and the U-item list this entry follows, live in
+`analysis/lco/unresolved_probes.md` and `u12-run-shape-latch-reverified.md` in the
+LCO repository; nothing on this page depends on them.
+
 Still open in the code layer: `load_sm_matrix_x{1,2,4}` (plane/lane layout) and
 `load_v_buff_fmt*` / `store_v_buff_fmt*` (descriptor format decode), 19 lines
 in total.  Offline `make verify` passes throughout (768 instructions, 20732
