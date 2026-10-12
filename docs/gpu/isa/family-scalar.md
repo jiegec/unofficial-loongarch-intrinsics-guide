@@ -76,7 +76,15 @@ tuples of scalar registers, and a wide load is modelled by its leading words.
 
 * The exact effect of the mask rows beyond their names.
 * Whether every arithmetic row defines the condition register, or only the ones
-  with an explicit carry role.
+  with an explicit carry role.  **Partly answered (2026-10-13):** fourteen rows name the
+  predicate they write to the condition register as unresolved - s_abs_i32, s_andn1_b32,
+  s_andn2_b32, s_bcnt_1_b32, s_bfe_i32, s_bfe_u32, s_bfm_b32, s_bitset0_b32,
+  s_bitset1_b32, s_clb_b32, and the four s_max_imm/s_min_imm rows.  The carry rule above
+  does not reach them, because none is a carry form, and the producer never emits any of
+  the fourteen: two whole linked programs (~30,000 lines each, runtime libraries
+  included) contain no instance of them, so there is no usage evidence to read the value
+  off.  That is why the sentence stands rather than being narrowed - the answer has to
+  come from the device, and it is fourteen separate measurements.
 * The behaviour of the count and find rows for all-zero input.
 * The rounding or saturation behaviour of the high-multiply and absolute
   difference rows for extreme operands.
