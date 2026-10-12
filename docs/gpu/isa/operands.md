@@ -334,8 +334,16 @@ RD8             result tuple
   hardware.
 * Whether the launch supplies any value beyond the entry registers listed
   above; no other register is documented as pre-loaded.
-* The exact semantics of the operation modifiers `mod2`, `clmp1`, `bl1` and
-  `bl2`.
+* The exact semantics of the operation modifiers - **the reachable half is now
+  separated from the unreachable one**.  `bl1` and `bl2` ARE reachable: they are the
+  two boolean parameters of the buffer forms in the vendor's producer, ordered `bl2`
+  first and then `bl1` (the closed intrinsic definition says so), and compiling the
+  four combinations emits exactly `(none)`, `bl1`, `bl2` and `bl2, bl1` - so the
+  identity and the order are established even though what the bits MEAN is not.
+  `mod2` and `clmp1` are NOT reachable at all: neither appears anywhere in the
+  producer's intrinsic layer, which is why every established producer emits them at
+  fixed values.  That is a stronger statement than "changing one is unsupported" -
+  there is no producer-level way to change one.
 * What the hardware does when a modifier is not at its default: a cleared
   `marker`, or a `form` bit at the value the producers do not emit.  The
   defaults are observations of every established producer, not hardware
