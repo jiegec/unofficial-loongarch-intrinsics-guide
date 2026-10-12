@@ -41,6 +41,32 @@ def unresolved_counts():
     return sum(1 for r in rows if 'UNRESOLVED' in r.get('description', '')), len(s), occ
 
 
+
+def bold_census(live):
+    """Every bold 3+ digit number near a measure keyword must be a live figure.
+
+    This replaces the older one-match-per-pattern shape, which is how four copies of
+    the same number drifted in turn: each sweep found the next copy, because the check
+    named one occurrence.  The convention here is that the pages mark a CURRENT figure
+    in bold and keep older ones plain, so bold is the set that has to be live - and a
+    new bold figure fails rather than waiting to be noticed.  Plain numbers are left
+    alone, which is what lets the historical snapshots stay on the pages."""
+    keys = ["UNRESOLVED", "value-expressible", "launch-shape", "buildable",
+            "occurrences", "vectors"]
+    ok = {"%d" % v for v in live.values()}
+    bad = 0
+    docs = Path(__file__).resolve().parent.parent.parent / "docs" / "gpu"
+    for path in sorted(docs.rglob("*.md")):
+        for n, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+            if not any(k in line for k in keys):
+                continue
+            for num in re.findall(r"\*\*([0-9][0-9,]{2,})\*\*", line):
+                if num not in ok and num.replace(",", "") not in ok:
+                    print("DRIFT    %s:%d: bold figure %s is not a live value"
+                          % (path.name, n, num))
+                    bad += 1
+    return bad
+
 def run(script, cwd):
     p = subprocess.run([sys.executable, script], cwd=cwd, text=True,
                        capture_output=True, timeout=1800)
@@ -94,6 +120,7 @@ def main() -> int:
             print('ok       %-22s %s = %d' % (doc, key, live[key]))
     for k, v in live.items():
         print('  live %-16s %d' % (k, v))
+    bad += bold_census(live)
     print('drift: %d' % bad)
     return 1 if bad else 0
 
