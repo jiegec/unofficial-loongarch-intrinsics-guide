@@ -236,6 +236,11 @@ def targets() -> list:
 # comes from the case index, not from a case value - so a boundary grid is
 # stageable even though the bench cannot time them.
 ATOMIC_OK = re.compile(r"^atomic_(sm|v_buff|v_flat|v_tex)_")
+# The sub-word loads stage their memory content from the case's FIRST input (the
+# carriers store it before loading), so a boundary grid exercises exactly the
+# classes the row's element width admits.  Their second input is the address
+# offset, which must stay inside the carrier's window and so is held at zero.
+LOAD_OK = re.compile(r"^load_(sm|v_buff|v_flat)_[iu](8|16)$")
 
 
 def case_targets() -> list:
@@ -248,6 +253,10 @@ def case_targets() -> list:
         sig = meta[mnemonic].get("operand_signature", "")
         if ATOMIC_OK.match(mnemonic):
             if not IMM_SLOT.search(sig) and nin_of(mnemonic) in (2, 3, 4, 6):
+                out.append(mnemonic)
+            continue
+        if LOAD_OK.match(mnemonic):
+            if nin_of(mnemonic) in (1, 2):
                 out.append(mnemonic)
             continue
         # Rows whose last input is an immediate: the register columns keep the
@@ -337,6 +346,9 @@ def main() -> int:
             # seed reads v_cmp_imm_eq_f16 p0, s0, v0, 0x00000000).
             cols = [base] * (nin - 1) + [base]
             gen = grid_cols(cols)
+        elif LOAD_OK.match(mnemonic) and nin == 2:
+            # content | address offset (held in-window)
+            gen = grid_cols([base, [0]])
         else:
             gen = grids(base, nin)
         for row in gen:

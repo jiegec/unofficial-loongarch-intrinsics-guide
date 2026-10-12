@@ -84,12 +84,18 @@ list is a UNION over the row's type tags rather than the last tag's list alone: 
 column can carry both.
 
 A row whose source is 64-bit can still name 32-bit tags (@@v_fcvt_f32_f64@@), so the
-pair list also carries those tags' boundaries as a pair's low word.  Coverage is
-**753 of 768** - the fifteen that remain are the twelve load rows (whose
-boundaries live in memory content the carrier cannot stage), the two interpolator
-rows (launch-owned coefficient window) and @@v_threadid_u32@@ (an
-execution-environment read).  Each is a carrier limitation, not a value the grid
-could have supplied.
+pair list also carries those tags' boundaries as a pair's low word.
+
+The sub-word loads turned out to be the same kind of omission: their carriers
+**already** stage the memory content from the case's first input (the LDS path
+stores it first, the flat and buffer paths preload it), so a boundary grid
+exercises exactly the classes the element width admits.  Their second input is the
+address offset, which must stay inside the carrier's window and is therefore held
+at zero.  Coverage is **765 of 768**.
+
+The three that remain are not values the grid could supply: the two interpolator
+rows read a launch-owned coefficient window, and @@v_threadid_u32@@ reads
+execution-environment state.  Each needs a launch shape, not a case.
 
 ## 4. The boundary cases changed the answer the hardware gives
 
