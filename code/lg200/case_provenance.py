@@ -109,6 +109,21 @@ def main() -> int:
     print("                     OBSERVED (hardware value recorded, no independent"
           " comparison), %d with nothing run at all" % empty)
 
+    # Which result artifacts are CLEAN?  The wedge at 2026-10-13 01:42 left
+    # 'cannot open /dev/dri/renderD128' rows in everything written after it, and
+    # a row whose only record says that is not evidence of anything.
+    print("  result artifacts (wedge-contaminated lines / total):")
+    build = HERE / "gpu" / "build"
+    for art in sorted(build.glob("*.tsv")):
+        try:
+            body = art.read_text(errors="replace")
+        except OSError:
+            continue
+        lines = body.count(chr(10))
+        dirty = body.count("renderD128")
+        mark = "CLEAN" if not dirty else ("ALL WEDGED" if dirty >= lines - 1 else "partly wedged")
+        print("    %-32s %5d / %5d  %s" % (art.name, dirty, lines, mark))
+
     grown = sorted((m, measured[m], n) for m, n in now.items()
                    if m in measured and n > measured[m])
     extra = sum(b - a for _, a, b in grown)
