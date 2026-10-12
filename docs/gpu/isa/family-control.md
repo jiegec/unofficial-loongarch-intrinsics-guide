@@ -136,7 +136,7 @@ address form of the global side, and the ordering requirements are UNRESOLVED.
 ## UNRESOLVED
 
 * The jump-stack predicate and its scalar operand.
-* The environment register namespace of the environment read and index forms.
+* Nothing on the namespace itself, which is settled (2026-10-13): the identifiers are a packed launch-state record addressed through the kernarg pair `s[0:1]`, plus the local ids in `v0/v1/v2` and the group ids at `s[kernel_sgpr_cnt + 0..2]` - see the Compute page. What stays open is `getreg`'s own `hw_reg` numbering, which no producer path reaches.
 * The defined prefix operations and the effect of their literals.
 * The transfer granularity and address form of the shared-memory copies.
 * The `flag` and `rfe` forms.

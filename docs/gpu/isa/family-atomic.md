@@ -110,10 +110,9 @@ other instructions in the same invocation are UNRESOLVED.
 
 ## UNRESOLVED
 
-* The unit of the shared-memory offset operand: byte or element.
+* The unit of the shared-memory offset operand is **BYTES**, settled 2026-10-13: the sm rows carry a byte address in `VK8`, and the closed producer's own code for `l[t + 1]` on an `int` array adds `0x4` to it rather than `0x1`.
 * Alignment requirements per width, and the behaviour of a misaligned access.
-* Where the counter bound is read from, since no encoded register field carries
-  it in the counter forms.
+* Nothing: **the counter bound IS the source operand** (`VJ8`) - the row's own semantics give `new = (old < b) ? old + 1 : 0` and its seed passes one.  The earlier claim that no field carries it was wrong (corrected 2026-10-13).  What remains is narrower: no producer path exercises the counter forms, because the closed backend lowers `atomic_inc`/`atomic_dec` to add/sub with 1 - so what the hardware does AT the bound is untested.
 * Which register supplies the data operand of the 32-bit buffer forms.
 * Out-of-range behaviour for a descriptor-relative access and for an image
   coordinate.
