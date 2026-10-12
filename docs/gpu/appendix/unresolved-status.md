@@ -45,9 +45,12 @@ applies to.  Closing one sentence closes every row that carries it.
 | 14 | the flat atomics' "address resolution, alignment, rejected accesses, lane collisions and fence-less visibility" | **20** | **partly established**: address resolution is the absolute 64-bit VA (Axis-1/U3) and lane collisions are architecturally undefined (the carrier leaves the per-lane old value unverified); the alignment requirement, out-of-range behaviour and fence-less visibility stay open because they need a fault-tolerant misaligned access or a two-instruction ordering test the single-instruction carrier cannot stage. | 2026-10-12 |
 | 15 | "whether a mask selector reads this destination back" | **14** | **static**: the layout carries both a predicate selector (`PJ2`) and a scalar destination (`RD8`), the vendor seed names both, and the row's own Semantics says the destination may be either - so a predicate consumer and a scalar read both see the mask. | 2026-10-12 |
 
-Rows 2, 5, 9, 10, 12, 13 and 15 are *static or recorded-evidence* resolutions; rows
-1, 3, 4, 6, 7, 8 and 11 carry direct hardware measurements; row 14 is a partial
-resolution that names exactly what remains and why.
+| 16 | "whether a long chain wraps modulo two to the thirty-second, saturates or faults" | **8** | **recorded hardware**: the pre-phase-4 grid (matrix 683 PASS / 1 FAIL) contains overflow cases only a wrapping model satisfies - `v_mma_323216_i8_i8_i32(0x7fffffff, 0x1, 0x80000000)` is `0x7ffffffc`, the wrapped `0x80000000 - 4`, where saturation would leave `0x80000000` - and the dependent-chain bench runs 2048 accumulations without faulting. | 2026-10-12 |
+| 17 | "the conversion rules for normalized scaling, signed clamping and float representation" | **8** | **static**: the conversion classes are the Vulkan ones, which is what `number_format` names (mesa maps each Vulkan texel class onto it, `loong_descriptor.c`).  What remains is coverage, not a rule: the formatted rows are observed-mode, so no case yet separates a conversion from a copy. | 2026-10-12 |
+
+Rows 2, 5, 9, 10, 12, 13, 15, 16 and 17 are *static or recorded-evidence*
+resolutions; rows 1, 3, 4, 6, 7, 8 and 11 carry direct hardware measurements;
+row 14 is a partial resolution that names exactly what remains and why.
 
 ## 2b. Executable-body writebacks (`code/lg200/*.h`)
 
