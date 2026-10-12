@@ -14,9 +14,16 @@ and the width extremes.
 
 | format | classes |
 |---|---|
-| f32 | `+0` `-0` `+1` `-1` `+0.5` `max_norm` `-max_norm` `min_norm` `-min_norm` `max_denorm` `min_denorm` `+inf` `-inf` `qnan` `-qnan` `snan` `-snan` (19) |
-| f16 | the same 19 against the f16 encoding, in the low half of the word |
-| f64 | the same set as word pairs |
+| f32 | `+0` `-0` `+1` `-1` `+0.5` `max_norm` `-max_norm` `min_norm` `-min_norm` `max_denorm` `min_denorm` `+inf` `-inf` `qnan` `-qnan` `snan` `-snan` (17) |
+| f16 | the same 17 against the f16 encoding, in the low half of the word |
+| f64 | the same 17 as word pairs |
+
+The count read (19) until 2026-10-13 while the list beside it named 17 - the row was
+counted from memory rather than from its own contents, which is the defect this page
+records elsewhere.  And `case_coverage.py` required only 12 of the 17 for f64 rows, so those
+rows were judged against a weaker requirement than f32 and f16: no negative max/min, no
+`max_denorm`, no negative NaN.  Both are fixed, and the full set still passes 738 of 738 -
+which means the generated vectors had carried the five all along.
 | i8/i16/i32/i64 | `0` `1` `max` `min` `-2` `-1` |
 
 ## 2. Measurement

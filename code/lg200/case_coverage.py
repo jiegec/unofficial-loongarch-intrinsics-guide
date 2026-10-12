@@ -69,12 +69,22 @@ def classes_for(mnemonic: str):
             continue
         if tag == "f64":
             # f64 boundary set, expressed as (low, high) pairs
+            # The same set as the 32-bit rows, as word pairs.  It was five short until
+            # 2026-10-13 - no negative max/min, no max_denorm, no negative NaN - so f64
+            # rows were being judged against a weaker requirement than f32 and f16, which
+            # is the defect this file exists to catch, one level up.
             for name, v in (("+0", 0), ("-0", 1 << 63), ("+1", 0x3ff0000000000000),
                             ("-1", 0xbff0000000000000), ("+0.5", 0x3fe0000000000000),
-                            ("max_norm", 0x7fefffffffffffff), ("min_norm", 0x0010000000000000),
+                            ("max_norm", 0x7fefffffffffffff),
+                            ("-max_norm", 0xffefffffffffffff),
+                            ("min_norm", 0x0010000000000000),
+                            ("-min_norm", 0x8010000000000000),
+                            ("max_denorm", 0x000fffffffffffff),
                             ("min_denorm", 1), ("+inf", 0x7ff0000000000000),
                             ("-inf", 0xfff0000000000000), ("qnan", 0x7ff8000000000000),
-                            ("snan", 0x7ff0000000000001)):
+                            ("-qnan", 0xfff8000000000000),
+                            ("snan", 0x7ff0000000000001),
+                            ("-snan", 0xfff0000000000001)):
                 req.append(("f64:" + name, v, 64))
         else:
             for name, v in tbl.items():
