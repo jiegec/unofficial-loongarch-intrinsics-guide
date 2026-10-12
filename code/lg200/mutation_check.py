@@ -105,6 +105,47 @@ def mutate_bench_doc(text):
     return text.replace('| buildable for both kinds | **626** |',
                         '| buildable for both kinds | **620** |', 1)
 
+
+
+def suite_accounting():
+    """Check that the suite's checks and this file's accounting agree.
+
+    The accounting above is prose.  A twelfth check could be added to check_all.sh and
+    the prose would quietly be wrong - the same shape as every drift this campaign has
+    found, one level up from the numbers.  So the suite's script names are read and
+    compared with the three lists the accounting describes."""
+    here = pathlib.Path(__file__).resolve().parent
+    script = here / "check_all.sh"
+    text = script.read_text(encoding="utf-8")
+    ran = set()
+    # The suite announces every check as  echo "== name" .  Reading those is exact:
+    # it needs no path resolution, and unlike a filename scan it still catches a check
+    # whose script name is a typo, which is the failure the scan was meant to find.
+    ran = set()
+    for line in text.splitlines():
+        line = line.strip()
+        if line.startswith('echo "== ') and line.endswith('"'):
+            ran.add(line[len('echo "== '):-1].split()[0])
+    # both sides are reduced to the bare script name: the CASES entries carry
+    # arguments and an extension, and the suite greps carry the extension
+    def bare(name):
+        return name.split()[0].rsplit('/', 1)[-1][:-3] if name.endswith('.py') \
+            else name.split()[0].rsplit('/', 1)[-1].replace('.py', '')
+    accounted = {bare(name) for name, _path, _mut, _cmd in CASES}
+    accounted |= {"rule_dupe_check", "md_table_check"}      # proven by injection
+    accounted |= {"prose_audit", "doc_register_audit"}       # reports by design
+    missing = sorted(ran - accounted)
+    extra_names = sorted(accounted - ran)
+    bad = 0
+    for name in missing:
+        print("UNACCOUNTED  %s runs in check_all.sh but is in none of the three lists"
+              % name)
+        bad += 1
+    for name in extra_names:
+        print("STALE        %s is accounted for but no longer runs" % name)
+        bad += 1
+    return bad
+
 CASES = [
     ("set_desc.py --check", "code/lg200-instructions.tsv", mutate_tsv,
      "cd code/lg200 && python3 set_desc.py --check"),
@@ -149,6 +190,7 @@ def main() -> int:
                  clean == 0, "OK" if ok else "PROBLEM"))
         if not ok:
             bad += 1
+    bad += suite_accounting()
     print("mutation check: %d checks, %d problems" % (len(CASES), bad))
     return 1 if bad else 0
 
