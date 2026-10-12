@@ -73,6 +73,18 @@ def check():
         desc = row.get("description") or ""
         if "\t" in desc or "\n" in desc:
             problems.append("row %d (%s): raw tab/newline in description" % (i, name))
+        # The seed column is machine text - a mnemonic, registers and hex.  Prose in it
+        # means a write landed in the wrong column, which is not hypothetical: on
+        # 2026-10-13 a write appended a description sentence to the LAST column, which is
+        # seed_assembly and not description, and this check passed it because it only ever
+        # looked at description.  The markers below are what the seed grammar cannot
+        # contain, and both are 0 across all 768 rows, so enforcing them costs nothing.
+        seed = row.get("seed_assembly") or ""
+        if not seed.strip():
+            problems.append("row %d (%s): empty seed_assembly" % (i, name))
+        if "UNRESOLVED" in seed or ". " in seed:
+            problems.append("row %d (%s): prose in seed_assembly - a write landed in the "
+                            "wrong column" % (i, name))
     print("rows=%d columns=%d unique=%d" % (len(rows), len(fields), len(seen)))
     for p in problems[:20]:
         print("  " + p)
