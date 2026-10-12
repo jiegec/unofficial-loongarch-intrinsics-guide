@@ -25,6 +25,16 @@ and the width extremes.
 case set and reports, per instruction, which required classes its inputs never
 take.
 
+**The parsed case set has two sources, and this matters to anyone checking by hand.**
+The parser reads the `LG200_CASE_BEGIN` block in each `<mnemonic>.cpp` and then merges
+`generated_cases.tsv`, which is much the larger of the two.  `atomic_sm_cmpswap_gt_f32`
+shows the ratio: four hand-written cases in its `.cpp`, 365 input rows in total.  So a
+reader who opens the `.cpp`, counts its cases and concludes a class is missing will be
+wrong - and that has now happened twice in this campaign, once in each direction: an
+audit that read only `CASE_FP` lines reported classes missing that the generated vectors
+carried, and a hand check of a `.cpp` reached the same conclusion from the other side.
+Parse through `cases.py` instead of counting a file.
+
     python3 code/lg200/case_coverage.py --tsv build/case_coverage.tsv
 
 ## 3. What it found (2026-10-12)
