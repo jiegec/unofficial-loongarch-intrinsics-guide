@@ -25,9 +25,9 @@ so it could not fail on an over-claim, which is the defect it exists to find.
 
 THE ELEVEN GATES, ACCOUNTED FOR (2026-10-13):
 
-  proven in this tool (7):  set_desc, check_doc_numbers, header_sync, check_gpu,
-                            run_cases, format_audit, bench_doc_check
-  proven by injection (2):  rule_dupe_check, md_table_check
+  proven in this tool (9):  set_desc, check_doc_numbers, header_sync, check_gpu,
+                            run_cases, format_audit, bench_doc_check,
+                            rule_dupe_check, md_table_check
   reports by design (2):    prose_audit, doc_register_audit
 
 The last two have no failing mode to prove: prose_audit findings include three expected
@@ -132,7 +132,8 @@ def suite_accounting():
         return name.split()[0].rsplit('/', 1)[-1][:-3] if name.endswith('.py') \
             else name.split()[0].rsplit('/', 1)[-1].replace('.py', '')
     accounted = {bare(name) for name, _path, _mut, _cmd in CASES}
-    accounted |= {"rule_dupe_check", "md_table_check"}      # proven by injection
+    # rule_dupe_check and md_table_check were proven by one-off injection
+    # until they joined CASES; the union below no longer needs them named twice.
     accounted |= {"prose_audit", "doc_register_audit"}       # reports by design
     missing = sorted(ran - accounted)
     extra_names = sorted(accounted - ran)
@@ -145,6 +146,16 @@ def suite_accounting():
         print("STALE        %s is accounted for but no longer runs" % name)
         bad += 1
     return bad
+
+def mutate_size_rule(text):
+    """Break one page's copy of a size rule, leaving the other page's copy alone."""
+    return text.replace("at least 16 and at most 102",
+                        "at least 16 and at most 101", 1)
+
+
+def mutate_table(text):
+    """Detach a row from every table by starting a new one at the end."""
+    return text.rstrip(chr(10)) + chr(10) + chr(10) + "| stranded | row | And text that no table wants. |" + chr(10)
 
 CASES = [
     ("set_desc.py --check", "code/lg200-instructions.tsv", mutate_tsv,
@@ -160,7 +171,11 @@ CASES = [
     ("format_audit.py", "docs/gpu/isa/encoding.md", mutate_format_claim,
      "cd code/lg200 && python3 format_audit.py"),
     ("bench_doc_check.py", "code/lg200/gpu/MICROBENCH.md", mutate_bench_doc,
-     "cd code/lg200 && python3 bench_doc_check.py"),]
+     "cd code/lg200 && python3 bench_doc_check.py"),
+    ("rule_dupe_check.py", "docs/gpu/shader/registers.md", mutate_size_rule,
+     "cd code/lg200 && python3 rule_dupe_check.py"),
+    ("md_table_check.py", "docs/gpu/appendix/status.md", mutate_table,
+     "cd code/lg200 && python3 md_table_check.py"),]
 
 
 def main() -> int:
