@@ -335,6 +335,7 @@ def restore_pending():
 
 
 def _signalled(signum, _frame):
+    pathlib.Path("/tmp/lg200-mutation.lock").unlink(missing_ok=True)
     n = len(PENDING)
     restore_pending()
     print("restored %d file(s) on signal %d" % (n, signum))
@@ -350,6 +351,11 @@ def main() -> int:
     if dirty:
         print("note: a file this tool mutates already differs from git:")
         print("  " + dirty.replace(chr(10), chr(10) + "  "))
+    lock = pathlib.Path("/tmp/lg200-mutation.lock")
+    if lock.exists():
+        print("another mutation run holds %s; refusing to run beside it" % lock)
+        return 2
+    lock.write_text(str(ROOT))
     # Piped output is block-buffered, so a run killed by a timeout showed nothing at all
     # and read as a crash.  Twenty-five cases take longer than a short window now.
     try:
@@ -360,9 +366,11 @@ def main() -> int:
     if "--only" in sys.argv:
         only = sys.argv[sys.argv.index("--only") + 1]
     bad = 0
+    ran = 0
     for name, rel, mutate, check in CASES:
         if only and only not in name:
             continue
+        ran += 1
         full = ROOT / rel
         rc, _ = run("git ls-files --error-unmatch " + rel)
         if rc != 0:
@@ -387,8 +395,9 @@ def main() -> int:
                  clean == 0, "OK" if ok else "PROBLEM"))
         if not ok:
             bad += 1
+    lock.unlink(missing_ok=True)
     bad += suite_accounting()
-    print("mutation check: %d checks, %d problems" % (len(CASES), bad))
+    print("mutation check: %d checks, %d problems" % (ran, bad))
     return 1 if bad else 0
 
 

@@ -21,6 +21,14 @@
 # the shell printed "can't open file" and the suite still printed ALL CHECKS PASSED.  A
 # suite that reports success while a check is missing is worse than no suite.
 set -eo pipefail
+# The mutation tool rewrites tracked files for the length of each case, so a suite run beside it
+# reads deliberately broken files and reports them as failures.  That is not hypothetical: the
+# two were started together and the suite failed at step one.  The lock is the fix.
+if [ -e /tmp/lg200-mutation.lock ]; then
+  echo "a mutation run holds /tmp/lg200-mutation.lock; refusing to read mutated files"
+  exit 1
+fi
+
 HERE=$(cd "$(dirname "$0")" && pwd)
 REPO=$(cd "$HERE/../.." && pwd)
 
