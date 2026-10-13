@@ -53,7 +53,10 @@ python3 code/lg200/set_desc.py --check
 ## Hardware runner
 
 ```sh
-make -C code/lg200/gpu build/lgpu-gpu   # build the runner
+# The deb-staged libdrm is older and lacks loonggpu_userq_free, so a plain make
+# fails at link and removes the binary.  Point at the current one:
+PKG_CONFIG_PATH=/home/lin/work/build/libdrm-loonggpu-prefix/lib/pkgconfig \
+  make -C code/lg200/gpu build/lgpu-gpu   # build the runner
 python3 code/lg200/gpu/run_gpu.py --mnemonic v_add_u32
 python3 code/lg200/gpu/run_gpu.py       # the whole universe
 python3 code/lg200/gpu/run_gpu.py --dry # assemble only, no submission

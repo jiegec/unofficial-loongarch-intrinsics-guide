@@ -25,7 +25,7 @@ so it could not fail on an over-claim, which is the defect it exists to find.
 
 THE ELEVEN GATES, ACCOUNTED FOR (2026-10-13):
 
-  proven in this tool (21): set_desc, check_doc_numbers, header_sync, check_gpu,
+  proven in this tool (22): set_desc, check_doc_numbers, header_sync, check_gpu,
                             run_cases, format_audit, bench_doc_check,
                             rule_dupe_check, md_table_check, check_all.sh,
                             fp_mode_audit, case_provenance, addr_scan, gate_check,
@@ -256,6 +256,12 @@ def mutate_cited_flag(text):
     old = '--pipe' + ' cs'
     return text.replace(old, '--pipe-not' + ' cs', 1)
 
+def mutate_build_env(text):
+    '''Strip the environment variable from a page's runner build.'''
+    # assembled, so this definition is not its own first match
+    old = 'PKG_CONFIG_PATH=' + '/home/lin/work/build/libdrm-loonggpu-prefix/lib/pkgconfig'
+    return text.replace(old, 'true', 1)
+
 CASES = [
     ("set_desc.py --check", "code/lg200-instructions.tsv", mutate_tsv,
      "cd code/lg200 && python3 set_desc.py --check"),
@@ -302,6 +308,8 @@ CASES = [
     ("link_check.py command", "code/lg200/gpu/MICROBENCH.md", mutate_cited_command,
      "python3 code/lg200/link_check.py"),
     ("link_check.py flag", "code/lg200/gpu/MICROBENCH.md", mutate_cited_flag,
+     "python3 code/lg200/link_check.py"),
+    ("link_check.py build env", "docs/gpu/appendix/verification.md", mutate_build_env,
      "python3 code/lg200/link_check.py"),]
 
 

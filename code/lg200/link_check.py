@@ -111,6 +111,18 @@ def main() -> int:
                     print("DEAD FLAG  %s -> python3 %s %s"
                           % (page.relative_to(ROOT), cited, f))
                     bad += 1
+
+    # A page that tells the reader to build the runner has to tell them how, or the build
+    # fails at link and deletes the binary.  That is what the hardware plan recorded, and
+    # what verification.md did until this round; a page-level rule is enough because the
+    # environment variable belongs to the invocation, not to the file.
+    for page in pages():
+        text = page.read_text(encoding="utf-8", errors="replace")
+        if (re.search(r"make\b[^\n]*build/lgpu-gpu", text)
+                and "PKG_CONFIG_PATH" not in text):
+            print("UNBUILDABLE  %s says to build the runner without PKG_CONFIG_PATH"
+                  % page.relative_to(ROOT))
+            bad += 1
     if bad:
         return 1
     print("links: %d, commands: %d (%d flags), every one resolving"
