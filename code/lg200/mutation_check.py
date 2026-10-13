@@ -384,9 +384,11 @@ def main() -> int:
             print("%-24s SKIPPED (mutation did not apply)" % name)
             bad += 1
             continue
+        PENDING[full] = original
         full.write_text(mutated)
         caught, _out = run(check)
         full.write_text(original)
+        PENDING.pop(full, None)
         after = sha(full)
         clean, _out = run(check)
         ok = caught != 0 and clean == 0 and before == after
