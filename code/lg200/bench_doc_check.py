@@ -28,6 +28,15 @@ PAGES = [
         r"\*\*(\d+) rows are buildable now against",
     ]),
 ]
+# The last hardware run's result, which the pages quote in three places.  Its source is a
+# device-produced CSV that is not tracked, so it is checked only when that file is present.
+MEASURED = [
+    (HERE / "gpu" / "MICROBENCH.md", r"\*\*(\d+) OK / (\d+) SKIP"),
+    (HERE / "gpu" / "README.md", r"\*\*(\d+) OK / (\d+) SKIP"),
+    (HERE.parent.parent / "docs" / "gpu" / "appendix" / "status.md",
+     r"\| CS microbench over the universe \| (\d+) OK / (\d+) SKIP"),
+]
+
 TOOL = HERE / "gpu" / "bench_buildable.py"
 
 
@@ -54,6 +63,25 @@ def main() -> int:
                 print("DRIFT  %s says %d, bench_buildable.py says %d"
                       % (path.name, doc, live))
                 bad += 1
+    # A second number in the same pages, kept by a different tool.  Without this it is the
+    # next one found stale by hand, in as many places as the first.
+    results = HERE / "gpu" / "build" / "cs_bench_results.tsv"
+    if results.exists():
+        lines = results.read_text(errors="replace").splitlines()
+        head = lines[0].split(chr(9))
+        idx = head.index("status") if "status" in head else 1
+        statuses = [ln.split(chr(9))[idx] for ln in lines[1:]
+                    if len(ln.split(chr(9))) > idx]
+        ok, skip = statuses.count("OK"), statuses.count("SKIP")
+        for path, pat in MEASURED:
+            for m in re.finditer(pat, path.read_text(encoding="utf-8")):
+                got = (int(m.group(1)), int(m.group(2)))
+                if got != (ok, skip):
+                    print("DRIFT  %s says %d OK / %d SKIP, the results file says %d / %d"
+                          % (path.name, got[0], got[1], ok, skip))
+                    bad += 1
+    else:
+        print("no bench results file; the measured OK/SKIP pair is not checked")
     if bad:
         return 1
     print("%d buildable for both kinds, and %d statements on %d pages agree"
