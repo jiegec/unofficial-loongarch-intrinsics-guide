@@ -56,9 +56,25 @@ def main() -> int:
             if anchor not in heads[f]:
                 print("DEAD ANCHOR  %s -> #%s" % (page.relative_to(ROOT), anchor))
                 bad += 1
+    # The pages also tell a reader which commands to run, and a renamed script rots that
+    # exactly as a renamed page rots a link.  Names are resolved by basename, because the
+    # docs write them both with and without their directory.
+    tools = {p.name for p in list((ROOT / "code" / "lg200").glob("*.py"))
+             + list((ROOT / "code" / "lg200" / "gpu").glob("*.py"))
+             + list(ROOT.glob("*.py"))}
+    cmds = 0
+    for page in pages():
+        for m in re.finditer(r"python3\s+([A-Za-z0-9_./-]+[.]py)",
+                             page.read_text(encoding="utf-8", errors="replace")):
+            cmds += 1
+            if m.group(1).split("/")[-1] not in tools:
+                print("DEAD COMMAND  %s -> python3 %s"
+                      % (page.relative_to(ROOT), m.group(1)))
+                bad += 1
     if bad:
         return 1
-    print("links: %d checked, every target and anchor resolves" % seen)
+    print("links: %d checked and %d commands cited, every target, anchor and script resolves"
+          % (seen, cmds))
     return 0
 
 

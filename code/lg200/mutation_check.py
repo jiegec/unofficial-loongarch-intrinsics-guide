@@ -25,7 +25,7 @@ so it could not fail on an over-claim, which is the defect it exists to find.
 
 THE ELEVEN GATES, ACCOUNTED FOR (2026-10-13):
 
-  proven in this tool (19): set_desc, check_doc_numbers, header_sync, check_gpu,
+  proven in this tool (20): set_desc, check_doc_numbers, header_sync, check_gpu,
                             run_cases, format_audit, bench_doc_check,
                             rule_dupe_check, md_table_check, check_all.sh,
                             fp_mode_audit, case_provenance, addr_scan, gate_check,
@@ -244,6 +244,12 @@ def mutate_taxonomy(text):
     q = chr(96)
     return text.replace(q + 'fp_bounds_gen.py' + q, q + 'fp_bounds_gen-renamed.py' + q, 1)
 
+def mutate_cited_command(text):
+    '''Rename a script the page tells the reader to run.'''
+    # assembled: written literally, the first occurrence is this function's own target
+    old = 'python3 ' + 'bench_coverage.py'
+    return text.replace(old, 'python3 ' + 'bench_coverage_renamed.py', 1)
+
 CASES = [
     ("set_desc.py --check", "code/lg200-instructions.tsv", mutate_tsv,
      "cd code/lg200 && python3 set_desc.py --check"),
@@ -286,7 +292,9 @@ CASES = [
     ("case_coverage.py", "code/lg200/case_coverage.py", mutate_class_space,
      "python3 code/lg200/case_coverage.py"),
     ("gate_check.py taxonomy", "docs/gpu/appendix/status.md", mutate_taxonomy,
-     "python3 code/lg200/gate_check.py"),]
+     "python3 code/lg200/gate_check.py"),
+    ("link_check.py command", "code/lg200/gpu/MICROBENCH.md", mutate_cited_command,
+     "python3 code/lg200/link_check.py"),]
 
 
 def main() -> int:
