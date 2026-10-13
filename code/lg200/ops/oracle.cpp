@@ -1918,7 +1918,10 @@ std::uint32_t oracle_fcvt_f32_u83(std::uint32_t a) { return sf_u32_f32((a >> 24)
 std::uint32_t oracle_pack_snorm16_f32(std::uint32_t a) {
   const float v = f32_bits(a);
   const long r = static_cast<long>(std::lround(v * 32767.0f));
-  return static_cast<std::uint32_t>(std::max(-32768L, std::min(32767L, r))) & 0xffffu;
+  return static_cast<std::uint32_t>(// [HW 2026-10-13] the negative rail is -32767, not -32768: snorm has two zeros,
+  // so -1.0 and below map to 0x8001.  The clamp to -32768 failed every negative
+  // full-scale case, 74 of them in v_pack_imm_snorm16_f32.
+  std::max(-32767L, std::min(32767L, r))) & 0xffffu;
 }
 std::uint32_t oracle_pack_unorm16_f32(std::uint32_t a) {
   const float v = f32_bits(a);
