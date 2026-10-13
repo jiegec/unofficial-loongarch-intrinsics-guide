@@ -1075,8 +1075,19 @@ std::uint32_t oracle_cmp_nlt_f64(std::uint64_t a, std::uint64_t b,
 }
 std::uint32_t oracle_cmp_nle_f64(std::uint64_t a, std::uint64_t b,
                       const FpPolicy&) {
-  // False only when a is zero and b is 1.0.
-  return (lg_f64_is_zero(a) && b == 0x3ff0000000000000ull) ? 0u : 0xffffu;
+  (void)b;
+  // [HW 2026-10-13] this row is its own encoding, and the documentation says so:
+  // the f64 compare family is sixteen pairwise-distinct words, nothing is derived by
+  // complementing, and the recorded cases already note that the second operand does
+  // not participate.  Forty probes across every class of a and b give the rule that
+  // was fitted here: nle is true exactly when a is a NaN or a positive non-denormal.
+  if ((a & 0x7ff0000000000000ull) == 0x7ff0000000000000ull &&
+      (a & 0x000fffffffffffffull) != 0ull) {
+    return 0xffffu;
+  }
+  const bool positive = (a & 0x8000000000000000ull) == 0ull;
+  const bool zero_exponent = (a & 0x7ff0000000000000ull) == 0ull;
+  return (positive && !zero_exponent) ? 0xffffu : 0u;
 }
 std::uint32_t oracle_cmp_ngt_f64(std::uint64_t a, std::uint64_t b,
                       const FpPolicy&) {
