@@ -67,6 +67,18 @@ def main() -> int:
             print("UNPROVEN  %s is a gate and no mutation case ever breaks it"
                   % name)
             bad += 1
+    # Every tool has to be either a gate in the suite or named in the taxonomy, or the
+    # table is a partial list presented as a whole one - which it was, missing the
+    # libraries, the runners and a generator.
+    tax = (HERE.parent.parent / 'docs' / 'gpu' / 'appendix' / 'status.md').read_text(encoding='utf-8')
+    tax = tax[tax.index('How these claims are kept true'):]
+    for p in sorted(list(HERE.glob('*.py')) + list((HERE / 'gpu').glob('*.py'))):
+        if p.stem in names:
+            continue
+        if '`' + p.name + '`' not in tax:
+            print('UNCLASSIFIED  %s is neither a gate nor named in the taxonomy'
+                  % p.name)
+            bad += 1
     if bad:
         return 1
     print("gate check: %d suite scripts, %d named as reports, the rest can fail and are all broken by a case"
