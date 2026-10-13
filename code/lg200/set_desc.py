@@ -73,6 +73,13 @@ def check():
         desc = row.get("description") or ""
         if "\t" in desc or "\n" in desc:
             problems.append("row %d (%s): raw tab/newline in description" % (i, name))
+        desc = row.get("description") or ""
+        if "UNRESOLVED" in desc:
+            # A marker has to say what is unknown.  Every one of the 580 rows carries full
+            # prose - the shortest is seventy words - so a floor catches a stub marker and
+            # constrains nothing else, because it applies only to rows that carry one.
+            if len(desc.replace("UNRESOLVED", " ").split()) < 40:
+                problems.append("row %d (%s): UNRESOLVED with no explanation" % (i, name))
         # The seed column is machine text - a mnemonic, registers and hex.  Prose in it
         # means a write landed in the wrong column, which is not hypothetical: on
         # 2026-10-13 a write appended a description sentence to the LAST column, which is
