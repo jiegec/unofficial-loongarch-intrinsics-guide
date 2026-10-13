@@ -1075,19 +1075,22 @@ std::uint32_t oracle_cmp_nlt_f64(std::uint64_t a, std::uint64_t b,
 }
 std::uint32_t oracle_cmp_nle_f64(std::uint64_t a, std::uint64_t b,
                       const FpPolicy&) {
-  (void)b;
-  // [HW 2026-10-13] this row is its own encoding, and the documentation says so:
-  // the f64 compare family is sixteen pairwise-distinct words, nothing is derived by
-  // complementing, and the recorded cases already note that the second operand does
-  // not participate.  Forty probes across every class of a and b give the rule that
-  // was fitted here: nle is true exactly when a is a NaN or a positive non-denormal.
-  if ((a & 0x7ff0000000000000ull) == 0x7ff0000000000000ull &&
+  // [HW 2026-10-13] from a 144-point two-dimensional sweep of the row: it compares
+  // a correctly but reads b with its two dwords REVERSED, and it flushes a denormal a.
+  // nle64(daz(a), swap32(b)) matches all 144 cells; the standard reading matches 100,
+  // and every other pairing tried - a_lo/b_lo, a_hi/b_hi, a_lo/b_hi, both-swapped - and
+  // each reading with the NaN test taken from f64 rather than the dwords matches fewer.
+  // The earlier form here was fitted to a single recorded case.
+  if ((a & 0x7ff0000000000000ull) == 0ull &&
       (a & 0x000fffffffffffffull) != 0ull) {
-    return 0xffffu;
+    a &= 0x8000000000000000ull;  // a denormal a is flushed before the compare
   }
-  const bool positive = (a & 0x8000000000000000ull) == 0ull;
-  const bool zero_exponent = (a & 0x7ff0000000000000ull) == 0ull;
-  return (positive && !zero_exponent) ? 0xffffu : 0u;
+  b = (b >> 32) | (b << 32);     // b halfwords arrive swapped
+  // !(a <= b), with an unordered comparison counted TRUE for this row - which is
+  // where CmpPred::NLE differs, since it excludes unordered.  Those are the twenty
+  // cases the shared predicate got wrong.
+  const CmpOrder o = cmp_f64_bits(a, b);
+  return (o == CmpOrder::Unordered || o == CmpOrder::Greater) ? 0xffffu : 0u;
 }
 std::uint32_t oracle_cmp_ngt_f64(std::uint64_t a, std::uint64_t b,
                       const FpPolicy&) {

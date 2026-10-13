@@ -114,7 +114,7 @@ inline u32 cmp_ngt_f64(u64 a, u64 b, const lgpu::test::FpPolicy& policy) { retur
 inline u32 cmp_nle_f16(u32 a, u32 b, const lgpu::test::FpPolicy& p) { return lgpu::test::oracle_cmp_nle_f16(daz_f16(a, p), daz_f16(b, p)); }
 inline u32 cmp_nle_f32(u32 a, u32 b, const lgpu::test::FpPolicy& p) { return lgpu::test::oracle_cmp_nle_f32(daz_f32(a, p), daz_f32(b, p)); }
 inline u32 cmp_nle_f32_std(u32 a, u32 b) { return lgpu::test::oracle_cmp_nle_f32_std(a, b); }
-inline u32 cmp_nle_f64(u64 a, u64 b, const lgpu::test::FpPolicy& policy) { return lgpu::test::oracle_cmp_nle_f64(daz_f64(a, policy), daz_f64(b, policy), policy); }
+inline u32 cmp_nle_f64(u64 a, u64 b, const lgpu::test::FpPolicy& policy) { return lgpu::test::oracle_cmp_nle_f64(daz_f64(a, policy), b, policy); }  // b is NOT daz-ed here: the hardware flushes only a.  // b is NOT daz-ed here: the hardware flushes only a.
 inline u32 cmp_nlg_f16(u32 a, u32 b, const lgpu::test::FpPolicy& p) { return lgpu::test::oracle_cmp_nlg_f16(daz_f16(a, p), daz_f16(b, p)); }
 inline u32 cmp_nlg_f32(u32 a, u32 b, const lgpu::test::FpPolicy& p) { return lgpu::test::oracle_cmp_nlg_f32(daz_f32(a, p), daz_f32(b, p)); }
 inline u32 cmp_nlg_f64(u64 a, u64 b, const lgpu::test::FpPolicy& policy) { return lgpu::test::oracle_cmp_nlg_f64(daz_f64(a, policy), daz_f64(b, policy), policy); }
