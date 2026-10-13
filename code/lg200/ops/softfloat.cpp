@@ -341,10 +341,34 @@ std::uint32_t sf_min32(std::uint32_t a, std::uint32_t b, FpPolicy) {
 std::uint32_t sf_max32(std::uint32_t a, std::uint32_t b, FpPolicy) {
   return minmax(a, b, false);
 }
+// [HW 2026-10-13] a NaN is quieted, and a signaling one outranks a quiet one
+// wherever it sits - (0, 0x7f800001, 0) comes back as 0x7fc00001 on the
+// hardware, and (qNaN, sNaN, 0) takes the sNaN.  The minmax helper below
+// returns whichever NaN it meets first, unquieted, which is what made these rows
+// disagree.
+static std::uint32_t nan_rule3(std::uint32_t a, std::uint32_t b,
+                               std::uint32_t c) {
+  const auto v_nan = [](std::uint32_t v) {
+    return (v & 0x7f800000u) == 0x7f800000u && (v & 0x007fffffu) != 0u;
+  };
+  const auto v_snan = [](std::uint32_t v) {
+    return (v & 0x7f800000u) == 0x7f800000u && (v & 0x007fffffu) != 0u &&
+           (v & 0x00400000u) == 0u;
+  };
+  if (v_snan(a)) return a | 0x00400000u;
+  if (v_snan(b)) return b | 0x00400000u;
+  if (v_snan(c)) return c | 0x00400000u;
+  if (v_nan(a)) return a | 0x00400000u;
+  if (v_nan(b)) return b | 0x00400000u;
+  if (v_nan(c)) return c | 0x00400000u;
+  return 0u;
+}
 std::uint32_t sf_min3(std::uint32_t a, std::uint32_t b, std::uint32_t c, FpPolicy) {
+  if (const std::uint32_t n = nan_rule3(a, b, c)) return n;
   return minmax(minmax(a, b, true), c, true);
 }
 std::uint32_t sf_max3(std::uint32_t a, std::uint32_t b, std::uint32_t c, FpPolicy) {
+  if (const std::uint32_t n = nan_rule3(a, b, c)) return n;
   return minmax(minmax(a, b, false), c, false);
 }
 std::uint32_t sf_med3(std::uint32_t a, std::uint32_t b, std::uint32_t c, FpPolicy) {
