@@ -532,11 +532,32 @@ std::uint64_t sf_mul64(std::uint64_t a, std::uint64_t b, FpPolicy policy) {
 }
 std::uint64_t sf_fma64(std::uint64_t a, std::uint64_t b, std::uint64_t c,
                        FpPolicy policy) {
+  // [HW 2026-10-13] the same split the f32 helpers use: a NaN OPERAND propagates,
+  // quieted only if it was signaling and with its sign intact (the addend first, as
+  // sf_fma32 has it), while a COMPUTED NaN - inf * 0 - is the positive canonical.
+  // The row expected 0xfff80000 where the hardware gives 0x7ff80000 in 100 cases, and
+  // the reverse in seven.
   if (policy.daz) { a = flush64(a); b = flush64(b); c = flush64(c); }
+  const auto isnan = [](std::uint64_t v) {
+    return (v & 0x7ff0000000000000ull) == 0x7ff0000000000000ull &&
+           (v & 0x000fffffffffffffull) != 0ull;
+  };
+  const auto snan = [&](std::uint64_t v) {
+    return isnan(v) && (v & 0x0008000000000000ull) == 0ull;
+  };
+  const std::uint64_t q = 0x0008000000000000ull;
+  if (snan(c)) return c | q;
+  if (snan(a)) return a | q;
+  if (snan(b)) return b | q;
+  if (isnan(c)) return c | q;
+  if (isnan(a)) return a | q;
+  if (isnan(b)) return b | q;
   set_round(policy);
   std::uint64_t r = bk64(f64_mulAdd(mk64(a), mk64(b), mk64(c)));
+  if (isnan(r)) r = 0x7ff8000000000000ull;  // computed NaN -> positive canonical
   return policy.ftz ? flush64(r) : r;
 }
+
 std::uint64_t sf_sqrt64(std::uint64_t a, FpPolicy policy) {
   if (policy.daz) a = flush64(a);
   set_round(policy);
