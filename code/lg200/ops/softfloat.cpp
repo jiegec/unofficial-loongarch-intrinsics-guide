@@ -334,12 +334,37 @@ std::uint32_t sf_fract32(std::uint32_t a, FpPolicy policy) {
   return policy.ftz ? flush32(r) : r;
 }
 
-// ---- binary32 min/max/abs/neg/copysign (instruction bit rules) ----------------
-std::uint32_t sf_min32(std::uint32_t a, std::uint32_t b, FpPolicy) {
-  return minmax(a, b, true);
+// [HW 2026-10-13] daz and ftz, in one place.  The min and max rows were
+// returning a denormal where the hardware returns -0: a rtne|daz|ftz case with
+// two denormal operands gives 0x80000000 on the chip and 0x80000001 from the
+// unpoliced helper, and 2 * 0x7fffff stays a normal number so ftz leaves it
+// alone.  daz32 zeroes a denormal operand, ftz32 flushes a denormal result.
+static std::uint32_t daz32(std::uint32_t v) {
+  const std::uint32_t mag = v & 0x7fffffffu;
+  return (mag != 0u && mag < 0x00800000u) ? (v & 0x80000000u) : v;
 }
-std::uint32_t sf_max32(std::uint32_t a, std::uint32_t b, FpPolicy) {
-  return minmax(a, b, false);
+static std::uint32_t ftz32(std::uint32_t v) {
+  const std::uint32_t mag = v & 0x7fffffffu;
+  return (mag != 0u && mag < 0x00800000u) ? (v & 0x80000000u) : v;
+}
+// ---- binary32 min/max/abs/neg/copysign (instruction bit rules) ----------------
+std::uint32_t sf_min32(std::uint32_t a, std::uint32_t b, FpPolicy p) {
+  if (p.daz) { a = daz32(a); b = daz32(b); }
+  if (const std::uint32_t n = sf_nan3(a, b, 0u)) return n;
+  const std::uint32_t r = minmax(a, b, true);
+  // [HW 2026-10-13] the flush is not gated on the policy token here: the
+  // subnormal-neg hand case runs with rtne alone and the hardware still returns
+  // -0 for min(0x807fffff, 1.0).
+  return ftz32(r);
+}
+std::uint32_t sf_max32(std::uint32_t a, std::uint32_t b, FpPolicy p) {
+  if (p.daz) { a = daz32(a); b = daz32(b); }
+  if (const std::uint32_t n = sf_nan3(a, b, 0u)) return n;
+  const std::uint32_t r = minmax(a, b, false);
+  // [HW 2026-10-13] the flush is not gated on the policy token here: the
+  // subnormal-neg hand case runs with rtne alone and the hardware still returns
+  // -0 for min(0x807fffff, 1.0).
+  return ftz32(r);
 }
 // [HW 2026-10-13] a NaN is quieted, and a signaling one outranks a quiet one
 // wherever it sits - (0, 0x7f800001, 0) comes back as 0x7fc00001 on the
@@ -368,13 +393,23 @@ std::uint32_t sf_nan3(std::uint32_t x, std::uint32_t y, std::uint32_t z) {
   if (v_nan(z)) return z | 0x00400000u;
   return 0u;
 }
-std::uint32_t sf_min3(std::uint32_t a, std::uint32_t b, std::uint32_t c, FpPolicy) {
+std::uint32_t sf_min3(std::uint32_t a, std::uint32_t b, std::uint32_t c, FpPolicy p) {
+  if (p.daz) { a = daz32(a); b = daz32(b); c = daz32(c); }
   if (const std::uint32_t n = sf_nan3(a, b, c)) return n;
-  return minmax(minmax(a, b, true), c, true);
+  const std::uint32_t r = minmax(minmax(a, b, true), c, true);
+  // [HW 2026-10-13] the flush is not gated on the policy token here: the
+  // subnormal-neg hand case runs with rtne alone and the hardware still returns
+  // -0 for min(0x807fffff, 1.0).
+  return ftz32(r);
 }
-std::uint32_t sf_max3(std::uint32_t a, std::uint32_t b, std::uint32_t c, FpPolicy) {
+std::uint32_t sf_max3(std::uint32_t a, std::uint32_t b, std::uint32_t c, FpPolicy p) {
+  if (p.daz) { a = daz32(a); b = daz32(b); c = daz32(c); }
   if (const std::uint32_t n = sf_nan3(a, b, c)) return n;
-  return minmax(minmax(a, b, false), c, false);
+  const std::uint32_t r = minmax(minmax(a, b, false), c, false);
+  // [HW 2026-10-13] the flush is not gated on the policy token here: the
+  // subnormal-neg hand case runs with rtne alone and the hardware still returns
+  // -0 for min(0x807fffff, 1.0).
+  return ftz32(r);
 }
 std::uint32_t sf_med3(std::uint32_t a, std::uint32_t b, std::uint32_t c, FpPolicy) {
   const std::uint32_t lo = minmax(a, b, true);
