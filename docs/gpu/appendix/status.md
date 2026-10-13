@@ -205,4 +205,4 @@ next sweep ends up rediscovering it.
 | session-time | `audit.py` | reads a device-produced runner listing, which is not tracked; it runs when one is present and says so when it is not |
 | cross-repo | `jumpstack_check.py`, `enc_probe.py` | compare against the vendor's ISA row and assembler, so they need the LCO checkout and say so without it |
 | diagnostic | `fp_boundary_audit.py` | checks a coarser subset of boundary classes than `case_coverage.py`, which is the gate for the full required set |
-| library, runner or generator | `cases.py`, `gen_cases.py`, `bench_buildable.py`, `bench_coverage.py`, `calibrate_ticks.py`, `run_gpu.py`, `run_bench.py`, `bench_ns.py`, `fp_bounds_gen.py` | not checks at all: some are imported rather than run, some produce an artefact, and the runners need a device |
+| library, runner or generator | `cases.py`, `gen_cases.py`, `bench_buildable.py`, `bench_coverage.py`, `calibrate_ticks.py`, `run_gpu.py`, `sweep2d.py`, `run_bench.py`, `bench_ns.py`, `fp_bounds_gen.py` | not checks at all: some are imported rather than run, some produce an artefact, and the runners need a device |
