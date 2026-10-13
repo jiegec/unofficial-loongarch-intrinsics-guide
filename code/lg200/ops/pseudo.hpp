@@ -120,7 +120,7 @@ inline u32 cmp_nlg_f32(u32 a, u32 b, const lgpu::test::FpPolicy& p) { return lgp
 inline u32 cmp_nlg_f64(u64 a, u64 b, const lgpu::test::FpPolicy& policy) { return lgpu::test::oracle_cmp_nlg_f64(daz_f64(a, policy), daz_f64(b, policy), policy); }
 inline u32 cmp_nlt_f16(u32 a, u32 b, const lgpu::test::FpPolicy& p) { return lgpu::test::oracle_cmp_nlt_f16(daz_f16(a, p), daz_f16(b, p)); }
 inline u32 cmp_nlt_f32(u32 a, u32 b, const lgpu::test::FpPolicy& p) { return lgpu::test::oracle_cmp_nlt_f32(daz_f32(a, p), daz_f32(b, p)); }
-inline u32 cmp_nlt_f64(u64 a, u64 b, const lgpu::test::FpPolicy& policy) { return lgpu::test::oracle_cmp_nlt_f64(daz_f64(a, policy), daz_f64(b, policy), policy); }
+inline u32 cmp_nlt_f64(u64 a, u64 b, const lgpu::test::FpPolicy& policy) { return lgpu::test::oracle_cmp_nlt_f64(daz_f64(a, policy), b, policy); }  // b raw: the row shifts b_lo itself; flushing b as an f64 breaks it.
 inline u32 cmp_o_f16(u32 a, u32 b, const lgpu::test::FpPolicy& p) { return lgpu::test::oracle_cmp_o_f16(daz_f16(a, p), daz_f16(b, p)); }
 inline u32 cmp_o_f32(u32 a, u32 b, const lgpu::test::FpPolicy& p) { return lgpu::test::oracle_cmp_o_f32(daz_f32(a, p), daz_f32(b, p)); }
 inline u32 cmp_o_f64(u64 a, u64 b, const lgpu::test::FpPolicy& policy) { return lgpu::test::oracle_cmp_o_f64(daz_f64(a, policy), daz_f64(b, policy), policy); }
