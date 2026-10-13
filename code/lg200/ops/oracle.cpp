@@ -1188,14 +1188,38 @@ std::uint32_t oracle_cmp_nlg_f64(std::uint64_t a, std::uint64_t b,
 }
 std::uint32_t oracle_cmp_o_f64(std::uint64_t a, std::uint64_t b,
                       const FpPolicy&) {
-  // The second operand is ignored; o == !isnan(a).
-  (void)b;
-  return lg_f64_is_nan(a) ? 0u : 0xffffu;}
+  // [HW 2026-10-13] from a widened 324-cell sweep.  As with the other f64 compare
+  // rows the second source enters through its LOW half shifted up, and the sweep ties
+  // several readings at zero - the cases decide which, as they did for the rest of the
+  // family.
+  const auto daz = [](std::uint64_t v) {
+    return ((v & 0x7ff0000000000000ull) == 0ull &&
+           (v & 0x000fffffffffffffull) != 0ull)
+               ? (v & 0x8000000000000000ull)
+               : v;
+  };
+  const std::uint64_t x = daz(a);  // the full f64, the better of the tied forms
+  const std::uint64_t y = daz((b & 0xffffffffu) << 32);
+  const CmpOrder o = cmp_f64_bits(x, y);
+  return (o != CmpOrder::Unordered) ? 0xffffu : 0u;
+}
 std::uint32_t oracle_cmp_u_f64(std::uint64_t a, std::uint64_t b,
                       const FpPolicy&) {
-  // The second operand is ignored; u == isnan(a).
-  (void)b;
-  return lg_f64_is_nan(a) ? 0xffffu : 0u;}
+  // [HW 2026-10-13] from a widened 324-cell sweep.  As with the other f64 compare
+  // rows the second source enters through its LOW half shifted up, and the sweep ties
+  // several readings at zero - the cases decide which, as they did for the rest of the
+  // family.
+  const auto daz = [](std::uint64_t v) {
+    return ((v & 0x7ff0000000000000ull) == 0ull &&
+           (v & 0x000fffffffffffffull) != 0ull)
+               ? (v & 0x8000000000000000ull)
+               : v;
+  };
+  const std::uint64_t x = daz(a);  // the full f64, the better of the tied forms
+  const std::uint64_t y = daz((b & 0xffffffffu) << 32);
+  const CmpOrder o = cmp_f64_bits(x, y);
+  return (o == CmpOrder::Unordered) ? 0xffffu : 0u;
+}
 
 // --- constant predicates (width-overloaded) --------------------------------
 std::uint32_t oracle_cmp_tru(std::uint32_t, std::uint32_t) {
