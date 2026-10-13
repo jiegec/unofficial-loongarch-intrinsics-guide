@@ -334,6 +334,14 @@ path (`src/mesa/src/loonggpu/vulkan/loongvk_kd.h`, `loongvk_mcs.c`, and
 | image/sampler tuple | loaded from the kernarg block (`s[6:7] + field offset`) | the same: `emit_tex_prelude` scalar-flat loads through `s[6:7]` with `env.rsd_load_off` (`kRsdTable` on compute, 0 on graphics) | **aligned** |
 | result/staging buffer addresses | derived at runtime from `s[6:7]`; the BO VAs are the driver's choice | assembled as literal VAs (`carrier::kCsArgVa` in `emit_store_desc` / `emit_load_desc` / `emit_result_store`) | **deviation** |
 | flat base | the flat access names a base pair the descriptor supplies | names `s[20:21] = 0` with an absolute vaddr pair | **deviation** |
+| workgroup shared memory | the kernel descriptor names the window: `SHARED_SIZE` at
+offset 28 and `PRIVATE_SIZE` at 24 (`LOONGVK_KD_OFF_SHARED_SIZE`), so a kernel that
+declares an LDS window sets it | the carrier carries the same field
+(`drm.cpp` copies `shared_bytes` into `shared_segment_size`) and leaves it at 0, the
+initialiser it starts from | **not resolved**: whether a zero window is correct for the
+`load_sm_*` / `store_sm_*` / `atomic_sm_*` rows has never been measured - there is no
+LDS row in the last hardware matrix - so this is a deviation recorded rather than
+settled, and it needs a device |
 | output pointer | the host writes the output BO VA as the first user argument at `kernarg+0`; the kernel loads it from `s[6:7]` | the host writes the same word (`drm.cpp`), and `build_generic` reads it once as launch-state evidence, then ignores it | **half-aligned**: produced, not consumed |
 
 The two deviations are safe **only because** the carrier and the host share
