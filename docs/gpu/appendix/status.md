@@ -189,3 +189,19 @@ silently passing them would not be.
 One tool defect was fixed while doing this: the note detail was truncated to 66
 characters, which cut off exactly the part that says WHY.  The E note now reads in full,
 and that reason is what points back at the catalog's UNRESOLVED.
+
+## How these claims are kept true
+
+The figures above are recomputed by `code/lg200/check_all.sh`, and every gate it runs is
+required to be able to fail: `gate_check.py` reads the scripts the suite actually invokes and
+refuses any without a failure path, and each of those has a case in `mutation_check.py` that
+breaks it and requires the break to be noticed.  Four categories are deliberately not gates,
+and each is named with its reason rather than left silent - an unnamed exception is how the
+next sweep ends up rediscovering it.
+
+| category | tools | why it is not a gate |
+|---|---|---|
+| reports by design | `prose_audit`, `doc_register_audit` | their findings include expected ones, so there is no pass or fail |
+| session-time | `audit.py` | reads a device-produced runner listing, which is not tracked; it runs when one is present and says so when it is not |
+| cross-repo | `jumpstack_check.py`, `enc_probe.py` | compare against the vendor's ISA row and assembler, so they need the LCO checkout and say so without it |
+| diagnostic | `fp_boundary_audit.py` | checks a coarser subset of boundary classes than `case_coverage.py`, which is the gate for the full required set |
