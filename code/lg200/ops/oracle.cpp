@@ -129,7 +129,10 @@ std::uint32_t oracle_v_pack_f16rtz_f32(std::uint32_t a, std::uint32_t b) {
     const std::uint32_t exp = (v >> 23) & 0xffu;
     const std::uint32_t mant = v & 0x7fffffu;
     if (exp == 0xffu) {
-      return (sign << 15) | 0x7c00u | ((mant >> 13) & 0x3ffu);
+      // [HW 2026-10-13] an infinity stays 0x7c00; a NaN arrives quiet, so
+      // 0x7f800001 packs to 0x7e00 rather than 0x7c00.
+      const std::uint32_t base = (sign << 15) | 0x7c00u;
+      return mant ? (base | 0x200u | ((mant >> 13) & 0x3ffu)) : base;
     }
     const int e = static_cast<int>(exp) - 127;
     if (e >= 16) {
@@ -2127,13 +2130,20 @@ std::uint32_t oracle_pack_f16rtz_f32(std::uint32_t a) {
   const std::uint32_t sign = (a >> 31) & 1u;
   const std::uint32_t exp = (a >> 23) & 0xffu;
   if (exp == 0xffu) {
-    return (sign << 15) | 0x7c00u | (((a & 0x7fffffu) >> 13) & 0x3ffu);
+    // [HW 2026-10-13] the same rule as the two-source packer: infinity keeps
+    // 0x7c00, a NaN is quieted to 0x7e00.
+    const std::uint32_t mant = a & 0x7fffffu;
+    const std::uint32_t base = (sign << 15) | 0x7c00u;
+    return mant ? (base | 0x200u | ((mant >> 13) & 0x3ffu)) : base;
   }
   // [HW 2026-08-24] finite magnitudes beyond the largest finite half
   // (0x7bff / 0xfbff) clamp instead of overflowing to inf.
   const std::uint32_t mag = a & 0x7fffffffu;
   if (mag > 0x477fe000u) {
-    return 0x7bffu | (a & 0x80000000u);
+    // [HW 2026-10-13] the sign belongs in bit 15 of the half, not bit 31 of the
+    // word: this returned 0x80007bff and dropped the sign as soon as the caller
+    // shifted it into the high half.
+    return 0x7bffu | ((a >> 16) & 0x8000u);
   }
   FpPolicy p;
   p.rounding = FpPolicy::Rounding::TowardZero;
