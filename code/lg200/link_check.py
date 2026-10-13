@@ -80,10 +80,41 @@ def main() -> int:
                 print("DEAD COMMAND  %s -> python3 %s"
                       % (page.relative_to(ROOT), m.group(1)))
                 bad += 1
+
+    # The flags on those commands matter too: the hardware plan's preconditions were wrong
+    # twice, once with a placeholder path and once with a missing environment variable, and
+    # checking the script name alone would have caught neither.  Resolved the same way, by
+    # path when the page writes one.
+    tool_paths = {}
+    for cand in (list((ROOT / "code" / "lg200").glob("*.py"))
+                 + list((ROOT / "code" / "lg200" / "gpu").glob("*.py"))
+                 + list(ROOT.glob("*.py"))):
+        tool_paths[cand.name] = cand
+    flag_n = 0
+    for page in pages():
+        text = page.read_text(encoding="utf-8", errors="replace")
+        for m in re.finditer(r"python3\s+([A-Za-z0-9_./-]+[.]py)([^\n]*)", text):
+            cited, rest = m.group(1), m.group(2)
+            path = None
+            for cand in (ROOT / cited, ROOT / "code" / cited):
+                if cand.exists():
+                    path = cand
+                    break
+            if path is None:
+                path = tool_paths.get(cited)
+            if path is None:
+                continue          # the command check above already reported this one
+            body = path.read_text(encoding="utf-8", errors="replace")
+            for f in re.findall(r"--[a-z][a-z0-9-]+", rest):
+                flag_n += 1
+                if f not in body:
+                    print("DEAD FLAG  %s -> python3 %s %s"
+                          % (page.relative_to(ROOT), cited, f))
+                    bad += 1
     if bad:
         return 1
-    print("links: %d checked and %d commands cited, every target, anchor and script resolves"
-          % (seen, cmds))
+    print("links: %d, commands: %d (%d flags), every one resolving"
+          % (seen, cmds, flag_n))
     return 0
 
 
