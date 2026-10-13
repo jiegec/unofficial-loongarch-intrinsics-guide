@@ -564,11 +564,34 @@ std::uint64_t sf_ldexp64(std::uint64_t a, std::uint32_t exp) {
     return d.sign ? kS64 : 0;
   return compose64(d.sign, static_cast<int>(target), d.mant);
 }
+// [HW 2026-10-13] the same rule for binary64: quieted, signaling first, then the
+// caller order.  min(f64 NaN, +inf) comes back as the quieted NaN, 0x7ff80000 in
+// the high word, where the model used to return the infinity.
+static std::uint64_t nan64(std::uint64_t v) {
+  return (v & 0x7ff0000000000000ull) == 0x7ff0000000000000ull &&
+                 (v & 0x000fffffffffffffull) != 0ull
+             ? v
+             : 0ull;
+}
+static std::uint64_t snan64(std::uint64_t v) {
+  return nan64(v) != 0ull && (v & 0x0008000000000000ull) == 0ull ? v : 0ull;
+}
+static std::uint64_t nan_rule2_64(std::uint64_t x, std::uint64_t y) {
+  if (snan64(x)) return x | 0x0008000000000000ull;
+  if (snan64(y)) return y | 0x0008000000000000ull;
+  if (nan64(x)) return x | 0x0008000000000000ull;
+  if (nan64(y)) return y | 0x0008000000000000ull;
+  return 0ull;
+}
 std::uint64_t sf_min64(std::uint64_t a, std::uint64_t b) {
-  return minmax64(a, b, true);
+  // [HW 2026-10-13] the result flushes, unconditionally, as the f32 rows do:
+  // min of two denormals comes back as zero on the hardware.
+  if (const std::uint64_t n = nan_rule2_64(a, b)) return n;
+  return flush64(minmax64(a, b, true));
 }
 std::uint64_t sf_max64(std::uint64_t a, std::uint64_t b) {
-  return minmax64(a, b, false);
+  if (const std::uint64_t n = nan_rule2_64(a, b)) return n;
+  return flush64(minmax64(a, b, false));
 }
 
 // ---- conversions between f32/f64 and integers (RTNE) --------------------------
