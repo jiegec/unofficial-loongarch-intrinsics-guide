@@ -2200,8 +2200,13 @@ std::uint32_t sf_ldexp32(std::uint32_t a, std::uint32_t e,
   // extremes clamp: >= 256 overflows to inf, <= -256 underflows to 0.
   const int exp = static_cast<int>(static_cast<std::int32_t>(e));
   const float x = f32_bits(a);
-  if (std::isnan(x) || std::isinf(x))
-    return a;  // infinities and NaNs pass through untouched
+  if (std::isinf(x))
+    return a;  // infinities pass through untouched
+  // [HW 2026-10-13] a NaN operand is QUIETED, not passed through: this row expected
+  // 0x7f800001 where the hardware gives 0x7fc00001, in all 40 of its failures.  The
+  // sign and the payload survive; only the quiet bit is set.
+  if (std::isnan(x))
+    return a | 0x00400000u;
   if (x != 0.0f && exp >= 256)
     return bits_f32(std::copysign(std::numeric_limits<float>::infinity(), x));
   if (exp <= -256)

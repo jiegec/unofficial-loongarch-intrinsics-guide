@@ -577,8 +577,13 @@ std::uint64_t sf_ldexp64(std::uint64_t a, std::uint32_t exp) {
   if ((a & 0x7fffffffffffffffull) == 0ull)
     return a;
   const D64 d = decompose64(a);
-  if (d.is_nan || d.is_inf || d.is_zero) {
+  if (d.is_inf || d.is_zero) {
     return a;
+  }
+  // [HW 2026-10-13] as in sf_ldexp32, a NaN operand is QUIETED rather than passed
+  // through: the sign and payload survive and only the quiet bit is set.
+  if (d.is_nan) {
+    return a | 0x0008000000000000ull;
   }
   // [HW 2026-08-24] int64 target so extreme 32-bit exponents
   // cannot wrap the int add.
