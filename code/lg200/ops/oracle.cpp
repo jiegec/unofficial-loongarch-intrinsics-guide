@@ -2119,8 +2119,18 @@ std::uint32_t oracle_v_subbrev_u32(std::uint32_t a, std::uint32_t b, std::uint32
 }
 
 std::uint32_t oracle_pack_f16rtz_f32(std::uint32_t a) {
-  // [HW 2026-08-24] the RTZ f16 packer clamps magnitudes beyond the
-  // largest finite half (0x7bff / 0xfbff) instead of overflowing to inf.
+  // [HW 2026-10-13] inf and NaN keep their half patterns (0x7c00 / 0x7e00 and
+  // their sign mirrors); they are not magnitudes to clamp.  This branch has to
+  // come first - the clamp below used to swallow them and return 0x7bff, which
+  // the two-source packer never did, and the hardware follows the two-source
+  // packer.
+  const std::uint32_t sign = (a >> 31) & 1u;
+  const std::uint32_t exp = (a >> 23) & 0xffu;
+  if (exp == 0xffu) {
+    return (sign << 15) | 0x7c00u | (((a & 0x7fffffu) >> 13) & 0x3ffu);
+  }
+  // [HW 2026-08-24] finite magnitudes beyond the largest finite half
+  // (0x7bff / 0xfbff) clamp instead of overflowing to inf.
   const std::uint32_t mag = a & 0x7fffffffu;
   if (mag > 0x477fe000u) {
     return 0x7bffu | (a & 0x80000000u);
