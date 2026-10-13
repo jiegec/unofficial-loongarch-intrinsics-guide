@@ -1485,16 +1485,29 @@ std::uint32_t oracle_cubema(std::uint32_t s0, std::uint32_t s1,
   float s, t, r;
   if (uint32_t nan = cube_ftz3(s0, s1, s2, s, t, r)) return nan;
   float as = std::fabs(s), at = std::fabs(t), ar = std::fabs(r);
-  float dom;
+  // [HW 2026-10-13] the dominant axis is chosen on the flushed magnitudes but
+  // the value doubled is the raw one.  (0, 1, 0x7fffff) flushes to three zeros,
+  // so z wins the tie, and the hardware doubles the denormal itself to
+  // 0x00fffffe - not the flushed zero the earlier note assumed.
+  int dom;
   if (ar >= at && ar >= as)
-    dom = r;
+    dom = 2;
   else if (at >= as)
-    dom = t;
+    dom = 1;
   else
-    dom = s;
-  float out = 2.0f * dom;
+    dom = 0;
+  const std::uint32_t raw[3] = {s0, s1, s2};
+  float d;
+  std::memcpy(&d, &raw[dom], 4);
+  float out = 2.0f * d;
   std::uint32_t u;
   std::memcpy(&u, &out, 4);
+  // [HW 2026-10-13] the result is flushed if it lands in the denormal range:
+  // 2 * 0x1 (= 0x2) becomes zero, while 2 * 0x7fffff is 0x00fffffe, a normal
+  // number, and survives.  That pair is what separates this from the inputs
+  // being flushed, which the earlier note assumed.
+  if ((u & 0x7f800000u) == 0u && (u & 0x007fffffu) != 0u)
+    u &= 0x80000000u;
   return u;
 }
 std::uint32_t oracle_cubeface(std::uint32_t s0, std::uint32_t s1,
