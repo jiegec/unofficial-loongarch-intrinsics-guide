@@ -1152,13 +1152,34 @@ std::uint32_t oracle_cmp_ngt_f64(std::uint64_t a, std::uint64_t b,
 }
 std::uint32_t oracle_cmp_nge_f64(std::uint64_t a, std::uint64_t b,
                       const FpPolicy&) {
-  (void)b;
-  return lg_f64_is_nan(a) ? 0xffffu : 0u;
+  // [HW 2026-10-13] widened 324-cell sweep.  Two forms score zero here - the full f64
+  // for a and its high half shifted up - and the one the cases choose is settled by the
+  // row result, as it was for nlt and ngt, which chose differently from each other.
+  const auto daz = [](std::uint64_t v) {
+    return ((v & 0x7ff0000000000000ull) == 0ull &&
+            (v & 0x000fffffffffffffull) != 0ull)
+               ? (v & 0x8000000000000000ull)
+               : v;
+  };
+  const std::uint64_t x = daz(a);
+  const std::uint64_t y = daz((b & 0xffffffffu) << 32);
+  const CmpOrder o = cmp_f64_bits(x, y);
+  return (o == CmpOrder::Less || o == CmpOrder::Unordered) ? 0xffffu : 0u;
 }
 std::uint32_t oracle_cmp_nlg_f64(std::uint64_t a, std::uint64_t b,
                       const FpPolicy&) {
-  (void)b;
-  return (lg_f64_is_zero(a) || lg_f64_is_nan(a)) ? 0xffffu : 0u;
+  // [HW 2026-10-13] widened 324-cell sweep: unlike nge, only the high-half reading scores
+  // zero here - the full f64 for a misses one cell - so this row takes the shifted form.
+  const auto daz = [](std::uint64_t v) {
+    return ((v & 0x7ff0000000000000ull) == 0ull &&
+            (v & 0x000fffffffffffffull) != 0ull)
+               ? (v & 0x8000000000000000ull)
+               : v;
+  };
+  const std::uint64_t x = daz(a);  // the cases pick the full value here
+  const std::uint64_t y = daz((b & 0xffffffffu) << 32);
+  const CmpOrder o = cmp_f64_bits(x, y);
+  return (o == CmpOrder::Equal || o == CmpOrder::Unordered) ? 0xffffu : 0u;
 }
 std::uint32_t oracle_cmp_o_f64(std::uint64_t a, std::uint64_t b,
                       const FpPolicy&) {
