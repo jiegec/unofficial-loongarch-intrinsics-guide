@@ -79,6 +79,26 @@ def main() -> int:
             print('UNCLASSIFIED  %s is neither a gate nor named in the taxonomy'
                   % p.name)
             bad += 1
+    # Axis 1 coverage: every memory family the emitter builds must head a row of that table.
+    emitter = (HERE / "gpu" / "envelope.cpp").read_text(encoding="utf-8", errors="replace")
+    families = {"flat": "flat", "buff": "buffer", "sm": "shared memory", "tex": "texture"}
+    built = sorted(fam for fam in families if ("build_cs_bench_" + fam) in emitter)
+    axis = (HERE / "gpu" / "README.md").read_text(encoding="utf-8")
+    head = axis.find("Launch and memory path vs loongvk")
+    cells = []
+    if head >= 0:
+        body = axis[axis.index(chr(10), head) + 1:]
+        for ln in body.splitlines():
+            if ln.startswith("#"):
+                break
+            if ln.startswith("|"):
+                cells.append(ln.split("|")[1].strip().lower())
+    for fam in built:
+        want = families[fam]
+        if not any((want in c) or (fam == "sm" and "lds" in c) for c in cells):
+            print("UNCOVERED  the emitter builds %s forms and no Axis 1 row heads %s"
+                  % (fam, want))
+            bad += 1
     if bad:
         return 1
     print("gate check: %d suite scripts, %d named as reports, the rest can fail and are all broken by a case"

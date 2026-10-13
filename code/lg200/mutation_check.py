@@ -25,7 +25,7 @@ so it could not fail on an over-claim, which is the defect it exists to find.
 
 THE ELEVEN GATES, ACCOUNTED FOR (2026-10-13):
 
-  proven in this tool (23): set_desc, check_doc_numbers, header_sync, check_gpu,
+  proven in this tool (24): set_desc, check_doc_numbers, header_sync, check_gpu,
                             run_cases, format_audit, bench_doc_check,
                             rule_dupe_check, md_table_check, check_all.sh,
                             fp_mode_audit, case_provenance, addr_scan, gate_check,
@@ -195,6 +195,14 @@ def mutate_addr_scan(text):
     """Force a hit, which tests the exit code rather than the detection."""
     return text.replace('total += len(hits)', 'total += len(hits) + 1', 1)
 
+def mutate_axis_row(text):
+    '''Rename the Axis 1 shared-memory row, which must leave that family uncovered.'''
+    # Assembled from two pieces, and aimed at the Axis 1 row rather than the families
+    # table, which carries the same words - renaming the wrong one is how the first
+    # attempt at this rule looked broken when it was working.
+    old = '| ' + 'workgroup shared memory | the kernel descriptor'
+    return text.replace(old, '| ' + 'workgroup memory | the kernel descriptor', 1)
+
 def mutate_gate_file(text):
     """Take a gate's failure path away, so gate_check should report it."""
     return text.replace('return 1', 'return 0', 1)
@@ -318,7 +326,9 @@ CASES = [
     ("link_check.py build env", "docs/gpu/appendix/verification.md", mutate_build_env,
      "python3 code/lg200/link_check.py"),
     ("link_check.py citation", "code/lg200/gpu/README.md", mutate_citation,
-     "python3 code/lg200/link_check.py"),]
+     "python3 code/lg200/link_check.py"),
+    ("gate_check.py axis 1", "code/lg200/gpu/README.md", mutate_axis_row,
+     "python3 code/lg200/gate_check.py"),]
 
 
 # A run killed by a timeout used to leave its mutation in place, and the next run then read the
