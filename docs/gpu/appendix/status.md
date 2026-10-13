@@ -162,7 +162,9 @@ hardware plan.
 
 `code/lg200/gpu/audit.py` reads the runner's own listings, not the source, so it audits
 the programs that were actually assembled.  Over a freshly regenerated corpus
-(`run_gpu.py --dry`, host only, 768 PASS / **85,645** rows in 23.4 s) it reports **768
+(`run_gpu.py --dry`, host only, 768 PASS / **85,897** rows in **54 s**; two runs, 53.7
+and 56.6, on 2026-10-13, replacing an earlier 23.4 s measurement taken before the 252
+rounding-mode cases were added) it reports **768
 programs audited, 0 refused, 0 problems**.
 
 Two properties are worth recording, because they are why the number means something.

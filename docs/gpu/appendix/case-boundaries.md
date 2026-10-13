@@ -197,8 +197,10 @@ value.  What `mod2` means when it is NOT zero remains a hardware item.
 
 The policy TOKENS are a third thing, and they are measured rather than assumed
 (`code/lg200/fp_mode_audit.py`, 2026-10-13): of the 173 rows with `CASE_FP` vectors,
-`rtne` appears in all 173, `ftz` in 92, `daz` in 91, `rtz` in 1 and `rtup` in 1, with
-`rtdn` absent - so 172 rows have no non-default rounding case and 81 no flush case.
+`rtne` appears in all 173, `ftz` in 92, `daz` in 91, `rtz` in 28, `rtup` in 28 and
+`rtdn` in 28 - the rounding-sensitive arithmetic rows, whose `rtne` cases were mirrored
+under the other three modes on 2026-10-13, before which `rtz` and `rtup` appeared on one
+row and `rtdn` on none - so 145 rows have no non-default rounding case and 81 no flush case.
 
 Those missing tokens are deliberately **not** counted as gaps, and the reason is a
 carrier boundary rather than an oversight: the PS carrier runs a fixed floating-point

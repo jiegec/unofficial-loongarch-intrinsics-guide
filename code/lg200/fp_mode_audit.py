@@ -4,7 +4,8 @@
 Phase 4 asks for the rounding and flush modes as well as the boundary values.  This
 reports what the cases actually carry:
 
-  2026-10-13: rtne 173 of 173, ftz 92, daz 91, rtz 1, rtup 1, rtdn 0.
+  2026-10-13: rtne 173 of 173, ftz 92, daz 91, rtz 28, rtup 28, rtdn 28 - the last
+  three raised from 1, 1 and 0 by mirroring the rounding-sensitive rows' rtne cases.
 
 Those missing tokens are deliberately NOT reported as gaps, and the reason is a carrier
 limitation rather than an oversight: the PS carrier runs a fixed floating-point default
@@ -49,6 +50,7 @@ def check_page(per, counts) -> int:
         (r"`daz` in [0-9]+", "daz", counts["daz"]),
         (r"`rtz` in [0-9]+", "rtz", counts["rtz"]),
         (r"`rtup` in [0-9]+", "rtup", counts["rtup"]),
+        (r"`rtdn` in [0-9]+", "rtdn", counts["rtdn"]),
         (r"so [0-9]+ rows have no non-default rounding case", "without-rounding", no_round),
         (r"and [0-9]+ no flush case", "without-flush", no_flush),
     ]
@@ -63,10 +65,9 @@ def check_page(per, counts) -> int:
         if said != actual:
             print("DRIFT    %s: page says %d, the cases carry %d" % (name, said, actual))
             bad += 1
-    if counts["rtdn"]:
-        print("DRIFT    rtdn appears on %d rows, and the page says it is absent"
-              % counts["rtdn"])
-        bad += 1
+    # rtdn used to be absent, and this check used to require that.  The rounding-sensitive
+    # rows carry it now, so it is an ordinary figure checked against the page above rather
+    # than a claim that can only hold while nothing changes.
     if bad:
         return 1
     print("fp mode audit: %d rows, every page figure agrees" % rows)

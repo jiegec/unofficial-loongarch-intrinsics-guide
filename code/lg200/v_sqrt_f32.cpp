@@ -14,7 +14,7 @@ CASE_FP(perfect, rtne, 0x40800000, 0x40000000)
 // divergence is the recorded hardware approximation. rtup rounds to the same
 // 0x3fb504f4 as the hardware.
 CASE_FP(two, rtne, 0x40000000, 0x3fb504f3)
-CASE_FP(zero, rtne, 0x0, 0x0)
+CASE_FP(zero, rtne, 0x0, 0x00000000)
 CASE_FP(negative-zero, rtne, 0x80000000, 0x80000000)
 CASE_FP(negative, rtne, 0xc0800000, 0xffc00014)  // [HW] fixed neg-NaN
 CASE_FP(subnormal, rtne, 0x800000, 0x20000000)
@@ -30,4 +30,13 @@ CASE_FP(nan-signal-pos, rtne, 0x7f800001, 0x7f800001)
 CASE_FP(nan-signal-neg, rtne, 0xff800001, 0xff800001)
 CASE_FP(finite-max-pos, rtne, 0x7f7fffff, 0x5f7fffff)
 CASE_FP(finite-max-neg, rtne, 0xff7fffff, 0xffc00014)
+CASE_FP(perfect, rtz, 0x40800000, 0x40000000)
+CASE_FP(perfect, rtup, 0x40800000, 0x40000000)
+CASE_FP(perfect, rtdn, 0x40800000, 0x40000000)
+CASE_FP(two, rtz, 0x40000000, 0x3fb504f3)
+CASE_FP(two, rtup, 0x40000000, 0x3fb504f4)
+CASE_FP(two, rtdn, 0x40000000, 0x3fb504f3)
+CASE_FP(zero, rtz, 0x0, 0x00000000)
+CASE_FP(zero, rtup, 0x0, 0x00000000)
+CASE_FP(zero, rtdn, 0x0, 0x00000000)
 LG200_CASE_END
