@@ -1145,7 +1145,12 @@ std::uint32_t oracle_cmp_ngt_f64(std::uint64_t a, std::uint64_t b,
                ? (v & 0x8000000000000000ull)
                : v;
   };
-  const std::uint64_t x = daz(((a >> 32) & 0xffffffffu) << 32);
+  // [HW 2026-10-13] the failing cases settle what the 324-cell grid could not: the
+  // full-f64 readings predict all fifteen of them and the high-half readings miss all
+  // fifteen, so this row takes a whole, as nlt and nlg do.  My grid scorecard said the
+  // opposite; the cases are a direct measurement and the scorecard was a summary, and
+  // the summary was arithmetically wrong.
+  const std::uint64_t x = daz(a);
   const std::uint64_t y = daz((b & 0xffffffffu) << 32);
   const CmpOrder o = cmp_f64_bits(x, y);
   return (o == CmpOrder::Greater) ? 0u : 0xffffu;
