@@ -600,11 +600,24 @@ std::uint64_t sf_ldexp64(std::uint64_t a, std::uint32_t exp) {
   // 2^32 in the low dword) flushes to signed zero.
   if (target == -1022 && d.mant < 0x100000000ull)
     return d.sign ? kS64 : 0;
-  // [HW 2026-08-25] a nonzero denormal input with any nonzero shift
-  // (e == 1 observed: target == -1021) also flushes to signed zero;
-  // only e == 0 keeps the value (handled above).
-  if ((a & 0x7ff0000000000000ull) == 0ull && d.mant != 0)
-    return d.sign ? kS64 : 0;
+  // [HW 2026-10-13] a denormal input cannot use the exponent arithmetic above: its
+  // d.exp is the constant -1022, so a small significand would be composed as if it
+  // were a normal number.  Measured over ten points plus the row's twenty-four
+  // denormal-input cases: scale the INTEGER significand instead, and keep the result
+  // only if the scaled leading bit reaches 52.  ldexp(0x000fffffffffffffff, 1) gives
+  // 0x001ffffffffffffffe that way, while e = 0 and every smaller significand flush.
+  if ((a & 0x7ff0000000000000ull) == 0ull && d.mant != 0) {
+    if (exp <= 0 || exp > 62)
+      return d.sign ? kS64 : 0;
+    const std::uint64_t v = d.mant << exp;
+    int lead = 63;
+    while (lead >= 0 && ((v >> lead) & 1ull) == 0ull)
+      --lead;
+    if (lead < 52)
+      return d.sign ? kS64 : 0;
+    const std::uint64_t biased = static_cast<std::uint64_t>(lead - 52 + 1);
+    return (d.sign ? kS64 : 0) | (biased << 52) | (v & 0x000fffffffffffffull);
+  }
   return compose64(d.sign, static_cast<int>(target), d.mant);
 }
 // [HW 2026-10-13] the same rule for binary64: quieted, signaling first, then the
