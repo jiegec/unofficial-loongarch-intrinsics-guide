@@ -123,10 +123,30 @@ def main() -> int:
             print("UNBUILDABLE  %s says to build the runner without PKG_CONFIG_PATH"
                   % page.relative_to(ROOT))
             bad += 1
+
+    # Citations that point into the LCO checkout have to resolve too, and one was not until
+    # it was given its path.  Checked only when that checkout is present, like the other
+    # cross-repo gates, because a fresh clone of this repository will not have it.
+    lco = pathlib.Path("/home/lin/work/src/loonggpu")
+    cross = 0
+    if lco.is_dir():
+        for page in pages():
+            text = page.read_text(encoding="utf-8", errors="replace")
+            for m in re.finditer(r"`([A-Za-z0-9_./-]+[.](?:h|c|cpp|py|md|xml|json))`", text):
+                ref = m.group(1)
+                if not ref.startswith(("analysis/", "src/mesa", "docs/mesa", "loongvk", "loonggpu")):
+                    continue
+                cross += 1
+                if (not (lco / ref).exists()
+                        and not list(lco.rglob(pathlib.PurePath(ref).name))):
+                    print("DEAD CITATION  %s -> %s" % (page.relative_to(ROOT), ref))
+                    bad += 1
+    else:
+        print("no LCO checkout; cross-repo citations are not checked")
     if bad:
         return 1
-    print("links: %d, commands: %d (%d flags), every one resolving"
-          % (seen, cmds, flag_n))
+    print("links: %d, commands: %d (%d flags), %d cross-repo citations, all resolving"
+          % (seen, cmds, flag_n, cross))
     return 0
 
 
