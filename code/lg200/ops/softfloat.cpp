@@ -422,6 +422,13 @@ std::uint32_t sf_max3(std::uint32_t a, std::uint32_t b, std::uint32_t c, FpPolic
   return ftz32(r);
 }
 std::uint32_t sf_med3(std::uint32_t a, std::uint32_t b, std::uint32_t c, FpPolicy) {
+  // [HW 2026-10-13] from a controlled probe of fifteen NaN triples: the row follows the
+  // shared rule exactly - a NaN is quieted, a signaling one outranks a quiet one wherever
+  // it sits, and among the same kind the caller's order decides.  q1+s2 returns s2 and
+  // s2+q1 returns s2, so position does not matter for signaling; q1+q2 returns q1 and
+  // q2+q1 returns q2, so it does among quiet ones.  The minmax chain below has no NaN
+  // branch at all, which left the oracle unquieted and the cases stale with it.
+  if (const std::uint32_t n = sf_nan3(a, b, c)) return n;
   const std::uint32_t lo = minmax(a, b, true);
   const std::uint32_t hi = minmax(a, b, false);
   return minmax(minmax(c, lo, false), hi, true);
