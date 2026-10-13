@@ -97,7 +97,7 @@ inline u32 cmp_ne_u32(u32 a, u32 b) { return lgpu::test::oracle_cmp_ne_u32(a, b)
 inline u32 cmp_ne_u64(u64 a, u64 b, const lgpu::test::FpPolicy& policy) { return lgpu::test::oracle_cmp_ne_u64(a, b, policy); }
 inline u32 cmp_neq_f16(u32 a, u32 b, const lgpu::test::FpPolicy& p) { return lgpu::test::oracle_cmp_neq_f16(daz_f16(a, p), daz_f16(b, p)); }
 inline u32 cmp_neq_f32(u32 a, u32 b, const lgpu::test::FpPolicy& p) { return lgpu::test::oracle_cmp_neq_f32(daz_f32(a, p), daz_f32(b, p)); }
-inline u32 cmp_neq_f64(u64 a, u64 b, const lgpu::test::FpPolicy& policy) { return lgpu::test::oracle_cmp_neq_f64(daz_f64(a, policy), daz_f64(b, policy), policy); }
+inline u32 cmp_neq_f64(u64 a, u64 b, const lgpu::test::FpPolicy& policy) { return lgpu::test::oracle_cmp_neq_f64(a, b, policy); }  // the row flushes the LOW HALF of b, not the f64 operands.
 inline u32 cmp_neq_i16(u32 a, u32 b) { return lgpu::test::oracle_cmp_neq_i16(a, b); }
 inline u32 cmp_neq_i32(u32 a, u32 b) { return lgpu::test::oracle_cmp_neq_i32(a, b); }
 inline u32 cmp_neq_i64(u64 a, u64 b, const lgpu::test::FpPolicy& policy) { return lgpu::test::oracle_cmp_neq_i64(a, b, policy); }

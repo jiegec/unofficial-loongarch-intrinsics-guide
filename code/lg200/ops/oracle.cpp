@@ -1055,8 +1055,20 @@ std::uint32_t oracle_cmp_lt_u64(std::uint64_t a, std::uint64_t b,
   return a < b ? 0xffffu : 0u;}
 std::uint32_t oracle_cmp_neq_f64(std::uint64_t a, std::uint64_t b,
                       const FpPolicy&) {
-  // This predicate has the same result as nle.
-  return (lg_f64_is_zero(a) && b == 0x3ff0000000000000ull) ? 0u : 0xffffu;
+  // [HW 2026-10-13] from the 144-point two-dimensional sweep.  This row compares the
+  // HIGH half of a with the LOW half of b, as f32 values, flushing a denormal b half
+  // first: ne_f32(a_hi, daz32(b_lo)) matches all 144 cells.  It is not nle - the two
+  // rows differ on the a = -1.0 row - which is what the documentation means by each
+  // compare row being its own encoding.  The earlier form encoded one recorded case.
+  std::uint32_t x = static_cast<std::uint32_t>(a >> 32);
+  if ((x & 0x7f800000u) == 0u && (x & 0x007fffffu) != 0u) {
+    x &= 0x80000000u;  // and a denormal high half of a is flushed too
+  }
+  std::uint32_t y = static_cast<std::uint32_t>(b & 0xffffffffu);
+  if ((y & 0x7f800000u) == 0u && (y & 0x007fffffu) != 0u) {
+    y &= 0x80000000u;  // a denormal low half is flushed
+  }
+  return cmp_pred_u32(cmp_f32_bits(x, y), CmpPred::NEQ);
 }
 std::uint32_t oracle_cmp_neq_i64(std::uint64_t a, std::uint64_t b,
                       const FpPolicy&) {
