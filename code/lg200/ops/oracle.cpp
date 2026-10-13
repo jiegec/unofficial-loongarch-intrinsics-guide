@@ -1105,7 +1105,11 @@ std::uint32_t oracle_cmp_nlt_f64(std::uint64_t a, std::uint64_t b,
                ? (v & 0x8000000000000000ull)
                : v;
   };
-  const std::uint64_t x = daz(((a >> 32) & 0xffffffffu) << 32);
+  // [HW 2026-10-13] a is the FULL f64, not its high half shifted up.  Three forms
+  // score zero on the 324-cell grid and differ only outside it: a = 0x1 0xfff00000 has
+  // a low half of 0x1, so the full value is a NaN while the shifted high half alone is
+  // -infinity.  The hardware answers true there, which only the full value predicts.
+  const std::uint64_t x = daz(a);
   const std::uint64_t y = daz((b & 0xffffffffu) << 32);
   const CmpOrder o = cmp_f64_bits(x, y);
   return (o == CmpOrder::Less) ? 0u : 0xffffu;
