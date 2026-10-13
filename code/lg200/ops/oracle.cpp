@@ -1060,10 +1060,21 @@ std::uint32_t oracle_cmp_neq_f64(std::uint64_t a, std::uint64_t b,
   // first: ne_f32(a_hi, daz32(b_lo)) matches all 144 cells.  It is not nle - the two
   // rows differ on the a = -1.0 row - which is what the documentation means by each
   // compare row being its own encoding.  The earlier form encoded one recorded case.
-  std::uint32_t x = static_cast<std::uint32_t>(a >> 32);
-  if ((x & 0x7f800000u) == 0u && (x & 0x007fffffu) != 0u) {
-    x &= 0x80000000u;  // and a denormal high half of a is flushed too
+  // [HW 2026-10-13] a is NOT flushed: the widened grid's hismallnorm row, whose high
+  // half is 0x00100000 - the smallest normal f32 - is all true, and finite-min-pos
+  // asks the same question.  An earlier version flushed it and produced 32 failures.
+  // [HW 2026-10-13] the flush follows the f64, and it is NOT policy-gated: a
+  // denormal f64 is flushed even under a bare rtne token, as the min/max rows are.
+  // 0x0 0x1 is a denormal f64 (flushed) while 0x0 0x00100000 is a normal f64 - though
+  // a denormal f32 - and is not, which is the whole difference between the two.
+  if ((a & 0x7ff0000000000000ull) == 0ull &&
+      (a & 0x000fffffffffffffull) != 0ull) {
+    a &= 0x8000000000000000ull;
   }
+  // b is NOT flushed at the f64 level: b = 0xffffffff 0x000fffff is a denormal
+  // f64 whose low half is a NaN, and the hardware answers true there.  The b side
+  // is handled by daz32 on the low half alone, below.
+  const std::uint32_t x = static_cast<std::uint32_t>(a >> 32);
   std::uint32_t y = static_cast<std::uint32_t>(b & 0xffffffffu);
   if ((y & 0x7f800000u) == 0u && (y & 0x007fffffu) != 0u) {
     y &= 0x80000000u;  // a denormal low half is flushed

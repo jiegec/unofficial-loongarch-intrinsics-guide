@@ -38,6 +38,15 @@ CLASSES64 = {
     "pinf": "0x0 0x7ff00000", "ninf": "0x0 0xfff00000",
     "pmax": "0xffffffff 0x7fefffff", "nmax": "0xffffffff 0xffefffff",
     "pqnan": "0x0 0x7ff80000", "nqnan": "0x0 0xfff80000",
+    # [HW 2026-10-13] the first grid gave every class a zero or a large half, so a
+    # rule that flushed only denormal halves fitted all 144 cells and still failed on
+    # finite-min-pos, whose high half is 0x00100000 - the smallest NORMAL f32.  These
+    # half-fill each side: small normals and denormals in either half.
+    # Names carry no underscore: the result regex splits a "FAIL a_b:" line on the
+    # single underscore, so a class name containing one is silently unparsed.
+    "hismallnorm": "0x0 0x00100000", "hismallden": "0x0 0x1",
+    "losmallnorm": "0x00800000 0x0", "losmallden": "0x1 0x0",
+    "hitwo": "0x0 0x40000000", "bothone": "0x3f800000 0x3f800000",
 }
 CLASSES32 = {
     "p0": "0x0", "n0": "0x80000000",
