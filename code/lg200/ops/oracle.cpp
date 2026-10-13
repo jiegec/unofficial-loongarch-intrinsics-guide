@@ -1977,21 +1977,44 @@ std::uint32_t oracle_pack_u8_f32(std::uint32_t a, std::uint32_t b, std::uint32_t
   return (c & ~mask) | (u8 << shift);
 }
 std::uint32_t oracle_frexp_mant_f32(std::uint32_t a) {
+  // [HW 2026-10-13] two branches the C library gets wrong for this row.  A denormal
+  // operand is flushed to signed zero - 0x1 gives 0x00000000 and 0x80000001 gives
+  // 0x80000000, where frexp would normalise them to 0.5 and -0.5.  And a signaling NaN
+  // comes back UNQUIETED, 0x7f800001, where the library sets the quiet bit.
+  if ((a & 0x7f800000u) == 0u)
+    return a & 0x80000000u;
+  if ((a & 0x7f800000u) == 0x7f800000u && (a & 0x007fffffu) != 0u)
+    return a;
   int e = 0;
   const float m = std::frexp(f32_bits(a), &e);
   return bits_f32(m);
 }
 std::uint32_t oracle_frexp_exp_i32_f32(std::uint32_t a) {
+  // [HW 2026-10-13] a denormal operand returns 0, the same flush its mantissa sibling
+  // applies: 0x1 would otherwise report an exponent of -148.
+  if ((a & 0x7f800000u) == 0u)
+    return 0u;
   int e = 0;
   std::frexp(f32_bits(a), &e);
   return static_cast<std::uint32_t>(e);
 }
 std::uint64_t oracle_frexp_mant_f64(std::uint64_t a) {
+  // [HW 2026-10-13] the same two branches as the f32 row: a denormal operand flushes to
+  // signed zero, and a signaling NaN comes back unquieted rather than normalised by the
+  // C library.
+  if ((a & 0x7ff0000000000000ull) == 0ull)
+    return a & 0x8000000000000000ull;
+  if ((a & 0x7ff0000000000000ull) == 0x7ff0000000000000ull &&
+      (a & 0x000fffffffffffffull) != 0ull)
+    return a;
   int e = 0;
   const double m = std::frexp(f64_bits(a), &e);
   return bits_f64(m);
 }
 std::uint32_t oracle_frexp_exp_i32_f64(std::uint64_t a) {
+  // [HW 2026-10-13] a denormal operand returns 0, as in the f32 row.
+  if ((a & 0x7ff0000000000000ull) == 0ull)
+    return 0u;
   int e = 0;
   std::frexp(f64_bits(a), &e);
   return static_cast<std::uint32_t>(e);
