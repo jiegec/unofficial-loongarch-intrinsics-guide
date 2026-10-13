@@ -1093,8 +1093,22 @@ std::uint32_t oracle_cmp_lg_f64(std::uint64_t a, std::uint64_t b,
   return cmp_pred_u32(cmp_f64_bits(a, b), CmpPred::LG);}
 std::uint32_t oracle_cmp_nlt_f64(std::uint64_t a, std::uint64_t b,
                       const FpPolicy&) {
-  (void)a; (void)b;
-  return 0xffffu;
+  // [HW 2026-10-13] from the widened 324-cell sweep.  The operands are built by
+  // shifting a_hi and b_lo into the HIGH half of an f64 with a zero low half, daz-ed
+  // at the f64 level, and the row applies nlt with ordinary NaN semantics.  Zero
+  // mismatches: nlt is false only for Less, and true for Equal, Greater and Unordered.
+  // The half-width reading misses 32 cells, all of them rows whose a_hi is a signaling
+  // pattern - 0xfff00000 - which is -infinity once shifted, not a NaN.
+  const auto daz = [](std::uint64_t v) {
+    return ((v & 0x7ff0000000000000ull) == 0ull &&
+            (v & 0x000fffffffffffffull) != 0ull)
+               ? (v & 0x8000000000000000ull)
+               : v;
+  };
+  const std::uint64_t x = daz(((a >> 32) & 0xffffffffu) << 32);
+  const std::uint64_t y = daz((b & 0xffffffffu) << 32);
+  const CmpOrder o = cmp_f64_bits(x, y);
+  return (o == CmpOrder::Less) ? 0u : 0xffffu;
 }
 std::uint32_t oracle_cmp_nle_f64(std::uint64_t a, std::uint64_t b,
                       const FpPolicy&) {
