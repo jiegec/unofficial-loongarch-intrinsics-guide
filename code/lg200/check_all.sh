@@ -24,7 +24,10 @@ set -eo pipefail
 # The mutation tool rewrites tracked files for the length of each case, so a suite run beside it
 # reads deliberately broken files and reports them as failures.  That is not hypothetical: the
 # two were started together and the suite failed at step one.  The lock is the fix.
-if [ -e /tmp/lg200-mutation.lock ]; then
+# The mutation tool holds the lock for its whole run, and one of its cases runs this
+# suite as its check - so that case would only ever see the refusal, which is exactly
+# what happened: it reported fault exit=1 and proved nothing from then on.
+if [ -e /tmp/lg200-mutation.lock ] && [ -z "$LG200_MUTATION_NESTED" ]; then
   echo "a mutation run holds /tmp/lg200-mutation.lock; refusing to read mutated files"
   exit 1
 fi

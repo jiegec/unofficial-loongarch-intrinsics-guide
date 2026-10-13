@@ -305,7 +305,7 @@ CASES = [
     ("md_table_check.py", "docs/gpu/appendix/status.md", mutate_table,
      "cd code/lg200 && python3 md_table_check.py"),
     ("check_all.sh", "code/lg200/check_all.sh", mutate_suite,
-     "sh code/lg200/check_all.sh"),
+     "LG200_MUTATION_NESTED=1 sh code/lg200/check_all.sh"),
     ("fp_mode_audit.py", "docs/gpu/appendix/case-boundaries.md", mutate_fp_mode,
      "cd code/lg200 && python3 fp_mode_audit.py --check"),
     ("case_provenance.py", "docs/gpu/appendix/status.md", mutate_provenance,
