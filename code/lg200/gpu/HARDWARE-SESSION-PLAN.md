@@ -24,6 +24,12 @@ diverts control, and it must not be treated like the others.
    the device state checked before and after.
 2. No blind retry.  A row that faults is recorded and skipped, not re-submitted.
 3. Every row gets a timeout; a timeout is a fault for scheduling purposes.
+4. **Never pack more than a few dozen cases into one process.**  A 1102-case batch
+   and then a 144-case batch both drew `program or result window exceeds the
+   persistent cache size`.  After the second, the device was parked and even the
+   one-case smoke test failed.  That message is a device-level warning, not a
+   per-batch rejection: stop and re-run the preconditions, do not split the batch
+   and retry.  That misreading is what wedged the device on 2026-10-13.
 
 ## 1. Preconditions before any submission
 
