@@ -292,7 +292,7 @@ std::uint32_t sf_sub32(std::uint32_t a, std::uint32_t b, FpPolicy policy) {
   return policy.ftz ? flush32(r) : r;
 }
 std::uint32_t sf_revsub32(std::uint32_t a, std::uint32_t b, FpPolicy policy) {
-  if (const std::uint32_t n = sf_nan3(a, b, 0u)) return n;  // operand NaN wins
+  if (const std::uint32_t n = sf_nan3(b, a, 0u)) return n;  // operand NaN wins
   if (policy.daz) { a = flush32(a); b = flush32(b); }
   set_round(policy);
   std::uint32_t r = bk32(f32_sub(mk32(b), mk32(a)));
