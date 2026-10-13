@@ -346,8 +346,13 @@ std::uint32_t sf_max32(std::uint32_t a, std::uint32_t b, FpPolicy) {
 // hardware, and (qNaN, sNaN, 0) takes the sNaN.  The minmax helper below
 // returns whichever NaN it meets first, unquieted, which is what made these rows
 // disagree.
-static std::uint32_t nan_rule3(std::uint32_t a, std::uint32_t b,
-                               std::uint32_t c) {
+// [HW 2026-10-13] The NaN rule, in one place.  A NaN is quieted, and a signaling
+// NaN outranks a quiet one wherever it sits; among NaNs of the same kind the
+// caller's operand order decides.  Measured: (0, 0x7f800001, 0) gives
+// 0x7fc00001, (qNaN, sNaN, 0) takes the sNaN, and (qNaN, -qNaN, 0) takes the
+// first.  This was written out four times - in the fma, the cube helper,
+// cubeface and max3/min3 - before being collected here.
+std::uint32_t sf_nan3(std::uint32_t x, std::uint32_t y, std::uint32_t z) {
   const auto v_nan = [](std::uint32_t v) {
     return (v & 0x7f800000u) == 0x7f800000u && (v & 0x007fffffu) != 0u;
   };
@@ -355,20 +360,20 @@ static std::uint32_t nan_rule3(std::uint32_t a, std::uint32_t b,
     return (v & 0x7f800000u) == 0x7f800000u && (v & 0x007fffffu) != 0u &&
            (v & 0x00400000u) == 0u;
   };
-  if (v_snan(a)) return a | 0x00400000u;
-  if (v_snan(b)) return b | 0x00400000u;
-  if (v_snan(c)) return c | 0x00400000u;
-  if (v_nan(a)) return a | 0x00400000u;
-  if (v_nan(b)) return b | 0x00400000u;
-  if (v_nan(c)) return c | 0x00400000u;
+  if (v_snan(x)) return x | 0x00400000u;
+  if (v_snan(y)) return y | 0x00400000u;
+  if (v_snan(z)) return z | 0x00400000u;
+  if (v_nan(x)) return x | 0x00400000u;
+  if (v_nan(y)) return y | 0x00400000u;
+  if (v_nan(z)) return z | 0x00400000u;
   return 0u;
 }
 std::uint32_t sf_min3(std::uint32_t a, std::uint32_t b, std::uint32_t c, FpPolicy) {
-  if (const std::uint32_t n = nan_rule3(a, b, c)) return n;
+  if (const std::uint32_t n = sf_nan3(a, b, c)) return n;
   return minmax(minmax(a, b, true), c, true);
 }
 std::uint32_t sf_max3(std::uint32_t a, std::uint32_t b, std::uint32_t c, FpPolicy) {
-  if (const std::uint32_t n = nan_rule3(a, b, c)) return n;
+  if (const std::uint32_t n = sf_nan3(a, b, c)) return n;
   return minmax(minmax(a, b, false), c, false);
 }
 std::uint32_t sf_med3(std::uint32_t a, std::uint32_t b, std::uint32_t c, FpPolicy) {

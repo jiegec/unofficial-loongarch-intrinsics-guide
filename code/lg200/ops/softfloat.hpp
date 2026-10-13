@@ -23,6 +23,8 @@ std::uint32_t sf_revsub32(std::uint32_t a, std::uint32_t b, FpPolicy policy);
 std::uint32_t sf_mul32(std::uint32_t a, std::uint32_t b, FpPolicy policy);
 std::uint32_t sf_min32(std::uint32_t a, std::uint32_t b, FpPolicy policy);
 std::uint32_t sf_max3(std::uint32_t a, std::uint32_t b, std::uint32_t c, FpPolicy policy);
+// The NaN rule: quieted, signaling first, then the caller order.  Returns 0 if none.
+std::uint32_t sf_nan3(std::uint32_t x, std::uint32_t y, std::uint32_t z);
 std::uint32_t sf_min3(std::uint32_t a, std::uint32_t b, std::uint32_t c, FpPolicy policy);
 std::uint32_t sf_med3(std::uint32_t a, std::uint32_t b, std::uint32_t c, FpPolicy policy);
 std::uint32_t sf_sqrt32(std::uint32_t a, FpPolicy policy);

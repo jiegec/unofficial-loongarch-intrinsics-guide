@@ -1524,21 +1524,7 @@ std::uint32_t oracle_cubeface(std::uint32_t s0, std::uint32_t s1,
   };
   // [HW 2026-08-24] a NaN input propagates as the face result (the
   // selector returns the NaN, quieted like the rest of the cube family).
-  // [HW 2026-10-13] quieted, and a signaling NaN outranks a quiet one, as in the
-  // rest of the cube family.
-  const auto qnan3 = [](std::uint32_t v) {
-    return (v & 0x7f800000u) == 0x7f800000u && (v & 0x007fffffu) != 0u;
-  };
-  const auto snan3 = [](std::uint32_t v) {
-    return (v & 0x7f800000u) == 0x7f800000u &&
-           (v & 0x007fffffu) != 0u && (v & 0x00400000u) == 0u;
-  };
-  for (const std::uint32_t v : {s0, s1, s2}) {
-    if (snan3(v)) return v | 0x00400000u;
-  }
-  for (const std::uint32_t v : {s0, s1, s2}) {
-    if (qnan3(v)) return v | 0x00400000u;
-  }
+  if (const std::uint32_t n = sf_nan3(s0, s1, s2)) return n;
   s0 = ftz(s0);
   s1 = ftz(s1);
   s2 = ftz(s2);
@@ -1575,22 +1561,7 @@ std::uint32_t cube_ftz3(std::uint32_t a, std::uint32_t b, std::uint32_t c,
   auto ftz = [](uint32_t v) -> uint32_t {
     return (v & 0x7f800000u) == 0u ? (v & 0x80000000u) : v;
   };
-  // [HW 2026-10-13] a NaN is quieted on the way out, and a signaling one outranks
-  // a quiet one wherever it sits - (qNaN, sNaN, 0) gives the b operand, as it does
-  // for the fma family.  Among NaNs of one kind it is operand order.
-  const auto qnan = [](std::uint32_t v) {
-    return (v & 0x7f800000u) == 0x7f800000u && (v & 0x007fffffu) != 0u;
-  };
-  const auto snan = [](std::uint32_t v) {
-    return (v & 0x7f800000u) == 0x7f800000u &&
-           (v & 0x007fffffu) != 0u && (v & 0x00400000u) == 0u;
-  };
-  for (const std::uint32_t v : {a, b, c}) {
-    if (snan(v)) return v | 0x00400000u;
-  }
-  for (const std::uint32_t v : {a, b, c}) {
-    if (qnan(v)) return v | 0x00400000u;
-  }
+  if (const std::uint32_t n = sf_nan3(a, b, c)) return n;
   a = ftz(a); b = ftz(b); c = ftz(c);
   std::memcpy(&s, &a, 4); std::memcpy(&t, &b, 4); std::memcpy(&r, &c, 4);
   return 0;
@@ -2084,34 +2055,13 @@ std::uint32_t sf_fma32(std::uint32_t a, std::uint32_t b, std::uint32_t c,
     const std::uint32_t mag = v & 0x7fffffffu;
     return (mag != 0u && mag < 0x00800000u) ? (v & 0x80000000u) : v;
   };
-  // [HW 2026-10-13] the NaN rule, from twenty-three probes and eight tsv rows.
-  // A signaling NaN outranks a quiet one wherever it sits - (qNaN, sNaN, 0)
-  // gives the b operand, 0x7fc00001, though a comes first.  Among NaNs of the
-  // same kind the addend comes first: (qNaN, 1, -qNaN) and (0, qNaN, -qNaN)
-  // both give the c operand, and only with c quiet does the order fall back to
-  // a then b, which (qNaN,-qNaN,0) and (+qNaN,0,+inf) show.  A NaN the
-  // operation itself makes - inf*0, inf-inf - is the positive canonical
-  // 0x7fc00000 whatever signs produced it.  The old code left all of this to
-  // the host double arithmetic and picked the wrong operand.
-  auto quiet = [](std::uint32_t v) { return v | 0x00400000u; };
-  const auto v_is_nan = [](std::uint32_t v) {
-    return (v & 0x7f800000u) == 0x7f800000u && (v & 0x007fffffu) != 0u;
-  };
-  const auto s_is_nan = [](std::uint32_t v) {
-    return (v & 0x7f800000u) == 0x7f800000u && (v & 0x007fffffu) != 0u &&
-           (v & 0x00400000u) == 0u;
-  };
-  for (const std::uint32_t v : {c, a, b}) {
-    if (s_is_nan(v)) return quiet(v);
-  }
-  for (const std::uint32_t v : {c, a, b}) {
-    if (v_is_nan(v)) return quiet(v);
-  }
+  if (const std::uint32_t n = sf_nan3(c, a, b)) return n;
   const double r = static_cast<double>(f32_bits(in(a))) *
                        static_cast<double>(std::bit_cast<float>(in(b))) +
                    static_cast<double>(std::bit_cast<float>(in(c)));
   const std::uint32_t out = bits_f32(static_cast<float>(r));
-  if (v_is_nan(out)) return 0x7fc00000u;
+  if ((out & 0x7f800000u) == 0x7f800000u && (out & 0x007fffffu) != 0u)
+    return 0x7fc00000u;
   if (p.ftz) {
     const std::uint32_t mag = out & 0x7fffffffu;
     if (mag != 0u && mag < 0x00800000u) return out & 0x80000000u;
