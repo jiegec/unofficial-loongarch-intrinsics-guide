@@ -41,6 +41,8 @@ echo "== format_audit"
 python3 format_audit.py | tail -1
 echo "== rule_dupe_check"
 python3 rule_dupe_check.py
+echo "== case_coverage"
+python3 case_coverage.py | head -1
 echo "== link_check"
 python3 link_check.py | tail -1
 echo "== gen_state_map"

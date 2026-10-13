@@ -25,11 +25,12 @@ so it could not fail on an over-claim, which is the defect it exists to find.
 
 THE ELEVEN GATES, ACCOUNTED FOR (2026-10-13):
 
-  proven in this tool (17): set_desc, check_doc_numbers, header_sync, check_gpu,
+  proven in this tool (18): set_desc, check_doc_numbers, header_sync, check_gpu,
                             run_cases, format_audit, bench_doc_check,
                             rule_dupe_check, md_table_check, check_all.sh,
                             fp_mode_audit, case_provenance, addr_scan, gate_check,
-                            jumpstack_check, gen_state_map, link_check
+                            jumpstack_check, gen_state_map, link_check,
+                            case_coverage
   note: addr_scan has two cases.  One forces a hit and proves the EXIT CODE; the
         other breaks the detector, which the tool's --selftest catches over a
         crafted listing, including the v[14:15] shape a register scan misses.
@@ -232,6 +233,12 @@ def mutate_link(text):
     '''Point a page's link at a file that does not exist.'''
     return text.replace('(isa/family-vector.md)', '(isa/family-vector-renamed.md)', 1)
 
+def mutate_class_space(text):
+    '''Remove a boundary class from a width's table, which must no longer be allowed.'''
+    q = chr(34)
+    old = '    ' + q + 'snan' + q + ': 0x7f800001, ' + q + '-snan' + q + ': 0xff800001,'
+    return text.replace(old, '    ' + q + 'snan' + q + ': 0x7f800001,', 1)
+
 CASES = [
     ("set_desc.py --check", "code/lg200-instructions.tsv", mutate_tsv,
      "cd code/lg200 && python3 set_desc.py --check"),
@@ -270,7 +277,9 @@ CASES = [
     ("gen_state_map.py", "code/lg200/gen_state_map.py", mutate_state_map,
      "python3 code/lg200/gen_state_map.py --check"),
     ("link_check.py", "docs/gpu/index.md", mutate_link,
-     "python3 code/lg200/link_check.py"),]
+     "python3 code/lg200/link_check.py"),
+    ("case_coverage.py", "code/lg200/case_coverage.py", mutate_class_space,
+     "python3 code/lg200/case_coverage.py"),]
 
 
 def main() -> int:

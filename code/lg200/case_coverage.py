@@ -129,7 +129,36 @@ def covered(words, value, bits):
     return False
 
 
+# The class space is the claim that every boundary class is covered, and it was read
+# from the tables below - so weakening a table weakened the requirement with it.
+# Deleting -snan from F32 left the report at 738 of 738 with 0 gaps, because the
+# cases no longer had to contain the class.  The names are pinned here instead.
+REQUIRED_NAMES = (
+    "+0", "+0.5", "+1", "+inf",
+    "-0", "-1", "-inf", "-max_norm",
+    "-min_norm", "-qnan", "-snan", "max_denorm",
+    "max_norm", "min_denorm", "min_norm", "qnan",
+    "snan",
+)
+
+
+def check_class_space():
+    """Does each width still ask for the whole boundary class space?"""
+    problems = []
+    for m in ("v_add_f32", "v_add_f16", "v_add_f64"):
+        # each entry is ("f64:+0", value, width), so compare the bare class name
+        have = {n.split(":", 1)[1] for n, _v, _w in classes_for(m)}
+        lost = [n for n in REQUIRED_NAMES if n not in have]
+        if lost:
+            problems.append("%s asks for %d classes and has lost %s" % (m, len(have), ", ".join(lost)))
+    return problems
+
 def main():
+    lost = check_class_space()
+    for p in lost:
+        print(p)
+    if lost:
+        return 1
     ap = argparse.ArgumentParser()
     ap.add_argument("--tsv")
     args = ap.parse_args()
@@ -209,4 +238,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
