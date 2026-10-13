@@ -50,6 +50,15 @@ cd "$REPO" && python3 code/lg200/fp_mode_audit.py --check | tail -1
 echo "== case_provenance"
 cd "$REPO" && python3 code/lg200/case_provenance.py --check | tail -1
 echo "== gate_check"
+# Field coverage needs a runner listing, which is a device-produced artifact and is
+# not tracked.  With one present this is a gate; without one there is nothing to audit,
+# and saying so is better than passing quietly.
+echo "== audit"
+if ls "$REPO"/code/lg200/gpu/build/gpu-run-logs/*.log >/dev/null 2>&1; then
+  cd "$REPO" && python3 code/lg200/gpu/audit.py | tail -1
+else
+  echo "no runner listing present; the field-coverage audit runs after a session"
+fi
 cd "$REPO" && python3 code/lg200/gate_check.py | tail -1
 echo "== addr_scan"
 cd "$REPO" && python3 code/lg200/gpu/addr_scan.py --selftest | tail -1

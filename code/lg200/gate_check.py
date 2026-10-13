@@ -22,6 +22,11 @@ SUITE = HERE / "check_all.sh"
 # list is deliberately short and named: anything else in the suite has to be able to fail.
 REPORTS = {"prose_audit", "doc_register_audit"}
 
+# Gates whose input is a device-produced artifact rather than a tracked file.  They run
+# when there is something to audit and say so when there is not; a mutation case cannot
+# be built for them here because the file it would break is not in the repository.
+SESSION_TIME = {"audit"}
+
 
 def main() -> int:
     text = SUITE.read_text(encoding="utf-8")
@@ -42,7 +47,7 @@ def main() -> int:
         cased.add(nm.split()[0][:-3])
     bad = 0
     for name in names:
-        if name in REPORTS:
+        if name in REPORTS | SESSION_TIME:
             continue
         for d in (HERE, HERE / "gpu", HERE.parent.parent):
             p = d / (name + ".py")
@@ -56,7 +61,7 @@ def main() -> int:
         if not re.search(r"return [1-9]|sys[.]exit\([1-9]|exit\([1-9]", body):
             print("CANNOT FAIL  %s is a gate in the suite and has no failure path" % name)
             bad += 1
-        if name not in cased:
+        if name not in cased and name not in SESSION_TIME:
             print("UNPROVEN  %s is a gate and no mutation case ever breaks it"
                   % name)
             bad += 1

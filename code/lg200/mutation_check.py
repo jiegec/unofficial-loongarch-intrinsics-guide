@@ -33,6 +33,8 @@ THE ELEVEN GATES, ACCOUNTED FOR (2026-10-13):
         other breaks the detector, which the tool's --selftest catches over a
         crafted listing, including the v[14:15] shape a register scan misses.
   reports by design (2):    prose_audit, doc_register_audit
+  session-time (1):        audit - reads a runner listing, which is not tracked, so it
+                           runs only when one is present and no case can break its input
 
 The last two have no failing mode to prove: prose_audit findings include three expected
 classes of false positive, and doc_register_audit states in its own docstring that it
@@ -142,6 +144,9 @@ def suite_accounting():
     # rule_dupe_check and md_table_check were proven by one-off injection
     # until they joined CASES; the union below no longer needs them named twice.
     accounted |= {"prose_audit", "doc_register_audit"}       # reports by design
+    # Session-time gates read a device-produced artifact that is not tracked, so they
+    # run only when there is something to audit and no case here can break their input.
+    accounted |= {"audit"}
     missing = sorted(ran - accounted)
     extra_names = sorted(accounted - ran)
     bad = 0
