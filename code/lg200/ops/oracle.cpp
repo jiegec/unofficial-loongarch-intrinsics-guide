@@ -2047,9 +2047,15 @@ std::uint32_t sf_fma32(std::uint32_t a, std::uint32_t b, std::uint32_t c,
   // [HW 2026-10-13] the policy reaches the arithmetic here for the first time.
   // v_mac_imm_f32 was fed 0x1 in a rtne|daz|ftz case and returned the denormal,
   // while the hardware returned zero: daz zeroes a denormal input and ftz
-  // flushes a denormal result.  Forty-five sf_ helpers take this policy and
-  // none of them reads it yet - this is one, and the same treatment is owed to
-  // the rest.
+  // flushes a denormal result.
+  //
+  // [corrected 2026-10-13] An earlier version of this comment said forty-five
+  // helpers take the policy and none reads it.  That counted occurrences, which
+  // includes declarations and the by-value spellings.  The measured position: of
+  // the helpers that take an FpPolicy, 12 read it; 7 here (rcp, rsq, sin, cos,
+  // exp2, log2, ldexp) and 14 in softfloat.cpp do not.  Some of those have nothing
+  // to read - abs, neg and copysign are bit manipulations - and whether the
+  // ordering and transcendental ones should flush has not been measured.
   auto in = [&p](std::uint32_t v) {
     if (!p.daz) return v;
     const std::uint32_t mag = v & 0x7fffffffu;
