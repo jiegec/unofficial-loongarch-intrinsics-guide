@@ -34,7 +34,7 @@ says where to look, and which of the open items actually block work.
 | [SIO and Export (family)](../isa/family-sio.md) | 6 |
 | [Interpolation (family)](../isa/family-interpolation.md) | 7 |
 
-The instruction rows carry their own: **575 of the 768** machine rows state at
+The instruction rows carry their own: **572 of the 768** machine rows state at
 least one property marked `UNRESOLVED` in the row's own description, because a row's case
 vectors pin one exact variant and leave its neighbours open.  Those are recorded
 on the row pages, not here.

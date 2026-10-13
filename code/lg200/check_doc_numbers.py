@@ -102,7 +102,10 @@ def main() -> int:
         ('unresolved.md', r'([0-9]+) of the 768', 'rows-unresolved'),
         ('status.md', r'\\?\| rows stating an .UNRESOLVED. \| [0-9]+ \| \*\*([0-9]+)\*\*', 'rows-unresolved'),
         ('status.md', r'distinct UNRESOLVED sentences \| [0-9]+ \| \*\*([0-9]+)\*\*', 'sentences'),
-        ('status.md', r'(1,[0-9]+) occurrences', 'occurrences'),
+        # The pattern used to be (1,[0-9]+), which assumed a thousands separator and
+        # could not match once the count fell below a thousand on 2026-10-13.  The
+        # status.md copy and the unresolved-status.md one now accept both forms.
+        ('status.md', r'([0-9,]+) occurrences', 'occurrences'),
         ('case-boundaries.md', r'\*\*([0-9]+) of [0-9]+ value-expressible', 'covered'),
         ('status.md', r'([0-9]+) of [0-9]+ value-expressible', 'covered'),
         # unresolved-status.md keeps a dated snapshot, so its current figures carry a
