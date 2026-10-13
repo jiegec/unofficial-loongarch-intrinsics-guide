@@ -40,8 +40,13 @@ echo "== set_desc --check"
 python3 set_desc.py --check
 echo "== header_sync --check"
 python3 header_sync.py --check
+# The oracle binary is not rebuilt by run_cases.py, so a case file that stops compiling
+# leaves the previous binary in place and every CPU case keeps passing against a model that
+# no longer matches.  That is exactly what had happened: 139 case files had a space where the
+# macro wanted a comma, the build had been failing, and this suite stayed green.  Building
+# first makes a broken case file fail here instead of hiding behind a stale binary.
 echo "== run_cases"
-python3 run_cases.py | tail -1
+make -s build/lgpu-cases && python3 run_cases.py | tail -1
 echo "== check_doc_numbers"
 python3 check_doc_numbers.py | tail -1
 echo "== prose_audit"
