@@ -130,7 +130,17 @@ def main(argv):
     if problems:
         return 1
     print("blocks=%d covered=0x%x ok" % (len(BLOCKS), TOTAL))
-    if "--check" in argv:
+    if '--check' in argv:
+        # The block table can be consistent while the checked-in asset is stale, which
+        # is the failure this generator exists to prevent: a hand-drawn map silently
+        # dropped nine blocks.  So compare the two rather than trusting the table.
+        want = render()
+        have = OUT.read_text(encoding='utf-8') if OUT.exists() else ''
+        if want != have:
+            print('the checked-in %s does not match what this generator renders'
+                  % OUT.relative_to(ROOT))
+            return 1
+        print('asset matches the generator')
         return 0
     OUT.write_text(render(), encoding="utf-8")
     print("wrote", OUT.relative_to(ROOT))
