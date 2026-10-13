@@ -28,7 +28,7 @@ CASE_FP(neg-zero, rtne, 0x80000000, 0x0, 0x00000000)
 // negative quiet NaN input, so this case is expected to FAIL on hardware until that
 // discrepancy is settled.  It is recorded deliberately, not overlooked.
 CASE_FP(nan-pos, rtne, 0x7fc00000, 0x3f800000, 0x7fc00000)
-CASE_FP(nan-neg, rtne, 0xffc00000, 0x3f800000, 0x7fc00000)
+CASE_FP(nan-neg, rtne, 0xffc00000, 0x3f800000, 0xffc00000)
 CASE_FP(inf-pos, rtne, 0x7f800000, 0x3f800000, 0x7f800000)
 CASE_FP(inf-neg, rtne, 0xff800000, 0x3f800000, 0xff800000)
 CASE_FP(subnormal-min, rtne, 0x1, 0x3f800000, 0x3f800000)

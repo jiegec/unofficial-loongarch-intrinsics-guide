@@ -257,8 +257,14 @@ inline std::uint64_t flush64(std::uint64_t b) {
 // Berkeley's x86 default is 0xFFC00000 (sign set).  Match the hardware for
 // invalid-op defaults (inf-inf, 0*inf, ...); propagated source NaNs keep
 // their sign/payload and are untouched (they never equal the default).
+// [HW 2026-10-13] a COMPUTED NaN - inf + -inf and the like - comes back as the positive
+// canonical 0x7fc00000, while a NaN OPERAND is propagated with its sign and payload, so
+// this canonicalises any NaN and the callers return an operand NaN before the arithmetic.
+// The old body rewrote the single value 0xffc00000, which turned a propagated negative
+// operand NaN into a positive one and cost about thirty-seven cases in each of a number
+// of arithmetic rows.
 inline std::uint32_t norm_nan32(std::uint32_t r) {
-  return r == 0xffc00000u ? 0x7fc00000u : r;
+  return (r & 0x7f800000u) == 0x7f800000u && (r & 0x007fffffu) != 0u ? 0x7fc00000u : r;
 }
 
 inline std::uint16_t flush16(std::uint16_t b) {
@@ -270,6 +276,7 @@ inline std::uint16_t flush16(std::uint16_t b) {
 
 // ---- binary32 arithmetic (correctly rounded via Berkeley) --------------------
 std::uint32_t sf_add32(std::uint32_t a, std::uint32_t b, FpPolicy policy) {
+  if (const std::uint32_t n = sf_nan3(a, b, 0u)) return n;  // operand NaN wins
   if (policy.daz) { a = flush32(a); b = flush32(b); }
   set_round(policy);
   std::uint32_t r = bk32(f32_add(mk32(a), mk32(b)));
@@ -277,6 +284,7 @@ std::uint32_t sf_add32(std::uint32_t a, std::uint32_t b, FpPolicy policy) {
   return policy.ftz ? flush32(r) : r;
 }
 std::uint32_t sf_sub32(std::uint32_t a, std::uint32_t b, FpPolicy policy) {
+  if (const std::uint32_t n = sf_nan3(a, b, 0u)) return n;  // operand NaN wins
   if (policy.daz) { a = flush32(a); b = flush32(b); }
   set_round(policy);
   std::uint32_t r = bk32(f32_sub(mk32(a), mk32(b)));
@@ -284,6 +292,7 @@ std::uint32_t sf_sub32(std::uint32_t a, std::uint32_t b, FpPolicy policy) {
   return policy.ftz ? flush32(r) : r;
 }
 std::uint32_t sf_revsub32(std::uint32_t a, std::uint32_t b, FpPolicy policy) {
+  if (const std::uint32_t n = sf_nan3(a, b, 0u)) return n;  // operand NaN wins
   if (policy.daz) { a = flush32(a); b = flush32(b); }
   set_round(policy);
   std::uint32_t r = bk32(f32_sub(mk32(b), mk32(a)));
@@ -291,6 +300,7 @@ std::uint32_t sf_revsub32(std::uint32_t a, std::uint32_t b, FpPolicy policy) {
   return policy.ftz ? flush32(r) : r;
 }
 std::uint32_t sf_mul32(std::uint32_t a, std::uint32_t b, FpPolicy policy) {
+  if (const std::uint32_t n = sf_nan3(a, b, 0u)) return n;  // operand NaN wins
   if (policy.daz) { a = flush32(a); b = flush32(b); }
   set_round(policy);
   std::uint32_t r = bk32(f32_mul(mk32(a), mk32(b)));
