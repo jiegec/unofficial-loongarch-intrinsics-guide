@@ -25,15 +25,19 @@ so it could not fail on an over-claim, which is the defect it exists to find.
 
 THE ELEVEN GATES, ACCOUNTED FOR (2026-10-13):
 
-  proven in this tool (14): set_desc, check_doc_numbers, header_sync, check_gpu,
+  proven in this tool (15): set_desc, check_doc_numbers, header_sync, check_gpu,
                             run_cases, format_audit, bench_doc_check,
                             rule_dupe_check, md_table_check, check_all.sh,
-                            fp_mode_audit, case_provenance, addr_scan, gate_check
+                            fp_mode_audit, case_provenance, addr_scan, gate_check,
+                            jumpstack_check
   note: addr_scan has two cases.  One forces a hit and proves the EXIT CODE; the
         other breaks the detector, which the tool's --selftest catches over a
         crafted listing, including the v[14:15] shape a register scan misses.
   reports by design (2):    prose_audit, doc_register_audit
-  session-time (1):        audit - reads a runner listing, which is not tracked, so it
+  session-time (2):        audit - reads a runner listing, which is not tracked, so it
+                           runs only when one is present and no case can break its input;
+                           enc_probe - compares against a cross-repo Mesa tree and builds
+                           a probe first, so there is nothing here to break
                            runs only when one is present and no case can break its input
 
 The last two have no failing mode to prove: prose_audit findings include three expected
@@ -146,7 +150,7 @@ def suite_accounting():
     accounted |= {"prose_audit", "doc_register_audit"}       # reports by design
     # Session-time gates read a device-produced artifact that is not tracked, so they
     # run only when there is something to audit and no case here can break their input.
-    accounted |= {"audit"}
+    accounted |= {"audit", "enc_probe"}
     missing = sorted(ran - accounted)
     extra_names = sorted(accounted - ran)
     bad = 0
@@ -210,6 +214,13 @@ def mutate_case_list(text):
     new = '(' + q + 'run_cases_renamed.py' + q + ', ' + q + 'code/lg200/atomic_sm_add_u32.cpp' + q
     return text.replace(old, new, 1)
 
+def mutate_jumpstack(text):
+    '''Break the check's own expectation, which proves the verdict path and not the
+    comparison: the data it compares against is the vendor's ISA row, in another
+    repository, so there is nothing here to break that would change the answer.''',
+    return text.replace('bad += 0 if d == 1 << 18 else 1',
+                        'bad += 0 if d == 1 << 19 else 1', 1)
+
 CASES = [
     ("set_desc.py --check", "code/lg200-instructions.tsv", mutate_tsv,
      "cd code/lg200 && python3 set_desc.py --check"),
@@ -242,7 +253,9 @@ CASES = [
     ("addr_scan.py", "code/lg200/gpu/addr_scan.py", mutate_addr_detect,
      "python3 code/lg200/gpu/addr_scan.py --selftest"),
     ("gate_check.py", "code/lg200/mutation_check.py", mutate_case_list,
-     "python3 code/lg200/gate_check.py"),]
+     "python3 code/lg200/gate_check.py"),
+    ("jumpstack_check.py", "code/lg200/gpu/jumpstack_check.py", mutate_jumpstack,
+     "python3 code/lg200/gpu/jumpstack_check.py"),]
 
 
 def main() -> int:

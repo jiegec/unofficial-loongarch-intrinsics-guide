@@ -53,6 +53,21 @@ echo "== gate_check"
 # Field coverage needs a runner listing, which is a device-produced artifact and is
 # not tracked.  With one present this is a gate; without one there is nothing to audit,
 # and saying so is better than passing quietly.
+# Both cross-check this tree against the closed driver and the vendor assembler,
+# so they need the LCO checkout present.  With it they are gates; without it there
+# is nothing to compare against, and the step says so.
+echo "== jumpstack_check"
+if [ -d /home/lin/work/src/loonggpu ]; then
+  cd "$REPO" && python3 code/lg200/gpu/jumpstack_check.py | tail -1
+else
+  echo "no LCO checkout; the jump-stack cross-check needs the vendor ISA row"
+fi
+echo "== enc_probe"
+if [ -d /home/lin/work/src/loonggpu ]; then
+  cd "$REPO" && python3 code/lg200/gpu/enc_probe.py | tail -1
+else
+  echo "no LCO checkout; the encoder cross-check needs the vendor assembler"
+fi
 echo "== audit"
 if ls "$REPO"/code/lg200/gpu/build/gpu-run-logs/*.log >/dev/null 2>&1; then
   cd "$REPO" && python3 code/lg200/gpu/audit.py | tail -1
