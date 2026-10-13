@@ -2049,10 +2049,34 @@ std::uint32_t sf_fma32(std::uint32_t a, std::uint32_t b, std::uint32_t c,
     const std::uint32_t mag = v & 0x7fffffffu;
     return (mag != 0u && mag < 0x00800000u) ? (v & 0x80000000u) : v;
   };
+  // [HW 2026-10-13] the NaN rule, from twenty-three probes and eight tsv rows.
+  // A signaling NaN outranks a quiet one wherever it sits - (qNaN, sNaN, 0)
+  // gives the b operand, 0x7fc00001, though a comes first.  Among NaNs of the
+  // same kind the addend comes first: (qNaN, 1, -qNaN) and (0, qNaN, -qNaN)
+  // both give the c operand, and only with c quiet does the order fall back to
+  // a then b, which (qNaN,-qNaN,0) and (+qNaN,0,+inf) show.  A NaN the
+  // operation itself makes - inf*0, inf-inf - is the positive canonical
+  // 0x7fc00000 whatever signs produced it.  The old code left all of this to
+  // the host double arithmetic and picked the wrong operand.
+  auto quiet = [](std::uint32_t v) { return v | 0x00400000u; };
+  const auto v_is_nan = [](std::uint32_t v) {
+    return (v & 0x7f800000u) == 0x7f800000u && (v & 0x007fffffu) != 0u;
+  };
+  const auto s_is_nan = [](std::uint32_t v) {
+    return (v & 0x7f800000u) == 0x7f800000u && (v & 0x007fffffu) != 0u &&
+           (v & 0x00400000u) == 0u;
+  };
+  for (const std::uint32_t v : {c, a, b}) {
+    if (s_is_nan(v)) return quiet(v);
+  }
+  for (const std::uint32_t v : {c, a, b}) {
+    if (v_is_nan(v)) return quiet(v);
+  }
   const double r = static_cast<double>(f32_bits(in(a))) *
                        static_cast<double>(std::bit_cast<float>(in(b))) +
                    static_cast<double>(std::bit_cast<float>(in(c)));
   const std::uint32_t out = bits_f32(static_cast<float>(r));
+  if (v_is_nan(out)) return 0x7fc00000u;
   if (p.ftz) {
     const std::uint32_t mag = out & 0x7fffffffu;
     if (mag != 0u && mag < 0x00800000u) return out & 0x80000000u;
