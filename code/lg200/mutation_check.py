@@ -25,7 +25,7 @@ so it could not fail on an over-claim, which is the defect it exists to find.
 
 THE ELEVEN GATES, ACCOUNTED FOR (2026-10-13):
 
-  proven in this tool (24): set_desc, check_doc_numbers, header_sync, check_gpu,
+  proven in this tool (26): set_desc, check_doc_numbers, header_sync, check_gpu,
                             run_cases, format_audit, bench_doc_check,
                             rule_dupe_check, md_table_check, check_all.sh,
                             fp_mode_audit, case_provenance, addr_scan, gate_check,
@@ -152,6 +152,15 @@ def suite_accounting():
     # Session-time gates read a device-produced artifact that is not tracked, so they
     # run only when there is something to audit and no case here can break their input.
     accounted |= {"audit", "enc_probe"}
+    # The count in the prose is a number in prose, and it drifted while it was updated
+    # by hand.  It is compared with the table now.
+    mc = pathlib.Path(__file__).read_text(encoding="utf-8")
+    said = re.search(r"proven in this tool [(]([0-9]+)[)]", mc)
+    if said and int(said.group(1)) != len(CASES):
+        print("COUNT  the accounting says %s proven in this tool and CASES holds %d"
+              % (said.group(1), len(CASES)))
+        bad += 1
+
     missing = sorted(ran - accounted)
     extra_names = sorted(accounted - ran)
     bad = 0
@@ -402,7 +411,10 @@ def main() -> int:
         after = sha(full)
         clean, _out = run(check)
         ok = caught != 0 and clean == 0 and before == after
-        print("%-24s fault exit=%d, restored %s, clean=%s  %s"
+        # "again" is the exit code of re-running the check on the restored file, not a
+        # git question.  It read as cleanliness, which sent a whole round looking for a
+        # dirty tree that was never there.
+        print("%-24s fault exit=%d, restored %s, again=%s  %s"
               % (name, caught, "ok" if before == after else "MISMATCH",
                  clean == 0, "OK" if ok else "PROBLEM"))
         if not ok:
