@@ -67,7 +67,16 @@ def main() -> int:
         for m in re.finditer(r"python3\s+([A-Za-z0-9_./-]+[.]py)",
                              page.read_text(encoding="utf-8", errors="replace")):
             cmds += 1
-            if m.group(1).split("/")[-1] not in tools:
+            # A cited path is resolved as written; only a bare name falls back to the
+            # basename, because two tools here share one (run_bench.py exists in code/lg200
+            # and in code/lg200/gpu with different flags), and a basename-only test would
+            # accept either.  That collision has now caught three of my own sweeps.
+            cited = m.group(1)
+            if "/" in cited:
+                ok = (ROOT / cited).exists() or (ROOT / "code" / cited).exists()
+            else:
+                ok = cited in tools
+            if not ok:
                 print("DEAD COMMAND  %s -> python3 %s"
                       % (page.relative_to(ROOT), m.group(1)))
                 bad += 1
