@@ -112,3 +112,14 @@ which stage the compare pair the way the correctness carrier does).
 `check_doc_numbers.py` keeps the pages' figures honest in the meantime, and
 `bench_doc_check.py` compares this section and the bench page against
 `bench_buildable.py`, because this is the second copy of one number.
+
+5. **一轮 campaign 的总提交量也是设备资源。** 2026-10-13：一次「全 768 行、一行一进程」的刷新
+   连续跑了约两小时后，parked 从 0 涨到 29，gfx/xdma0/bpipe 三个 ring 被 quarantine，dmesg
+   出现 67 条 reset/fault/hang，最后 renderD128 无法打开，只能重启恢复。
+
+   **一行一进程并不能保证安全**：rule 4 限制的是「单进程塞多少 case」，这里超的是**累计提交次数**。
+   之后的批量刷新必须**分批**（例如每批 100 行），并**在批次之间跑前置条件**（parked 计数与单例
+   smoke test）；任何一项不过就停下，而不是继续跑完剩下的行。
+
+   同一轮里我还在这个已经变坏的设备上继续提交了很久，并把结果当作进度汇报——**设备前置条件要在
+   每次开始测量前检查，而不是在测量结束后才看 dmesg。**
