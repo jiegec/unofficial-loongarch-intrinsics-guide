@@ -2037,11 +2037,27 @@ std::uint64_t sf_fract64(std::uint64_t a, const FpPolicy&) {
   return bits_f64(v - std::floor(v));
 }
 std::uint32_t sf_fma32(std::uint32_t a, std::uint32_t b, std::uint32_t c,
-                      const FpPolicy&) {
-  const double r = static_cast<double>(f32_bits(a)) *
-                       static_cast<double>(std::bit_cast<float>(b)) +
-                   static_cast<double>(std::bit_cast<float>(c));
-  return bits_f32(static_cast<float>(r));
+                       const FpPolicy& p) {
+  // [HW 2026-10-13] the policy reaches the arithmetic here for the first time.
+  // v_mac_imm_f32 was fed 0x1 in a rtne|daz|ftz case and returned the denormal,
+  // while the hardware returned zero: daz zeroes a denormal input and ftz
+  // flushes a denormal result.  Forty-five sf_ helpers take this policy and
+  // none of them reads it yet - this is one, and the same treatment is owed to
+  // the rest.
+  auto in = [&p](std::uint32_t v) {
+    if (!p.daz) return v;
+    const std::uint32_t mag = v & 0x7fffffffu;
+    return (mag != 0u && mag < 0x00800000u) ? (v & 0x80000000u) : v;
+  };
+  const double r = static_cast<double>(f32_bits(in(a))) *
+                       static_cast<double>(std::bit_cast<float>(in(b))) +
+                   static_cast<double>(std::bit_cast<float>(in(c)));
+  const std::uint32_t out = bits_f32(static_cast<float>(r));
+  if (p.ftz) {
+    const std::uint32_t mag = out & 0x7fffffffu;
+    if (mag != 0u && mag < 0x00800000u) return out & 0x80000000u;
+  }
+  return out;
 }
 std::uint32_t sf_ldexp32(std::uint32_t a, std::uint32_t e,
                      const FpPolicy&) {
