@@ -321,9 +321,48 @@ CASES = [
      "python3 code/lg200/link_check.py"),]
 
 
+# A run killed by a timeout used to leave its mutation in place, and the next run then read the
+# tree as already-mutated and skipped the case.  Two guards, neither of which can discard an
+# edit: restore on the signals a timeout or an interrupt delivers, and say at startup when a
+# file this tool would mutate already differs from git, which is what a killed run looks like.
+PENDING = {}
+
+
+def restore_pending():
+    for path, text in list(PENDING.items()):
+        path.write_text(text)
+    PENDING.clear()
+
+
+def _signalled(signum, _frame):
+    n = len(PENDING)
+    restore_pending()
+    print("restored %d file(s) on signal %d" % (n, signum))
+    sys.exit(128 + signum)
+
 def main() -> int:
+    import signal
+    signal.signal(signal.SIGTERM, _signalled)
+    signal.signal(signal.SIGINT, _signalled)
+    dirty = subprocess.run(
+        ["git", "status", "--porcelain"] + [r for _n, r, _m, _c in CASES],
+        cwd=ROOT, capture_output=True, text=True).stdout.strip()
+    if dirty:
+        print("note: a file this tool mutates already differs from git:")
+        print("  " + dirty.replace(chr(10), chr(10) + "  "))
+    # Piped output is block-buffered, so a run killed by a timeout showed nothing at all
+    # and read as a crash.  Twenty-five cases take longer than a short window now.
+    try:
+        sys.stdout.reconfigure(line_buffering=True)
+    except Exception:
+        pass
+    only = None
+    if "--only" in sys.argv:
+        only = sys.argv[sys.argv.index("--only") + 1]
     bad = 0
     for name, rel, mutate, check in CASES:
+        if only and only not in name:
+            continue
         full = ROOT / rel
         rc, _ = run("git ls-files --error-unmatch " + rel)
         if rc != 0:
