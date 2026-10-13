@@ -1523,13 +1523,22 @@ std::uint32_t oracle_cubeface(std::uint32_t s0, std::uint32_t s1,
     return (b & 0x7f800000u) == 0u ? (b & 0x80000000u) : b;
   };
   // [HW 2026-08-24] a NaN input propagates as the face result (the
-  // selector returns the NaN bit pattern itself).
-  if ((s0 & 0x7f800000u) == 0x7f800000u && (s0 & 0x007fffffu) != 0u)
-    return s0;
-  if ((s1 & 0x7f800000u) == 0x7f800000u && (s1 & 0x007fffffu) != 0u)
-    return s1;
-  if ((s2 & 0x7f800000u) == 0x7f800000u && (s2 & 0x007fffffu) != 0u)
-    return s2;
+  // selector returns the NaN, quieted like the rest of the cube family).
+  // [HW 2026-10-13] quieted, and a signaling NaN outranks a quiet one, as in the
+  // rest of the cube family.
+  const auto qnan3 = [](std::uint32_t v) {
+    return (v & 0x7f800000u) == 0x7f800000u && (v & 0x007fffffu) != 0u;
+  };
+  const auto snan3 = [](std::uint32_t v) {
+    return (v & 0x7f800000u) == 0x7f800000u &&
+           (v & 0x007fffffu) != 0u && (v & 0x00400000u) == 0u;
+  };
+  for (const std::uint32_t v : {s0, s1, s2}) {
+    if (snan3(v)) return v | 0x00400000u;
+  }
+  for (const std::uint32_t v : {s0, s1, s2}) {
+    if (qnan3(v)) return v | 0x00400000u;
+  }
   s0 = ftz(s0);
   s1 = ftz(s1);
   s2 = ftz(s2);
@@ -1566,9 +1575,22 @@ std::uint32_t cube_ftz3(std::uint32_t a, std::uint32_t b, std::uint32_t c,
   auto ftz = [](uint32_t v) -> uint32_t {
     return (v & 0x7f800000u) == 0u ? (v & 0x80000000u) : v;
   };
-  if ((a & 0x7f800000u) == 0x7f800000u && (a & 0x007fffffu) != 0u) return a;
-  if ((b & 0x7f800000u) == 0x7f800000u && (b & 0x007fffffu) != 0u) return b;
-  if ((c & 0x7f800000u) == 0x7f800000u && (c & 0x007fffffu) != 0u) return c;
+  // [HW 2026-10-13] a NaN is quieted on the way out, and a signaling one outranks
+  // a quiet one wherever it sits - (qNaN, sNaN, 0) gives the b operand, as it does
+  // for the fma family.  Among NaNs of one kind it is operand order.
+  const auto qnan = [](std::uint32_t v) {
+    return (v & 0x7f800000u) == 0x7f800000u && (v & 0x007fffffu) != 0u;
+  };
+  const auto snan = [](std::uint32_t v) {
+    return (v & 0x7f800000u) == 0x7f800000u &&
+           (v & 0x007fffffu) != 0u && (v & 0x00400000u) == 0u;
+  };
+  for (const std::uint32_t v : {a, b, c}) {
+    if (snan(v)) return v | 0x00400000u;
+  }
+  for (const std::uint32_t v : {a, b, c}) {
+    if (qnan(v)) return v | 0x00400000u;
+  }
   a = ftz(a); b = ftz(b); c = ftz(c);
   std::memcpy(&s, &a, 4); std::memcpy(&t, &b, 4); std::memcpy(&r, &c, 4);
   return 0;
