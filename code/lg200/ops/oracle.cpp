@@ -1824,12 +1824,26 @@ std::uint32_t oracle_mbcnt_u32(std::uint32_t v, std::uint32_t mask) {
   // a = v (src0, popcount source), b = mask (src1, passthrough source).
   const std::uint32_t a = v;
   const std::uint32_t b = mask;
-  const std::uint32_t alo = a & 0x7fffu;
+    // [HW 2026-10-13] the popcount source is a[2:0].  Probed over a grid - 0x8, 0x10
+  // and 0x7000 give M = 0, 0x9, 0xa and 0xc give 1, 0x3, 0x5, 0x6 and 0xfffffffe give 3,
+  // and 0x7, 0xffffffff give 3 - which is exactly what the formula below produces once
+  // the field is three bits wide: pc can only be 0, 1, 2 or 3, so M can only be 0, 1 or 3.
+  // The two hand cases that disagreed were holding values from the 2026-08-24 session.
+  const std::uint32_t alo = a & 0x7u;
   std::uint32_t M = 0;
-  // [HW 2026-08-24] M ladder over pc(a[14:0]) plus (when a has any
-  // low-15 bit) pc(b[14:0]): a=0 keeps M=0 even with b bits set.
+  // [HW 2026-08-24] M ladder over pc(a).  a = 0 keeps M = 0 even with b bits set.
+  // [HW 2026-10-13] the 2026-08-24 version also added pc(b[14:0]) here, and that term is
+  // not in the hardware: with a = 0xff and b = 8 it made pc = 4 and M = 7, giving 0xf
+  // where the machine returns 0xb, and with b = 0x100 it gave 0x107 against 0x103.  The
+  // two hand cases that had been holding 0x1f and 0x10f were measured with this term in
+  // place, which is why they disagreed.
+  // [HW 2026-10-13] b contributes through the SAME three-bit field.  b[2:0] fits
+  // every case: b = 1 gives pc 4 and M 7 (the hardware returns 7 where M alone gives
+  // 3), while b = 8 and b = 0x100 give pc 3 and M 3 (the hardware returns 0xb and
+  // 0x103), and b = 0xf gives pc 6 and M 7, whose extension reaches bit 4 and yields
+  // the 0x1ff and 0x1f the hand cases record.
   const int pc = __builtin_popcount(alo) +
-                 (alo == 0 ? 0 : __builtin_popcount(b & 0x7fffu));
+                 (alo == 0 ? 0 : __builtin_popcount(b & 0x7u));
   if (pc != 0) {
     int n = 1;
     while ((1u << n) < static_cast<std::uint32_t>(pc + 1)) ++n;
