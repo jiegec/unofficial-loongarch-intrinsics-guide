@@ -484,10 +484,11 @@ CPU Flags: {cur_simd.upper()}
         width = widths[name[0]]
         width2 = widths[name2[0]]
         signedness = signednesses[name]
+        ext_verb = "Sign-extend" if signedness == "signed" else "Zero-extend"
         return instruction(
             intrinsic=f"__m128i __lsx_vexth_{name}_{name2} (__m128i a)",
             instr=f"vexth.{name}.{name2} vr, vr",
-            desc=f"Extend {signedness} {width2}-bit elements in the higher half of every 128-bit vector of `a` to {width}-bit.",
+            desc=f"{ext_verb} {width2}-bit elements in the higher half of every 128-bit vector of `a` to {width}-bit.",
         )
 
     @my_macro(env)
@@ -495,10 +496,11 @@ CPU Flags: {cur_simd.upper()}
         width = widths[name[0]]
         width2 = widths[name2[0]]
         signedness = signednesses[name]
+        ext_verb = "Sign-extend" if signedness == "signed" else "Zero-extend"
         return instruction(
             intrinsic=f"__m128i __lsx_vextl_{name}_{name2} (__m128i a)",
             instr=f"vextl.{name}.{name2} vr, vr",
-            desc=f"Extend {signedness} {width2}-bit elements in the lower half of every 128-bit vector of `a` to {width}-bit.",
+            desc=f"{ext_verb} {width2}-bit elements in the lower half of every 128-bit vector of `a` to {width}-bit.",
         )
 
     @my_macro(env)
@@ -635,10 +637,11 @@ CPU Flags: {cur_simd.upper()}
         width = widths[name[0]]
         width2 = widths[name2[0]]
         signedness = signednesses[name]
+        ext_verb = "sign-extending" if signedness == "signed" else "zero-extending"
         return instruction(
             intrinsic=f"__m128i __lsx_vhaddw_{name}_{name2} (__m128i a, __m128i b)",
             instr=f"vhaddw.{name}.{name2} vr, vr, vr",
-            desc=f"Add odd-positioned {signedness} {width2}-bit elements in `a` to even-positioned {signedness} {width2}-bit elements in `b`, extending both to {width}-bit, to get the {width}-bit result.",
+            desc=f"Add odd-positioned {signedness} {width2}-bit elements in `a` to even-positioned {signedness} {width2}-bit elements in `b`, {ext_verb} both to {width}-bit, to get the {width}-bit result.",
         )
 
     @my_macro(env)
@@ -646,10 +649,11 @@ CPU Flags: {cur_simd.upper()}
         width = widths[name[0]]
         width2 = widths[name2[0]]
         signedness = signednesses[name]
+        ext_verb = "sign-extending" if signedness == "signed" else "zero-extending"
         return instruction(
             intrinsic=f"__m128i __lsx_vhsubw_{name}_{name2} (__m128i a, __m128i b)",
             instr=f"vhsubw.{name}.{name2} vr, vr, vr",
-            desc=f"Subtract even-positioned {signedness} {width2}-bit elements in `b` from odd-positioned {signedness} {width2}-bit elements in `a`, extending both to {width}-bit, to get the {width}-bit result.",
+            desc=f"Subtract even-positioned {signedness} {width2}-bit elements in `b` from odd-positioned {signedness} {width2}-bit elements in `a`, {ext_verb} both to {width}-bit, to get the {width}-bit result.",
         )
 
     @my_macro(env)
@@ -701,10 +705,11 @@ CPU Flags: {cur_simd.upper()}
         width = widths[name]
         width2 = widths[name2]
         signedness = signednesses[name]
+        ext_verb = "Sign-extend" if signedness == "signed" else "Zero-extend"
         return instruction(
             intrinsic=f"__m256i __lasx_vext2xv_{name}_{name2} (__m256i a)",
             instr=f"vext2xv.{name}.{name2} xr, xr",
-            desc=f"Extend the lowest {256 // width} {signedness} {width2}-bit elements of `a` to {signedness} {width}-bit elements.",
+            desc=f"{ext_verb} the lowest {256 // width} {width2}-bit elements of `a` to {width}-bit elements.",
         )
 
     @my_macro(env)
@@ -834,7 +839,7 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         return instruction(
             intrinsic=f"__m128i __lsx_vmaddw{name}_{wide}_{narrow}{intrinsic_suffix} (__m128i a, __m128i b, __m128i c)",
             instr=f"vmaddw{name}.{wide}.{narrow}{inst_suffix} vr, vr, vr",
-            desc=f"Multiply {even_odd}-positioned {signedness} {narrow_width}-bit elements in `b` and {signedness2} elements in `c`, add to {wide_width}-bit elements in `a`.",
+            desc=f"Multiply the {even_odd}-positioned {signedness} {narrow_width}-bit elements in `b` and the corresponding {signedness2} {narrow_width}-bit elements in `c`, extending both to {wide_width}-bit, and add the product to the {wide_width}-bit elements in `a`.",
         )
 
     @my_macro(env)
@@ -890,7 +895,7 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         return instruction(
             intrinsic=f"void __lsx_vstelm_{name} (__m128i data, void * addr, imm_n128_127 offset, imm0_{imm_upper} lane)",
             instr=f"vstelm.{name} vr, r, imm, imm",
-            desc=f"Store element `lane` of `data` to memory address `addr + offset`.",
+            desc=f"Store element `lane` of `data` to memory address `addr + offset`. The `offset` operand is a byte offset; the encoded instruction stores it as a scaled immediate for wider elements.",
         )
 
     @my_macro(env)
@@ -1313,10 +1318,11 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         width = widths[name[0]]
         width2 = widths[name2[0]]
         signedness = signednesses[name]
+        ext_verb = "sign-extend" if signedness == "signed" else "zero-extend"
         return instruction(
             intrinsic=f"__m128i __lsx_vsllwil_{name}_{name2} (__m128i a, imm0_{width2-1} imm)",
             instr=f"vsllwil.{name}.{name2} vr, vr, imm",
-            desc=f"For each 128-bit lane, extend and shift the {signedness} {width2}-bit elements in the lower part of that lane by `imm` to {signedness} {width}-bit result.",
+            desc=f"For each 128-bit lane, {ext_verb} and shift the {width2}-bit elements in the lower part of that lane by `imm` to {width}-bit result.",
         )
 
     @my_macro(env)
@@ -1768,7 +1774,7 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         return instruction(
             intrinsic=f"__m128i __lsx_vldx (void * addr, long int offset)",
             instr=f"vldx vr, r, r",
-            desc=f"Read whole vector from memory address `addr + offset`, save the data into `dst`.  Note that you can use this intrinsic to load floating point vectors, even though the return type represents integer vectors.",
+            desc=f"Read whole vector from memory address `addr + offset`, save the data into `dst`. Note that you can use this intrinsic to load floating point vectors, even though the return type represents integer vectors.",
         )
 
     @my_macro(env)
@@ -1784,7 +1790,7 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         return instruction(
             intrinsic=f"void __lsx_vstx (__m128i data, void * addr, long int offset)",
             instr=f"vstx vr, r, r",
-            desc=f"Write whole-vector data in `data` to memory address `addr + offset`.",
+            desc=f"Write whole vector data in `data` to memory address `addr + offset`.",
         )
 
     @my_macro(env)
@@ -1952,10 +1958,12 @@ Initialize `dst` using predefined patterns:
 - `imm[12:8]=0b10110`: broadcast `(imm[7:0] << 8) | 0xFF` as 32-bit elements to all lanes
 - `imm[12:8]=0b10111`: broadcast `(imm[7:0] << 16) | 0xFFFF` as 32-bit elements to all lanes
 - `imm[12:8]=0b11000`: broadcast `imm[7:0]` as 8-bit elements to all lanes
-- `imm[12:8]=0b11001`: repeat each bit of `imm[7:0]` eight times, and broadcast the result as 64-bit elements to all lanes
+- `imm[12:8]=0b11001`: repeat each bit of `imm[7:0]` eight times, with `imm[7]` in the most significant byte and `imm[0]` in the least significant byte, and broadcast the result as 64-bit elements to all lanes
 - `imm[12:8]=0b11010`: broadcast `(imm[7] << 31) | ((1-imm[6]) << 30) | ((imm[6] * 0x1F) << 25) | (imm[5:0] << 19)` as 32-bit elements to all lanes
 - `imm[12:8]=0b11011`: broadcast `(imm[7] << 31) | ((1-imm[6]) << 30) | ((imm[6] * 0x1F) << 25) | (imm[5:0] << 19)` as 64-bit elements to all lanes
 - `imm[12:8]=0b11100`: broadcast `(imm[7] << 63) | ((1-imm[6]) << 62) | ((imm[6] * 0xFF) << 54) | (imm[5:0] << 48)` as 64-bit elements to all lanes
+
+Other `imm` encodings raise an INE exception.
 """,
         )
 
