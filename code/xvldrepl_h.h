@@ -1,4 +1,4 @@
-u16 data = memory_load(16, addr + (offset << 1));
+u16 data = memory_load(16, addr + offset);
 for (int i = 0; i < 16; i++) {
   dst.half[i] = data;
 }

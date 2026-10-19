@@ -331,9 +331,9 @@ CPU Flags: {cur_simd.upper()}
         else:
             suffix = "od"
         if op == "sub":
-            result_desc = f"Subtract {even_odd}-positioned {signedness} {narrow_width}-bit elements in `b` from the corresponding elements in `a`, save the {wide_width}-bit result in `dst`."
+            result_desc = f"Subtract the {even_odd}-positioned {signedness} {narrow_width}-bit elements in `b` from the corresponding elements in `a`, extending both to {wide_width}-bit, and save the {wide_width}-bit result in `dst`."
         else:
-            result_desc = f"{desc} {even_odd}-positioned {signedness} {narrow_width}-bit elements in `a` and {signedness2} elements in `b`, save the {wide_width}-bit result in `dst`."
+            result_desc = f"{desc} the {even_odd}-positioned {signedness} {narrow_width}-bit elements in `a` and the corresponding {signedness2} {narrow_width}-bit elements in `b`, extending both to {wide_width}-bit, and save the {wide_width}-bit result in `dst`."
         return instruction(
             intrinsic=f"__m128i __lsx_v{op}w{suffix}_{wide}_{narrow}{intrinsic_suffix} (__m128i a, __m128i b)",
             instr=f"v{op}w{suffix}.{wide}.{narrow}{inst_suffix} vr, vr, vr",
@@ -520,9 +520,9 @@ CPU Flags: {cur_simd.upper()}
     @my_macro(env)
     def vfcmp(cond):
         if cond[0] == "c":
-            trap = "Do not trap for QNaN."
+            trap = "No exception is raised for QNaN."
         else:
-            trap = "Trap for QNaN."
+            trap = "An exception is raised for QNaN."
         desc = {
             "af": "AF(Always False)",
             "un": "UN(Unordered)",
@@ -540,13 +540,13 @@ CPU Flags: {cur_simd.upper()}
             instruction(
                 intrinsic=f"__m128i __lsx_vfcmp_{cond}_s (__m128 a, __m128 b)",
                 instr=f"vfcmp.{cond}.s vr, vr, vr",
-                desc=f"Compare single precision elements in `a` and `b`, save the comparison result (all ones if {desc}, all zeros otherwise) into `dst`. {trap}",
+                desc=f"Compare corresponding single precision elements in `a` and `b`, save the comparison result (all ones if {desc}, all zeros otherwise) into `dst`. {trap}",
             )
             + "\n"
             + instruction(
                 intrinsic=f"__m128i __lsx_vfcmp_{cond}_d (__m128d a, __m128d b)",
                 instr=f"vfcmp.{cond}.d vr, vr, vr",
-                desc=f"Compare double precision elements in `a` and `b`, save the comparison result (all ones if {desc}, all zeros otherwise) into `dst`. {trap}",
+                desc=f"Compare corresponding double precision elements in `a` and `b`, save the comparison result (all ones if {desc}, all zeros otherwise) into `dst`. {trap}",
             )
         )
 
@@ -557,7 +557,7 @@ CPU Flags: {cur_simd.upper()}
         return instruction(
             intrinsic=f"{fp_type} __lsx_vfmul_{name} ({fp_type} a, {fp_type} b)",
             instr=f"vfmul.{name} vr, vr, vr",
-            desc=f"Multiply {precision} precision floating point elements in `a` and elements in `b`.",
+            desc=f"Multiply corresponding {precision} precision floating point elements in `a` and `b`.",
         )
 
     @my_macro(env)
@@ -567,7 +567,7 @@ CPU Flags: {cur_simd.upper()}
         return instruction(
             intrinsic=f"{fp_type} __lsx_vfdiv_{name} ({fp_type} a, {fp_type} b)",
             instr=f"vfdiv.{name} vr, vr, vr",
-            desc=f"Divide {precision} precision floating point elements in `a` by elements in `b`.",
+            desc=f"Divide corresponding {precision} precision floating point elements in `a` by elements in `b`.",
         )
 
     @my_macro(env)
@@ -577,7 +577,7 @@ CPU Flags: {cur_simd.upper()}
         return instruction(
             intrinsic=f"{fp_type} __lsx_vfadd_{name} ({fp_type} a, {fp_type} b)",
             instr=f"vfadd.{name} vr, vr, vr",
-            desc=f"Add {precision} precision floating point elements in `a` to elements in `b`.",
+            desc=f"Add corresponding {precision} precision floating point elements in `a` and `b`.",
         )
 
     @my_macro(env)
@@ -587,7 +587,7 @@ CPU Flags: {cur_simd.upper()}
         return instruction(
             intrinsic=f"{fp_type} __lsx_vfsub_{name} ({fp_type} a, {fp_type} b)",
             instr=f"vfsub.{name} vr, vr, vr",
-            desc=f"Subtract {precision} precision floating point elements in `a` by elements in `b`.",
+            desc=f"Subtract corresponding {precision} precision floating point elements in `b` from elements in `a`.",
         )
 
     @my_macro(env)
@@ -638,7 +638,7 @@ CPU Flags: {cur_simd.upper()}
         return instruction(
             intrinsic=f"__m128i __lsx_vhaddw_{name}_{name2} (__m128i a, __m128i b)",
             instr=f"vhaddw.{name}.{name2} vr, vr, vr",
-            desc=f"Add odd-positioned {signedness} {width2}-bit elements in `a` to even-positioned {signedness} {width2}-bit elements in `b` to get {width}-bit result.",
+            desc=f"Add odd-positioned {signedness} {width2}-bit elements in `a` to even-positioned {signedness} {width2}-bit elements in `b`, extending both to {width}-bit, to get the {width}-bit result.",
         )
 
     @my_macro(env)
@@ -649,7 +649,7 @@ CPU Flags: {cur_simd.upper()}
         return instruction(
             intrinsic=f"__m128i __lsx_vhsubw_{name}_{name2} (__m128i a, __m128i b)",
             instr=f"vhsubw.{name}.{name2} vr, vr, vr",
-            desc=f"Subtract even-positioned {signedness} {width2}-bit elements in `b` from odd-positioned {signedness} {width2}-bit elements in `a` to get {width}-bit result.",
+            desc=f"Subtract even-positioned {signedness} {width2}-bit elements in `b` from odd-positioned {signedness} {width2}-bit elements in `a`, extending both to {width}-bit, to get the {width}-bit result.",
         )
 
     @my_macro(env)
@@ -704,7 +704,7 @@ CPU Flags: {cur_simd.upper()}
         return instruction(
             intrinsic=f"__m256i __lasx_vext2xv_{name}_{name2} (__m256i a)",
             instr=f"vext2xv.{name}.{name2} xr, xr",
-            desc=f"Extend {signedness} {width2}-bit elements in the lowest 128-bit part of `a` to {signedness} {width}-bit elements.",
+            desc=f"Extend the lowest {256 // width} {signedness} {width2}-bit elements of `a` to {signedness} {width}-bit elements.",
         )
 
     @my_macro(env)
@@ -756,7 +756,7 @@ CPU Flags: {cur_simd.upper()}
             intrinsic=f"__m128i __lsx_vshuf_b (__m128i a, __m128i b, __m128i c)",
             instr=f"vshuf.{name} vr, vr, vr, vr",
             desc=f"""
-For each 128-bit lane, shuffle bytes from `a` and `b` using indices from the corresponding lane of `c`.
+For each 128-bit lane, shuffle bytes from `a` and `b` using the low 5 bits of the indices from the corresponding lane of `c`.
 
 Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they are placed in `a`.
 
@@ -767,22 +767,21 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
     @my_macro(env)
     def vshuf_hwd(name):
         width = widths[name]
+        index_bits = int(math.log2(256 // width))
         return instruction(
             intrinsic=f"__m128i __lsx_vshuf_{name} (__m128i a, __m128i b, __m128i c)",
             instr=f"vshuf.{name} vr, vr, vr",
-            desc=f"For each 128-bit lane, shuffle {width}-bit elements from `b` and `c` using indices from the corresponding lane of `a`, and save the result to `dst`.",
+            desc=f"For each 128-bit lane, shuffle {width}-bit elements from `b` and `c` using the low {index_bits} bits of the indices from the corresponding lane of `a`, and save the result to `dst`.",
         )
 
     @my_macro(env)
     def vldrepl(name):
         width = widths[name]
         imm_range = 2048 // (width // 8)
-        shift = int(math.log2(width // 8))
-        offset_expr = "offset" if shift == 0 else f"(offset << {shift})"
         return instruction(
             intrinsic=f"__m128i __lsx_vldrepl_{name} (void * addr, imm_n{imm_range}_{imm_range-1} offset)",
             instr=f"vldrepl.{name} vr, r, imm",
-            desc=f"Read {width}-bit data from memory address `addr + {offset_expr}`, replicate the data to all vector lanes and save into `dst`.",
+            desc=f"Read {width}-bit data from memory address `addr + offset`, replicate the data to all vector lanes and save into `dst`. The `offset` operand is a byte offset, matching the assembly immediate; the encoded instruction stores it as a scaled immediate for wider elements.",
         )
 
     @my_macro(env)
@@ -891,7 +890,7 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         return instruction(
             intrinsic=f"void __lsx_vstelm_{name} (__m128i data, void * addr, imm_n128_127 offset, imm0_{imm_upper} lane)",
             instr=f"vstelm.{name} vr, r, imm, imm",
-            desc=f"Store the {width}-bit element in `data` specified by `lane` to memory address `addr + offset`.",
+            desc=f"Store element `lane` of `data` to memory address `addr + offset`.",
         )
 
     @my_macro(env)
@@ -1241,6 +1240,7 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
     @my_macro(env)
     def vpickve2gr(name):
         width = widths[name]
+        signedness = signednesses[name]
         return_type = {
             "b": "int",
             "bu": "unsigned int",
@@ -1251,11 +1251,12 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
             "d": "long int",
             "du": "unsigned long int",
         }[name]
+        ext = "sign-extend" if signedness == "signed" else "zero-extend"
         global cur_vlen
         return instruction(
             intrinsic=f"{return_type} __lsx_vpickve2gr_{name} (__m128i a, imm0_{cur_vlen // width - 1} idx)",
             instr=f"vpickve2gr.{name} r, vr, imm",
-            desc=f"Pick the {width}-bit element at lane `idx` from `a`, extend it to the GPR width according to the element signedness, and store it in `dst`.",
+            desc=f"Pick the {width}-bit element at lane `idx` from `a`, {ext} it to the GPR width, and store it in `dst`.",
         )
 
     @my_macro(env)
@@ -1605,7 +1606,7 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         return instruction(
             intrinsic=f"__m128i __lsx_vmepatmsk_v (int mode, int uimm5)",
             instr=f"vmepatmsk.v vr, mode, uimm5",
-            desc=f"Compute a byte pattern selected by `mode`, then add `uimm5` to each byte element.",
+            desc=f"Compute an 8-bit pattern selected by `mode` (0: repeating 0..3; 1: 0..3 shifted by 1 for each group; 2: 4..7 shifted by 1 for each group; 3: 0..15), then add `uimm5` to each byte element.",
         )
 
     @my_macro(env)
@@ -1712,7 +1713,7 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         return instruction(
             intrinsic=f"__m256i __lasx_xvperm_w (__m256i a, __m256i b)",
             instr=f"xvperm.w xr, xr, xr",
-            desc=f"Permute words from `a` with indices recorded in `b` and store into `dst`.",
+            desc=f"For each word, use the low 3 bits of the corresponding word in `b` as an index into the eight words of `a`, and store the result in `dst`.",
         )
 
     @env.macro
@@ -1970,7 +1971,7 @@ Initialize `dst` using predefined patterns:
         return instruction(
             intrinsic=f"{arg_type} __lsx_vf{name}_{ty} ({arg_type} a, __m128i b)",
             instr=f"vf{name}.{ty} vr, vr, vr",
-            desc=f"Compute {desc} of {precision} precision floating point elements in `a` by integer elements in `b`. Currently undocumented.",
+            desc=f"Compute IEEE 754 scaleB (multiply by 2^`b`) of {precision} precision floating point elements in `a` using integer exponents in `b`. Currently undocumented.",
         )
 
     @env.macro
@@ -1978,7 +1979,7 @@ Initialize `dst` using predefined patterns:
         return instruction(
             intrinsic=f"__m256i __lasx_xvhseli_d (__m256i a, imm0_31 imm)",
             instr=f"xvhseli.d xr, xr, imm",
-            desc=f"Select double words from `a` with indices recorded in `imm` and store into `dst`.",
+            desc=f"Select each double word of `dst` from an adjacent pair in `a` according to `imm`: bits 0 and 1 choose the sources for D[0] and D[1] from {{a.D[0], a.D[1]}}, and bits 2 and 3 choose the sources for D[2] and D[3] from {{a.D[2], a.D[3]}}.",
         )
 
     lasx_128_lane_entries = {
