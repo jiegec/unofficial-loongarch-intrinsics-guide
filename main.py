@@ -301,7 +301,7 @@ CPU Flags: {cur_simd.upper()}
         return instruction(
             intrinsic=f"__m128i __lsx_vaddi_{name} (__m128i a, imm0_31 imm)",
             instr=f"vaddi.{name} vr, vr, imm",
-            desc=f"Add {width}-bit elements in `a` and `imm`, save the result in `dst`.",
+            desc=f"Add the zero-extended `imm` to each {width}-bit element in `a`, save the result in `dst`.",
         )
 
     @my_macro(env)
@@ -310,7 +310,7 @@ CPU Flags: {cur_simd.upper()}
         return instruction(
             intrinsic=f"__m128i __lsx_vsubi_{name} (__m128i a, imm0_31 imm)",
             instr=f"vsubi.{name} vr, vr, imm",
-            desc=f"Subtract {width}-bit elements in `a` by `imm`, save the result in `dst`.",
+            desc=f"Subtract the zero-extended `imm` from each {width}-bit element in `a`, save the result in `dst`.",
         )
 
     @my_macro(env)
@@ -330,10 +330,14 @@ CPU Flags: {cur_simd.upper()}
             suffix = "ev"
         else:
             suffix = "od"
+        if op == "sub":
+            result_desc = f"Subtract {even_odd}-positioned {signedness} {narrow_width}-bit elements in `b` from the corresponding elements in `a`, save the {wide_width}-bit result in `dst`."
+        else:
+            result_desc = f"{desc} {even_odd}-positioned {signedness} {narrow_width}-bit elements in `a` and {signedness2} elements in `b`, save the {wide_width}-bit result in `dst`."
         return instruction(
             intrinsic=f"__m128i __lsx_v{op}w{suffix}_{wide}_{narrow}{intrinsic_suffix} (__m128i a, __m128i b)",
             instr=f"v{op}w{suffix}.{wide}.{narrow}{inst_suffix} vr, vr, vr",
-            desc=f"{desc} {even_odd}-positioned {signedness} {narrow_width}-bit elements in `a` and {signedness2} elements in `b`, save the {wide_width}-bit result in `dst`.",
+            desc=result_desc,
         )
 
     @my_macro(env)
@@ -386,7 +390,7 @@ CPU Flags: {cur_simd.upper()}
         return instruction(
             intrinsic=f"__m128i __lsx_vbitclr_{name} (__m128i a, __m128i b)",
             instr=f"vbitclr.{name} vr, vr, vr",
-            desc=f"Clear the bit specified by elements in `b` from {width}-bit elements in `a`, save the result in `dst`.",
+            desc=f"For each {width}-bit element, clear the bit indexed by the corresponding element of `b` modulo {width}, save the result in `dst`.",
         )
 
     @my_macro(env)
@@ -396,7 +400,7 @@ CPU Flags: {cur_simd.upper()}
         return instruction(
             intrinsic=f"__m128i __lsx_vbitclri_{name} (__m128i a, imm0_{imm_upper} imm)",
             instr=f"vbitclri.{name} vr, vr, imm",
-            desc=f"Clear the bit specified by `imm` from {width}-bit elements in `a`, save the result in `dst`.",
+            desc=f"For each {width}-bit element, clear the bit indexed by `imm`, save the result in `dst`.",
         )
 
     @my_macro(env)
@@ -405,7 +409,7 @@ CPU Flags: {cur_simd.upper()}
         return instruction(
             intrinsic=f"__m128i __lsx_vbitset_{name} (__m128i a, __m128i b)",
             instr=f"vbitset.{name} vr, vr, vr",
-            desc=f"Set the bit specified by elements in `b` from {width}-bit elements in `a`, save the result in `dst`.",
+            desc=f"For each {width}-bit element, set the bit indexed by the corresponding element of `b` modulo {width}, save the result in `dst`.",
         )
 
     @my_macro(env)
@@ -415,7 +419,7 @@ CPU Flags: {cur_simd.upper()}
         return instruction(
             intrinsic=f"__m128i __lsx_vbitseti_{name} (__m128i a, imm0_{imm_upper} imm)",
             instr=f"vbitseti.{name} vr, vr, imm",
-            desc=f"Set the bit specified by `imm` from {width}-bit elements in `a`, save the result in `dst`.",
+            desc=f"For each {width}-bit element, set the bit indexed by `imm`, save the result in `dst`.",
         )
 
     @my_macro(env)
@@ -424,7 +428,7 @@ CPU Flags: {cur_simd.upper()}
         return instruction(
             intrinsic=f"__m128i __lsx_vbitrev_{name} (__m128i a, __m128i b)",
             instr=f"vbitrev.{name} vr, vr, vr",
-            desc=f"Toggle the bit specified by elements in `b` from {width}-bit elements in `a`, save the result in `dst`.",
+            desc=f"For each {width}-bit element, toggle the bit indexed by the corresponding element of `b` modulo {width}, save the result in `dst`.",
         )
 
     @my_macro(env)
@@ -434,7 +438,7 @@ CPU Flags: {cur_simd.upper()}
         return instruction(
             intrinsic=f"__m128i __lsx_vbitrevi_{name} (__m128i a, imm0_{imm_upper} imm)",
             instr=f"vbitrevi.{name} vr, vr, imm",
-            desc=f"Toggle the bit specified by `imm` from {width}-bit elements in `a`, save the result in `dst`.",
+            desc=f"For each {width}-bit element, toggle the bit indexed by `imm`, save the result in `dst`.",
         )
 
     @my_macro(env)
@@ -462,7 +466,7 @@ CPU Flags: {cur_simd.upper()}
         return instruction(
             intrinsic=f"__m128i __lsx_vdiv_{name} (__m128i a, __m128i b)",
             instr=f"vdiv.{name} vr, vr, vr",
-            desc=f"Divide {signedness} {width}-bit elements in `a` by elements in `b`.",
+            desc=f"Divide each {signedness} {width}-bit element in `a` by the corresponding element in `b`.",
         )
 
     @my_macro(env)
@@ -472,7 +476,7 @@ CPU Flags: {cur_simd.upper()}
         return instruction(
             intrinsic=f"__m128i __lsx_vmod_{name} (__m128i a, __m128i b)",
             instr=f"vmod.{name} vr, vr, vr",
-            desc=f"Modulo residual {signedness} {width}-bit elements in `a` by elements in `b`.",
+            desc=f"Compute the remainder of each {signedness} {width}-bit element in `a` divided by the corresponding element in `b`.",
         )
 
     @my_macro(env)
@@ -501,9 +505,9 @@ CPU Flags: {cur_simd.upper()}
     def vextrins(name):
         width = widths[name[0]]
         if cur_simd == "lasx":
-            desc = f"For each 128-bit half, extract one {width}-bit element in `b` and insert it to `a` according to `imm`."
+            desc = f"For each 128-bit lane, copy one {width}-bit element from `b` to `a` according to `imm`; other elements remain unchanged."
         else:
-            desc = f"Extract one {width}-bit element in `b` and insert it to `a` according to `imm`."
+            desc = f"Copy one {width}-bit element from `b` to `a` according to `imm`; other elements remain unchanged."
         return instruction(
             intrinsic=f"__m128i __lsx_vextrins_{name} (__m128i a, __m128i b, imm0_255 imm)",
             instr=f"vextrins.{name} vr, vr, imm",
@@ -642,7 +646,7 @@ CPU Flags: {cur_simd.upper()}
         return instruction(
             intrinsic=f"__m128i __lsx_vhsubw_{name}_{name2} (__m128i a, __m128i b)",
             instr=f"vhsubw.{name}.{name2} vr, vr, vr",
-            desc=f"Subtract odd-positioned {signedness} {width2}-bit elements in `a` by even-positioned {signedness} {width2}-bit elements in `b` to get {width}-bit result.",
+            desc=f"Subtract even-positioned {signedness} {width2}-bit elements in `b` from odd-positioned {signedness} {width2}-bit elements in `a` to get {width}-bit result.",
         )
 
     @my_macro(env)
@@ -675,7 +679,7 @@ CPU Flags: {cur_simd.upper()}
         return instruction(
             intrinsic=f"__m128i __lsx_vinsgr2vr_{name} (__m128i a, {long}int b, imm0_{imm_upper} imm)",
             instr=f"vinsgr2vr.{name} vr, r, imm",
-            desc=f"Insert {width}-bit element into lane indexed `imm`.",
+            desc=f"Insert the low {width} bits of `b` into lane `imm` of `a`; the other lanes are unchanged.",
         )
 
     @env.macro
@@ -684,7 +688,7 @@ CPU Flags: {cur_simd.upper()}
         return instruction(
             intrinsic=f"__m256i __lasx_xvinsve0_{name} (__m256i a, __m256i b, imm0_{256 // width - 1} imm)",
             instr=f"xvinsve0.{name} xr, xr, imm",
-            desc=f"Insert the first {width}-bit lane of `b` into lane indexed `imm` of `a`.",
+            desc=f"Insert the first {width}-bit element of `b` into lane `imm` of `a`; the other lanes are unchanged.",
         )
 
     @env.macro
@@ -726,10 +730,11 @@ CPU Flags: {cur_simd.upper()}
             imm_range = "0_31"
         else:
             imm_range = "_n16_15"
+        ext = "zero-extended" if signedness == "unsigned" else "sign-extended"
         return instruction(
             intrinsic=f"__m128i __lsx_v{min_max}i_{name} (__m128i a, imm{imm_range} imm)",
             instr=f"v{min_max}i.{name} vr, vr, imm",
-            desc=f"Compute elementwise {min_max}imum for {signedness} {width}-bit elements in `a` and `imm`.",
+            desc=f"Compute elementwise {min_max}imum for {signedness} {width}-bit elements in `a` and the {ext} `imm`.",
         )
 
     @my_macro(env)
@@ -748,7 +753,7 @@ CPU Flags: {cur_simd.upper()}
             intrinsic=f"__m128i __lsx_vshuf_b (__m128i a, __m128i b, __m128i c)",
             instr=f"vshuf.{name} vr, vr, vr, vr",
             desc=f"""
-Shuffle bytes from `a` and `b` with indices from `c`.
+For each 128-bit lane, shuffle bytes from `a` and `b` using indices from the corresponding lane of `c`.
 
 Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they are placed in `a`.
 
@@ -762,7 +767,7 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         return instruction(
             intrinsic=f"__m128i __lsx_vshuf_{name} (__m128i a, __m128i b, __m128i c)",
             instr=f"vshuf.{name} vr, vr, vr",
-            desc=f"Shuffle {width}-bit elements in `b` and `c` with indices from `a`, save the result to `dst`.",
+            desc=f"For each 128-bit lane, shuffle {width}-bit elements from `b` and `c` using indices from the corresponding lane of `a`, and save the result to `dst`.",
         )
 
     @my_macro(env)
@@ -770,10 +775,11 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         width = widths[name]
         imm_range = 2048 // (width // 8)
         shift = int(math.log2(width // 8))
+        offset_expr = "offset" if shift == 0 else f"(offset << {shift})"
         return instruction(
             intrinsic=f"__m128i __lsx_vldrepl_{name} (void * addr, imm_n{imm_range}_{imm_range-1} offset)",
             instr=f"vldrepl.{name} vr, r, imm",
-            desc=f"Read {width}-bit data from memory address `addr + (offset << {shift})`, replicate the data to all vector lanes and save into `dst`.",
+            desc=f"Read {width}-bit data from memory address `addr + {offset_expr}`, replicate the data to all vector lanes and save into `dst`.",
         )
 
     @my_macro(env)
@@ -782,7 +788,7 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         return instruction(
             intrinsic=f"__m128i __lsx_vsub_{name} (__m128i a, __m128i b)",
             instr=f"vsub.{name} vr, vr, vr",
-            desc=f"Subtract {width}-bit elements in `a` and `b`, save the result in `dst`.",
+            desc=f"Subtract {width}-bit elements in `b` from elements in `a`, save the result in `dst`.",
         )
 
     @my_macro(env)
@@ -807,7 +813,7 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         return instruction(
             intrinsic=f"__m128i __lsx_vmadd_{name} (__m128i a, __m128i b, __m128i c)",
             instr=f"vmadd.{name} vr, vr, vr",
-            desc=f"Multiply {width}-bit elements in `b` and `c`, add to elements in `a`, save the result in `dst`.",
+            desc=f"Multiply {width}-bit elements in `b` and `c`, add the low {width} bits of the product to elements in `a`, save the result in `dst`.",
         )
 
     @my_macro(env)
@@ -862,7 +868,7 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         return instruction(
             intrinsic=f"__m128i __lsx_vmsub_{name} (__m128i a, __m128i b, __m128i c)",
             instr=f"vmsub.{name} vr, vr, vr",
-            desc=f"Multiply {width}-bit elements in `b` and `c`, negate and add elements in `a`, save the result in `dst`.",
+            desc=f"Multiply {width}-bit elements in `b` and `c`, subtract the low {width} bits of the product from elements in `a`, save the result in `dst`.",
         )
 
     @my_macro(env)
@@ -900,7 +906,7 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         return instruction(
             intrinsic=f"__m128i __lsx_vseqi_{name} (__m128i a, imm_n16_15 imm)",
             instr=f"vseqi.{name} vr, vr, imm",
-            desc=f"Compare the {width}-bit elements in `a` and `imm`, store all-ones to `dst` if equal, zero otherwise.",
+            desc=f"Compare the {width}-bit elements in `a` and the sign-extended `imm`, store all-ones to `dst` if equal, zero otherwise.",
         )
 
     @my_macro(env)
@@ -921,10 +927,11 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
             imm_range = "imm_n16_15"
         else:
             imm_range = "imm0_31"
+        ext = "sign-extended" if signedness == "signed" else "zero-extended"
         return instruction(
             intrinsic=f"__m128i __lsx_vslti_{name} (__m128i a, {imm_range} imm)",
             instr=f"vslti.{name} vr, vr, imm",
-            desc=f"Compare the {signedness} {width}-bit elements in `a` and `imm`, store all-ones to `dst` if corresponding element in `a` is less than `imm`, zero otherwise.",
+            desc=f"Compare the {signedness} {width}-bit elements in `a` and the {ext} `imm`, store all-ones to `dst` if corresponding element in `a` is less than `imm`, zero otherwise.",
         )
 
     @my_macro(env)
@@ -945,10 +952,11 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
             imm_range = "imm_n16_15"
         else:
             imm_range = "imm0_31"
+        ext = "sign-extended" if signedness == "signed" else "zero-extended"
         return instruction(
             intrinsic=f"__m128i __lsx_vslei_{name} (__m128i a, {imm_range} imm)",
             instr=f"vslei.{name} vr, vr, imm",
-            desc=f"Compare the {signedness} {width}-bit elements in `a` and `imm`, store all-ones to `dst` if corresponding element in `a` is less than or equal to `imm`, zero otherwise.",
+            desc=f"Compare the {signedness} {width}-bit elements in `a` and the {ext} `imm`, store all-ones to `dst` if corresponding element in `a` is less than or equal to `imm`, zero otherwise.",
         )
 
     @my_macro(env)
@@ -968,7 +976,7 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         return instruction(
             intrinsic=f"__m128i __lsx_vssub_{name} (__m128i a, __m128i b)",
             instr=f"vssub.{name} vr, vr, vr",
-            desc=f"Saturating subtract the {signedness} {width}-bit elements in `a` and `b`, store the result to `dst`.",
+            desc=f"Saturating subtract the {signedness} {width}-bit elements in `b` from elements in `a`, store the result to `dst`.",
         )
 
     @my_macro(env)
@@ -978,7 +986,7 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         return instruction(
             intrinsic=f"__m128i __lsx_vsll_{name} (__m128i a, __m128i b)",
             instr=f"vsll.{name} vr, vr, vr",
-            desc=f"Logical left shift the unsigned {width}-bit elements in `a` by elements in `b`, store the result to `dst`.",
+            desc=f"Logical left shift each unsigned {width}-bit element in `a` by the corresponding element of `b` modulo {width}, store the result in `dst`.",
         )
 
     @my_macro(env)
@@ -998,7 +1006,7 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         return instruction(
             intrinsic=f"__m128i __lsx_vsrl_{name} (__m128i a, __m128i b)",
             instr=f"vsrl.{name} vr, vr, vr",
-            desc=f"Logical right shift the unsigned {width}-bit elements in `a` by elements in `b`, store the result to `dst`.",
+            desc=f"Logical right shift each unsigned {width}-bit element in `a` by the corresponding element of `b` modulo {width}, store the result in `dst`.",
         )
 
     @my_macro(env)
@@ -1018,7 +1026,7 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         return instruction(
             intrinsic=f"__m128i __lsx_vsra_{name} (__m128i a, __m128i b)",
             instr=f"vsra.{name} vr, vr, vr",
-            desc=f"Arithmetic right shift the signed {width}-bit elements in `a` by elements in `b`, store the result to `dst`.",
+            desc=f"Arithmetic right shift each signed {width}-bit element in `a` by the corresponding element of `b` modulo {width}, store the result in `dst`.",
         )
 
     @my_macro(env)
@@ -1038,7 +1046,7 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         return instruction(
             intrinsic=f"__m128i __lsx_vrotr_{name} (__m128i a, __m128i b)",
             instr=f"vrotr.{name} vr, vr, vr",
-            desc=f"Rotate right the unsigned {width}-bit elements in `a` by elements in `b`, store the result to `dst`.",
+            desc=f"Rotate right each unsigned {width}-bit element in `a` by the corresponding element of `b` modulo {width}, store the result in `dst`.",
         )
 
     @my_macro(env)
@@ -1058,7 +1066,7 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         return instruction(
             intrinsic=f"__m128i __lsx_vsrlr_{name} (__m128i a, __m128i b)",
             instr=f"vsrlr.{name} vr, vr, vr",
-            desc=f"Logical right shift (with rounding) the unsigned {width}-bit elements in `a` by elements in `b`, store the result to `dst`.",
+            desc=f"Logical right shift with rounding each unsigned {width}-bit element in `a` by the corresponding element of `b` modulo {width}, store the result in `dst`.",
         )
 
     @my_macro(env)
@@ -1078,7 +1086,7 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         return instruction(
             intrinsic=f"__m128i __lsx_vsrar_{name} (__m128i a, __m128i b)",
             instr=f"vsrar.{name} vr, vr, vr",
-            desc=f"Arithmetic right shift (with rounding) the signed {width}-bit elements in `a` by elements in `b`, store the result to `dst`.",
+            desc=f"Arithmetic right shift with rounding each signed {width}-bit element in `a` by the corresponding element of `b` modulo {width}, store the result in `dst`.",
         )
 
     @my_macro(env)
@@ -1097,7 +1105,7 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         return instruction(
             intrinsic=f"__m128i __lsx_vpackev_{name} (__m128i a, __m128i b)",
             instr=f"vpackev.{name} vr, vr, vr",
-            desc=f"Collect and pack even-positioned {width}-bit elements in `a` and `b` and store `dst`.",
+            desc=f"Interleave even-positioned {width}-bit elements of `a` and `b`: the element from `b` is placed at the even output position and the element from `a` at the following odd position.",
         )
 
     @my_macro(env)
@@ -1106,7 +1114,7 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         return instruction(
             intrinsic=f"__m128i __lsx_vpackod_{name} (__m128i a, __m128i b)",
             instr=f"vpackod.{name} vr, vr, vr",
-            desc=f"Collect and pack odd-positioned {width}-bit elements in `a` and `b` and store `dst`.",
+            desc=f"Interleave odd-positioned {width}-bit elements of `a` and `b`: the element from `b` is placed at the even output position and the element from `a` at the following odd position.",
         )
 
     @my_macro(env)
@@ -1179,7 +1187,7 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         return instruction(
             intrinsic=f"__m128i __lsx_vreplgr2vr_{name} ({long}int val)",
             instr=f"vreplgr2vr.{name} vr, r",
-            desc=f"Repeat `val` to whole vector.",
+            desc=f"Broadcast the low {width} bits of `val` to all lanes of `dst`.",
         )
 
     @my_macro(env)
@@ -1244,7 +1252,7 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         return instruction(
             intrinsic=f"{return_type} __lsx_vpickve2gr_{name} (__m128i a, imm0_{cur_vlen // width - 1} idx)",
             instr=f"vpickve2gr.{name} r, vr, imm",
-            desc=f"Pick the `lane` specified by `idx` from `a` and store into `dst`.",
+            desc=f"Pick the {width}-bit element at lane `idx` from `a`, extend it to the GPR width according to the element signedness, and store it in `dst`.",
         )
 
     @my_macro(env)
@@ -1252,14 +1260,14 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         width = widths[name]
         if name == "d":
             b = " __m128i b,"
-            b_desc = " and `b`"
+            desc = "For each 128-bit lane, select two 64-bit elements from the four elements formed by the corresponding lanes of `a` and `b` using `imm[1:0]` and `imm[3:2]`, save the result to `dst`."
         else:
             b = ""
-            b_desc = ""
+            desc = f"For each group of four consecutive {width}-bit elements in `a`, permute the group according to the four 2-bit fields of `imm`, save the result to `dst`."
         return instruction(
             intrinsic=f"__m128i __lsx_vshuf4i_{name} (__m128i a,{b} imm0_255 imm)",
             instr=f"vshuf4i.{name} vr, vr, imm",
-            desc=f"Shuffle every four {width}-bit elements in `a`{b_desc} with indices packed in `imm`, save the result to `dst`.",
+            desc=desc,
         )
 
     @my_macro(env)
@@ -1314,7 +1322,7 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         return instruction(
             intrinsic=f"__m128i __lsx_vsrln_{name}_{name2} (__m128i a, __m128i b)",
             instr=f"vsrln.{name}.{name2} vr, vr, vr",
-            desc=f"Logical right shift the unsigned {width2}-bit elements in `a` by elements in `b`, truncate to {width}-bit and store the result to `dst`.",
+            desc=f"Logical right shift each unsigned {width2}-bit element in `a` by the corresponding element of `b` modulo {width2}, write the lower {width} bits of the shifted result into the lower half of each 128-bit lane of `dst`, and zero the upper half.",
         )
 
     @my_macro(env)
@@ -1324,27 +1332,35 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         return instruction(
             intrinsic=f"__m128i __lsx_vsran_{name}_{name2} (__m128i a, __m128i b)",
             instr=f"vsran.{name}.{name2} vr, vr, vr",
-            desc=f"Arithmetic right shift the signed {width2}-bit elements in `a` by elements in `b`, truncate to {width}-bit and store the result to `dst`.",
+            desc=f"Arithmetic right shift each signed {width2}-bit element in `a` by the corresponding element of `b` modulo {width2}, write the lower {width} bits of the shifted result into the lower half of each 128-bit lane of `dst`, and zero the upper half.",
         )
 
     @my_macro(env)
     def vsrlni(name, name2):
         width = widths[name[0]]
         width2 = widths[name2[0]]
+        if width == 64:
+            result_desc = f"write the {width}-bit results into `dst`."
+        else:
+            result_desc = f"write the lower {width} bits of the shifted result into the lower half of each 128-bit lane of `dst`, and zero the upper half."
         return instruction(
             intrinsic=f"__m128i __lsx_vsrlni_{name}_{name2} (__m128i a, __m128i b, imm0_{width2-1} imm)",
             instr=f"vsrlni.{name}.{name2} vr, vr, imm",
-            desc=f"Logical right shift the unsigned {width2}-bit elements in `a` and `b` by `imm`, truncate to {width}-bit and store the result to `dst`.",
+            desc=f"Logical right shift the unsigned {width2}-bit elements in `a` and `b` by `imm`, {result_desc}",
         )
 
     @my_macro(env)
     def vsrani(name, name2):
         width = widths[name[0]]
         width2 = widths[name2[0]]
+        if width == 64:
+            result_desc = f"write the {width}-bit results into `dst`."
+        else:
+            result_desc = f"write the lower {width} bits of the shifted result into the lower half of each 128-bit lane of `dst`, and zero the upper half."
         return instruction(
             intrinsic=f"__m128i __lsx_vsrani_{name}_{name2} (__m128i a, __m128i b, imm0_{width2-1} imm)",
             instr=f"vsrani.{name}.{name2} vr, vr, imm",
-            desc=f"Arithmetic right shift the signed {width2}-bit elements in `a` and `b` by `imm`, truncate to {width}-bit and store the result to `dst`.",
+            desc=f"Arithmetic right shift the signed {width2}-bit elements in `a` and `b` by `imm`, {result_desc}",
         )
 
     @my_macro(env)
@@ -1354,7 +1370,7 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         return instruction(
             intrinsic=f"__m128i __lsx_vsrlrn_{name}_{name2} (__m128i a, __m128i b)",
             instr=f"vsrlrn.{name}.{name2} vr, vr, vr",
-            desc=f"Logical right shift (with rounding) the unsigned {width2}-bit elements in `a` by elements in `b`, truncate to {width}-bit and store the result to `dst`.",
+            desc=f"Logical right shift with rounding each unsigned {width2}-bit element in `a` by the corresponding element of `b` modulo {width2}, write the lower {width} bits of the shifted result into the lower half of each 128-bit lane of `dst`, and zero the upper half.",
         )
 
     @my_macro(env)
@@ -1364,27 +1380,35 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         return instruction(
             intrinsic=f"__m128i __lsx_vsrarn_{name}_{name2} (__m128i a, __m128i b)",
             instr=f"vsrarn.{name}.{name2} vr, vr, vr",
-            desc=f"Arithmetic right shift (with rounding) the signed {width2}-bit elements in `a` by elements in `b`, truncate to {width}-bit and store the result to `dst`.",
+            desc=f"Arithmetic right shift with rounding each signed {width2}-bit element in `a` by the corresponding element of `b` modulo {width2}, write the lower {width} bits of the shifted result into the lower half of each 128-bit lane of `dst`, and zero the upper half.",
         )
 
     @my_macro(env)
     def vsrlrni(name, name2):
         width = widths[name[0]]
         width2 = widths[name2[0]]
+        if width == 64:
+            result_desc = f"write the {width}-bit results into `dst`."
+        else:
+            result_desc = f"write the lower {width} bits of the shifted result into the lower half of each 128-bit lane of `dst`, and zero the upper half."
         return instruction(
             intrinsic=f"__m128i __lsx_vsrlrni_{name}_{name2} (__m128i a, __m128i b, imm0_{width2-1} imm)",
             instr=f"vsrlrni.{name}.{name2} vr, vr, imm",
-            desc=f"Logical right shift (with rounding) the unsigned {width2}-bit elements in `a` and `b` by `imm`, truncate to {width}-bit and store the result to `dst`.",
+            desc=f"Logical right shift with rounding the unsigned {width2}-bit elements in `a` and `b` by `imm`, {result_desc}",
         )
 
     @my_macro(env)
     def vsrarni(name, name2):
         width = widths[name[0]]
         width2 = widths[name2[0]]
+        if width == 64:
+            result_desc = f"write the {width}-bit results into `dst`."
+        else:
+            result_desc = f"write the lower {width} bits of the shifted result into the lower half of each 128-bit lane of `dst`, and zero the upper half."
         return instruction(
             intrinsic=f"__m128i __lsx_vsrarni_{name}_{name2} (__m128i a, __m128i b, imm0_{width2-1} imm)",
             instr=f"vsrarni.{name}.{name2} vr, vr, imm",
-            desc=f"Arithmetic right shift (with rounding) the signed {width2}-bit elements in `a` and `b` by `imm`, truncate to {width}-bit and store the result to `dst`.",
+            desc=f"Arithmetic right shift with rounding the signed {width2}-bit elements in `a` and `b` by `imm`, {result_desc}",
         )
 
     @my_macro(env)
@@ -1395,7 +1419,7 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         return instruction(
             intrinsic=f"__m128i __lsx_vssrln_{name}_{name2} (__m128i a, __m128i b)",
             instr=f"vssrln.{name}.{name2} vr, vr, vr",
-            desc=f"Logical right shift the unsigned {width2}-bit elements in `a` by elements in `b`, clamp to fit in {signedness} {width}-bit integer and store the result to `dst`.",
+            desc=f"Logical right shift each unsigned {width2}-bit element in `a` by the corresponding element of `b` modulo {width2}, saturate the result to {signedness} {width}-bit, write it into the lower half of each 128-bit lane of `dst`, and zero the upper half.",
         )
 
     @my_macro(env)
@@ -1406,7 +1430,7 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         return instruction(
             intrinsic=f"__m128i __lsx_vssran_{name}_{name2} (__m128i a, __m128i b)",
             instr=f"vssran.{name}.{name2} vr, vr, vr",
-            desc=f"Arithmetic right shift the signed {width2}-bit elements in `a` by elements in `b`, clamp to fit in {signedness} {width}-bit integer and store the result to `dst`.",
+            desc=f"Arithmetic right shift each signed {width2}-bit element in `a` by the corresponding element of `b` modulo {width2}, saturate the result to {signedness} {width}-bit, write it into the lower half of each 128-bit lane of `dst`, and zero the upper half.",
         )
 
     @my_macro(env)
@@ -1414,10 +1438,14 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         width = widths[name[0]]
         signedness = signednesses[name]
         width2 = widths[name2[0]]
+        if width == 64:
+            result_desc = f"write the {width}-bit results into `dst`."
+        else:
+            result_desc = f"write the {width}-bit result into the lower half of each 128-bit lane of `dst`, and zero the upper half."
         return instruction(
             intrinsic=f"__m128i __lsx_vssrlni_{name}_{name2} (__m128i a, __m128i b, imm0_{width2-1} imm)",
             instr=f"vssrlni.{name}.{name2} vr, vr, imm",
-            desc=f"Logical right shift the unsigned {width2}-bit elements in `a` and `b` by `imm`, clamp to fit in {signedness} {width}-bit integer and store the result to `dst`.",
+            desc=f"Logical right shift the unsigned {width2}-bit elements in `a` and `b` by `imm`, saturate the result to {signedness} {width}-bit, {result_desc}",
         )
 
     @my_macro(env)
@@ -1425,10 +1453,14 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         width = widths[name[0]]
         signedness = signednesses[name]
         width2 = widths[name2[0]]
+        if width == 64:
+            result_desc = f"write the {width}-bit results into `dst`."
+        else:
+            result_desc = f"write the {width}-bit result into the lower half of each 128-bit lane of `dst`, and zero the upper half."
         return instruction(
             intrinsic=f"__m128i __lsx_vssrani_{name}_{name2} (__m128i a, __m128i b, imm0_{width2-1} imm)",
             instr=f"vssrani.{name}.{name2} vr, vr, imm",
-            desc=f"Arithmetic right shift the signed {width2}-bit elements in `a` and `b` by `imm`, clamp to fit in {signedness} {width}-bit integer and store the result to `dst`.",
+            desc=f"Arithmetic right shift the signed {width2}-bit elements in `a` and `b` by `imm`, saturate the result to {signedness} {width}-bit, {result_desc}",
         )
 
     @my_macro(env)
@@ -1439,7 +1471,7 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         return instruction(
             intrinsic=f"__m128i __lsx_vssrlrn_{name}_{name2} (__m128i a, __m128i b)",
             instr=f"vssrlrn.{name}.{name2} vr, vr, vr",
-            desc=f"Logical right shift (with rounding) the unsigned {width2}-bit elements in `a` by elements in `b`, clamp to fit in {signedness} {width}-bit integer and store the result to `dst`.",
+            desc=f"Logical right shift with rounding each unsigned {width2}-bit element in `a` by the corresponding element of `b` modulo {width2}, saturate the result to {signedness} {width}-bit, write it into the lower half of each 128-bit lane of `dst`, and zero the upper half.",
         )
 
     @my_macro(env)
@@ -1450,7 +1482,7 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         return instruction(
             intrinsic=f"__m128i __lsx_vssrarn_{name}_{name2} (__m128i a, __m128i b)",
             instr=f"vssrarn.{name}.{name2} vr, vr, vr",
-            desc=f"Arithmetic right shift (with rounding) the signed {width2}-bit elements in `a` by elements in `b`, clamp to fit in {signedness} {width}-bit integer and store the result to `dst`.",
+            desc=f"Arithmetic right shift with rounding each signed {width2}-bit element in `a` by the corresponding element of `b` modulo {width2}, saturate the result to {signedness} {width}-bit, write it into the lower half of each 128-bit lane of `dst`, and zero the upper half.",
         )
 
     @my_macro(env)
@@ -1458,10 +1490,14 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         width = widths[name[0]]
         signedness = signednesses[name]
         width2 = widths[name2[0]]
+        if width == 64:
+            result_desc = f"write the {width}-bit results into `dst`."
+        else:
+            result_desc = f"write the {width}-bit result into the lower half of each 128-bit lane of `dst`, and zero the upper half."
         return instruction(
             intrinsic=f"__m128i __lsx_vssrlrni_{name}_{name2} (__m128i a, __m128i b, imm0_{width2-1} imm)",
             instr=f"vssrlrni.{name}.{name2} vr, vr, imm",
-            desc=f"Logical right shift (with rounding) the unsigned {width2}-bit elements in `a` and `b` by `imm`, clamp to fit in {signedness} {width}-bit integer and store the result to `dst`.",
+            desc=f"Logical right shift with rounding the unsigned {width2}-bit elements in `a` and `b` by `imm`, saturate the result to {signedness} {width}-bit, {result_desc}",
         )
 
     @my_macro(env)
@@ -1469,10 +1505,14 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         width = widths[name[0]]
         signedness = signednesses[name]
         width2 = widths[name2[0]]
+        if width == 64:
+            result_desc = f"write the {width}-bit results into `dst`."
+        else:
+            result_desc = f"write the {width}-bit result into the lower half of each 128-bit lane of `dst`, and zero the upper half."
         return instruction(
             intrinsic=f"__m128i __lsx_vssrarni_{name}_{name2} (__m128i a, __m128i b, imm0_{width2-1} imm)",
             instr=f"vssrarni.{name}.{name2} vr, vr, imm",
-            desc=f"Arithmetic right shift (with rounding) the signed {width2}-bit elements in `a` and `b` by `imm`, clamp to fit in {signedness} {width}-bit integer and store the result to `dst`.",
+            desc=f"Arithmetic right shift with rounding the signed {width2}-bit elements in `a` and `b` by `imm`, saturate the result to {signedness} {width}-bit, {result_desc}",
         )
 
     @my_macro(env)
@@ -1510,7 +1550,7 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         return instruction(
             intrinsic=f"__m128i __lsx_vftint{rounding}{low_high}_l_s (__m128 a)",
             instr=f"vftint{rounding}{low_high}.l.s vr, vr",
-            desc=f"Convert single-precision floating point elements in {half} part of every 128-bit vector of `a` to 64-bit integer, {rounding_mode}.",
+            desc=f"Convert single-precision floating point elements in {half} part of every 128-bit vector of `a` to signed 64-bit integer, {rounding_mode}.",
         )
 
     @my_macro(env)
@@ -1519,7 +1559,7 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         return instruction(
             intrinsic=f"__m128i __lsx_vftint{rounding}_w_d (__m128d a, __m128d b)",
             instr=f"vftint{rounding}.w.d vr, vr, vr",
-            desc=f"Convert double-precision floating point elements in `a` and `b` to 32-bit integer, {rounding_mode}.",
+            desc=f"For each 128-bit lane, convert double-precision floating point elements in the corresponding lane of `a` into the upper half and elements in `b` into the lower half, as signed 32-bit integers, {rounding_mode}.",
         )
 
     @my_macro(env)
@@ -1562,7 +1602,7 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         return instruction(
             intrinsic=f"__m128i __lsx_vmepatmsk_v (int mode, int uimm5)",
             instr=f"vmepatmsk.v vr, mode, uimm5",
-            desc=f"Compute pattern according to `mode`, then add `uimm5` to each element.",
+            desc=f"Compute a byte pattern selected by `mode`, then add `uimm5` to each byte element.",
         )
 
     @my_macro(env)
@@ -1589,7 +1629,7 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         return instruction(
             intrinsic=f"__m128d __lsx_vffint{low_high}_d_w (__m128i a)",
             instr=f"vffint{low_high}.d.w vr, vr",
-            desc=f"Convert 32-bit integer elements in {half} part of every 128-bit vector of `a` to double precision floating point numbers.",
+            desc=f"Convert signed 32-bit integer elements in {half} part of every 128-bit vector of `a` to double precision floating point numbers.",
         )
 
     @my_macro(env)
@@ -1617,7 +1657,7 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         return instruction(
             intrinsic=f"__m128 __lsx_vffint_s_l (__m128i a, __m128i b)",
             instr=f"vffint.s.l vr, vr, vr",
-            desc=f"Convert 64-bit integer elements in `a` and `b` to single-precision floating point numbers.",
+            desc=f"For each 128-bit lane, convert signed 64-bit integer elements in the corresponding lane of `a` into the upper half and elements in `b` into the lower half, as single-precision floating point numbers.",
         )
 
     @my_macro(env)
@@ -1627,7 +1667,7 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         return instruction(
             intrinsic=f"__m128i __lsx_vfrstp_{name} (__m128i a, __m128i b, __m128i c)",
             instr=f"vfrstp.{name} vr, vr, vr",
-            desc=f"For each 128-bit lane, find the first negative {width}-bit element in `b`, set the index of the element to the lane of `a` specified by the first element of the corresponding 128-bit lane of `c` modulo {modulo} (or max index plus one when not found), with other lanes copied from `a`.",
+            desc=f"For each 128-bit lane, find the first negative {width}-bit element in `b`. Write its index into the lane of `a` selected by the first element of the corresponding lane of `c` modulo {modulo}, or write the maximum valid index plus one if no such element exists. Other elements of `a` remain unchanged.",
         )
 
     @my_macro(env)
@@ -1637,7 +1677,7 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         return instruction(
             intrinsic=f"__m128i __lsx_vfrstpi_{name} (__m128i a, __m128i b, imm0_31 imm)",
             instr=f"vfrstpi.{name} vr, vr, imm",
-            desc=f"For every 128-bit vector, find the first negative {width}-bit element in `b`, set the index of the element to the lane of `a` specified by `imm % {modulo}` (or max index plus one when not found), with other lanes copied from `a`.",
+            desc=f"For each 128-bit lane, find the first negative {width}-bit element in `b`. Write its index into the lane of `a` selected by `imm` modulo {modulo}, or write the maximum valid index plus one if no such element exists. Other elements of `a` remain unchanged.",
         )
 
     @my_macro(env)
@@ -1645,7 +1685,7 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         return instruction(
             intrinsic=f"__m128i __lsx_vb{name}_v (__m128i a, imm0_31 imm)",
             instr=f"vb{name}.v vr, vr, imm",
-            desc=f"Compute every 128-bit vector of `a` shifted {dir} by `(imm % 16) * 8` bits.",
+            desc=f"Shift each 128-bit lane of `a` {dir} by `(imm % 16) * 8` bits, filling the vacated bits with zeros.",
         )
 
     @my_macro(env)
@@ -1653,7 +1693,7 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         return instruction(
             intrinsic=f"__m128i __lsx_vpermi_w (__m128i a, __m128i b, imm0_255 imm)",
             instr=f"vpermi.w vr, vr, imm",
-            desc=f"Permute words from `a` and `b` with indices recorded in `imm` and store into `dst`.",
+            desc=f"For each 128-bit lane, use `imm[1:0]` and `imm[3:2]` to select words 0 and 1 from `b`, and `imm[5:4]` and `imm[7:6]` to select words 2 and 3 from `a`; store the result in `dst`.",
         )
 
     @env.macro
@@ -1661,7 +1701,7 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         return instruction(
             intrinsic=f"__m256i __lasx_xvpermi_d (__m256i a, imm0_255 imm)",
             instr=f"xvpermi.d xr, xr, imm",
-            desc=f"Permute double words from `a` with indices recorded in `imm` and store into `dst`.",
+            desc=f"Select four double words from `a` using `imm[1:0]`, `imm[3:2]`, `imm[5:4]`, and `imm[7:6]`, and store them in `dst`.",
         )
 
     @env.macro
@@ -1677,7 +1717,7 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         return instruction(
             intrinsic=f"__m256i __lasx_xvpermi_q (__m256i a, __m256i b, imm0_255 imm)",
             instr=f"xvpermi.q xr, xr, imm",
-            desc=f"Permute quad words from `a` and `b` with indices recorded in `imm` and store into `dst`.",
+            desc=f"Select the two quad words of `dst` from the four quad words of `a` and `b` using `imm[1:0]` and `imm[5:4]`.",
         )
 
     @env.macro
@@ -1756,7 +1796,7 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         return instruction(
             intrinsic=f"__m128i __lsx_vbitseli_b (__m128i a, __m128i b, imm0_255 imm)",
             instr=f"vbitseli.b vr, vr, imm",
-            desc=f"Compute bitwise selection: for each bit position, if the bit in `a` equals to one, copy the bit from `imm` to `dst`, otherwise copy from `b`.",
+            desc=f"Use each bit of `a` as a mask: where the bit is 1, select the corresponding bit of `imm`; where it is 0, select the corresponding bit of `b`. The result is written to `dst`.",
         )
 
     @my_macro(env)
@@ -1780,7 +1820,7 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         return instruction(
             intrinsic=f"__m128 __lsx_vfcvt_s_d (__m128d a, __m128d b)",
             instr=f"vfcvt.s.d vr, vr, vr",
-            desc=f"Convert double precision floating point elements in `a` and `b` to single precision.",
+            desc=f"For each 128-bit lane, convert double-precision floating point elements in the corresponding lane of `a` into the upper half and elements in `b` into the lower half, as single-precision floating point numbers.",
         )
 
     @my_macro(env)
@@ -1804,7 +1844,7 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         return instruction(
             intrinsic=f"__m128i __lsx_vfcvt_h_s (__m128 a, __m128 b)",
             instr=f"vfcvt.h.s vr, vr, vr",
-            desc=f"Convert single precision floating point elements in `a` and `b` to half precision.",
+            desc=f"For each 128-bit lane, convert single-precision floating point elements in the corresponding lane of `a` into the upper half and elements in `b` into the lower half, as half-precision floating point numbers.",
         )
 
     @my_macro(env)
@@ -1812,7 +1852,7 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         return instruction(
             intrinsic=f"__m128i __lsx_vfclass_d (__m128d a)",
             instr=f"vfclass.d vr, vr",
-            desc=f"Classifiy each double precision floating point elements in `a`.",
+            desc=f"Classify each double precision floating point element in `a` according to IEEE 754 `class(x)`, writing the 10-bit classification result into the corresponding element of `dst`.",
         )
 
     @my_macro(env)
@@ -1820,7 +1860,7 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         return instruction(
             intrinsic=f"__m128i __lsx_vfclass_s (__m128 a)",
             instr=f"vfclass.s vr, vr",
-            desc=f"Classifiy each single precision floating point elements in `a`.",
+            desc=f"Classify each single precision floating point element in `a` according to IEEE 754 `class(x)`, writing the 10-bit classification result into the corresponding element of `dst`.",
         )
 
     @my_macro(env)

@@ -24,8 +24,8 @@
 {{ vfsub('s') }}
 {{ vfsub('d') }}
 
-{{ vfop('2-based logarithm', 'logb', 's') }}
-{{ vfop('2-based logarithm', 'logb', 'd') }}
+{{ vfop('base-2 logarithm', 'logb', 's') }}
+{{ vfop('base-2 logarithm', 'logb', 'd') }}
 
 {{ vfop('square root', 'sqrt', 's') }}
 {{ vfop('square root', 'sqrt', 'd') }}

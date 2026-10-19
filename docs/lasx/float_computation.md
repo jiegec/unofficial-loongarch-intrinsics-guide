@@ -24,8 +24,8 @@
 {{ xvfsub('s') }}
 {{ xvfsub('d') }}
 
-{{ xvfop('2-based logarithm', 'logb', 's') }}
-{{ xvfop('2-based logarithm', 'logb', 'd') }}
+{{ xvfop('base-2 logarithm', 'logb', 's') }}
+{{ xvfop('base-2 logarithm', 'logb', 'd') }}
 
 {{ xvfop('square root', 'sqrt', 's') }}
 {{ xvfop('square root', 'sqrt', 'd') }}
