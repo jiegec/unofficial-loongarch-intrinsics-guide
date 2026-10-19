@@ -274,7 +274,7 @@ CPU Flags: {cur_simd.upper()}
         return instruction(
             intrinsic=f"__m128i __lsx_vabsd_{name} (__m128i a, __m128i b)",
             instr=f"vabsd.{name} vr, vr, vr",
-            desc=f"Compute absolute difference of {signedness} {width}-bit elements in `a` and `b`, save the result in `dst`.",
+            desc=f"Compute the absolute difference between corresponding {signedness} {width}-bit elements in `a` and `b`, save the result in `dst`.",
         )
 
     @my_macro(env)
@@ -283,7 +283,7 @@ CPU Flags: {cur_simd.upper()}
         return instruction(
             intrinsic=f"__m128i __lsx_vadd_{name} (__m128i a, __m128i b)",
             instr=f"vadd.{name} vr, vr, vr",
-            desc=f"Add {width}-bit elements in `a` and `b`, save the result in `dst`.",
+            desc=f"Add corresponding {width}-bit elements in `a` and `b`, save the result in `dst`.",
         )
 
     @my_macro(env)
@@ -371,7 +371,7 @@ CPU Flags: {cur_simd.upper()}
         return instruction(
             intrinsic=f"__m128i __lsx_vavg_{name} (__m128i a, __m128i b)",
             instr=f"vavg.{name} vr, vr, vr",
-            desc=f"Compute the average (rounded towards negative infinity) of {signedness} {width}-bit elements in `a` and `b`, save the result in `dst`.",
+            desc=f"Compute the average (rounded towards negative infinity) of corresponding {signedness} {width}-bit elements in `a` and `b`, save the result in `dst`.",
         )
 
     @my_macro(env)
@@ -381,7 +381,7 @@ CPU Flags: {cur_simd.upper()}
         return instruction(
             intrinsic=f"__m128i __lsx_vavgr_{name} (__m128i a, __m128i b)",
             instr=f"vavgr.{name} vr, vr, vr",
-            desc=f"Compute the average (rounded towards positive infinity) of {signedness} {width}-bit elements in `a` and `b`, save the result in `dst`.",
+            desc=f"Compute the average (rounded towards positive infinity) of corresponding {signedness} {width}-bit elements in `a` and `b`, save the result in `dst`.",
         )
 
     @my_macro(env)
@@ -719,7 +719,7 @@ CPU Flags: {cur_simd.upper()}
         return instruction(
             intrinsic=f"__m128i __lsx_v{min_max}_{name} (__m128i a, __m128i b)",
             instr=f"v{min_max}.{name} vr, vr, vr",
-            desc=f"Compute elementwise {min_max}imum for {signedness} {width}-bit elements in `a` and `b`.",
+            desc=f"Compute elementwise {min_max}imum for corresponding {signedness} {width}-bit elements in `a` and `b`.",
         )
 
     @my_macro(env)
@@ -795,7 +795,7 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         return instruction(
             intrinsic=f"__m128i __lsx_vsub_{name} (__m128i a, __m128i b)",
             instr=f"vsub.{name} vr, vr, vr",
-            desc=f"Subtract {width}-bit elements in `b` from elements in `a`, save the result in `dst`.",
+            desc=f"Subtract corresponding {width}-bit elements in `b` from elements in `a`, save the result in `dst`.",
         )
 
     @my_macro(env)
@@ -870,7 +870,7 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         return instruction(
             intrinsic=f"__m128i __lsx_vmul_{name} (__m128i a, __m128i b)",
             instr=f"vmul.{name} vr, vr, vr",
-            desc=f"Multiply {width}-bit elements in `a` and `b`, save the result in `dst`.",
+            desc=f"Multiply corresponding {width}-bit elements in `a` and `b`, save the result in `dst`.",
         )
 
     @my_macro(env)
@@ -880,7 +880,7 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         return instruction(
             intrinsic=f"__m128i __lsx_vmuh_{name} (__m128i a, __m128i b)",
             instr=f"vmuh.{name} vr, vr, vr",
-            desc=f"Multiply {signedness} {width}-bit elements in `a` and `b`, save the high {width}-bit result in `dst`.",
+            desc=f"Multiply corresponding {signedness} {width}-bit elements in `a` and `b`, save the upper half of the double-width product in `dst`.",
         )
 
     @my_macro(env)
@@ -987,7 +987,7 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         return instruction(
             intrinsic=f"__m128i __lsx_vsadd_{name} (__m128i a, __m128i b)",
             instr=f"vsadd.{name} vr, vr, vr",
-            desc=f"Saturating add the {signedness} {width}-bit elements in `a` and `b`, store the result to `dst`.",
+            desc=f"Saturating add corresponding {signedness} {width}-bit elements in `a` and `b`, store the result to `dst`.",
         )
 
     @my_macro(env)
@@ -997,7 +997,7 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         return instruction(
             intrinsic=f"__m128i __lsx_vssub_{name} (__m128i a, __m128i b)",
             instr=f"vssub.{name} vr, vr, vr",
-            desc=f"Saturating subtract the {signedness} {width}-bit elements in `b` from elements in `a`, store the result to `dst`.",
+            desc=f"Saturating subtract corresponding {signedness} {width}-bit elements in `b` from elements in `a`, store the result to `dst`.",
         )
 
     @my_macro(env)
