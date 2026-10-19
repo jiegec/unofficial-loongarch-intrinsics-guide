@@ -1620,7 +1620,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
         return instruction(
             intrinsic=f"__m128i __lsx_vfrstp_{name} (__m128i a, __m128i b, __m128i c)",
             instr=f"vfrstp.{name} vr, vr, vr",
-            desc=f"For every 128-bit vector, find the first negative {width}-bit element in `b`, set the index of the element to the lane of `a` specified by `c`.",
+            desc=f"For every 128-bit vector, find the first negative {width}-bit element in `b`, set the index of the element to the lane of `a` specified by `c` (or max index plus one when not found), with other lanes copied from `a`.",
         )
 
     @my_macro(env)
@@ -1629,7 +1629,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
         return instruction(
             intrinsic=f"__m128i __lsx_vfrstpi_{name} (__m128i a, __m128i b, imm0_31 imm)",
             instr=f"vfrstpi.{name} vr, vr, imm",
-            desc=f"For every 128-bit vector, find the first negative {width}-bit element in `b`, set the index of the element to the lane of `a` specified by `imm`.",
+            desc=f"For every 128-bit vector, find the first negative {width}-bit element in `b`, set the index of the element to the lane of `a` specified by `imm` (or max index plus one when not found), with other lanes copied from `a`.",
         )
 
     @my_macro(env)
