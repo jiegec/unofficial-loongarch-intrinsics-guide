@@ -1571,7 +1571,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
         return instruction(
             intrinsic=f"{arg_type} __lsx_vfrint{rounding}_{name} ({arg_type} a)",
             instr=f"vfrint{rounding}.{name} vr, vr",
-            desc=f"Round single-precision floating point elements in `a` to integers, {rounding_mode}, and store as floating point numbers.",
+            desc=f"Round {precision}-precision floating point elements in `a` to integers, {rounding_mode}, and store as floating point numbers.",
         )
 
     @my_macro(env)
@@ -1620,7 +1620,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
         return instruction(
             intrinsic=f"__m128i __lsx_vfrstp_{name} (__m128i a, __m128i b, __m128i c)",
             instr=f"vfrstp.{name} vr, vr, vr",
-            desc=f"Find the first negative {width}-bit element in `b`, set the index of the element to the lane of `a` specified by `c`.",
+            desc=f"For every 128-bit vector, find the first negative {width}-bit element in `b`, set the index of the element to the lane of `a` specified by `c`.",
         )
 
     @my_macro(env)
@@ -1629,7 +1629,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
         return instruction(
             intrinsic=f"__m128i __lsx_vfrstpi_{name} (__m128i a, __m128i b, imm0_31 imm)",
             instr=f"vfrstpi.{name} vr, vr, imm",
-            desc=f"Find the first negative {width}-bit element in `b`, set the index of the element to the lane of `a` specified by `imm`.",
+            desc=f"For every 128-bit vector, find the first negative {width}-bit element in `b`, set the index of the element to the lane of `a` specified by `imm`.",
         )
 
     @my_macro(env)
@@ -1637,7 +1637,7 @@ Caveat: the indices are placed in `c`, while in other `vshuf` intrinsics, they a
         return instruction(
             intrinsic=f"__m128i __lsx_vb{name}_v (__m128i a, imm0_31 imm)",
             instr=f"vb{name}.v vr, vr, imm",
-            desc=f"Compute whole vector `a` shifted {dir} by `imm * 8` bits.",
+            desc=f"Compute every 128-bit vector of `a` shifted {dir} by `imm * 8` bits.",
         )
 
     @my_macro(env)
