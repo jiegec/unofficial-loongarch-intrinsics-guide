@@ -43,4 +43,6 @@ The GitHub repo is [jiegec/unofficial-loongarch-intrinsics-guide](https://github
 
 If you want to visit this site in Markdown format (e.g. you are an LLM), please read [llms.txt](https://jia.je/unofficial-loongarch-intrinsics-guide/llms.txt).
 
+See also: [LoongArch Reference Manual Volume II-a: Vector Instruction Extensions V1.11](https://file.loongfans.cn/loonginfo/LoongArchReferenceManual-VolumeII%28VectorInstructionExtensions%29V1.11.pdf).
+
 Contributions are welcome.
