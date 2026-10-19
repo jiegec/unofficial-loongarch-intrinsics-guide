@@ -292,7 +292,7 @@ CPU Flags: {cur_simd.upper()}
         return instruction(
             intrinsic=f"__m128i __lsx_vadda_{name} (__m128i a, __m128i b)",
             instr=f"vadda.{name} vr, vr, vr",
-            desc=f"Add absolute of {width}-bit elements in `a` and `b`, save the result in `dst`.",
+            desc=f"Add the absolute values of the {width}-bit elements in `a` and `b`, save the result in `dst`.",
         )
 
     @my_macro(env)
@@ -504,10 +504,13 @@ CPU Flags: {cur_simd.upper()}
     @my_macro(env)
     def vextrins(name):
         width = widths[name[0]]
+        src_bits = int(math.log2(128 // width))
+        src_field = "imm[0]" if src_bits == 1 else f"imm[{src_bits - 1}:0]"
+        dst_field = "imm[4]" if src_bits == 1 else f"imm[{3 + src_bits}:4]"
         if cur_simd == "lasx":
-            desc = f"For each 128-bit lane, copy one {width}-bit element from `b` to `a` according to `imm`; other elements remain unchanged."
+            desc = f"For each 128-bit lane, copy the {width}-bit element of `b` selected by `{src_field}` into the element of `a` selected by `{dst_field}`; other elements remain unchanged."
         else:
-            desc = f"Copy one {width}-bit element from `b` to `a` according to `imm`; other elements remain unchanged."
+            desc = f"Copy the {width}-bit element of `b` selected by `{src_field}` into the element of `a` selected by `{dst_field}`; other elements remain unchanged."
         return instruction(
             intrinsic=f"__m128i __lsx_vextrins_{name} (__m128i a, __m128i b, imm0_255 imm)",
             instr=f"vextrins.{name} vr, vr, imm",
@@ -528,7 +531,7 @@ CPU Flags: {cur_simd.upper()}
             "lt": "LT(Less than)",
             "ult": "ULT(Unordered or Less than)",
             "le": "LE(Less than or Equal)",
-            "ule": "ULE(Unordered, Less than or Equal)",
+            "ule": "ULE(Unordered or Less than or Equal)",
             "ne": "NE(Not Equal)",
             "or": "OR(Ordered)",
             "une": "UNE(Unordered or Not Equal)",
@@ -594,7 +597,7 @@ CPU Flags: {cur_simd.upper()}
         return instruction(
             intrinsic=f"{fp_type} __lsx_vfmax_{name} ({fp_type} a, {fp_type} b)",
             instr=f"vfmax.{name} vr, vr, vr",
-            desc=f"Compute maximum of {precision} precision floating point elements in `a` and `b`.",
+            desc=f"Compute the maximum (maxNum) of {precision} precision floating point elements in `a` and `b`.",
         )
 
     @my_macro(env)
@@ -604,7 +607,7 @@ CPU Flags: {cur_simd.upper()}
         return instruction(
             intrinsic=f"{fp_type} __lsx_vfmaxa_{name} ({fp_type} a, {fp_type} b)",
             instr=f"vfmaxa.{name} vr, vr, vr",
-            desc=f"Compute maximum of {precision} precision floating point elements in `a` and `b` by magnitude.",
+            desc=f"Compute the maximum (maxNumMag) of {precision} precision floating point elements in `a` and `b`, selecting the element with the larger absolute value.",
         )
 
     @my_macro(env)
@@ -614,7 +617,7 @@ CPU Flags: {cur_simd.upper()}
         return instruction(
             intrinsic=f"{fp_type} __lsx_vfmin_{name} ({fp_type} a, {fp_type} b)",
             instr=f"vfmin.{name} vr, vr, vr",
-            desc=f"Compute minimum of {precision} precision floating point elements in `a` and `b`.",
+            desc=f"Compute the minimum (minNum) of {precision} precision floating point elements in `a` and `b`.",
         )
 
     @my_macro(env)
@@ -624,7 +627,7 @@ CPU Flags: {cur_simd.upper()}
         return instruction(
             intrinsic=f"{fp_type} __lsx_vfmina_{name} ({fp_type} a, {fp_type} b)",
             instr=f"vfmina.{name} vr, vr, vr",
-            desc=f"Compute minimum of {precision} precision floating point elements in `a` and `b` by magnitude.",
+            desc=f"Compute the minimum (minNumMag) of {precision} precision floating point elements in `a` and `b`, selecting the element with the smaller absolute value.",
         )
 
     @my_macro(env)
@@ -655,7 +658,7 @@ CPU Flags: {cur_simd.upper()}
         return instruction(
             intrinsic=f"__m128i __lsx_vilvh_{name} (__m128i a, __m128i b)",
             instr=f"vilvh.{name} vr, vr, vr",
-            desc=f"Interleave {width}-bit elements in higher half of every 128-bit vector of `a` and `b`.",
+            desc=f"For each 128-bit lane, interleave the {width}-bit elements in the upper half of that lane from `a` and `b`: the element from `b` is placed at the even output position and the element from `a` at the following odd position.",
         )
 
     @my_macro(env)
@@ -664,7 +667,7 @@ CPU Flags: {cur_simd.upper()}
         return instruction(
             intrinsic=f"__m128i __lsx_vilvl_{name} (__m128i a, __m128i b)",
             instr=f"vilvl.{name} vr, vr, vr",
-            desc=f"Interleave {width}-bit elements in lower half of every 128-bit vector of `a` and `b`.",
+            desc=f"For each 128-bit lane, interleave the {width}-bit elements in the lower half of that lane from `a` and `b`: the element from `b` is placed at the even output position and the element from `a` at the following odd position.",
         )
 
     @my_macro(env)
@@ -1214,7 +1217,7 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         return instruction(
             intrinsic=f"__m128i __lsx_vmskltz_{name} (__m128i a)",
             instr=f"vmskltz.{name} vr, vr",
-            desc=f"For each 128-bit lane, for each {width}-bit element in `a`, if the element is less than zero, set the corresponding low bit of that lane to one, otherwise zero; the remaining bits of the lane are zero.",
+            desc=f"For each 128-bit lane, for each {width}-bit element in `a`, set the bit at that element's index within the lane to one if the element is less than zero, otherwise zero; the remaining bits of the lane are zero.",
         )
 
     @my_macro(env)
@@ -1223,7 +1226,7 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         return instruction(
             intrinsic=f"__m128i __lsx_vmskgez_{name} (__m128i a)",
             instr=f"vmskgez.{name} vr, vr",
-            desc=f"For each 128-bit lane, for each {width}-bit element in `a`, if the element is greater than or equal to zero, set the corresponding low bit of that lane to one, otherwise zero; the remaining bits of the lane are zero.",
+            desc=f"For each 128-bit lane, for each {width}-bit element in `a`, set the bit at that element's index within the lane to one if the element is greater than or equal to zero, otherwise zero; the remaining bits of the lane are zero.",
         )
 
     @my_macro(env)
@@ -1232,7 +1235,7 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         return instruction(
             intrinsic=f"__m128i __lsx_vmsknz_{name} (__m128i a)",
             instr=f"vmsknz.{name} vr, vr",
-            desc=f"For each 128-bit lane, for each {width}-bit element in `a`, if the element is non-zero, set the corresponding low bit of that lane to one, otherwise zero; the remaining bits of the lane are zero.",
+            desc=f"For each 128-bit lane, for each {width}-bit element in `a`, set the bit at that element's index within the lane to one if the element is non-zero, otherwise zero; the remaining bits of the lane are zero.",
         )
 
     @my_macro(env)
@@ -1522,7 +1525,7 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         return instruction(
             intrinsic=f"__m128i __lsx_vsat_{name} (__m128i a, imm0_{width - 1} imm)",
             instr=f"vsat.{name} vr, vr, imm",
-            desc=f"Clamp {signedness} {width}-bit elements in `a` to range specified by `imm`.",
+            desc=f"Saturate each {signedness} {width}-bit element in `a` to the number of significant bits specified by `imm`.",
         )
 
     def get_rounding_mode(rounding):
