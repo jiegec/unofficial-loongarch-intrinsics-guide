@@ -786,7 +786,7 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         return instruction(
             intrinsic=f"__m128i __lsx_vldrepl_{name} (void * addr, imm_n{imm_range}_{imm_range-1} offset)",
             instr=f"vldrepl.{name} vr, r, imm",
-            desc=f"Read {width}-bit data from memory address `addr + offset`, replicate the data to all vector lanes and save into `dst`. The `offset` operand is a byte offset, matching the assembly immediate; the encoded instruction stores it as a scaled immediate for wider elements.",
+            desc=f"Read {width}-bit data from memory address `addr + offset`, replicate the data to all vector lanes and save into `dst`. Address misalignment does not raise an exception. The `offset` operand is a byte offset, matching the assembly immediate; the encoded instruction stores it as a scaled immediate for wider elements.",
         )
 
     @my_macro(env)
@@ -800,18 +800,32 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
 
     @my_macro(env)
     def vlogical(op):
+        desc = {
+            "and": "AND",
+            "or": "OR",
+            "xor": "XOR",
+            "nor": "NOR (~(a | b))",
+            "andn": "ANDN (~a & b)",
+            "orn": "ORN (a | ~b)",
+        }[op]
         return instruction(
             intrinsic=f"__m128i __lsx_v{op}_v (__m128i a, __m128i b)",
             instr=f"v{op}.v vr, vr, vr",
-            desc=f"Compute bitwise {op.upper()} between elements in `a` and `b`.",
+            desc=f"Compute bitwise {desc} of elements in `a` and `b`.",
         )
 
     @my_macro(env)
     def vlogicali(op):
+        desc = {
+            "and": "AND",
+            "or": "OR",
+            "xor": "XOR",
+            "nor": "NOR (~(a | imm))",
+        }[op]
         return instruction(
             intrinsic=f"__m128i __lsx_v{op}i_b (__m128i a, imm0_255 imm)",
             instr=f"v{op}i.b vr, vr, imm",
-            desc=f"Compute bitwise {op.upper()} between elements in `a` and `imm`.",
+            desc=f"Compute bitwise {desc} of elements in `a` and `imm`.",
         )
 
     @my_macro(env)
@@ -895,7 +909,7 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         return instruction(
             intrinsic=f"void __lsx_vstelm_{name} (__m128i data, void * addr, imm_n128_127 offset, imm0_{imm_upper} lane)",
             instr=f"vstelm.{name} vr, r, imm, imm",
-            desc=f"Store element `lane` of `data` to memory address `addr + offset`. The `offset` operand is a byte offset; the encoded instruction stores it as a scaled immediate for wider elements.",
+            desc=f"Store element `lane` of `data` to memory address `addr + offset`. Address misalignment does not raise an exception. The `offset` operand is a byte offset; the encoded instruction stores it as a scaled immediate for wider elements.",
         )
 
     @my_macro(env)
@@ -1148,7 +1162,7 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         if cur_simd == "lasx":
             desc = f"For each 128-bit lane, repeat that lane's element `idx` (index modulo {128 // width}) to fill the same lane."
         else:
-            desc = f"Repeat the element in lane `idx` of `a` to fill whole vector."
+            desc = f"Repeat the element in lane `idx` (index modulo {128 // width}) of `a` to fill whole vector."
         return instruction(
             intrinsic=f"__m128i __lsx_vreplve_{name} (__m128i a, int idx)",
             instr=f"vreplve.{name} vr, vr, r",
@@ -1766,7 +1780,7 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         return instruction(
             intrinsic=f"__m128i __lsx_vld (void * addr, imm_n2048_2047 offset)",
             instr=f"vld vr, r, imm",
-            desc=f"Read whole vector from memory address `addr + offset`, save the data into `dst`. Note that you can use this intrinsic to load floating point vectors, even though the return type represents integer vectors.",
+            desc=f"Read whole vector from memory address `addr + offset`, save the data into `dst`. Address misalignment does not raise an exception. Note that you can use this intrinsic to load floating point vectors, even though the return type represents integer vectors.",
         )
 
     @my_macro(env)
@@ -1774,7 +1788,7 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         return instruction(
             intrinsic=f"__m128i __lsx_vldx (void * addr, long int offset)",
             instr=f"vldx vr, r, r",
-            desc=f"Read whole vector from memory address `addr + offset`, save the data into `dst`. Note that you can use this intrinsic to load floating point vectors, even though the return type represents integer vectors.",
+            desc=f"Read whole vector from memory address `addr + offset`, save the data into `dst`. Address misalignment does not raise an exception. Note that you can use this intrinsic to load floating point vectors, even though the return type represents integer vectors.",
         )
 
     @my_macro(env)
@@ -1782,7 +1796,7 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         return instruction(
             intrinsic=f"void __lsx_vst (__m128i data, void * addr, imm_n2048_2047 offset)",
             instr=f"vst vr, r, imm",
-            desc=f"Write whole vector data in `data` to memory address `addr + offset`.",
+            desc=f"Write whole vector data in `data` to memory address `addr + offset`. Address misalignment does not raise an exception.",
         )
 
     @my_macro(env)
@@ -1790,7 +1804,7 @@ Caution: the result is undefined when the highest 3 bits of the index byte are n
         return instruction(
             intrinsic=f"void __lsx_vstx (__m128i data, void * addr, long int offset)",
             instr=f"vstx vr, r, r",
-            desc=f"Write whole vector data in `data` to memory address `addr + offset`.",
+            desc=f"Write whole vector data in `data` to memory address `addr + offset`. Address misalignment does not raise an exception.",
         )
 
     @my_macro(env)
