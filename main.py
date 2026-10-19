@@ -483,7 +483,7 @@ CPU Flags: {cur_simd.upper()}
         return instruction(
             intrinsic=f"__m128i __lsx_vexth_{name}_{name2} (__m128i a)",
             instr=f"vexth.{name}.{name2} vr, vr",
-            desc=f"Extend {signedness} {width2}-bit elements in the higher half of `a` to {width}-bit.",
+            desc=f"Extend {signedness} {width2}-bit elements in the higher half of every 128-bit vector of `a` to {width}-bit.",
         )
 
     @my_macro(env)
@@ -494,7 +494,7 @@ CPU Flags: {cur_simd.upper()}
         return instruction(
             intrinsic=f"__m128i __lsx_vextl_{name}_{name2} (__m128i a)",
             instr=f"vextl.{name}.{name2} vr, vr",
-            desc=f"Extend {signedness} {width2}-bit elements in the lower half of `a` to {width}-bit.",
+            desc=f"Extend {signedness} {width2}-bit elements in the lower half of every 128-bit vector of `a` to {width}-bit.",
         )
 
     @my_macro(env)
@@ -651,7 +651,7 @@ CPU Flags: {cur_simd.upper()}
         return instruction(
             intrinsic=f"__m128i __lsx_vilvh_{name} (__m128i a, __m128i b)",
             instr=f"vilvh.{name} vr, vr, vr",
-            desc=f"Interleave {width}-bit elements in higher half of `a` and `b`.",
+            desc=f"Interleave {width}-bit elements in higher half of every 128-bit vector of `a` and `b`.",
         )
 
     @my_macro(env)
@@ -660,7 +660,7 @@ CPU Flags: {cur_simd.upper()}
         return instruction(
             intrinsic=f"__m128i __lsx_vilvl_{name} (__m128i a, __m128i b)",
             instr=f"vilvl.{name} vr, vr, vr",
-            desc=f"Interleave {width}-bit elements in lower half of `a` and `b`.",
+            desc=f"Interleave {width}-bit elements in lower half of every 128-bit vector of `a` and `b`.",
         )
 
     @my_macro(env)
@@ -1156,7 +1156,7 @@ Caution: when index overflows, the result is undefined (i.e. the behavior depend
         return instruction(
             intrinsic=f"__m256i __lasx_xvrepl128vei_{name} (__m256i a, imm0_{imm_upper} idx)",
             instr=f"xvrepl128vei.{name} xr, xr, imm",
-            desc=f"Repeat the element in lane `idx` of `a` to fill whole vector.",
+            desc=f"For every 128-bit vector, repeat the element in lane `idx` of `a` to fill whole vector.",
         )
 
     @my_macro(env)
@@ -1205,7 +1205,7 @@ Caution: when index overflows, the result is undefined (i.e. the behavior depend
         return instruction(
             intrinsic=f"__m128i __lsx_vmskltz_{name} (__m128i a)",
             instr=f"vmskltz.{name} vr, vr",
-            desc=f"For each {width}-bit element in `a`, if the element is less than zero, set one bit in `dst`, otherwise clear it.",
+            desc=f"For every 128-bit vector, for each {width}-bit element in `a`, if the element is less than zero, set one bit in `dst`, otherwise clear it.",
         )
 
     @my_macro(env)
@@ -1214,7 +1214,7 @@ Caution: when index overflows, the result is undefined (i.e. the behavior depend
         return instruction(
             intrinsic=f"__m128i __lsx_vmskgez_{name} (__m128i a)",
             instr=f"vmskgez.{name} vr, vr",
-            desc=f"For each {width}-bit element in `a`, if the element is greater than or equal to zero, set one bit in `dst`, otherwise clear it.",
+            desc=f"For every 128-bit vector, for each {width}-bit element in `a`, if the element is greater than or equal to zero, set one bit in `dst`, otherwise clear it.",
         )
 
     @my_macro(env)
@@ -1223,7 +1223,7 @@ Caution: when index overflows, the result is undefined (i.e. the behavior depend
         return instruction(
             intrinsic=f"__m128i __lsx_vmsknz_{name} (__m128i a)",
             instr=f"vmsknz.{name} vr, vr",
-            desc=f"For each {width}-bit element in `a`, if the element is non-zero, set one bit in `dst`, otherwise clear it.",
+            desc=f"For every 128-bit vector, for each {width}-bit element in `a`, if the element is non-zero, set one bit in `dst`, otherwise clear it.",
         )
 
     @my_macro(env)
@@ -1303,7 +1303,7 @@ Caution: when index overflows, the result is undefined (i.e. the behavior depend
         return instruction(
             intrinsic=f"__m128i __lsx_vsllwil_{name}_{name2} (__m128i a, imm0_{width2-1} imm)",
             instr=f"vsllwil.{name}.{name2} vr, vr, imm",
-            desc=f"Extend and shift {signedness} {width2}-bit elements in `a` by `imm` to {signedness} {width}-bit result.",
+            desc=f"For every 128-bit vector, extend and shift {signedness} {width2}-bit elements in `a` by `imm` to {signedness} {width}-bit result.",
         )
 
     @my_macro(env)
@@ -1509,7 +1509,7 @@ Caution: when index overflows, the result is undefined (i.e. the behavior depend
         return instruction(
             intrinsic=f"__m128i __lsx_vftint{rounding}{low_high}_l_s (__m128 a)",
             instr=f"vftint{rounding}{low_high}.l.s vr, vr",
-            desc=f"Convert single-precision floating point elements in {half} part of `a` to 64-bit integer, {rounding_mode}.",
+            desc=f"Convert single-precision floating point elements in {half} part of every 128-bit vector of `a` to 64-bit integer, {rounding_mode}.",
         )
 
     @my_macro(env)
@@ -1588,7 +1588,7 @@ Caution: when index overflows, the result is undefined (i.e. the behavior depend
         return instruction(
             intrinsic=f"__m128d __lsx_vffint{low_high}_d_w (__m128i a)",
             instr=f"vffint{low_high}.d.w vr, vr",
-            desc=f"Convert 32-bit integer elements in {half} part of `a` to double precision floating point numbers.",
+            desc=f"Convert 32-bit integer elements in {half} part of every 128-bit vector of `a` to double precision floating point numbers.",
         )
 
     @my_macro(env)
@@ -1707,7 +1707,7 @@ Caution: when index overflows, the result is undefined (i.e. the behavior depend
         return instruction(
             intrinsic=f"__m256i __lasx_xvreplve0_{name} (__m256i a)",
             instr=f"xvreplve0.{name} xr, xr",
-            desc=f"Repeat the first {width}-bit lane from `a` to all lanes of `dst`.",
+            desc=f"For every 128-bit vector, repeat the first {width}-bit lane from `a` to all lanes of `dst`.",
         )
 
     @my_macro(env)
@@ -1763,7 +1763,7 @@ Caution: when index overflows, the result is undefined (i.e. the behavior depend
         return instruction(
             intrinsic=f"__m128d __lsx_vfcvth_d_s (__m128 a)",
             instr=f"vfcvth.d.s vr, vr",
-            desc=f"Convert single precision floating point elements in higher half of `a` to double precision.",
+            desc=f"Convert single precision floating point elements in higher half of every 128-bit vector of `a` to double precision.",
         )
 
     @my_macro(env)
@@ -1771,7 +1771,7 @@ Caution: when index overflows, the result is undefined (i.e. the behavior depend
         return instruction(
             intrinsic=f"__m128d __lsx_vfcvtl_d_s (__m128 a)",
             instr=f"vfcvtl.d.s vr, vr",
-            desc=f"Convert single precision floating point elements in lower half of `a` to double precision.",
+            desc=f"Convert single precision floating point elements in lower half of every 128-bit vector of `a` to double precision.",
         )
 
     @my_macro(env)
