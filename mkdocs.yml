@@ -19,3 +19,93 @@ plugins:
 
 extra_css:
   - main.css
+
+nav:
+  - Home: index.md
+  - Latency and Throughput: latency_throughput.md
+  - LoongArch LBT Basics: lbt_basics.md
+  - LoongArch SIMD Basics: loongarch_simd_basics.md
+  - Migrating from AVX to LASX: migrating_avx.md
+  - Migrating from SSE to LSX: migrating_sse.md
+  - Browse All Intrinsics: viewer.md
+  - Lasx:
+      - lasx/bitwise_operations.md
+      - lasx/branch.md
+      - lasx/float_comparison.md
+      - lasx/float_computation.md
+      - lasx/float_conversion.md
+      - lasx/float_misc.md
+      - lasx/fma.md
+      - lasx/integer_comparison.md
+      - lasx/integer_computation.md
+      - lasx/logical.md
+      - lasx/memory.md
+      - lasx/misc.md
+      - lasx/permutation.md
+      - lasx/shift.md
+      - lasx/shuffling.md
+      - lasx/undocumented.md
+  - Lbt:
+      - lbt/arm_integer.md
+      - lbt/arm_logical.md
+      - lbt/arm_misc.md
+      - lbt/arm_shift.md
+      - lbt/integer.md
+      - lbt/jump.md
+      - lbt/mips_memory.md
+      - lbt/state.md
+      - lbt/x86_fpu.md
+      - lbt/x86_integer.md
+      - lbt/x86_logical.md
+      - lbt/x86_misc.md
+      - lbt/x86_shift.md
+  - Lsx:
+      - lsx/bitwise_operations.md
+      - lsx/branch.md
+      - lsx/float_comparison.md
+      - lsx/float_computation.md
+      - lsx/float_conversion.md
+      - lsx/float_misc.md
+      - lsx/fma.md
+      - lsx/integer_comparison.md
+      - lsx/integer_computation.md
+      - lsx/logical.md
+      - lsx/memory.md
+      - lsx/misc.md
+      - lsx/permutation.md
+      - lsx/shift.md
+      - lsx/shuffling.md
+      - lsx/undocumented.md
+  - Loongson GPU (LG200):
+      - Architecture and Graphical ABI: gpu/overview.md
+      - Architecture: gpu/architecture.md
+      - Instruction Encoding: gpu/encoding.md
+      - Host Interface:
+          - Host Interface: gpu/host-interface.md
+          - Command Words: gpu/host/scmd32.md
+          - Rings and Indirect Buffers: gpu/host/rings-and-ib.md
+          - GPIPE: gpu/host/gpipe.md
+          - BPIPE: gpu/host/bpipe.md
+          - XDMA: gpu/host/xdma.md
+          - CPIPE: gpu/host/cpipe.md
+          - Synchronization and Traps: gpu/host/sync-fence.md
+      - Graphics State:
+          - Graphics State: gpu/graphics-state.md
+          - Full-State Envelope: gpu/graphics/full-state.md
+          - Draw and Raster: gpu/graphics/draw-raster.md
+          - Depth, Stencil and Blend: gpu/graphics/depth-blend.md
+          - Stage Configuration: gpu/graphics/stage-config.md
+      - Shader ABI:
+          - Shader ABI: gpu/shader-abi.md
+          - Shader-Info Records: gpu/shader/shader-info.md
+          - Descriptors: gpu/shader/descriptors.md
+          - Stage Conventions: gpu/shader/stages.md
+          - SIO: gpu/shader/sio.md
+      - Vector ALU: gpu/vector-alu.md
+      - Scalar ALU: gpu/scalar-alu.md
+      - Memory and Image: gpu/memory-image.md
+      - Atomic: gpu/atomic.md
+      - Control Prefix: gpu/control-prefix.md
+      - Measurements: gpu/measurements.md
+      - SIO and Export: gpu/sio-export.md
+      - Interpolation: gpu/interpolation.md

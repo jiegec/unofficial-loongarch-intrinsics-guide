@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 640" role="img" aria-labelledby="title desc">
+  <title id="title">LG200 GPU virtual address and BO residency</title>
+  <desc id="desc">Packet and record fields hold 64-bit GPU virtual addresses; the VMID selects a four-level page table; mapped ranges are backed by resident BOs; the shader observes only resolved bytes and descriptors.</desc>
+<defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#334b5c"/></marker>
+    <style>
+      .frame { fill:#f7f9fb; stroke:#8796a2; stroke-width:2; }
+      .box { stroke:#253746; stroke-width:2; rx:6; }
+      .line { stroke:#334b5c; stroke-width:2.5; fill:none; marker-end:url(#arrow); }
+      .dash { stroke:#697d8c; stroke-width:2; stroke-dasharray:8 6; fill:none; marker-end:url(#arrow); }
+      .title { font:700 20px sans-serif; fill:#17242f; }
+      .label { font:700 15px sans-serif; fill:#17242f; }
+      .small { font:12px sans-serif; fill:#263746; }
+      .mono { font:12px monospace; fill:#263746; }
+      .head { font:600 12px sans-serif; fill:#52645a; }
+    </style>
+  </defs>
+  <rect x="25" y="25" width="1150" height="590" rx="8" class="frame"/>
+  <text x="50" y="58" class="title">GPU-VA fields, page-table walk, and BO residency</text>
+
+  <rect x="50" y="85" width="420" height="150" class="box" fill="#dbe9f6"/>
+  <text x="70" y="110" class="label">Address fields are GPU VAs</text>
+  <text x="70" y="134" class="mono">IB: ib_va                     (L1 wrapper)</text>
+  <text x="70" y="154" class="mono">record: kernel_entry          (shader-info +0x10)</text>
+  <text x="70" y="174" class="mono">roots: rw / cb / constant / rsd / attr</text>
+  <text x="70" y="196" class="small">a host allocation handle is not a packet address</text>
+  <text x="70" y="216" class="small">all 64-bit little-endian byte addresses</text>
+
+  <rect x="520" y="85" width="300" height="150" class="box" fill="#f4e2be"/>
+  <text x="540" y="110" class="label">Selected GPU VM</text>
+  <text x="540" y="134" class="mono">VMID -&gt; 4-level page-table walk</text>
+  <text x="540" y="154" class="small">PTE controls: present, huge-page,</text>
+  <text x="540" y="172" class="small">exception, writable</text>
+  <text x="540" y="194" class="small">alignment / page size / cache attributes</text>
+  <text x="540" y="212" class="small">are VM policy; every field must obey them</text>
+
+  <rect x="870" y="85" width="280" height="150" class="box" fill="#d9eee3"/>
+  <text x="890" y="110" class="label">Mapped VA ranges</text>
+  <text x="890" y="134" class="mono">IB range      -&gt; command bytes</text>
+  <text x="890" y="154" class="mono">CODE range    -&gt; shader words</text>
+  <text x="890" y="174" class="mono">DESC range    -&gt; descriptors</text>
+  <text x="890" y="194" class="mono">DATA range    -&gt; resources</text>
+
+  <rect x="50" y="270" width="1090" height="90" class="box" fill="#eef3f0"/>
+  <text x="70" y="295" class="label">Residency</text>
+  <text x="70" y="317" class="small">each referenced range must be mapped in the selected VM and its backing BO must remain</text>
+  <text x="70" y="337" class="small">resident until the completion fence. A BO is the byte storage; the VA range is the mapping.</text>
+
+  <rect x="50" y="395" width="1090" height="120" class="box" fill="#eadcf1"/>
+  <text x="70" y="420" class="label">What the shader can observe</text>
+  <text x="70" y="444" class="small">GPU bytes at the resolved address, descriptor extent/format fields, and stage state</text>
+  <text x="70" y="466" class="small">it cannot observe GEM handles, CPU pointers, relocation indices, or host fences</text>
+  <text x="70" y="488" class="small">a descriptor names a payload range; a root names descriptor memory</text>
+
+  <rect x="50" y="540" width="1090" height="55" class="box" fill="#f7f9fb"/>
+  <text x="70" y="562" class="small">fence = memory word written by the command processor at completion; it is not a shader ordering operation</text>
+  <text x="70" y="582" class="small">DOORBELL wakes a KCD queue; a KCD rptr advance is not evidence of shader execution</text>
+</svg>

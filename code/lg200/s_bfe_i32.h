@@ -1,0 +1,6 @@
+// s_bfe_i32 -- Extracts the bit field selected by the offset and width
+// operands and writes the result to the scalar destination.
+// The scalar ALU form also updates SCC as a side effect; only the value
+// result is modeled here (the field is sign-extended from the signed
+// interpretation of width).
+dst[0] = bfe_i32(src[0], src[1], src[2]);

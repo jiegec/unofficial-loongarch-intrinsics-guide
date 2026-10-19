@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 560" role="img" aria-labelledby="title desc">
+  <title id="title">LG200 shader ABI address chain</title>
+  <desc id="desc">The stage record provides kernel_entry and descriptor roots; kernel_entry points to shader code, roots point to descriptor memory, and descriptors point to payload ranges. Live-in registers hydrate before execution.</desc>
+<defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#334b5c"/></marker>
+    <style>
+      .frame { fill:#f7f9fb; stroke:#8796a2; stroke-width:2; }
+      .box { stroke:#253746; stroke-width:2; rx:6; }
+      .line { stroke:#334b5c; stroke-width:2.5; fill:none; marker-end:url(#arrow); }
+      .dash { stroke:#697d8c; stroke-width:2; stroke-dasharray:8 6; fill:none; marker-end:url(#arrow); }
+      .title { font:700 20px sans-serif; fill:#17242f; }
+      .label { font:700 15px sans-serif; fill:#17242f; }
+      .small { font:12px sans-serif; fill:#263746; }
+      .mono { font:12px monospace; fill:#263746; }
+      .head { font:600 12px sans-serif; fill:#52645a; }
+    </style>
+  </defs>
+  <rect x="25" y="25" width="1150" height="510" rx="8" class="frame"/>
+  <text x="50" y="58" class="title">Shader ABI: record, roots, descriptors, payload</text>
+
+  <rect x="50" y="90" width="400" height="180" class="box" fill="#eadcf1"/>
+  <text x="70" y="115" class="label">Stage record (0x60 bytes)</text>
+  <text x="70" y="139" class="mono">+0x10 kernel_entry</text>
+  <text x="70" y="159" class="mono">+0x20 rw_buffer root</text>
+  <text x="70" y="179" class="mono">+0x28 const_buffer root</text>
+  <text x="70" y="199" class="mono">+0x30 constant root</text>
+  <text x="70" y="219" class="mono">+0x38 resource_sampler root</text>
+  <text x="70" y="239" class="mono">+0x40 attributes root</text>
+  <text x="70" y="261" class="small">all fields are GPU VAs in the selected VM</text>
+
+  <rect x="510" y="90" width="300" height="90" class="box" fill="#dbe9f6"/>
+  <text x="530" y="115" class="label">Shader code BO</text>
+  <text x="530" y="137" class="small">kernel_entry -&gt; 8-byte INST_LO/HI words</text>
+  <text x="530" y="157" class="small">code size bound from record +0x06</text>
+
+  <rect x="510" y="195" width="300" height="110" class="box" fill="#d9eee3"/>
+  <text x="530" y="220" class="label">Descriptor BO</text>
+  <text x="530" y="242" class="small">buffer (16 B), image (32 B), sampler (16 B),</text>
+  <text x="530" y="260" class="small">attribute (16 B per entry) records</text>
+  <text x="530" y="280" class="small">roots resolve shader operand tuples</text>
+
+  <rect x="510" y="320" width="300" height="90" class="box" fill="#f4e2be"/>
+  <text x="530" y="345" class="label">Data BO</text>
+  <text x="530" y="367" class="small">constants / vertices / images / attachments / results</text>
+  <text x="530" y="387" class="small">byte extent and format come from the descriptor</text>
+
+  <line x1="450" y1="140" x2="510" y2="140" class="line"/>
+  <line x1="450" y1="230" x2="510" y2="230" class="line"/>
+  <line x1="450" y1="340" x2="510" y2="340" class="line"/>
+
+  <rect x="870" y="90" width="280" height="140" class="box" fill="#f8f0f8"/>
+  <text x="890" y="115" class="label">Launch context</text>
+  <text x="890" y="139" class="small">stage enable + shader type from Shader Config</text>
+  <text x="890" y="159" class="small">live-in SGPR/VGPR hydration</text>
+  <text x="890" y="179" class="small">descriptor tuple widths must match records</text>
+
+  <rect x="870" y="260" width="280" height="150" class="box" fill="#dbe9f6"/>
+  <text x="890" y="285" class="label">Execution</text>
+  <text x="890" y="307" class="small">instructions read/write registers and memory</text>
+  <text x="890" y="327" class="small">SIO export commits stage output</text>
+  <text x="890" y="347" class="small">check; exit</text>
+  <line x1="1020" y1="230" x2="1020" y2="260" class="line"/>
+
+  <rect x="50" y="470" width="1090" height="50" class="box" fill="#f7f9fb"/>
+  <text x="70" y="492" class="small">the shader never sees a GEM handle, CPU pointer, or relocation index</text>
+  <text x="70" y="510" class="small">a root names descriptor memory; a descriptor names a payload range</text>
+</svg>

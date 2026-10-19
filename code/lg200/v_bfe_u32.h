@@ -1,0 +1,3 @@
+// v_bfe_u32 -- Extracts the bit field selected by the offset and width operands and writes the result to the vector destination
+// The predicate gates the lane write; only the value result of the named operation is modeled here.
+dst[0] = bfe_u32(src[0], src[1], src[2]);
