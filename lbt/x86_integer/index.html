@@ -1,0 +1,2277 @@
+<!DOCTYPE html><html class="writer-html5" lang="en"><head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="canonical" href="https://jia.je/unofficial-loongarch-intrinsics-guide/lbt/x86_integer/">
+      <link rel="shortcut icon" href="../../img/favicon.ico">
+    <title>x86 Integer - Unofficial LoongArch Intrinsics Guide</title>
+    <link rel="stylesheet" href="../../css/theme.css">
+    <link rel="stylesheet" href="../../css/theme_extra.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css">
+        <link href="../../main.css" rel="stylesheet">
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "x86 Integer";
+        var mkdocs_page_input_path = "lbt/x86_integer.md";
+        var mkdocs_page_url = "/unofficial-loongarch-intrinsics-guide/lbt/x86_integer/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+<link href="../../assets/stylesheets/glightbox.min.css" rel="stylesheet"><script src="../../assets/javascripts/glightbox.min.js"></script><style id="glightbox-style">
+            html.glightbox-open { overflow: initial; height: 100%; }
+            .gslide-title { margin-top: 0px; user-select: text; }
+            .gslide-desc { color: #666; user-select: text; }
+            .gslide-image img { background: white; }
+        </style></head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> Unofficial LoongArch Intrinsics Guide
+        </a>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Unofficial LoongArch Intrinsics Guide</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../latency_throughput/">Latency and Throughput of Instructions</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../lbt_basics/">LoongArch LBT Basics</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../loongarch_simd_basics/">LoongArch SIMD Basics</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../migrating_avx/">Migrating from AVX to LASX</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../migrating_sse/">Migrating from SSE to LSX</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../viewer/">Browse All Intrinsics</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Lasx</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lasx/bitwise_operations/">Bitwise Operations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lasx/branch/">Branch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lasx/float_comparison/">Floating Point Comparison</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lasx/float_computation/">Floating Point Computation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lasx/float_conversion/">Floating Point Conversion</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lasx/float_misc/">Floating Point Misc</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lasx/fma/">Fused Multiply-Add</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lasx/integer_comparison/">Integer Comparison</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lasx/integer_computation/">Integer Computation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lasx/logical/">Logical</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lasx/memory/">Memory Load &amp; Store</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lasx/misc/">Misc</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lasx/permutation/">Permutation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lasx/shift/">Shift</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lasx/shuffling/">Shuffling</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lasx/undocumented/">Undocumented Intrinsics</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Lbt</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../arm_integer/">ARM Integer</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../arm_logical/">ARM Logical</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../arm_misc/">ARM Misc</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../arm_shift/">ARM Shift</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../integer/">LBT Integer</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../jump/">LBT Jump</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../mips_memory/">MIPS Memory</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../state/">LBT State Transfer</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../x86_fpu/">x86 FPU</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">x86 Integer</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#x86adcb">x86adc.b</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#x86adch">x86adc.h</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_1">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_1">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_1">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_1">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#x86adcw">x86adc.w</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_2">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_2">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_2">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_2">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#x86adcd">x86adc.d</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_3">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_3">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_3">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_3">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#x86addb">x86add.b</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_4">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_4">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_4">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_4">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#x86addh">x86add.h</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_5">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_5">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_5">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_5">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#x86addw">x86add.w</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_6">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_6">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_6">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_6">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#x86addd">x86add.d</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_7">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_7">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_7">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_7">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#x86addwu">x86add.wu</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_8">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_8">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_8">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_8">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#x86adddu">x86add.du</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_9">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_9">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_9">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_9">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#x86incb">x86inc.b</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_10">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_10">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_10">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_10">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#x86inch">x86inc.h</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_11">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_11">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_11">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_11">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#x86incw">x86inc.w</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_12">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_12">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_12">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_12">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#x86incd">x86inc.d</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_13">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_13">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_13">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_13">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#x86sbcb">x86sbc.b</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_14">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_14">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_14">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_14">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#x86sbch">x86sbc.h</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_15">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_15">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_15">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_15">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#x86sbcw">x86sbc.w</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_16">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_16">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_16">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_16">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#x86sbcd">x86sbc.d</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_17">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_17">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_17">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_17">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#x86subb">x86sub.b</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_18">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_18">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_18">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_18">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#x86subh">x86sub.h</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_19">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_19">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_19">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_19">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#x86subw">x86sub.w</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_20">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_20">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_20">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_20">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#x86subd">x86sub.d</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_21">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_21">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_21">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_21">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#x86subwu">x86sub.wu</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_22">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_22">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_22">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_22">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#x86subdu">x86sub.du</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_23">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_23">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_23">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_23">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#x86decb">x86dec.b</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_24">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_24">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_24">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_24">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#x86dech">x86dec.h</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_25">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_25">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_25">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_25">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#x86decw">x86dec.w</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_26">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_26">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_26">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_26">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#x86decd">x86dec.d</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_27">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_27">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_27">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_27">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#x86mulb">x86mul.b</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_28">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_28">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_28">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_28">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#x86mulh">x86mul.h</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_29">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_29">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_29">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_29">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#x86mulw">x86mul.w</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_30">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_30">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_30">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_30">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#x86muld">x86mul.d</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_31">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_31">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_31">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_31">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#x86mulbu">x86mul.bu</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_32">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_32">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_32">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_32">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#x86mulhu">x86mul.hu</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_33">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_33">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_33">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_33">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#x86mulwu">x86mul.wu</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_34">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_34">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_34">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_34">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#x86muldu">x86mul.du</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#synopsis_35">Synopsis</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#description_35">Description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#operation_35">Operation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#latency-and-throughput_35">Latency and Throughput</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../x86_logical/">x86 Logical</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../x86_misc/">x86 Misc</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../x86_shift/">x86 Shift</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Lsx</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/bitwise_operations/">Bitwise Operations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/branch/">Branch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/float_comparison/">Floating Point Comparison</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/float_computation/">Floating Point Computation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/float_conversion/">Floating Point Conversion</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/float_misc/">Floating Point Misc</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/fma/">Fused Multiply-Add</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/integer_comparison/">Integer Comparison</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/integer_computation/">Integer Computation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/logical/">Logical</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/memory/">Memory Load &amp; Store</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/misc/">Misc</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/permutation/">Permutation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/shift/">Shift</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/shuffling/">Shuffling</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/undocumented/">Undocumented Intrinsics</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">Unofficial LoongArch Intrinsics Guide</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Lbt</li>
+      <li class="breadcrumb-item active">x86 Integer</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="x86-integer">x86 Integer</h1>
+<h2 id="x86adcb">x86adc.b</h2>
+<h3 id="synopsis">Synopsis</h3>
+<pre><code>Instruction: x86adc.b rj, rk
+CPU Flags: LBT
+</code></pre>
+<h3 id="description">Description</h3>
+<p>x86-style add with carry: add 8-bit values in <code>rj</code> and <code>rk</code> with CF (in EFLAGS). Update EFLAGS (CF, AF, OF, PF, ZF, SF) according to the result. Only EFLAGS (LBT4) is updated; the GPR is not modified.</p>
+<h3 id="operation">Operation</h3>
+<pre><code class="language-c++">uint8_t lhs = (uint8_t)a;
+uint8_t rhs = (uint8_t)b;
+uint8_t carry_in = EFLAGS.CF;
+uint8_t result = lhs + rhs + carry_in;
+EFLAGS.CF = (uint64_t)lhs + rhs + carry_in &gt; UINT8_MAX;
+EFLAGS.AF = ((lhs ^ rhs ^ result) &amp; 0x10) != 0;
+EFLAGS.OF = ((~(lhs ^ rhs)) &amp; (lhs ^ result) &amp; 0x80) != 0;
+EFLAGS.PF = parity_even((uint8_t)result);
+EFLAGS.ZF = result == 0;
+EFLAGS.SF = (int8_t)result &lt; 0;
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>µarch</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3C5000</td>
+<td>LA464</td>
+<td>2</td>
+<td>0.5(1/2)</td>
+</tr>
+<tr>
+<td>3C6000</td>
+<td>LA664</td>
+<td>2</td>
+<td>0.5(1/2)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="x86adch">x86adc.h</h2>
+<h3 id="synopsis_1">Synopsis</h3>
+<pre><code>Instruction: x86adc.h rj, rk
+CPU Flags: LBT
+</code></pre>
+<h3 id="description_1">Description</h3>
+<p>x86-style add with carry: add 16-bit values in <code>rj</code> and <code>rk</code> with CF (in EFLAGS). Update EFLAGS (CF, AF, OF, PF, ZF, SF) according to the result. Only EFLAGS (LBT4) is updated; the GPR is not modified.</p>
+<h3 id="operation_1">Operation</h3>
+<pre><code class="language-c++">uint16_t lhs = (uint16_t)a;
+uint16_t rhs = (uint16_t)b;
+uint8_t carry_in = EFLAGS.CF;
+uint16_t result = lhs + rhs + carry_in;
+EFLAGS.CF = (uint64_t)lhs + rhs + carry_in &gt; UINT16_MAX;
+EFLAGS.AF = ((lhs ^ rhs ^ result) &amp; 0x10) != 0;
+EFLAGS.OF = ((~(lhs ^ rhs)) &amp; (lhs ^ result) &amp; 0x8000) != 0;
+EFLAGS.PF = parity_even((uint8_t)result);
+EFLAGS.ZF = result == 0;
+EFLAGS.SF = (int16_t)result &lt; 0;
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_1">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>µarch</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3C5000</td>
+<td>LA464</td>
+<td>2</td>
+<td>0.5(1/2)</td>
+</tr>
+<tr>
+<td>3C6000</td>
+<td>LA664</td>
+<td>2</td>
+<td>0.5(1/2)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="x86adcw">x86adc.w</h2>
+<h3 id="synopsis_2">Synopsis</h3>
+<pre><code>Instruction: x86adc.w rj, rk
+CPU Flags: LBT
+</code></pre>
+<h3 id="description_2">Description</h3>
+<p>x86-style add with carry: add 32-bit values in <code>rj</code> and <code>rk</code> with CF (in EFLAGS). Update EFLAGS (CF, AF, OF, PF, ZF, SF) according to the result. Only EFLAGS (LBT4) is updated; the GPR is not modified.</p>
+<h3 id="operation_2">Operation</h3>
+<pre><code class="language-c++">uint32_t lhs = (uint32_t)a;
+uint32_t rhs = (uint32_t)b;
+uint8_t carry_in = EFLAGS.CF;
+uint32_t result = lhs + rhs + carry_in;
+EFLAGS.CF = (uint64_t)lhs + rhs + carry_in &gt; UINT32_MAX;
+EFLAGS.AF = ((lhs ^ rhs ^ result) &amp; 0x10) != 0;
+EFLAGS.OF = ((~(lhs ^ rhs)) &amp; (lhs ^ result) &amp; 0x80000000) != 0;
+EFLAGS.PF = parity_even((uint8_t)result);
+EFLAGS.ZF = result == 0;
+EFLAGS.SF = (int32_t)result &lt; 0;
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_2">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>µarch</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3C5000</td>
+<td>LA464</td>
+<td>2</td>
+<td>0.5(1/2)</td>
+</tr>
+<tr>
+<td>3C6000</td>
+<td>LA664</td>
+<td>2</td>
+<td>0.5(1/2)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="x86adcd">x86adc.d</h2>
+<h3 id="synopsis_3">Synopsis</h3>
+<pre><code>Instruction: x86adc.d rj, rk
+CPU Flags: LBT
+</code></pre>
+<h3 id="description_3">Description</h3>
+<p>x86-style add with carry: add 64-bit values in <code>rj</code> and <code>rk</code> with CF (in EFLAGS). Update EFLAGS (CF, AF, OF, PF, ZF, SF) according to the result. Only EFLAGS (LBT4) is updated; the GPR is not modified.</p>
+<h3 id="operation_3">Operation</h3>
+<pre><code class="language-c++">uint64_t lhs = (uint64_t)a;
+uint64_t rhs = (uint64_t)b;
+uint8_t carry_in = EFLAGS.CF;
+uint64_t result = lhs + rhs + carry_in;
+EFLAGS.CF = lhs &gt; UINT64_MAX - rhs - carry_in;
+EFLAGS.AF = ((lhs ^ rhs ^ result) &amp; 0x10) != 0;
+EFLAGS.OF = ((~(lhs ^ rhs)) &amp; (lhs ^ result) &amp; 0x8000000000000000ULL) != 0;
+EFLAGS.PF = parity_even((uint8_t)result);
+EFLAGS.ZF = result == 0;
+EFLAGS.SF = (int64_t)result &lt; 0;
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_3">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>µarch</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3C5000</td>
+<td>LA464</td>
+<td>2</td>
+<td>0.5(1/2)</td>
+</tr>
+<tr>
+<td>3C6000</td>
+<td>LA664</td>
+<td>2</td>
+<td>0.5(1/2)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="x86addb">x86add.b</h2>
+<h3 id="synopsis_4">Synopsis</h3>
+<pre><code>Instruction: x86add.b rj, rk
+CPU Flags: LBT
+</code></pre>
+<h3 id="description_4">Description</h3>
+<p>x86-style add: add 8-bit values in <code>rj</code> and <code>rk</code>. Update EFLAGS (CF, AF, OF, PF, ZF, SF) according to the result. Only EFLAGS (LBT4) is updated; the GPR is not modified.</p>
+<h3 id="operation_4">Operation</h3>
+<pre><code class="language-c++">uint8_t lhs = (uint8_t)a;
+uint8_t rhs = (uint8_t)b;
+uint8_t result = lhs + rhs;
+EFLAGS.CF = (uint64_t)lhs + (uint64_t)rhs &gt; UINT8_MAX;
+EFLAGS.AF = ((lhs ^ rhs ^ result) &amp; 0x10) != 0;
+EFLAGS.OF = ((~(lhs ^ rhs)) &amp; (lhs ^ result) &amp; 0x80) != 0;
+EFLAGS.PF = parity_even((uint8_t)result);
+EFLAGS.ZF = result == 0;
+EFLAGS.SF = (int8_t)result &lt; 0;
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_4">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>µarch</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3C5000</td>
+<td>LA464</td>
+<td>2</td>
+<td>0.5(1/2)</td>
+</tr>
+<tr>
+<td>3C6000</td>
+<td>LA664</td>
+<td>2</td>
+<td>0.5(1/2)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="x86addh">x86add.h</h2>
+<h3 id="synopsis_5">Synopsis</h3>
+<pre><code>Instruction: x86add.h rj, rk
+CPU Flags: LBT
+</code></pre>
+<h3 id="description_5">Description</h3>
+<p>x86-style add: add 16-bit values in <code>rj</code> and <code>rk</code>. Update EFLAGS (CF, AF, OF, PF, ZF, SF) according to the result. Only EFLAGS (LBT4) is updated; the GPR is not modified.</p>
+<h3 id="operation_5">Operation</h3>
+<pre><code class="language-c++">uint16_t lhs = (uint16_t)a;
+uint16_t rhs = (uint16_t)b;
+uint16_t result = lhs + rhs;
+EFLAGS.CF = (uint64_t)lhs + (uint64_t)rhs &gt; UINT16_MAX;
+EFLAGS.AF = ((lhs ^ rhs ^ result) &amp; 0x10) != 0;
+EFLAGS.OF = ((~(lhs ^ rhs)) &amp; (lhs ^ result) &amp; 0x8000) != 0;
+EFLAGS.PF = parity_even((uint8_t)result);
+EFLAGS.ZF = result == 0;
+EFLAGS.SF = (int16_t)result &lt; 0;
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_5">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>µarch</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3C5000</td>
+<td>LA464</td>
+<td>2</td>
+<td>0.5(1/2)</td>
+</tr>
+<tr>
+<td>3C6000</td>
+<td>LA664</td>
+<td>2</td>
+<td>0.5(1/2)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="x86addw">x86add.w</h2>
+<h3 id="synopsis_6">Synopsis</h3>
+<pre><code>Instruction: x86add.w rj, rk
+CPU Flags: LBT
+</code></pre>
+<h3 id="description_6">Description</h3>
+<p>x86-style add: add 32-bit values in <code>rj</code> and <code>rk</code>. Update EFLAGS (CF, AF, OF, PF, ZF, SF) according to the result. Only EFLAGS (LBT4) is updated; the GPR is not modified.</p>
+<h3 id="operation_6">Operation</h3>
+<pre><code class="language-c++">uint32_t lhs = (uint32_t)a;
+uint32_t rhs = (uint32_t)b;
+uint32_t result = lhs + rhs;
+EFLAGS.CF = (uint64_t)lhs + (uint64_t)rhs &gt; UINT32_MAX;
+EFLAGS.AF = ((lhs ^ rhs ^ result) &amp; 0x10) != 0;
+EFLAGS.OF = ((~(lhs ^ rhs)) &amp; (lhs ^ result) &amp; 0x80000000) != 0;
+EFLAGS.PF = parity_even((uint8_t)result);
+EFLAGS.ZF = result == 0;
+EFLAGS.SF = (int32_t)result &lt; 0;
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_6">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>µarch</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3C5000</td>
+<td>LA464</td>
+<td>2</td>
+<td>0.5(1/2)</td>
+</tr>
+<tr>
+<td>3C6000</td>
+<td>LA664</td>
+<td>2</td>
+<td>0.5(1/2)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="x86addd">x86add.d</h2>
+<h3 id="synopsis_7">Synopsis</h3>
+<pre><code>Instruction: x86add.d rj, rk
+CPU Flags: LBT
+</code></pre>
+<h3 id="description_7">Description</h3>
+<p>x86-style add: add 64-bit values in <code>rj</code> and <code>rk</code>. Update EFLAGS (CF, AF, OF, PF, ZF, SF) according to the result. Only EFLAGS (LBT4) is updated; the GPR is not modified.</p>
+<h3 id="operation_7">Operation</h3>
+<pre><code class="language-c++">uint64_t lhs = (uint64_t)a;
+uint64_t rhs = (uint64_t)b;
+uint64_t result = lhs + rhs;
+EFLAGS.CF = lhs &gt; UINT64_MAX - rhs;
+EFLAGS.AF = ((lhs ^ rhs ^ result) &amp; 0x10) != 0;
+EFLAGS.OF = ((~(lhs ^ rhs)) &amp; (lhs ^ result) &amp; 0x8000000000000000ULL) != 0;
+EFLAGS.PF = parity_even((uint8_t)result);
+EFLAGS.ZF = result == 0;
+EFLAGS.SF = (int64_t)result &lt; 0;
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_7">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>µarch</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3C5000</td>
+<td>LA464</td>
+<td>2</td>
+<td>0.5(1/2)</td>
+</tr>
+<tr>
+<td>3C6000</td>
+<td>LA664</td>
+<td>2</td>
+<td>0.5(1/2)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="x86addwu">x86add.wu</h2>
+<h3 id="synopsis_8">Synopsis</h3>
+<pre><code>Instruction: x86add.wu rj, rk
+CPU Flags: LBT
+</code></pre>
+<h3 id="description_8">Description</h3>
+<p>x86-style add: add unsigned 32-bit values in <code>rj</code> and <code>rk</code>. Update EFLAGS (CF, AF, OF, PF, ZF, SF) according to the result. Only EFLAGS (LBT4) is updated; the GPR is not modified.</p>
+<h3 id="operation_8">Operation</h3>
+<pre><code class="language-c++">uint32_t lhs = (uint32_t)a;
+uint32_t rhs = (uint32_t)b;
+uint32_t result = lhs + rhs;
+EFLAGS.CF = (uint64_t)lhs + (uint64_t)rhs &gt; UINT32_MAX;
+EFLAGS.AF = ((lhs ^ rhs ^ result) &amp; 0x10) != 0;
+EFLAGS.OF = 0;
+EFLAGS.PF = parity_even((uint8_t)result);
+EFLAGS.ZF = result == 0;
+EFLAGS.SF = (int32_t)result &lt; 0;
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_8">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>µarch</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3C5000</td>
+<td>LA464</td>
+<td>2</td>
+<td>0.5(1/2)</td>
+</tr>
+<tr>
+<td>3C6000</td>
+<td>LA664</td>
+<td>2</td>
+<td>0.5(1/2)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="x86adddu">x86add.du</h2>
+<h3 id="synopsis_9">Synopsis</h3>
+<pre><code>Instruction: x86add.du rj, rk
+CPU Flags: LBT
+</code></pre>
+<h3 id="description_9">Description</h3>
+<p>x86-style add: add unsigned 64-bit values in <code>rj</code> and <code>rk</code>. Update EFLAGS (CF, AF, OF, PF, ZF, SF) according to the result. Only EFLAGS (LBT4) is updated; the GPR is not modified.</p>
+<h3 id="operation_9">Operation</h3>
+<pre><code class="language-c++">uint64_t lhs = (uint64_t)a;
+uint64_t rhs = (uint64_t)b;
+uint64_t result = lhs + rhs;
+EFLAGS.CF = lhs &gt; UINT64_MAX - rhs;
+EFLAGS.AF = ((lhs ^ rhs ^ result) &amp; 0x10) != 0;
+EFLAGS.OF = 0;
+EFLAGS.PF = parity_even((uint8_t)result);
+EFLAGS.ZF = result == 0;
+EFLAGS.SF = (int64_t)result &lt; 0;
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_9">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>µarch</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3C5000</td>
+<td>LA464</td>
+<td>2</td>
+<td>0.5(1/2)</td>
+</tr>
+<tr>
+<td>3C6000</td>
+<td>LA664</td>
+<td>2</td>
+<td>0.5(1/2)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="x86incb">x86inc.b</h2>
+<h3 id="synopsis_10">Synopsis</h3>
+<pre><code>Instruction: x86inc.b rj
+CPU Flags: LBT
+</code></pre>
+<h3 id="description_10">Description</h3>
+<p>x86-style increment: add 1 to the 8-bit value in <code>rj</code>. Update EFLAGS (AF, OF, PF, ZF, SF). Preserve CF. Only EFLAGS (LBT4) is updated; the GPR is not modified.</p>
+<h3 id="operation_10">Operation</h3>
+<pre><code class="language-c++">uint8_t v = (uint8_t)a;
+uint8_t r = v + 1;
+// CF preserved from input EFLAGS.CF
+EFLAGS.PF = parity_even((uint8_t)r);
+EFLAGS.AF = ((v ^ 1 ^ r) &amp; 0x10) != 0;
+EFLAGS.ZF = r == 0;
+EFLAGS.SF = (int8_t)r &lt; 0;
+EFLAGS.OF = v == (uint8_t)INT8_MAX;
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_10">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>µarch</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3C5000</td>
+<td>LA464</td>
+<td>2</td>
+<td>0.5(1/2)</td>
+</tr>
+<tr>
+<td>3C6000</td>
+<td>LA664</td>
+<td>2</td>
+<td>0.5(1/2)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="x86inch">x86inc.h</h2>
+<h3 id="synopsis_11">Synopsis</h3>
+<pre><code>Instruction: x86inc.h rj
+CPU Flags: LBT
+</code></pre>
+<h3 id="description_11">Description</h3>
+<p>x86-style increment: add 1 to the 16-bit value in <code>rj</code>. Update EFLAGS (AF, OF, PF, ZF, SF). Preserve CF. Only EFLAGS (LBT4) is updated; the GPR is not modified.</p>
+<h3 id="operation_11">Operation</h3>
+<pre><code class="language-c++">uint16_t v = (uint16_t)a;
+uint16_t r = v + 1;
+// CF preserved from input EFLAGS.CF
+EFLAGS.PF = parity_even((uint8_t)r);
+EFLAGS.AF = ((v ^ 1 ^ r) &amp; 0x10) != 0;
+EFLAGS.ZF = r == 0;
+EFLAGS.SF = (int16_t)r &lt; 0;
+EFLAGS.OF = v == (uint16_t)INT16_MAX;
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_11">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>µarch</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3C5000</td>
+<td>LA464</td>
+<td>2</td>
+<td>0.5(1/2)</td>
+</tr>
+<tr>
+<td>3C6000</td>
+<td>LA664</td>
+<td>2</td>
+<td>0.5(1/2)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="x86incw">x86inc.w</h2>
+<h3 id="synopsis_12">Synopsis</h3>
+<pre><code>Instruction: x86inc.w rj
+CPU Flags: LBT
+</code></pre>
+<h3 id="description_12">Description</h3>
+<p>x86-style increment: add 1 to the 32-bit value in <code>rj</code>. Update EFLAGS (AF, OF, PF, ZF, SF). Preserve CF. Only EFLAGS (LBT4) is updated; the GPR is not modified.</p>
+<h3 id="operation_12">Operation</h3>
+<pre><code class="language-c++">uint32_t v = (uint32_t)a;
+uint32_t r = v + 1;
+// CF preserved from input EFLAGS.CF
+EFLAGS.PF = parity_even((uint8_t)r);
+EFLAGS.AF = ((v ^ 1 ^ r) &amp; 0x10) != 0;
+EFLAGS.ZF = r == 0;
+EFLAGS.SF = (int32_t)r &lt; 0;
+EFLAGS.OF = v == (uint32_t)INT32_MAX;
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_12">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>µarch</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3C5000</td>
+<td>LA464</td>
+<td>2</td>
+<td>0.5(1/2)</td>
+</tr>
+<tr>
+<td>3C6000</td>
+<td>LA664</td>
+<td>2</td>
+<td>0.5(1/2)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="x86incd">x86inc.d</h2>
+<h3 id="synopsis_13">Synopsis</h3>
+<pre><code>Instruction: x86inc.d rj
+CPU Flags: LBT
+</code></pre>
+<h3 id="description_13">Description</h3>
+<p>x86-style increment: add 1 to the 64-bit value in <code>rj</code>. Update EFLAGS (AF, OF, PF, ZF, SF). Preserve CF. Only EFLAGS (LBT4) is updated; the GPR is not modified.</p>
+<h3 id="operation_13">Operation</h3>
+<pre><code class="language-c++">uint64_t v = (uint64_t)a;
+uint64_t r = v + 1;
+// CF preserved from input EFLAGS.CF
+EFLAGS.PF = parity_even((uint8_t)r);
+EFLAGS.AF = ((v ^ 1 ^ r) &amp; 0x10) != 0;
+EFLAGS.ZF = r == 0;
+EFLAGS.SF = (int64_t)r &lt; 0;
+EFLAGS.OF = v == (uint64_t)INT64_MAX;
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_13">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>µarch</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3C5000</td>
+<td>LA464</td>
+<td>2</td>
+<td>0.5(1/2)</td>
+</tr>
+<tr>
+<td>3C6000</td>
+<td>LA664</td>
+<td>2</td>
+<td>0.5(1/2)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="x86sbcb">x86sbc.b</h2>
+<h3 id="synopsis_14">Synopsis</h3>
+<pre><code>Instruction: x86sbc.b rj, rk
+CPU Flags: LBT
+</code></pre>
+<h3 id="description_14">Description</h3>
+<p>x86-style subtract with borrow: subtract 8-bit values in <code>rj</code> and <code>rk</code> with CF (in EFLAGS). Update EFLAGS (CF, AF, OF, PF, ZF, SF) according to the result. Only EFLAGS (LBT4) is updated; the GPR is not modified.</p>
+<h3 id="operation_14">Operation</h3>
+<pre><code class="language-c++">uint8_t lhs = (uint8_t)a;
+uint8_t rhs = (uint8_t)b;
+uint8_t carry_in = EFLAGS.CF;
+uint64_t subtrahend = (uint64_t)rhs + carry_in;
+uint8_t result = (uint8_t)(lhs - subtrahend);
+EFLAGS.CF = lhs &lt; subtrahend;
+EFLAGS.AF = (lhs &amp; 0xf) &lt; (rhs &amp; 0xf);
+EFLAGS.OF = ((lhs ^ rhs) &amp; (lhs ^ result) &amp; 0x80) != 0;
+EFLAGS.PF = parity_even((uint8_t)result);
+EFLAGS.ZF = result == 0;
+EFLAGS.SF = (int8_t)result &lt; 0;
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_14">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>µarch</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3C5000</td>
+<td>LA464</td>
+<td>2</td>
+<td>0.5(1/2)</td>
+</tr>
+<tr>
+<td>3C6000</td>
+<td>LA664</td>
+<td>2</td>
+<td>0.5(1/2)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="x86sbch">x86sbc.h</h2>
+<h3 id="synopsis_15">Synopsis</h3>
+<pre><code>Instruction: x86sbc.h rj, rk
+CPU Flags: LBT
+</code></pre>
+<h3 id="description_15">Description</h3>
+<p>x86-style subtract with borrow: subtract 16-bit values in <code>rj</code> and <code>rk</code> with CF (in EFLAGS). Update EFLAGS (CF, AF, OF, PF, ZF, SF) according to the result. Only EFLAGS (LBT4) is updated; the GPR is not modified.</p>
+<h3 id="operation_15">Operation</h3>
+<pre><code class="language-c++">uint16_t lhs = (uint16_t)a;
+uint16_t rhs = (uint16_t)b;
+uint8_t carry_in = EFLAGS.CF;
+uint64_t subtrahend = (uint64_t)rhs + carry_in;
+uint16_t result = (uint16_t)(lhs - subtrahend);
+EFLAGS.CF = lhs &lt; subtrahend;
+EFLAGS.AF = (lhs &amp; 0xf) &lt; (rhs &amp; 0xf);
+EFLAGS.OF = ((lhs ^ rhs) &amp; (lhs ^ result) &amp; 0x8000) != 0;
+EFLAGS.PF = parity_even((uint8_t)result);
+EFLAGS.ZF = result == 0;
+EFLAGS.SF = (int16_t)result &lt; 0;
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_15">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>µarch</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3C5000</td>
+<td>LA464</td>
+<td>2</td>
+<td>0.5(1/2)</td>
+</tr>
+<tr>
+<td>3C6000</td>
+<td>LA664</td>
+<td>2</td>
+<td>0.5(1/2)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="x86sbcw">x86sbc.w</h2>
+<h3 id="synopsis_16">Synopsis</h3>
+<pre><code>Instruction: x86sbc.w rj, rk
+CPU Flags: LBT
+</code></pre>
+<h3 id="description_16">Description</h3>
+<p>x86-style subtract with borrow: subtract 32-bit values in <code>rj</code> and <code>rk</code> with CF (in EFLAGS). Update EFLAGS (CF, AF, OF, PF, ZF, SF) according to the result. Only EFLAGS (LBT4) is updated; the GPR is not modified.</p>
+<h3 id="operation_16">Operation</h3>
+<pre><code class="language-c++">uint32_t lhs = (uint32_t)a;
+uint32_t rhs = (uint32_t)b;
+uint8_t carry_in = EFLAGS.CF;
+uint64_t subtrahend = (uint64_t)rhs + carry_in;
+uint32_t result = (uint32_t)(lhs - subtrahend);
+EFLAGS.CF = lhs &lt; subtrahend;
+EFLAGS.AF = (lhs &amp; 0xf) &lt; (rhs &amp; 0xf);
+EFLAGS.OF = ((lhs ^ rhs) &amp; (lhs ^ result) &amp; 0x80000000) != 0;
+EFLAGS.PF = parity_even((uint8_t)result);
+EFLAGS.ZF = result == 0;
+EFLAGS.SF = (int32_t)result &lt; 0;
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_16">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>µarch</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3C5000</td>
+<td>LA464</td>
+<td>2</td>
+<td>0.5(1/2)</td>
+</tr>
+<tr>
+<td>3C6000</td>
+<td>LA664</td>
+<td>2</td>
+<td>0.5(1/2)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="x86sbcd">x86sbc.d</h2>
+<h3 id="synopsis_17">Synopsis</h3>
+<pre><code>Instruction: x86sbc.d rj, rk
+CPU Flags: LBT
+</code></pre>
+<h3 id="description_17">Description</h3>
+<p>x86-style subtract with borrow: subtract 64-bit values in <code>rj</code> and <code>rk</code> with CF (in EFLAGS). Update EFLAGS (CF, AF, OF, PF, ZF, SF) according to the result. Only EFLAGS (LBT4) is updated; the GPR is not modified.</p>
+<h3 id="operation_17">Operation</h3>
+<pre><code class="language-c++">uint64_t lhs = (uint64_t)a;
+uint64_t rhs = (uint64_t)b;
+uint8_t carry_in = EFLAGS.CF;
+uint64_t subtrahend = (uint64_t)rhs + carry_in;
+uint64_t result = (uint64_t)(lhs - subtrahend);
+EFLAGS.CF = lhs &lt; subtrahend;
+EFLAGS.AF = (lhs &amp; 0xf) &lt; (rhs &amp; 0xf);
+EFLAGS.OF = ((lhs ^ rhs) &amp; (lhs ^ result) &amp; 0x8000000000000000ULL) != 0;
+EFLAGS.PF = parity_even((uint8_t)result);
+EFLAGS.ZF = result == 0;
+EFLAGS.SF = (int64_t)result &lt; 0;
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_17">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>µarch</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3C5000</td>
+<td>LA464</td>
+<td>2</td>
+<td>0.5(1/2)</td>
+</tr>
+<tr>
+<td>3C6000</td>
+<td>LA664</td>
+<td>2</td>
+<td>0.5(1/2)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="x86subb">x86sub.b</h2>
+<h3 id="synopsis_18">Synopsis</h3>
+<pre><code>Instruction: x86sub.b rj, rk
+CPU Flags: LBT
+</code></pre>
+<h3 id="description_18">Description</h3>
+<p>x86-style subtract: subtract 8-bit values in <code>rj</code> and <code>rk</code>. Update EFLAGS (CF, AF, OF, PF, ZF, SF) according to the result. Only EFLAGS (LBT4) is updated; the GPR is not modified.</p>
+<h3 id="operation_18">Operation</h3>
+<pre><code class="language-c++">uint8_t lhs = (uint8_t)a;
+uint8_t rhs = (uint8_t)b;
+uint8_t result = lhs - rhs;
+EFLAGS.CF = lhs &lt; rhs;
+EFLAGS.AF = ((lhs ^ rhs ^ result) &amp; 0x10) != 0;
+EFLAGS.OF = ((lhs ^ rhs) &amp; (lhs ^ result) &amp; 0x80) != 0;
+EFLAGS.PF = parity_even((uint8_t)result);
+EFLAGS.ZF = result == 0;
+EFLAGS.SF = (int8_t)result &lt; 0;
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_18">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>µarch</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3C5000</td>
+<td>LA464</td>
+<td>2</td>
+<td>0.5(1/2)</td>
+</tr>
+<tr>
+<td>3C6000</td>
+<td>LA664</td>
+<td>2</td>
+<td>0.5(1/2)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="x86subh">x86sub.h</h2>
+<h3 id="synopsis_19">Synopsis</h3>
+<pre><code>Instruction: x86sub.h rj, rk
+CPU Flags: LBT
+</code></pre>
+<h3 id="description_19">Description</h3>
+<p>x86-style subtract: subtract 16-bit values in <code>rj</code> and <code>rk</code>. Update EFLAGS (CF, AF, OF, PF, ZF, SF) according to the result. Only EFLAGS (LBT4) is updated; the GPR is not modified.</p>
+<h3 id="operation_19">Operation</h3>
+<pre><code class="language-c++">uint16_t lhs = (uint16_t)a;
+uint16_t rhs = (uint16_t)b;
+uint16_t result = lhs - rhs;
+EFLAGS.CF = lhs &lt; rhs;
+EFLAGS.AF = ((lhs ^ rhs ^ result) &amp; 0x10) != 0;
+EFLAGS.OF = ((lhs ^ rhs) &amp; (lhs ^ result) &amp; 0x8000) != 0;
+EFLAGS.PF = parity_even((uint8_t)result);
+EFLAGS.ZF = result == 0;
+EFLAGS.SF = (int16_t)result &lt; 0;
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_19">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>µarch</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3C5000</td>
+<td>LA464</td>
+<td>2</td>
+<td>0.5(1/2)</td>
+</tr>
+<tr>
+<td>3C6000</td>
+<td>LA664</td>
+<td>2</td>
+<td>0.5(1/2)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="x86subw">x86sub.w</h2>
+<h3 id="synopsis_20">Synopsis</h3>
+<pre><code>Instruction: x86sub.w rj, rk
+CPU Flags: LBT
+</code></pre>
+<h3 id="description_20">Description</h3>
+<p>x86-style subtract: subtract 32-bit values in <code>rj</code> and <code>rk</code>. Update EFLAGS (CF, AF, OF, PF, ZF, SF) according to the result. Only EFLAGS (LBT4) is updated; the GPR is not modified.</p>
+<h3 id="operation_20">Operation</h3>
+<pre><code class="language-c++">uint32_t lhs = (uint32_t)a;
+uint32_t rhs = (uint32_t)b;
+uint32_t result = lhs - rhs;
+EFLAGS.CF = lhs &lt; rhs;
+EFLAGS.AF = ((lhs ^ rhs ^ result) &amp; 0x10) != 0;
+EFLAGS.OF = ((lhs ^ rhs) &amp; (lhs ^ result) &amp; 0x80000000) != 0;
+EFLAGS.PF = parity_even((uint8_t)result);
+EFLAGS.ZF = result == 0;
+EFLAGS.SF = (int32_t)result &lt; 0;
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_20">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>µarch</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3C5000</td>
+<td>LA464</td>
+<td>2</td>
+<td>0.5(1/2)</td>
+</tr>
+<tr>
+<td>3C6000</td>
+<td>LA664</td>
+<td>2</td>
+<td>0.5(1/2)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="x86subd">x86sub.d</h2>
+<h3 id="synopsis_21">Synopsis</h3>
+<pre><code>Instruction: x86sub.d rj, rk
+CPU Flags: LBT
+</code></pre>
+<h3 id="description_21">Description</h3>
+<p>x86-style subtract: subtract 64-bit values in <code>rj</code> and <code>rk</code>. Update EFLAGS (CF, AF, OF, PF, ZF, SF) according to the result. Only EFLAGS (LBT4) is updated; the GPR is not modified.</p>
+<h3 id="operation_21">Operation</h3>
+<pre><code class="language-c++">uint64_t lhs = (uint64_t)a;
+uint64_t rhs = (uint64_t)b;
+uint64_t result = lhs - rhs;
+EFLAGS.CF = lhs &lt; rhs;
+EFLAGS.AF = ((lhs ^ rhs ^ result) &amp; 0x10) != 0;
+EFLAGS.OF = ((lhs ^ rhs) &amp; (lhs ^ result) &amp; 0x8000000000000000ULL) != 0;
+EFLAGS.PF = parity_even((uint8_t)result);
+EFLAGS.ZF = result == 0;
+EFLAGS.SF = (int64_t)result &lt; 0;
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_21">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>µarch</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3C5000</td>
+<td>LA464</td>
+<td>2</td>
+<td>0.5(1/2)</td>
+</tr>
+<tr>
+<td>3C6000</td>
+<td>LA664</td>
+<td>2</td>
+<td>0.5(1/2)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="x86subwu">x86sub.wu</h2>
+<h3 id="synopsis_22">Synopsis</h3>
+<pre><code>Instruction: x86sub.wu rj, rk
+CPU Flags: LBT
+</code></pre>
+<h3 id="description_22">Description</h3>
+<p>x86-style subtract: subtract unsigned 32-bit values in <code>rj</code> and <code>rk</code>. Update EFLAGS (CF, AF, OF, PF, ZF, SF) according to the result. Only EFLAGS (LBT4) is updated; the GPR is not modified.</p>
+<h3 id="operation_22">Operation</h3>
+<pre><code class="language-c++">uint32_t lhs = (uint32_t)a;
+uint32_t rhs = (uint32_t)b;
+uint32_t result = lhs - rhs;
+EFLAGS.CF = lhs &lt; rhs;
+EFLAGS.AF = ((lhs ^ rhs ^ result) &amp; 0x10) != 0;
+EFLAGS.OF = 0;
+EFLAGS.PF = parity_even((uint8_t)result);
+EFLAGS.ZF = result == 0;
+EFLAGS.SF = (int32_t)result &lt; 0;
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_22">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>µarch</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3C5000</td>
+<td>LA464</td>
+<td>2</td>
+<td>0.5(1/2)</td>
+</tr>
+<tr>
+<td>3C6000</td>
+<td>LA664</td>
+<td>2</td>
+<td>0.5(1/2)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="x86subdu">x86sub.du</h2>
+<h3 id="synopsis_23">Synopsis</h3>
+<pre><code>Instruction: x86sub.du rj, rk
+CPU Flags: LBT
+</code></pre>
+<h3 id="description_23">Description</h3>
+<p>x86-style subtract: subtract unsigned 64-bit values in <code>rj</code> and <code>rk</code>. Update EFLAGS (CF, AF, OF, PF, ZF, SF) according to the result. Only EFLAGS (LBT4) is updated; the GPR is not modified.</p>
+<h3 id="operation_23">Operation</h3>
+<pre><code class="language-c++">uint64_t lhs = (uint64_t)a;
+uint64_t rhs = (uint64_t)b;
+uint64_t result = lhs - rhs;
+EFLAGS.CF = lhs &lt; rhs;
+EFLAGS.AF = ((lhs ^ rhs ^ result) &amp; 0x10) != 0;
+EFLAGS.OF = 0;
+EFLAGS.PF = parity_even((uint8_t)result);
+EFLAGS.ZF = result == 0;
+EFLAGS.SF = (int64_t)result &lt; 0;
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_23">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>µarch</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3C5000</td>
+<td>LA464</td>
+<td>2</td>
+<td>0.5(1/2)</td>
+</tr>
+<tr>
+<td>3C6000</td>
+<td>LA664</td>
+<td>2</td>
+<td>0.5(1/2)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="x86decb">x86dec.b</h2>
+<h3 id="synopsis_24">Synopsis</h3>
+<pre><code>Instruction: x86dec.b rj
+CPU Flags: LBT
+</code></pre>
+<h3 id="description_24">Description</h3>
+<p>x86-style decrement: subtract 1 from the 8-bit value in <code>rj</code>. Update EFLAGS (AF, OF, PF, ZF, SF). Preserve CF. Only EFLAGS (LBT4) is updated; the GPR is not modified.</p>
+<h3 id="operation_24">Operation</h3>
+<pre><code class="language-c++">uint8_t v = (uint8_t)a;
+uint8_t r = v - 1;
+// CF preserved from input EFLAGS.CF
+EFLAGS.PF = parity_even((uint8_t)r);
+EFLAGS.AF = ((v ^ 1 ^ r) &amp; 0x10) != 0;
+EFLAGS.ZF = r == 0;
+EFLAGS.SF = (int8_t)r &lt; 0;
+EFLAGS.OF = v == (uint8_t)INT8_MIN;
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_24">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>µarch</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3C5000</td>
+<td>LA464</td>
+<td>2</td>
+<td>0.5(1/2)</td>
+</tr>
+<tr>
+<td>3C6000</td>
+<td>LA664</td>
+<td>2</td>
+<td>0.5(1/2)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="x86dech">x86dec.h</h2>
+<h3 id="synopsis_25">Synopsis</h3>
+<pre><code>Instruction: x86dec.h rj
+CPU Flags: LBT
+</code></pre>
+<h3 id="description_25">Description</h3>
+<p>x86-style decrement: subtract 1 from the 16-bit value in <code>rj</code>. Update EFLAGS (AF, OF, PF, ZF, SF). Preserve CF. Only EFLAGS (LBT4) is updated; the GPR is not modified.</p>
+<h3 id="operation_25">Operation</h3>
+<pre><code class="language-c++">uint16_t v = (uint16_t)a;
+uint16_t r = v - 1;
+// CF preserved from input EFLAGS.CF
+EFLAGS.PF = parity_even((uint8_t)r);
+EFLAGS.AF = ((v ^ 1 ^ r) &amp; 0x10) != 0;
+EFLAGS.ZF = r == 0;
+EFLAGS.SF = (int16_t)r &lt; 0;
+EFLAGS.OF = v == (uint16_t)INT16_MIN;
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_25">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>µarch</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3C5000</td>
+<td>LA464</td>
+<td>2</td>
+<td>0.5(1/2)</td>
+</tr>
+<tr>
+<td>3C6000</td>
+<td>LA664</td>
+<td>2</td>
+<td>0.5(1/2)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="x86decw">x86dec.w</h2>
+<h3 id="synopsis_26">Synopsis</h3>
+<pre><code>Instruction: x86dec.w rj
+CPU Flags: LBT
+</code></pre>
+<h3 id="description_26">Description</h3>
+<p>x86-style decrement: subtract 1 from the 32-bit value in <code>rj</code>. Update EFLAGS (AF, OF, PF, ZF, SF). Preserve CF. Only EFLAGS (LBT4) is updated; the GPR is not modified.</p>
+<h3 id="operation_26">Operation</h3>
+<pre><code class="language-c++">uint32_t v = (uint32_t)a;
+uint32_t r = v - 1;
+// CF preserved from input EFLAGS.CF
+EFLAGS.PF = parity_even((uint8_t)r);
+EFLAGS.AF = ((v ^ 1 ^ r) &amp; 0x10) != 0;
+EFLAGS.ZF = r == 0;
+EFLAGS.SF = (int32_t)r &lt; 0;
+EFLAGS.OF = v == (uint32_t)INT32_MIN;
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_26">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>µarch</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3C5000</td>
+<td>LA464</td>
+<td>2</td>
+<td>0.5(1/2)</td>
+</tr>
+<tr>
+<td>3C6000</td>
+<td>LA664</td>
+<td>2</td>
+<td>0.5(1/2)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="x86decd">x86dec.d</h2>
+<h3 id="synopsis_27">Synopsis</h3>
+<pre><code>Instruction: x86dec.d rj
+CPU Flags: LBT
+</code></pre>
+<h3 id="description_27">Description</h3>
+<p>x86-style decrement: subtract 1 from the 64-bit value in <code>rj</code>. Update EFLAGS (AF, OF, PF, ZF, SF). Preserve CF. Only EFLAGS (LBT4) is updated; the GPR is not modified.</p>
+<h3 id="operation_27">Operation</h3>
+<pre><code class="language-c++">uint64_t v = (uint64_t)a;
+uint64_t r = v - 1;
+// CF preserved from input EFLAGS.CF
+EFLAGS.PF = parity_even((uint8_t)r);
+EFLAGS.AF = ((v ^ 1 ^ r) &amp; 0x10) != 0;
+EFLAGS.ZF = r == 0;
+EFLAGS.SF = (int64_t)r &lt; 0;
+EFLAGS.OF = v == (uint64_t)INT64_MIN;
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_27">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>µarch</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3C5000</td>
+<td>LA464</td>
+<td>2</td>
+<td>0.5(1/2)</td>
+</tr>
+<tr>
+<td>3C6000</td>
+<td>LA664</td>
+<td>2</td>
+<td>0.5(1/2)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="x86mulb">x86mul.b</h2>
+<h3 id="synopsis_28">Synopsis</h3>
+<pre><code>Instruction: x86mul.b rj, rk
+CPU Flags: LBT
+</code></pre>
+<h3 id="description_28">Description</h3>
+<p>x86-style multiply: multiply signed 8-bit values in <code>rj</code> and <code>rk</code>. Set CF and OF if overflow (result does not fit in 8-bits), clear other flags. Only EFLAGS (LBT4) is updated; the GPR is not modified.</p>
+<h3 id="operation_28">Operation</h3>
+<pre><code class="language-c++">uint8_t lhs = (uint8_t)a;
+uint8_t rhs = (uint8_t)b;
+__int128 product = (__int128)(int8_t)lhs * (__int128)(int8_t)rhs;
+bool overflow = product &lt; (__int128)INT8_MIN || product &gt; (__int128)INT8_MAX;
+EFLAGS.CF = overflow;
+EFLAGS.OF = overflow;
+EFLAGS.SF = 0;
+EFLAGS.ZF = 0;
+EFLAGS.AF = 0;
+EFLAGS.PF = 0;
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_28">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>µarch</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3C5000</td>
+<td>LA464</td>
+<td>1.17</td>
+<td>0.86(1/1.17)</td>
+</tr>
+<tr>
+<td>3C6000</td>
+<td>LA664</td>
+<td>1</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<h2 id="x86mulh">x86mul.h</h2>
+<h3 id="synopsis_29">Synopsis</h3>
+<pre><code>Instruction: x86mul.h rj, rk
+CPU Flags: LBT
+</code></pre>
+<h3 id="description_29">Description</h3>
+<p>x86-style multiply: multiply signed 16-bit values in <code>rj</code> and <code>rk</code>. Set CF and OF if overflow (result does not fit in 16-bits), clear other flags. Only EFLAGS (LBT4) is updated; the GPR is not modified.</p>
+<h3 id="operation_29">Operation</h3>
+<pre><code class="language-c++">uint16_t lhs = (uint16_t)a;
+uint16_t rhs = (uint16_t)b;
+__int128 product = (__int128)(int16_t)lhs * (__int128)(int16_t)rhs;
+bool overflow = product &lt; (__int128)INT16_MIN || product &gt; (__int128)INT16_MAX;
+EFLAGS.CF = overflow;
+EFLAGS.OF = overflow;
+EFLAGS.SF = 0;
+EFLAGS.ZF = 0;
+EFLAGS.AF = 0;
+EFLAGS.PF = 0;
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_29">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>µarch</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3C5000</td>
+<td>LA464</td>
+<td>1.17</td>
+<td>0.86(1/1.17)</td>
+</tr>
+<tr>
+<td>3C6000</td>
+<td>LA664</td>
+<td>1</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<h2 id="x86mulw">x86mul.w</h2>
+<h3 id="synopsis_30">Synopsis</h3>
+<pre><code>Instruction: x86mul.w rj, rk
+CPU Flags: LBT
+</code></pre>
+<h3 id="description_30">Description</h3>
+<p>x86-style multiply: multiply signed 32-bit values in <code>rj</code> and <code>rk</code>. Set CF and OF if overflow (result does not fit in 32-bits), clear other flags. Only EFLAGS (LBT4) is updated; the GPR is not modified.</p>
+<h3 id="operation_30">Operation</h3>
+<pre><code class="language-c++">uint32_t lhs = (uint32_t)a;
+uint32_t rhs = (uint32_t)b;
+__int128 product = (__int128)(int32_t)lhs * (__int128)(int32_t)rhs;
+bool overflow = product &lt; (__int128)INT32_MIN || product &gt; (__int128)INT32_MAX;
+EFLAGS.CF = overflow;
+EFLAGS.OF = overflow;
+EFLAGS.SF = 0;
+EFLAGS.ZF = 0;
+EFLAGS.AF = 0;
+EFLAGS.PF = 0;
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_30">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>µarch</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3C5000</td>
+<td>LA464</td>
+<td>1.17</td>
+<td>0.86(1/1.17)</td>
+</tr>
+<tr>
+<td>3C6000</td>
+<td>LA664</td>
+<td>1</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<h2 id="x86muld">x86mul.d</h2>
+<h3 id="synopsis_31">Synopsis</h3>
+<pre><code>Instruction: x86mul.d rj, rk
+CPU Flags: LBT
+</code></pre>
+<h3 id="description_31">Description</h3>
+<p>x86-style multiply: multiply signed 64-bit values in <code>rj</code> and <code>rk</code>. Set CF and OF if overflow (result does not fit in 64-bits), clear other flags. Only EFLAGS (LBT4) is updated; the GPR is not modified.</p>
+<h3 id="operation_31">Operation</h3>
+<pre><code class="language-c++">uint64_t lhs = (uint64_t)a;
+uint64_t rhs = (uint64_t)b;
+__int128 product = (__int128)(int64_t)lhs * (__int128)(int64_t)rhs;
+bool overflow = product &lt; (__int128)INT64_MIN || product &gt; (__int128)INT64_MAX;
+EFLAGS.CF = overflow;
+EFLAGS.OF = overflow;
+EFLAGS.SF = 0;
+EFLAGS.ZF = 0;
+EFLAGS.AF = 0;
+EFLAGS.PF = 0;
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_31">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>µarch</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3C5000</td>
+<td>LA464</td>
+<td>1.17</td>
+<td>0.86(1/1.17)</td>
+</tr>
+<tr>
+<td>3C6000</td>
+<td>LA664</td>
+<td>1</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<h2 id="x86mulbu">x86mul.bu</h2>
+<h3 id="synopsis_32">Synopsis</h3>
+<pre><code>Instruction: x86mul.bu rj, rk
+CPU Flags: LBT
+</code></pre>
+<h3 id="description_32">Description</h3>
+<p>x86-style multiply: multiply unsigned 8-bit values in <code>rj</code> and <code>rk</code>. Set CF and OF if overflow (result does not fit in 8-bits), clear other flags. Only EFLAGS (LBT4) is updated; the GPR is not modified.</p>
+<h3 id="operation_32">Operation</h3>
+<pre><code class="language-c++">uint8_t lhs = (uint8_t)a;
+uint8_t rhs = (uint8_t)b;
+unsigned __int128 product =
+    (unsigned __int128)(uint8_t)lhs * (unsigned __int128)(uint8_t)rhs;
+bool overflow = (product &gt;&gt; 8) != 0;
+EFLAGS.CF = overflow;
+EFLAGS.OF = overflow;
+EFLAGS.SF = 0;
+EFLAGS.ZF = 0;
+EFLAGS.AF = 0;
+EFLAGS.PF = 0;
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_32">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>µarch</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3C5000</td>
+<td>LA464</td>
+<td>1.17</td>
+<td>0.86(1/1.17)</td>
+</tr>
+<tr>
+<td>3C6000</td>
+<td>LA664</td>
+<td>1</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<h2 id="x86mulhu">x86mul.hu</h2>
+<h3 id="synopsis_33">Synopsis</h3>
+<pre><code>Instruction: x86mul.hu rj, rk
+CPU Flags: LBT
+</code></pre>
+<h3 id="description_33">Description</h3>
+<p>x86-style multiply: multiply unsigned 16-bit values in <code>rj</code> and <code>rk</code>. Set CF and OF if overflow (result does not fit in 16-bits), clear other flags. Only EFLAGS (LBT4) is updated; the GPR is not modified.</p>
+<h3 id="operation_33">Operation</h3>
+<pre><code class="language-c++">uint16_t lhs = (uint16_t)a;
+uint16_t rhs = (uint16_t)b;
+unsigned __int128 product =
+    (unsigned __int128)(uint16_t)lhs * (unsigned __int128)(uint16_t)rhs;
+bool overflow = (product &gt;&gt; 16) != 0;
+EFLAGS.CF = overflow;
+EFLAGS.OF = overflow;
+EFLAGS.SF = 0;
+EFLAGS.ZF = 0;
+EFLAGS.AF = 0;
+EFLAGS.PF = 0;
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_33">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>µarch</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3C5000</td>
+<td>LA464</td>
+<td>1.17</td>
+<td>0.86(1/1.17)</td>
+</tr>
+<tr>
+<td>3C6000</td>
+<td>LA664</td>
+<td>1</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<h2 id="x86mulwu">x86mul.wu</h2>
+<h3 id="synopsis_34">Synopsis</h3>
+<pre><code>Instruction: x86mul.wu rj, rk
+CPU Flags: LBT
+</code></pre>
+<h3 id="description_34">Description</h3>
+<p>x86-style multiply: multiply unsigned 32-bit values in <code>rj</code> and <code>rk</code>. Set CF and OF if overflow (result does not fit in 32-bits), clear other flags. Only EFLAGS (LBT4) is updated; the GPR is not modified.</p>
+<h3 id="operation_34">Operation</h3>
+<pre><code class="language-c++">uint32_t lhs = (uint32_t)a;
+uint32_t rhs = (uint32_t)b;
+unsigned __int128 product =
+    (unsigned __int128)(uint32_t)lhs * (unsigned __int128)(uint32_t)rhs;
+bool overflow = (product &gt;&gt; 32) != 0;
+EFLAGS.CF = overflow;
+EFLAGS.OF = overflow;
+EFLAGS.SF = 0;
+EFLAGS.ZF = 0;
+EFLAGS.AF = 0;
+EFLAGS.PF = 0;
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_34">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>µarch</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3C5000</td>
+<td>LA464</td>
+<td>1.17</td>
+<td>0.86(1/1.17)</td>
+</tr>
+<tr>
+<td>3C6000</td>
+<td>LA664</td>
+<td>1</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<h2 id="x86muldu">x86mul.du</h2>
+<h3 id="synopsis_35">Synopsis</h3>
+<pre><code>Instruction: x86mul.du rj, rk
+CPU Flags: LBT
+</code></pre>
+<h3 id="description_35">Description</h3>
+<p>x86-style multiply: multiply unsigned 64-bit values in <code>rj</code> and <code>rk</code>. Set CF and OF if overflow (result does not fit in 64-bits), clear other flags. Only EFLAGS (LBT4) is updated; the GPR is not modified.</p>
+<h3 id="operation_35">Operation</h3>
+<pre><code class="language-c++">uint64_t lhs = (uint64_t)a;
+uint64_t rhs = (uint64_t)b;
+unsigned __int128 product =
+    (unsigned __int128)(uint64_t)lhs * (unsigned __int128)(uint64_t)rhs;
+bool overflow = (product &gt;&gt; 64) != 0;
+EFLAGS.CF = overflow;
+EFLAGS.OF = overflow;
+EFLAGS.SF = 0;
+EFLAGS.ZF = 0;
+EFLAGS.AF = 0;
+EFLAGS.PF = 0;
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput_35">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>µarch</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3C5000</td>
+<td>LA464</td>
+<td>1.17</td>
+<td>0.86(1/1.17)</td>
+</tr>
+<tr>
+<td>3C6000</td>
+<td>LA664</td>
+<td>1</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../x86_fpu/" class="btn btn-neutral float-left" title="x86 FPU"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../x86_logical/" class="btn btn-neutral float-right" title="x86 Logical">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p>Copyright © 2023-2026 Jiajie Chen</p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../x86_fpu/" style="color: #fcfcfc">« Previous</a></span>
+    
+    
+      <span><a href="../x86_logical/" style="color: #fcfcfc">Next »</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+
+
+<script id="init-glightbox">const lightbox = GLightbox({"touchNavigation": true, "loop": false, "zoomable": true, "draggable": true, "openEffect": "zoom", "closeEffect": "zoom", "slideEffect": "slide"});
+</script></body></html>

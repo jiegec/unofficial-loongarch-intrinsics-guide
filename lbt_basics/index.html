@@ -1,0 +1,700 @@
+<!DOCTYPE html><html class="writer-html5" lang="en"><head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="canonical" href="https://jia.je/unofficial-loongarch-intrinsics-guide/lbt_basics/">
+      <link rel="shortcut icon" href="../img/favicon.ico">
+    <title>LoongArch LBT Basics - Unofficial LoongArch Intrinsics Guide</title>
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/theme_extra.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css">
+        <link href="../main.css" rel="stylesheet">
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "LoongArch LBT Basics";
+        var mkdocs_page_input_path = "lbt_basics.md";
+        var mkdocs_page_url = "/unofficial-loongarch-intrinsics-guide/lbt_basics/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+<link href="../assets/stylesheets/glightbox.min.css" rel="stylesheet"><script src="../assets/javascripts/glightbox.min.js"></script><style id="glightbox-style">
+            html.glightbox-open { overflow: initial; height: 100%; }
+            .gslide-title { margin-top: 0px; user-select: text; }
+            .gslide-desc { color: #666; user-select: text; }
+            .gslide-image img { background: white; }
+        </style></head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Unofficial LoongArch Intrinsics Guide
+        </a>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Unofficial LoongArch Intrinsics Guide</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../latency_throughput/">Latency and Throughput of Instructions</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">LoongArch LBT Basics</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#registers">Registers</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#jiscr">jiscr</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#x86-eflags">x86 EFLAGS</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#armflags">ARMFLAGS</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#condition-codes">Condition Codes</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#x86-condition-codes">x86 Condition Codes</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#arm-condition-codes">ARM Condition Codes</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#x87-fpu-emulation">x87 FPU Emulation</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#ftop-stack-top-pointer">FTOP (Stack Top Pointer)</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#tm-translation-mode">TM (Translation Mode)</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#x87-80-bit-extended-precision">x87 80-bit Extended Precision</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#tag-word">Tag Word</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#mips-unaligned-memory">MIPS Unaligned Memory</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#instruction-groups">Instruction Groups</a>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../loongarch_simd_basics/">LoongArch SIMD Basics</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../migrating_avx/">Migrating from AVX to LASX</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../migrating_sse/">Migrating from SSE to LSX</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../viewer/">Browse All Intrinsics</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Lasx</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../lasx/bitwise_operations/">Bitwise Operations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lasx/branch/">Branch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lasx/float_comparison/">Floating Point Comparison</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lasx/float_computation/">Floating Point Computation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lasx/float_conversion/">Floating Point Conversion</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lasx/float_misc/">Floating Point Misc</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lasx/fma/">Fused Multiply-Add</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lasx/integer_comparison/">Integer Comparison</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lasx/integer_computation/">Integer Computation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lasx/logical/">Logical</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lasx/memory/">Memory Load &amp; Store</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lasx/misc/">Misc</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lasx/permutation/">Permutation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lasx/shift/">Shift</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lasx/shuffling/">Shuffling</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lasx/undocumented/">Undocumented Intrinsics</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Lbt</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../lbt/arm_integer/">ARM Integer</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lbt/arm_logical/">ARM Logical</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lbt/arm_misc/">ARM Misc</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lbt/arm_shift/">ARM Shift</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lbt/integer/">LBT Integer</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lbt/jump/">LBT Jump</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lbt/mips_memory/">MIPS Memory</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lbt/state/">LBT State Transfer</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lbt/x86_fpu/">x86 FPU</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lbt/x86_integer/">x86 Integer</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lbt/x86_logical/">x86 Logical</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lbt/x86_misc/">x86 Misc</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lbt/x86_shift/">x86 Shift</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Lsx</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../lsx/bitwise_operations/">Bitwise Operations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lsx/branch/">Branch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lsx/float_comparison/">Floating Point Comparison</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lsx/float_computation/">Floating Point Computation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lsx/float_conversion/">Floating Point Conversion</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lsx/float_misc/">Floating Point Misc</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lsx/fma/">Fused Multiply-Add</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lsx/integer_comparison/">Integer Comparison</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lsx/integer_computation/">Integer Computation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lsx/logical/">Logical</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lsx/memory/">Memory Load &amp; Store</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lsx/misc/">Misc</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lsx/permutation/">Permutation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lsx/shift/">Shift</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lsx/shuffling/">Shuffling</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lsx/undocumented/">Undocumented Intrinsics</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Unofficial LoongArch Intrinsics Guide</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">LoongArch LBT Basics</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="loongarch-lbt-basics">LoongArch LBT Basics</h1>
+<p>LBT (LoongArch Binary Translation) is a set of instructions for emulating x86, ARM, and MIPS instruction sets. It provides hardware-accelerated flag manipulation, x87 FPU stack management, and conditional execution primitives.</p>
+<h2 id="registers">Registers</h2>
+<p>5 dedicated registers shared with the floating-point unit:</p>
+<table>
+<thead>
+<tr>
+<th>Register</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>LBT0–LBT3</td>
+<td>Scratch registers (GPR save/restore)</td>
+</tr>
+<tr>
+<td>LBT4</td>
+<td>High 32 bits: x87 FTOP, Low 32 bits: EFLAGS</td>
+</tr>
+</tbody>
+</table>
+<p>Scratch registers are accessible via:</p>
+<ul>
+<li><code>$scr0</code> = LBT0</li>
+<li><code>$scr1</code> = LBT1</li>
+<li><code>$scr2</code> = LBT2</li>
+<li><code>$scr3</code> = LBT3</li>
+</ul>
+<pre><code class="language-c">// movgr2scr $scrd, $rj
+movgr2scr(scrd, rj) {
+    SCR[scrd] = GPR[rj];
+}
+
+// movscr2gr $rd, $scrj
+movscr2gr(rd, scrj) {
+    GPR[rd] = SCR[scrj];
+}
+</code></pre>
+<h3 id="jiscr">jiscr</h3>
+<pre><code class="language-c">// jiscr0 imm
+jiscr0(imm) {
+    PC = SCR[0] + imm;
+}
+
+// jiscr1 imm
+jiscr1(imm) {
+    SCR[0] = PC;
+    PC = SCR[1] + imm;
+}
+</code></pre>
+<h2 id="x86-eflags">x86 EFLAGS</h2>
+<p>EFLAGS bits are stored in the low 32 bits of LBT4:</p>
+<table>
+<thead>
+<tr>
+<th>Bit</th>
+<th>Flag</th>
+<th>Position Shift</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CF</td>
+<td>0x001</td>
+<td>0</td>
+</tr>
+<tr>
+<td>PF</td>
+<td>0x004</td>
+<td>2</td>
+</tr>
+<tr>
+<td>AF</td>
+<td>0x010</td>
+<td>4</td>
+</tr>
+<tr>
+<td>ZF</td>
+<td>0x040</td>
+<td>6</td>
+</tr>
+<tr>
+<td>SF</td>
+<td>0x080</td>
+<td>7</td>
+</tr>
+<tr>
+<td>OF</td>
+<td>0x800</td>
+<td>11</td>
+</tr>
+</tbody>
+</table>
+<p>All flags set: <code>0x8d5</code></p>
+<p>PF (Parity Flag) is set when the least significant byte of the result has an even number of 1 bits:</p>
+<pre><code class="language-c">bool PF = parity_even((uint8_t)result);
+</code></pre>
+<h2 id="armflags">ARMFLAGS</h2>
+<p>ARM condition flags (N, Z, C, V) are mapped to the corresponding x86 EFLAGS bits in LBT4:</p>
+<table>
+<thead>
+<tr>
+<th>ARM Flag</th>
+<th>x86 Equivalent</th>
+<th>Bit Position</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>N (Negative)</td>
+<td>SF</td>
+<td>0x080</td>
+</tr>
+<tr>
+<td>Z (Zero)</td>
+<td>ZF</td>
+<td>0x040</td>
+</tr>
+<tr>
+<td>C (Carry)</td>
+<td>CF</td>
+<td>0x001</td>
+</tr>
+<tr>
+<td>V (Overflow)</td>
+<td>OF</td>
+<td>0x800</td>
+</tr>
+</tbody>
+</table>
+<h2 id="condition-codes">Condition Codes</h2>
+<h3 id="x86-condition-codes">x86 Condition Codes</h3>
+<p><code>setx86j rd, cond</code> evaluates the x86 condition <code>cond</code> against EFLAGS and stores 1 or 0 in <code>rd</code>.</p>
+<table>
+<thead>
+<tr>
+<th>cond</th>
+<th>Mnemonic</th>
+<th>Condition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>A / NBE</td>
+<td>CF = 0 and ZF = 0</td>
+</tr>
+<tr>
+<td>1</td>
+<td>AE / NB / NC</td>
+<td>CF = 0</td>
+</tr>
+<tr>
+<td>2</td>
+<td>B / C / NAE</td>
+<td>CF = 1</td>
+</tr>
+<tr>
+<td>3</td>
+<td>BE / NA</td>
+<td>CF = 1 or ZF = 1</td>
+</tr>
+<tr>
+<td>4</td>
+<td>E / Z</td>
+<td>ZF = 1</td>
+</tr>
+<tr>
+<td>5</td>
+<td>NE / NZ</td>
+<td>ZF = 0</td>
+</tr>
+<tr>
+<td>6</td>
+<td>G / NLE</td>
+<td>ZF = 0 and SF = OF</td>
+</tr>
+<tr>
+<td>7</td>
+<td>GE / NL</td>
+<td>SF = OF</td>
+</tr>
+<tr>
+<td>8</td>
+<td>L / NGE</td>
+<td>SF != OF</td>
+</tr>
+<tr>
+<td>9</td>
+<td>LE / NG</td>
+<td>ZF = 1 or SF != OF</td>
+</tr>
+<tr>
+<td>10</td>
+<td>S</td>
+<td>SF = 1</td>
+</tr>
+<tr>
+<td>11</td>
+<td>NS</td>
+<td>SF = 0</td>
+</tr>
+<tr>
+<td>12</td>
+<td>O</td>
+<td>OF = 1</td>
+</tr>
+<tr>
+<td>13</td>
+<td>NO</td>
+<td>OF = 0</td>
+</tr>
+<tr>
+<td>14</td>
+<td>P / PE</td>
+<td>PF = 1</td>
+</tr>
+<tr>
+<td>15</td>
+<td>NP / PO</td>
+<td>PF = 0</td>
+</tr>
+</tbody>
+</table>
+<h3 id="arm-condition-codes">ARM Condition Codes</h3>
+<p><code>setarmj rd, cond</code> evaluates the ARM condition <code>cond</code> against ARMFLAGS and stores 1 or 0 in <code>rd</code>. These same condition codes govern all ARM instructions (the operation only executes when the condition holds).</p>
+<table>
+<thead>
+<tr>
+<th>cond</th>
+<th>Mnemonic</th>
+<th>Condition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>EQ</td>
+<td>Z = 1</td>
+</tr>
+<tr>
+<td>1</td>
+<td>NE</td>
+<td>Z = 0</td>
+</tr>
+<tr>
+<td>2</td>
+<td>CS / HS</td>
+<td>C = 1</td>
+</tr>
+<tr>
+<td>3</td>
+<td>CC / LO</td>
+<td>C = 0</td>
+</tr>
+<tr>
+<td>4</td>
+<td>MI</td>
+<td>N = 1</td>
+</tr>
+<tr>
+<td>5</td>
+<td>PL</td>
+<td>N = 0</td>
+</tr>
+<tr>
+<td>6</td>
+<td>VS</td>
+<td>V = 1</td>
+</tr>
+<tr>
+<td>7</td>
+<td>VC</td>
+<td>V = 0</td>
+</tr>
+<tr>
+<td>8</td>
+<td>HI</td>
+<td>C = 1 and Z = 0</td>
+</tr>
+<tr>
+<td>9</td>
+<td>LS</td>
+<td>C = 0 or Z = 1</td>
+</tr>
+<tr>
+<td>10</td>
+<td>GE</td>
+<td>N = V</td>
+</tr>
+<tr>
+<td>11</td>
+<td>LT</td>
+<td>N != V</td>
+</tr>
+<tr>
+<td>12</td>
+<td>GT</td>
+<td>Z = 0 and N = V</td>
+</tr>
+<tr>
+<td>13</td>
+<td>LE</td>
+<td>Z = 1 or N != V</td>
+</tr>
+<tr>
+<td>14</td>
+<td>AL</td>
+<td>always</td>
+</tr>
+<tr>
+<td>15</td>
+<td>AL</td>
+<td>always</td>
+</tr>
+</tbody>
+</table>
+<h2 id="x87-fpu-emulation">x87 FPU Emulation</h2>
+<h3 id="ftop-stack-top-pointer">FTOP (Stack Top Pointer)</h3>
+<p>The x87 FPU uses an 8-entry stack. FTOP (3-bit, stored in high 32 bits of LBT4) points to the current stack top. FPR register indices are remapped by TOP when TM mode is enabled.</p>
+<pre><code class="language-c">// x86mftop $rd
+x86mftop(rd) {
+    GPR[rd] = TOP;
+}
+
+// x86mttop imm
+x86mttop(imm) {
+    TOP = imm;
+}
+
+// x86inctop (FINCSTP)
+x86inctop() {
+    TOP = (TOP + 1) &amp; 0x7;
+}
+
+// x86dectop (FDECSTP)
+x86dectop() {
+    TOP = (TOP - 1) &amp; 0x7;
+}
+</code></pre>
+<h3 id="tm-translation-mode">TM (Translation Mode)</h3>
+<p>When TM is set, FPR indices 0-7 are offset by TOP:</p>
+<pre><code class="language-c">// x86settm
+x86settm() {
+    TM = 1;
+}
+
+// x86clrtm
+x86clrtm() {
+    TM = 0;
+}
+
+mappedFPR(fpr) {
+    if (TM &amp;&amp; fpr &lt; 8) {
+        return FPR[(fpr + TOP) % 8];
+    } else {
+        return FPR[fpr];
+    }
+}
+</code></pre>
+<p>LSX/LASX registers are not remapped.</p>
+<h3 id="x87-80-bit-extended-precision">x87 80-bit Extended Precision</h3>
+<p>x87 long double (80-bit) is stored across two FPRs:</p>
+<table>
+<thead>
+<tr>
+<th>Part</th>
+<th>Format</th>
+<th>Register</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Low 64 bits</td>
+<td>J(bit 63) + fraction(bits 62:0)</td>
+<td>fd</td>
+</tr>
+<tr>
+<td>High 16 bits</td>
+<td>sign(bit 15) + exponent(bits 14:0)</td>
+<td>upper bits of paired register</td>
+</tr>
+</tbody>
+</table>
+<p>Conversion instructions:</p>
+<ul>
+<li><code>fcvt.ld.d fd, fj</code> — double → low 64 bits of extended</li>
+<li><code>fcvt.ud.d fd, fj</code> — double → high 16 bits of extended</li>
+<li><code>fcvt.d.ld fd, fj, fk</code> — extended → double</li>
+</ul>
+<h3 id="tag-word">Tag Word</h3>
+<p><code>x86settag rd, imm1, imm2</code> manipulates the x87 tag word (stored in a GPR). The operation mode is encoded in <code>imm1 % 8</code>:</p>
+<ul>
+<li>0: set bit (0→1 only), raises BTE on invalid transition</li>
+<li>1: clear bit (1→0 only), raises BTE on invalid transition</li>
+<li>2–4: check tag byte then modify, raises BTE on invalid state</li>
+</ul>
+<h2 id="mips-unaligned-memory">MIPS Unaligned Memory</h2>
+<p>LBT provides MIPS-style unaligned load and store instructions for emulating <code>ldl</code>/<code>ldr</code>/<code>stl</code>/<code>str</code>:</p>
+<ul>
+<li><code>ldl.w</code>/<code>ldl.d</code> — load doubleword left: load left part of an unaligned value from memory, merge with existing bytes in <code>rd</code></li>
+<li><code>ldr.w</code>/<code>ldr.d</code> — load doubleword right: load right part of an unaligned value from memory, merge with existing bytes in <code>rd</code></li>
+<li><code>stl.w</code>/<code>stl.d</code> — store doubleword left: store left part of an unaligned value to memory</li>
+<li><code>str.w</code>/<code>str.d</code> — store doubleword right: store right part of an unaligned value to memory</li>
+</ul>
+<h2 id="instruction-groups">Instruction Groups</h2>
+<p>All LBT instruction groups are documented in the following pages:</p>
+<ul>
+<li><a href="../lbt/integer/">LBT Integer</a>: <code>addu12i</code>, <code>adc</code>, <code>sbc</code>, <code>rotr</code>, <code>rotri</code>, <code>rcr</code>, <code>rcri</code></li>
+<li><a href="../lbt/x86_integer/">x86 Integer</a>: <code>x86adc</code>, <code>x86add</code>, <code>x86inc</code>, <code>x86sbc</code>, <code>x86sub</code>, <code>x86dec</code>, <code>x86mul</code></li>
+<li><a href="../lbt/x86_logical/">x86 Logical</a>: <code>x86and</code>, <code>x86or</code>, <code>x86xor</code></li>
+<li><a href="../lbt/x86_shift/">x86 Shift</a>: <code>x86rcl</code>, <code>x86rcli</code>, <code>x86rcr</code>, <code>x86rcri</code>, <code>x86rotl</code>, <code>x86rotli</code>, <code>x86rotr</code>, <code>x86rotri</code>, <code>x86sll</code>, <code>x86slli</code>, <code>x86srl</code>, <code>x86srli</code>, <code>x86sra</code>, <code>x86srai</code></li>
+<li><a href="../lbt/x86_fpu/">x86 FPU</a>: <code>x86mftop</code>, <code>x86mttop</code>, <code>x86inctop</code>, <code>x86dectop</code>, <code>x86settm</code>, <code>x86clrtm</code>, <code>x86settag</code>, <code>fcvt.ud.d</code>, <code>fcvt.ld.d</code>, <code>fcvt.d.ld</code></li>
+<li><a href="../lbt/x86_misc/">x86 Misc</a>: <code>setx86j</code>, <code>setx86loope</code>, <code>setx86loopne</code></li>
+<li><a href="../lbt/arm_integer/">ARM Integer</a>: <code>armadd</code>, <code>armsub</code>, <code>armadc</code>, <code>armsbc</code></li>
+<li><a href="../lbt/arm_logical/">ARM Logical</a>: <code>armand</code>, <code>armor</code>, <code>armxor</code>, <code>armnot</code></li>
+<li><a href="../lbt/arm_shift/">ARM Shift</a>: <code>armsll</code>, <code>armsrl</code>, <code>armsra</code>, <code>armrotr</code>, <code>armslli</code>, <code>armsrli</code>, <code>armsrai</code>, <code>armrotri</code></li>
+<li><a href="../lbt/arm_misc/">ARM Misc</a>: <code>armrrx</code>, <code>armmove</code>, <code>armmov</code>, <code>setarmj</code></li>
+<li><a href="../lbt/state/">LBT State Transfer</a>: <code>movgr2scr</code>, <code>movscr2gr</code>, <code>x86mfflag</code>, <code>x86mtflag</code>, <code>armmfflag</code>, <code>armmtflag</code></li>
+<li><a href="../lbt/jump/">LBT Jump</a>: <code>jiscr0</code>, <code>jiscr1</code></li>
+<li><a href="../lbt/mips_memory/">MIPS Memory</a>: <code>ldl.d</code>, <code>ldl.w</code>, <code>ldr.w</code>, <code>ldr.d</code>, <code>stl.w</code>, <code>stl.d</code>, <code>str.w</code>, <code>str.d</code></li>
+</ul>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../latency_throughput/" class="btn btn-neutral float-left" title="Latency and Throughput of Instructions"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../loongarch_simd_basics/" class="btn btn-neutral float-right" title="LoongArch SIMD Basics">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p>Copyright © 2023-2026 Jiajie Chen</p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../latency_throughput/" style="color: #fcfcfc">« Previous</a></span>
+    
+    
+      <span><a href="../loongarch_simd_basics/" style="color: #fcfcfc">Next »</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+
+
+<script id="init-glightbox">const lightbox = GLightbox({"touchNavigation": true, "loop": false, "zoomable": true, "draggable": true, "openEffect": "zoom", "closeEffect": "zoom", "slideEffect": "slide"});
+</script></body></html>
