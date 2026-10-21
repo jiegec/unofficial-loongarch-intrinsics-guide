@@ -53,7 +53,7 @@ mechanically checkable with case_provenance.py:
 
 1. **Was it executed?**  Only vectors inside the measured baseline - the 10-10 grid
    (4f26f81, 18,542 vectors) - may settle anything.  The 10-13 regeneration added
-   62,969 vectors that are oracle expectation, not reading.
+   62,957 vectors that are oracle expectation, not reading.
 2. **How strong is the record?**  Of the 768 matrix rows, 631 were compared against
    the oracle, 117 were merely OBSERVED (the hardware value recorded without an
    independent comparison) and 20 ran nothing at all.  Observed is a weaker class
