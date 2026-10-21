@@ -52,7 +52,7 @@ the ones that force a decision, ordered by how much they constrain the code:
 
 | Open item | Consequence |
 |-----------|-------------|
-| ~~The semantics of `PJ2`~~ ([Encoding](../isa/encoding.md), [Operands](../isa/operands.md)) | **Closed 2026-10-21.** `PJ2=k` selects `pK` as the instruction's absolute lane mask; the mask survives the instruction, compares can write a mask register, and branches can read one.  An emitter writes the selector it means; a decoder should print it as the mask operand. |
+| ~~The semantics of `PJ2`~~ ([Encoding](../isa/encoding.md), [Operands](../isa/operands.md)) | **Closed 2026-10-21/22.** `PJ2=k` selects `pK` as the instruction's absolute lane mask; the mask survives the instruction (ALU, flat, shared memory and the fragment stage), compares can write a mask register while selecting it, `cb`/`czb` read one, `s_wqm_b32` takes and returns one, the mask file is not a window of the scalar file, and a gated write suppresses the write instead of clearing the lane — so two gated copies with complementary masks compose into a per-lane merge.  An emitter writes the selector it means; a decoder should print it as the mask operand. |
 | The shared-memory address unit and lane mapping ([Operands](../isa/operands.md), [Atomic family](../isa/family-atomic.md), [Memory family](../isa/family-memory.md)) | Workgroup addressing cannot be generated, and the matrix plane layout cannot be read, without it. |
 | The operand form of 8- and 16-bit buffer loads and stores ([Operands](../isa/operands.md)) | Narrow vertex attributes and narrow storage access have no verified form. |
 | Where the atomic counter bound is read from ([Atomic family](../isa/family-atomic.md)) | **Partly wrong before; corrected 2026-10-13.**  A field DOES carry it: the row's own semantics say the source operand IS the bound (`new = (old < b) ? old + 1 : 0`), and the seed `atomic_sm_inc_u32 p0, v0, v0, v0` passes one.  What is true is that no PRODUCER path exercises it: compiling OpenCL `atomic_inc`/`atomic_dec` with the closed backend lowers them to **add/sub with 1** - `atomic.v.flat.add.i32`, `atomic.sm.add.u32`, `atomic.v.flat.sub.i32` - and the `*_inc_*` / `*_dec_*` instructions are never emitted at all.  So the bound is encodable but unreached, and the open half is the hardware's behaviour AT it. |
@@ -79,6 +79,13 @@ Two further gaps are structural rather than per-row:
   command stream, another pipe or another stage is outside its coverage;
 * the compute path is the only way to stage a workgroup allocation, which is why
   the matrix rows were measured through it.
+
+One gap is narrower than it looks: the mask campaign could not ask whether the
+**texture/sampling** forms and the **SIO** transfers gate by `PJ2`, because the
+structured carrier refuses the texture family (a single-instruction run has no
+bound image or sampler tuple) and no SIO transfer was executed under a mask.  Both
+of those layouts do carry the field, so the open part is the gating behaviour, not
+the encoding.
 
 ## How to read a statement
 

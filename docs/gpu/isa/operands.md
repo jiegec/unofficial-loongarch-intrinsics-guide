@@ -137,21 +137,54 @@ the sequence runner; each row is one submission:
 | `p2=0`, `p1=0x55555555`, `v_cmp_eq_u32` under `PJ2=1` writing `p2` | `p2=0x55555555`: the destination write is gated, so a zeroed destination plus a gated compare yields `parent & condition` in one instruction |
 | `cb p1, +1` with `p1=0` / `p1=0xffffffff` | not taken / taken |
 
+The rest of the model was measured in the same campaign (2026-10-21/22);
+each row is again one submission:
+
+| Setup | Observation |
+|-------|-------------|
+| immediate-form `v_add_imm_u32` under `PJ2=1`, `p1=0x55555555` | only the even lanes were written: the **vop-imm** layout gates like `vop` |
+| `store_sm_b32` under `PJ2=1`, cells pre-filled per lane | only the selected lanes' cells changed: the **shared-memory** layout gates |
+| `load_sm_b32` under `PJ2=1`, destination pre-filled per lane | only the selected lanes' destinations changed |
+| gated shared-memory store, then read `p1` | still `0x55555555`: the mask survives a shared-memory access |
+| `czb p1, +1` with `p1=0` / `p1=0x55555555` | taken / not taken: `czb` reads a mask register, as `cb` does |
+| `s_wqm_b32 p2, p1` with `p1=1`; in place on `p1`; in place on `p0` | `p2 = 0xf` / `p1 = 0xf` / `p0 = 0xf`: the whole-quad transform takes and returns mask registers, including the live set |
+| `p1=0x55555555`, `v_cmp_lt_u32` under `PJ2=1` **writing `p1`**, condition true in lanes 0..3 | `p1 = 0x5` = old & condition: the selector is read before the gated write, so selecting and overwriting one mask is safe |
+| `p1..p3` written with markers, `s4..s11` staged with eight distinct patterns, both read back | neither direction changed: the mask file is **its own** file, not a window of the scalar file |
+| destination filled with `0xdeadbeef` (then with the lane id) in every lane, then a gated `v_mov` / gated load of another value | the unselected lanes kept `0xdeadbeef` (and the lane id): a gated write **suppresses** the write, it does not clear the lane |
+| destination `0xdeadbeef`, first copy `0xaaaaaaaa` under `p1=0x55555555`, second copy `0xbbbbbbbb` under the complement | even lanes `0xaaaaaaaa`, odd lanes `0xbbbbbbbb`: two masked copies partition the wave and do **not** erase each other |
+
+The fragment pipe (4x4 = 16 lanes) answers the same questions the same way, which
+is what makes the mask model usable for a fragment stage that needs helper lanes:
+
+| Setup | Observation |
+|-------|-------------|
+| `p1=1`, `s_wqm_b32 p2, p1`; in place on `p1`; narrow `p0` to 1 then in place on `p0` | `0xf` each time: the whole-quad transform works on the fragment stage |
+| `p0` narrowed to a single lane, then a compare whose destination write is gated | the destination read back `0x1`: a narrowed `p0` really gates the fragment stage's vector writes |
+| `p1=0x5555`, gated fragment store, then read `p1` | the store landed and `p1` still read `0x5555` |
+| whole-quad round trip: narrow `p0` to one lane, `s_wqm_b32 p0,p0`, gated compare, restore the exact mask, gated compare | the compare under the widened mask read `0xf` (helper lanes ran), the one under the restored mask read `0x1` |
+
 So: a compare can produce a mask directly in a mask register, and a compare
 executed under `PJ2=k` writes only `pK`'s lanes — with a zeroed destination that
 is exactly `pK & condition`.  A branch can read a mask register directly, and the
 mask selected by an instruction survives that instruction,
-including a vector memory instruction.  `p0` is still the invocation's live set
+including a vector memory instruction.  A gated instruction suppresses the write,
+so a lane outside the selected mask keeps its previous value; it does not clear
+it, and two gated writes with complementary masks compose instead of erasing each
+other.  `p0` is still the invocation's live set
 by convention — the established producers open with the whole-quad mask in `p0`
 and treat the others as region masks — but nothing in the encoding or in the
 measured behaviour gives `p0` a privilege over `p1..p3`.
 
-Two consequences for a producer:
+Three consequences for a producer:
 
 * `p1..p3` are **undefined at launch** (each submission observed a different
   residue), so a shader must write a mask before selecting it.
 * Because masks are absolute, the compiler must compute `parent & condition`
   when it opens a region instead of inheriting it from a single exec register.
+* Because a gated write suppresses rather than clears, a per-lane merge can be
+  built from one gated copy per predecessor mask (as long as the masks cover the
+  wave), and a whole-quad region only has to widen and then restore the live set
+  — helper lanes never have to be cleaned up out of a value.
 
 The `p0..p3` mechanism is:
 
@@ -195,13 +228,19 @@ One hazard survives from the earlier reading of this section:
 
 The two mask hazards that used to be listed here — "a lane mask does not
 survive a vector instruction" and "vector memory and sampling clobber lane
-masks" — are **not** established as written.  The compute-pipe probe above kept
-the selected mask unchanged across a vector ALU operation and across a flat
-store, and the earlier X-1 probe kept a mask that was not selected unchanged
-across `s_wqm_b32`, `s_and_b32`, `barrier`, `v_mov_b32` and a vector store.
-What is still untested: the fragment pipe (WQM/helper lanes), the sampling and
-shared-memory forms, and whether a mask register that also serves as the
-selected mask of a *destination-writing* instruction behaves differently.
+masks" — are **not** established as written.  The probes above kept the selected
+mask unchanged across a vector ALU operation, a flat store, a shared-memory
+access and a fragment-stage vector store, and the earlier X-1 probe kept a mask
+that was not selected unchanged across `s_wqm_b32`, `s_and_b32`, `barrier`,
+`v_mov_b32` and a vector store.  A destination-writing instruction that also
+selects its own destination is safe: the selector is read before the write.
+
+What is still untested is the part no carrier can currently stage: whether the
+**texture/sampling** forms and the **SIO** transfers gate by `PJ2` the way the
+ALU, flat and shared-memory forms do.  The structured carrier refuses the
+texture family (there is no way to bind a valid image and sampler tuple for a
+single-instruction run) and no SIO transfer was ever executed under a mask, so
+both stay open rather than inferred from the layouts that do carry the field.
 
 Because masks are per-lane data but the branch is wave-wide, a divergent branch
 is expressed as a compare into a mask, a branch on that mask, and mask

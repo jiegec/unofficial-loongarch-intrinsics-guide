@@ -58,6 +58,10 @@ struct EnvelopeProgram {
   // GS family: bytes/words carry the GS program; fs_bytes carries the
   // companion fragment shader (solid export).
   std::vector<std::uint8_t> fs_bytes;
+  // Declared workgroup shared memory for the compute launch, in bytes.  Only
+  // the mask probes that stage cells in LDS set it; everything else leaves it
+  // zero so the kernel descriptor keeps declaring no shared memory.
+  std::uint32_t shared_bytes = 0;
 };
 
 // True when the mnemonic has a materializable generic PS suite.
@@ -182,5 +186,38 @@ std::optional<EnvelopeProgram> build_carrier(
 // failure.
 std::optional<EnvelopeProgram> build_cs_probe(std::string& error,
                                              unsigned lanes);
+
+// U-2 / P0-R10 raw-shader sequence probe (LCO X-1): write a magic value into
+// the saved lane-mask predicate p1, optionally disturb the live exec mask p0,
+// then read p1/p0/p2/p3 back and store them at output offsets 0/4/8/12.
+// Variants: 0 = plain write/read, 1 = s_wqm_b32 p0,p0, 2 = narrow p0 with
+// s_and_b32, 3 = barrier, 4 = write p2/p3 as well.  p1 is expected to read the
+// magic back in every variant if it is ordinary per-wave storage.
+std::optional<EnvelopeProgram> build_cs_mask_probe(unsigned variant,
+                                                   std::string& error,
+                                                   unsigned lanes);
+
+// E-1: the same carrier, but every instruction under test carries an explicit
+// PJ2 selector.  Variants 20-23 write a vector destination under PJ2=k with
+// known p0/p1 contents and store the result per lane; 24 reads the selected
+// mask back; 25/26 isolate a vector store's gating; 27/28 branch on p1.
+// 40/41 extend the gating question to the vop-imm layout, 42-44 to the shared
+// memory layout (store, load, mask survival), 45/46 ask whether czb reads a
+// mask register, 47-49 whether s_wqm_b32 accepts mask registers as source and
+// destination, 50 whether an instruction may select and write the same mask,
+// and 51/52 whether the pN file aliases the sGPR window.
+std::optional<EnvelopeProgram> build_cs_pj2_probe(unsigned variant,
+                                                  std::string& error,
+                                                  unsigned lanes);
+
+// The same mask-register sequence through the graphics PS carrier (4x4 = 16
+// lanes, fragment stage).  Same write/read mechanism and output offsets; the
+// point is whether the fragment stage's mask window behaves like the compute
+// pipe's, since that is where WQM and helper lanes live.  Variants 10-12 run
+// s_wqm_b32 through the mask file, 13 asks whether a narrowed p0 really gates
+// the stage's vector writes, 14 whether the selected mask survives a vector
+// store, and 15 is the whole-quad prologue/epilogue round trip.
+std::optional<EnvelopeProgram> build_ps_mask_probe(unsigned variant,
+                                                   std::string& error);
 
 }  // namespace lgpu::envelope

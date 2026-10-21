@@ -32,6 +32,13 @@ Because the condition lives in a register rather than in a flags word, `cb` and
 materialised before the next compare is issued.  A branch whose condition is a
 lane mask acts on the mask's value, not on a per-lane predicate.
 
+That last sentence is measured, not inferred from the field layout: on the
+compute pipe, `czb p1, +1` with `p1=0` took the branch and with
+`p1=0x55555555` fell through, and `cb p1, +1` behaves the same way (2026-10-21;
+see [Operands](../isa/operands.md#conditional-execution)).  A mask register is
+therefore an ordinary condition source for a wave-wide branch, which is what lets
+a divergent region be skipped when its mask is empty.
+
 ## Ordering
 
 `check` is the ordering instruction.  It drains the pending kernel, VM,

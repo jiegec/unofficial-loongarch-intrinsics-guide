@@ -870,6 +870,199 @@ int csprobe(std::uint32_t timeout_ms) {
 
 // Host-only: run the compute preflight and print what it checked.  No device
 // is opened, so this is the check to run before ever touching hardware.
+// Graphics-stage counterpart of csmask: the same p0..p3 write/read-back
+// through the PS carrier (4x4 = 16 lanes).
+int psmask(unsigned variant, bool dry_run) {
+  std::string error;
+  auto program = lgpu::envelope::build_ps_mask_probe(variant, error);
+  if (!program) {
+    std::fprintf(stderr, "psmask: %s\n", error.c_str());
+    return 2;
+  }
+  if (dry_run) {
+    std::printf("-- PS mask probe variant %u (%zu bytes, %zu instructions; "
+                "sgpr<=%u vgpr<=%u) --\n%s",
+                variant, program->bytes.size(), program->words.size(),
+                program->sgpr_high_water, program->vgpr_high_water,
+                program->listing.c_str());
+    return 0;
+  }
+#if !defined(LGPU_HAVE_DRM)
+  std::fprintf(stderr, "psmask: drm submit layer not built (LGPU_HAVE_DRM)\n");
+  return 3;
+#else
+  lgpu::drm::PsSubmitRequest request;
+  request.shader_words.resize(program->words.size() * 2);
+  for (std::size_t i = 0; i < program->words.size(); ++i) {
+    request.shader_words[2 * i] = program->words[i].lo;
+    request.shader_words[2 * i + 1] = program->words[i].hi;
+  }
+  request.result_bytes = 0x1000;
+  request.argument_dwords.assign(request.result_bytes / 4, 0u);
+  const auto report = lgpu::drm::submit_ps(request);
+  if (report.status != lgpu::drm::PsStatus::Clean) {
+    std::fprintf(stderr, "psmask: submit %s\n", report.detail.c_str());
+    return 3;
+  }
+  std::uint32_t got[4] = {0, 0, 0, 0};
+  for (unsigned i = 0; i < 4; ++i)
+    if (4u * i + 4 <= report.result.size())
+      std::memcpy(&got[i], report.result.data() + 4u * i, 4);
+  std::printf("psmask variant=%u p0=0x%08x p1=0x%08x p2=0x%08x p3=0x%08x",
+              variant, got[0], got[1], got[2], got[3]);
+  if (variant >= 10) {
+    // 0x10 carries the individual test's readback; 0x40 is where variant 14's
+    // gated vector store landed.
+    std::uint32_t extra[2] = {0, 0};
+    if (16u + 4 <= report.result.size())
+      std::memcpy(&extra[0], report.result.data() + 16u, 4);
+    if (0x40u + 4 <= report.result.size())
+      std::memcpy(&extra[1], report.result.data() + 0x40u, 4);
+    std::printf(" r10=0x%08x st=0x%08x\n", extra[0], extra[1]);
+    return 0;
+  }
+  std::printf("\n");
+  if (variant == 6) {
+    std::printf("OBSERVE psmask: p1 was not written\n");
+    return 0;
+  }
+  if (got[1] != 0x5a5aa5a5u) {
+    std::printf("FAIL ps-mask-probe: p1 read back 0x%08x\n", got[1]);
+    return 1;
+  }
+  std::printf("PASS ps-mask-probe: p1 survived variant %u\n", variant);
+  return 0;
+#endif
+}
+
+// X-1 raw-shader sequence probe: p1/p0/p2/p3 write-read-back around a chosen
+// exec-mask disturbance.  One program, one submission, fixed output offsets.
+int csmask(unsigned variant, std::uint32_t timeout_ms, bool dry_run) {
+  std::string error;
+  std::uint32_t group[3];
+  cs_group(group);
+  const unsigned lanes = group[0] * group[1] * group[2];
+  auto program = lgpu::envelope::build_cs_mask_probe(variant, error, lanes);
+  if (!program) {
+    std::fprintf(stderr, "csmask: %s\n", error.c_str());
+    return 2;
+  }
+  if (dry_run) {
+    std::printf("-- mask probe variant %u (%zu bytes, %zu instructions; "
+                "sgpr<=%u vgpr<=%u) --\n%s",
+                variant, program->bytes.size(), program->words.size(),
+                program->sgpr_high_water, program->vgpr_high_water,
+                program->listing.c_str());
+    if (std::getenv("LGPU_DUMP_WORDS")) {
+      for (std::size_t i = 0; i < program->words.size(); ++i)
+        std::printf("word %3zu: lo=0x%08x hi=0x%08x\n", i,
+                    program->words[i].lo, program->words[i].hi);
+    }
+    return 0;
+  }
+#if !defined(LGPU_HAVE_DRM)
+  std::fprintf(stderr, "csmask: drm submit layer not built (LGPU_HAVE_DRM)\n");
+  return 3;
+#else
+  if (!cs_preflight("csmask")) return 5;
+  lgpu::drm::ComputeSubmitRequest request;
+  cs_fill_request(request, *program, 256);
+  request.timeout_ms = timeout_ms;
+  const auto report = lgpu::drm::submit_compute(request);
+  if (report.status != lgpu::drm::ComputeSubmitReport::Status::Clean) {
+    cs_print_wedge(report, "csmask");
+    return 3;
+  }
+  std::uint32_t got[4] = {0, 0, 0, 0};
+  for (unsigned i = 0; i < 4; ++i)
+    if (4u * i + 4 <= report.output.size())
+      std::memcpy(&got[i], report.output.data() + 4u * i, 4);
+  // Output offsets: 0 = p0, 4 = p1, 8 = p2, 12 = p3.
+  std::printf("csmask variant=%u p0=0x%08x p1=0x%08x p2=0x%08x p3=0x%08x "
+              "signal=0x%016llx\n",
+              variant, got[0], got[1], got[2], got[3],
+              static_cast<unsigned long long>(report.signal_value));
+  // Variant 6 does not write p1: it reports whatever the launch left there.
+  if (variant == 6) {
+    std::printf("OBSERVE mask-probe: p1 was not written (launch value)\n");
+    return 0;
+  }
+  const std::uint32_t want = variant == 8 ? 0xdeadbeefu : 0x5a5aa5a5u;
+  if (got[1] != want) {
+    std::printf("FAIL mask-probe: p1 read back 0x%08x, not the written "
+                "0x%08x\n",
+                got[1], want);
+    return 1;
+  }
+  std::printf("PASS mask-probe: p1 survived variant %u\n", variant);
+  return 0;
+#endif
+}
+
+// E-1: PJ2 is the per-instruction mask selector.  Each variant stages known
+// p0/p1 contents and reports, per lane, whether the instruction under test
+// wrote.  Output: p0..p3 at 0..12, the post-test p1 at 0x10, the branch
+// marker at 0x18, the two gated-store dwords at 0x120/0x124, and the 32
+// per-lane results at 0x100.
+int pj2(unsigned variant, std::uint32_t timeout_ms, bool dry_run) {
+  std::string error;
+  std::uint32_t group[3];
+  cs_group(group);
+  const unsigned lanes = group[0] * group[1] * group[2];
+  auto program = lgpu::envelope::build_cs_pj2_probe(variant, error, lanes);
+  if (!program) {
+    std::fprintf(stderr, "pj2: %s\n", error.c_str());
+    return 2;
+  }
+  if (dry_run) {
+    std::printf("-- PJ2 probe variant %u (%zu bytes, %zu instructions; "
+                "sgpr<=%u vgpr<=%u) --\n%s",
+                variant, program->bytes.size(), program->words.size(),
+                program->sgpr_high_water, program->vgpr_high_water,
+                program->listing.c_str());
+    return 0;
+  }
+#if !defined(LGPU_HAVE_DRM)
+  std::fprintf(stderr, "pj2: drm submit layer not built (LGPU_HAVE_DRM)\n");
+  return 3;
+#else
+  if (!cs_preflight("pj2")) return 5;
+  lgpu::drm::ComputeSubmitRequest request;
+  // 1024 bytes: the per-lane record lives at 0x100..0x17c.
+  cs_fill_request(request, *program, 1024);
+  // Only the shared-memory variants declare LDS; zero everywhere else keeps
+  // the descriptor of the E-1 variants unchanged.
+  request.shared_segment_size = program->shared_bytes;
+  request.timeout_ms = timeout_ms;
+  const auto report = lgpu::drm::submit_compute(request);
+  if (report.status != lgpu::drm::ComputeSubmitReport::Status::Clean) {
+    cs_print_wedge(report, "pj2");
+    return 3;
+  }
+  auto dword = [&](std::size_t i) -> std::uint32_t {
+    std::uint32_t v = 0;
+    if (4 * i + 4 <= report.output.size())
+      std::memcpy(&v, report.output.data() + 4 * i, 4);
+    return v;
+  };
+  std::printf("pj2 variant=%u p0=0x%08x p1=0x%08x p2=0x%08x p3=0x%08x "
+              "after=0x%08x branch=0x%08x st0=0x%08x st1=0x%08x\n",
+              variant, dword(0), dword(1), dword(2), dword(3), dword(4),
+              dword(6), dword(128), dword(129));
+  if (variant >= 40) {
+    // The variants past 40 report up to eight dwords of scalar readback at
+    // 0x10..0x2c, in addition to the p0..p3 window above.
+    std::printf("probe=");
+    for (unsigned i = 4; i < 12; ++i)
+      std::printf("%08x%s", dword(i), i == 11 ? "\n" : ",");
+  }
+  std::printf("lanes=");
+  for (unsigned i = 0; i < 32; ++i)
+    std::printf("%08x%s", dword(64 + i), i == 31 ? "\n" : ",");
+  return 0;
+#endif
+}
+
 int csverify() {
   std::string detail;
   if (!lgpu::drm::compute_selfcheck(detail)) {
@@ -1599,6 +1792,35 @@ int main(int argc, char** argv) {
         argc >= 3 ? static_cast<std::uint32_t>(std::strtoul(argv[2], nullptr, 0))
                   : 8000u;
     return csprobe(tmo);
+  }
+  if (argc >= 3 && std::strcmp(argv[1], "psmask") == 0) {
+    const unsigned variant =
+        static_cast<unsigned>(std::strtoul(argv[2], nullptr, 0));
+    const bool dry_run =
+        std::strcmp(argv[argc - 1], "--dry-run") == 0;
+    return psmask(variant, dry_run);
+  }
+  if (argc >= 3 && std::strcmp(argv[1], "csmask") == 0) {
+    const unsigned variant =
+        static_cast<unsigned>(std::strtoul(argv[2], nullptr, 0));
+    const bool dry_run =
+        std::strcmp(argv[argc - 1], "--dry-run") == 0;
+    const std::uint32_t tmo =
+        argc >= 4 && !dry_run
+            ? static_cast<std::uint32_t>(std::strtoul(argv[3], nullptr, 0))
+            : 8000u;
+    return csmask(variant, tmo, dry_run);
+  }
+  if (argc >= 3 && std::strcmp(argv[1], "pj2") == 0) {
+    const unsigned variant =
+        static_cast<unsigned>(std::strtoul(argv[2], nullptr, 0));
+    const bool dry_run =
+        std::strcmp(argv[argc - 1], "--dry-run") == 0;
+    const std::uint32_t tmo =
+        argc >= 4 && !dry_run
+            ? static_cast<std::uint32_t>(std::strtoul(argv[3], nullptr, 0))
+            : 8000u;
+    return pj2(variant, tmo, dry_run);
   }
   if (argc >= 3 && std::strcmp(argv[1], "cspersist") == 0) {
     const unsigned n =

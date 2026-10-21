@@ -75,7 +75,11 @@ instruction stream over its own registers.
   [Operands and Execution Registers](../isa/operands.md) for the files, the
   reserved windows and the conditional-execution mechanism.
 * **Divergence** is expressed through lane masks and branches, not through
-  instruction-level predication.
+  instruction-level predication: a compare writes a mask, a branch reads one, and
+  every gated instruction names the mask it runs under.  A gated instruction
+  suppresses its write on the lanes outside that mask instead of clearing them,
+  so a mask is a per-instruction lane set and not a rewrite of the destination.
+  See [Conditional execution](../isa/operands.md#conditional-execution).
 * **Entry state.** A stage starts with the launch-provided registers described
   in [Stage Interfaces](../shader/stages.md): vertex index, instance identifier,
   interpolation coordinates, descriptor bases.
