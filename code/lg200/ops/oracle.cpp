@@ -2193,7 +2193,24 @@ std::uint64_t sf_trunc64(std::uint64_t a, const FpPolicy&) {
   return bits_f64(std::trunc(f64_bits(a)));
 }
 std::uint64_t sf_rndne64(std::uint64_t a, const FpPolicy&) {
-  return bits_f64(std::round(f64_bits(a)));
+  // [HW 2026-10-22] ties go to EVEN, not away from zero: rndne(0.5) returns 0 on the
+  // hardware, where std::round gave 1.0.  The arithmetic is written out rather than taken
+  // from std::nearbyint so that a rounding mode left set by an earlier case cannot leak in.
+  const double v = f64_bits(a);
+  if (!std::isfinite(v)) {
+    // [HW 2026-10-22] a NaN is quieted here too, sign and payload kept: the pair
+    // (0x1, 0x7ff00000) is a signaling NaN and returns 0x7ff80000 in its high half.
+    const bool is_nan = (a & 0x7ff0000000000000ull) == 0x7ff0000000000000ull &&
+                        (a & 0x000fffffffffffffull) != 0ull;
+    return is_nan ? (a | 0x0008000000000000ull) : a;
+  }
+  const double f = std::floor(v);
+  const double d = v - f;
+  double r = f;
+  if (d > 0.5) r = f + 1.0;
+  else if (d == 0.5) r = (std::fmod(f, 2.0) == 0.0) ? f : f + 1.0;
+  if (r == 0.0 && std::signbit(v)) r = -0.0;  // a negative value in (-1,0) rounds to -0
+  return bits_f64(r);
 }
 std::uint64_t sf_fract64(std::uint64_t a, const FpPolicy&) {
   const double v = f64_bits(a);
