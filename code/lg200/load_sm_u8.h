@@ -1,5 +1,6 @@
 // load_sm_u8 -- Loads an unsigned 8-bit integer from workgroup shared memory, zero-extended into a per-lane vector destination register.
 //
-// lds-carrier read: the shared-memory address/permutation formation is part of the workgroup lds contract; the CPU model passes the data words through (wider tuples by their leading words).
+// [HW 2026-10-22] the model passed the data word through, but the hardware zero-extends: the staged
+// word 0x7fffffff returns 0x000000ff, so only the low byte survives.
 
-dst[0] = src[0];
+dst[0] = src[0] & 0xffu;

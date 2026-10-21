@@ -1,5 +1,5 @@
 // store_sm_b16 -- Stores the low 16 bits of a vector source register into workgroup shared memory as a bit pattern.
 //
-// lds-carrier write: the shared-memory address/permutation formation is part of the workgroup lds contract; the CPU model passes the data words through (wider tuples by their leading words).
+// [HW 2026-10-22] the model passed the data word through, but only the low halfword is stored.
 
-dst[0] = src[0];
+dst[0] = src[0] & 0xffffu;
