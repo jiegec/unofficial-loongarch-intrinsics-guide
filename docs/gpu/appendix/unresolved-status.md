@@ -55,7 +55,7 @@ operand either and still write it.
 Inside the 737 description cells there were **872 distinct UNRESOLVED sentences**
 (1,511 occurrences), i.e. the same unknown is restated on every family member it
 applies to.  Closing one sentence closes every row that carries it.  **As of
-2026-10-13 the same measure is 748 distinct sentences and 982 occurrences**,
+2026-10-13 the same measure is 749 distinct sentences and 983 occurrences**,
 counted by the tracked definition in `check_doc_numbers.py`; the earlier pair is
 kept because it is what the snapshot said, not because it is smaller.
 
