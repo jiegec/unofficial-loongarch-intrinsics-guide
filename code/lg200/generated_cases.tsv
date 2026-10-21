@@ -81331,3 +81331,12 @@ v_v2s_b32		0xffffffff 0x0	0xffffffff
 v_v2s_b32		0xffffffff 0x1	0xffffffff
 v_v2s_b32		0xffffffff 0x2	0xffffffff
 v_v2s_b32		0xffffffff 0x3	0xffffffff
+v_fcvt_f32_u81	rtne|daz|ftz	0xff00	0x437f0000
+v_fcvt_f32_u81	rtne|daz|ftz	0x100	0x3f800000
+v_fcvt_f32_u81	rtne|daz|ftz	0x7f00	0x42fe0000
+v_fcvt_f32_u81	rtne|daz|ftz	0x8000	0x43000000
+v_fcvt_f32_u81	rtne|daz|ftz	0xc000	0x43400000
+v_fcvt_f32_u81	rtne|daz|ftz	0x12345678	0x42ac0000
+v_fcvt_f32_u81	rtne|daz|ftz	0x7f7fffff	0x437f0000
+v_fcvt_f32_u81	rtne|daz|ftz	0xffffffff	0x437f0000
+v_fcvt_f32_u81	rtne|daz|ftz	0xffff	0x437f0000
