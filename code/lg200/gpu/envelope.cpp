@@ -1122,16 +1122,23 @@ std::optional<EnvelopeProgram> build_generic(
   // [HW 2026-08-25] the interpolation phases read the coefficient window
   // (launch-dependent barycentric state), not the staged sources; the
   // generic carrier cannot oracle them (same class as load_sm_interp).
-  if (mn == "v_interp_2_f32" || mn == "v_interp_mov_b32")
+  if (mn == "v_interp_2_f32" || mn == "v_interp_mov_b32") {
     program.observe = true;
+    program.observe_reason = "coefficient window is launch state";
+  }
   // [HW 2026-08-25] LG210-legacy no-op holes (decode but execute empty on
   // LG200, dest left undefined) and the lane-id read (the carrier's
   // multi-lane write leaves the last lane's value; which lane is read
   // back is not oracle-able): record observations without failing.
   if (mn == "v_fcvt_f16_i16" || mn == "v_fcvt_f16_u16" ||
-      mn == "v_fcvt_i16_f16" || mn == "v_fcvt_u16_f16" ||
-      mn == "v_threadid_u32")
+      mn == "v_fcvt_i16_f16" || mn == "v_fcvt_u16_f16") {
     program.observe = true;
+    program.observe_reason = "LG210-legacy no-op hole: executes empty, dest undefined";
+  }
+  if (mn == "v_threadid_u32") {
+    program.observe = true;
+    program.observe_reason = "lane-id read is not oracle-able";
+  }
   std::uint32_t case_offset = 0;
   for (const auto& def : active) {
     const std::uint32_t result_offset = case_offset;
@@ -1803,6 +1810,7 @@ std::optional<EnvelopeProgram> build_lds(const std::string& mnemonic,
   // dependent, not oracle-able); observe without comparison.
   if (mnemonic == "load_sm_interp") {
     program.observe = true;
+    program.observe_reason = "coefficient window is launch state";
   }
   std::uint32_t off = carrier::kResultBase;
   for (std::size_t ci = 0; ci < rows.size(); ++ci) {
@@ -2981,6 +2989,9 @@ std::optional<EnvelopeProgram> build_gs(const std::string& mnemonic,
   if ((sio && mnemonic != "siowrite" && mnemonic != "siowrite_imm") ||
       emit) {
     program.observe = true;
+    program.observe_reason = sio && mnemonic != "siowrite" && mnemonic != "siowrite_imm"
+                                ? "SIO channel-file content is not oracle-able"
+                                : "emit-index VGPR clobbered by the descriptor side effect";
   }
   std::uint32_t off = carrier::kResultBase;
   for (std::size_t ci = 0; ci < rows.size(); ++ci) {
@@ -3368,7 +3379,26 @@ std::optional<EnvelopeProgram> build_carrier_env(
       mnemonic == "v_add_imm_i32" || mnemonic == "v_sub_imm_i32" ||
       mnemonic == "v_perm_sm_b32" || mnemonic == "v_bperm_sm_b32" ||
       mnemonic == "s_cmp_eq_u64" || mnemonic == "s_cmp_ne_u64";
-  if (launch_state) p->observe = true;
+  if (launch_state) {
+    p->observe = true;
+    // The group is broad; the reason is not.  Name the mechanism the comment
+    // above records, and fall back to the group name when there is none.
+    const char* why = "launch-state group in build_carrier";
+    if (route.family == CarrierRoute::Family::Flat)
+      why = "flat input-plane values change with the 0x530 input_enable toggle";
+    else if (mnemonic.rfind("load_sm_matrix_", 0) == 0)
+      why = "persistent matrix file is cross-run state";
+    else if (mnemonic.rfind("load_", 0) == 0 &&
+             (mnemonic.find("_fmtdesc_") != std::string::npos ||
+              mnemonic.find("_fmtinst_") != std::string::npos ||
+              mnemonic == "load_v_buff_i8" || mnemonic == "load_v_buff_u8"))
+      why = "fixed plane patterns for any staged data";
+    else if (mnemonic.rfind("load_v_tex", 0) == 0 ||
+             mnemonic.rfind("store_v_tex", 0) == 0 ||
+             mnemonic == "getlod" || mnemonic == "getresinfo")
+      why = "window state rather than the staged texels";
+    p->observe_reason = why;
+  }
   return p;
 }
 

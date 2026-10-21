@@ -46,6 +46,10 @@ struct EnvelopeProgram {
   // Observe mode: the carrier executes and reports the readback values
   // without value comparison (SIO file contents are not oracle-able).
   bool observe = false;
+  // Why observe is set, in the carrier's own words.  The runner prints it so
+  // the results matrix carries the reason beside the row, instead of leaving a
+  // reader to infer one from the mnemonic.
+  const char* observe_reason = "";
   // 1-ulp tolerant compare for the hardware-approximation families.
   bool approx1ulp = false;
   // Highest SGPR index + 1 and VGPR index + 1 the program touches, derived

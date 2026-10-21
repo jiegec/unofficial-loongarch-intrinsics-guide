@@ -268,7 +268,11 @@ int compare_cases(const lgpu::envelope::EnvelopeProgram& program,
         std::printf("OBS %s: offset 0x%x = 0x%08x\n", c.id.c_str(), off,
                     actual);
       }
-      std::printf("PASS %s (observed)\n", c.id.c_str());
+      if (program.observe_reason[0])
+        std::printf("PASS %s (observed: %s)\n", c.id.c_str(),
+                    program.observe_reason);
+      else
+        std::printf("PASS %s (observed)\n", c.id.c_str());
       continue;
     }
     if (program.control) {

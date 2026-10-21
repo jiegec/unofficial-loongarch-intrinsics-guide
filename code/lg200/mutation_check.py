@@ -25,7 +25,7 @@ so it could not fail on an over-claim, which is the defect it exists to find.
 
 THE ELEVEN GATES, ACCOUNTED FOR (2026-10-13):
 
-  proven in this tool (26): set_desc, check_doc_numbers, header_sync, check_gpu,
+  proven in this tool (27): set_desc, check_doc_numbers, header_sync, check_gpu,
                             run_cases, format_audit, bench_doc_check,
                             rule_dupe_check, md_table_check, check_all.sh,
                             fp_mode_audit, case_provenance, addr_scan, gate_check,
@@ -198,7 +198,11 @@ def mutate_fp_mode(text):
 
 def mutate_provenance(text):
     """Change the unmeasured-vector count on the page, leaving the grid alone."""
-    return text.replace('+62,969 vectors', '+62,970 vectors', 1)
+    # The figure case_provenance reads is the bold "N rows grew, +M vectors" sentence,
+    # which now reports zero; the old '62,969' wording was retired when the whole grid
+    # was measured, and this mutation stopped applying with it.
+    return text.replace('**0 rows grew, +0 vectors**',
+                        '**0 rows grew, +1 vectors**', 1)
 
 def mutate_addr_scan(text):
     """Force a hit, which tests the exit code rather than the detection."""
@@ -285,6 +289,12 @@ def mutate_citation(text):
     old = 'src/mesa/src/loonggpu/vulkan/' + 'loongvk_kd.h'
     return text.replace(old, 'src/mesa/src/loonggpu/vulkan/' + 'loongvk_kd_missing.h', 1)
 
+def mutate_observe_reason(text):
+    # observed_reasons.py checks that a row the matrix marks observed names the mechanism
+    # the runner recorded beside it.  Take the mechanism out of one flat row's text.
+    return text.replace('read input-plane values', 'read the values', 1)
+
+
 CASES = [
     ("set_desc.py --check", "code/lg200-instructions.tsv", mutate_tsv,
      "cd code/lg200 && python3 set_desc.py --check"),
@@ -326,6 +336,8 @@ CASES = [
      "python3 code/lg200/link_check.py"),
     ("case_coverage.py", "code/lg200/case_coverage.py", mutate_class_space,
      "python3 code/lg200/case_coverage.py"),
+    ("observed_reasons.py", "code/lg200-instructions.tsv", mutate_observe_reason,
+     "cd code/lg200 && python3 observed_reasons.py"),
     ("gate_check.py taxonomy", "docs/gpu/appendix/status.md", mutate_taxonomy,
      "python3 code/lg200/gate_check.py"),
     ("link_check.py command", "code/lg200/gpu/MICROBENCH.md", mutate_cited_command,
