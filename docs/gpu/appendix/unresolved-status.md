@@ -47,7 +47,7 @@ operand either and still write it.
 
 | carrier | markers | note |
 |---|---|---|
-| `code/lg200-instructions.tsv` `description` cells | 737 rows | the authored source (`main.py` only reads it).  **564 as of 2026-10-13** - the snapshot above is kept, not rewritten; the drift check reads the later figure |
+| `code/lg200-instructions.tsv` `description` cells | 737 rows | the authored source (`main.py` only reads it).  **563 as of 2026-10-13** - the snapshot above is kept, not rewritten; the drift check reads the later figure |
 | `code/lg200/*.h` / `*.cpp` | 61 files, 68 occurrences | oracle headers and carrier notes.  **None of these is an independent claim.**  The explicit `[UNRESOLVED]` placeholder bodies are 0 (section 2b); every remaining occurrence is a POINTER - the observed-mode headers say in their own words that what the row leaves unresolved is stated in the tsv, e.g. `samp_c_d.h`: "What it established, and what it leaves UNRESOLVED, is stated in the `**Observed.**` and `**Boundaries.**` sections of this row in `code/lg200-instructions.tsv`".  So resolving the tsv rows resolves these, and no separate pass is needed. |
 | `docs/gpu/**` | ~40 | prose pages |
 | other (`DEVELOPMENT.md`, `main.py`, ...) | ~24 | - |
@@ -55,7 +55,7 @@ operand either and still write it.
 Inside the 737 description cells there were **872 distinct UNRESOLVED sentences**
 (1,511 occurrences), i.e. the same unknown is restated on every family member it
 applies to.  Closing one sentence closes every row that carries it.  **As of
-2026-10-13 the same measure is 746 distinct sentences and 980 occurrences**,
+2026-10-13 the same measure is 743 distinct sentences and 977 occurrences**,
 counted by the tracked definition in `check_doc_numbers.py`; the earlier pair is
 kept because it is what the snapshot said, not because it is smaller.
 
