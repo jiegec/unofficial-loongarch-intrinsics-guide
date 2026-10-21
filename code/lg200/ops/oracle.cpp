@@ -1925,6 +1925,10 @@ std::uint32_t oracle_fcvt_f32off_i4(std::uint32_t a) {
   return (f & 0x807fffffu) | (static_cast<std::uint32_t>(e - 4) << 23);
 }
 std::uint32_t oracle_fcvt_i32flr_f32(std::uint32_t a) {
+  // [HW 2026-10-22] a denormal input is flushed to signed zero before the floor, as its
+  // rpi sibling already does: 0x80000001 returns 0, not the -1 that flooring the denormal
+  // itself would give.  The row's subnormal-neg hand case is the direct measurement.
+  if ((a & 0x7f800000u) == 0u) a &= 0x80000000u;
   const float v = f32_bits(a);
   return static_cast<std::uint32_t>(static_cast<std::int32_t>(std::floor(v)));
 }

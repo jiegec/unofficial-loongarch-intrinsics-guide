@@ -30502,8 +30502,8 @@ v_fcvt_i32flr_f32	rtne|daz|ftz	0x7f7fffff	0x7fffffff
 v_fcvt_i32flr_f32	rtne|daz|ftz	0xff7fffff	0x80000000
 v_fcvt_i32flr_f32	rtne|daz|ftz	0x1	0x00000000
 v_fcvt_i32flr_f32	rtne|daz|ftz	0x7fffff	0x00000000
-v_fcvt_i32flr_f32	rtne|daz|ftz	0x80000001	0xffffffff
-v_fcvt_i32flr_f32	rtne|daz|ftz	0x807fffff	0xffffffff
+v_fcvt_i32flr_f32	rtne|daz|ftz	0x80000001	0x00000000
+v_fcvt_i32flr_f32	rtne|daz|ftz	0x807fffff	0x00000000
 v_fcvt_i32flr_f32	rtne|daz|ftz	0x7f800000	0x7fffffff
 v_fcvt_i32flr_f32	rtne|daz|ftz	0xff800000	0x80000000
 v_fcvt_i32flr_f32	rtne|daz|ftz	0x7fc00000	0x00000000
