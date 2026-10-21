@@ -79,7 +79,7 @@ tuple; every other form moves one channel through one register.
 | `M.sioid1` | stream selector; the printed form is `sio:0` or `sio:1` |
 | `VA8` | ring channel index, held in a register (identifier read form) |
 | `IA16` | ring channel index, as an immediate (identifier read form) |
-| `PJ2` | predicate position; see UNRESOLVED |
+| `PJ2` | mask selector over `p0..p3`; see [Operands](../isa/operands.md#conditional-execution) |
 
 ## Writing channels
 
@@ -153,8 +153,10 @@ SIO is order-sensitive; these are interface rules, not implementation advice:
 
 ## UNRESOLVED
 
-* `PJ2` is named as a predicate in every row of the family, but no established
-  producer predicates with it; per-lane gating is done with a lane mask.
+* `PJ2` is the instruction's mask selector in every row of the family and the
+  selector semantics are measured ([Operands](../isa/operands.md#conditional-execution));
+  what is untested here is only whether an SIO transfer is gated like the ALU and
+  flat-memory forms.
 * The write forms other than `siowrrot` and `siowrrot_imm`, and the read forms
   other than `siordrot_id_c4`, are not emitted by any established producer, so
   their operand roles come from the field layout rather than from observation.

@@ -111,22 +111,55 @@ because they are operand encoding rather than allocation:
 
 ## Conditional execution
 
-The predicate field `PJ2` and the lane-mask mechanism are two different things,
-and both are present in the instruction set.
+`PJ2` is the instruction's mask selector, and it is a first-class part of the
+execution model rather than a per-family oddity.  The field is 2 bits (the
+position differs by format: `HI[13:12]` in `vop`, `HI[17:16]` in `vop-imm`,
+`smem`, `flat`, `tex-buffer` and `shared-memory`, `HI[21:20]` in `sio-id`,
+`HI[17:16]` in `jump-stack`) and it names one of the four lane-mask registers
+`p0..p3`; the instruction then executes only on the lanes whose bit is set in
+that register.  A census of the closed producer's whole linked program counts
+all four in the field (`p0` 2772, `p1` 5244, `p2` 4290, `p3` 4142), so selecting
+a mask other than `p0` is ordinary, not a corner case.
 
-A lane mask in a register is the mechanism the established scalar and vector ALU
-producers use to make a result conditional on which lanes are active, and it is
-the mechanism behind the two hazards below.  Separately, several rows — the
-emit forms, the interpolation forms and the matrix forms — carry their predicate
-in the `PJ2` operand, where it gates whether the lane participates in the
-operation.  The ALU producers write zero in that field, so its exact semantics
-are not established, but a reader must not conclude that the field is unused by
-the instruction set as a whole.
+The behaviour was measured on the compute pipe (32 lanes) on 2026-10-21 with
+the sequence runner; each row is one submission:
+
+| Setup | Observation |
+|-------|-------------|
+| `p1=0x55555555`, `v_mov` under `PJ2=1` | only lanes 0,2,...,30 were written |
+| `p2=0x55555555`, `PJ2=2`; `p3=0x55555555`, `PJ2=3` | same lane set each time |
+| `p0=0xffff0000`, `p1=0x55555555`, `PJ2=1` | lanes 0..15 written too: the mask is an **absolute** lane set, not an intersection with `p0` |
+| `p0=0`, `p1=all`, flat store under `PJ2=1` | the store landed |
+| `p0=all`, `p1=0`, flat store under `PJ2=1` | the store did not land |
+| `p1=0x55555555`, `v_mov` under `PJ2=1`, then read `p1` | still `0x55555555` |
+| `p1=0x55555555`, flat store under `PJ2=1`, then read `p1` | still `0x55555555` |
+| `v_cmp_eq_u32` with `p2` as the destination | `p2` became `0xffffffff` |
+| `p2=0`, `p1=0x55555555`, `v_cmp_eq_u32` under `PJ2=1` writing `p2` | `p2=0x55555555`: the destination write is gated, so a zeroed destination plus a gated compare yields `parent & condition` in one instruction |
+| `cb p1, +1` with `p1=0` / `p1=0xffffffff` | not taken / taken |
+
+So: a compare can produce a mask directly in a mask register, and a compare
+executed under `PJ2=k` writes only `pK`'s lanes — with a zeroed destination that
+is exactly `pK & condition`.  A branch can read a mask register directly, and the
+mask selected by an instruction survives that instruction,
+including a vector memory instruction.  `p0` is still the invocation's live set
+by convention — the established producers open with the whole-quad mask in `p0`
+and treat the others as region masks — but nothing in the encoding or in the
+measured behaviour gives `p0` a privilege over `p1..p3`.
+
+Two consequences for a producer:
+
+* `p1..p3` are **undefined at launch** (each submission observed a different
+  residue), so a shader must write a mask before selecting it.
+* Because masks are absolute, the compiler must compute `parent & condition`
+  when it opens a region instead of inheriting it from a single exec register.
+
+The `p0..p3` mechanism is:
 
 The lane-mask mechanism is:
 
-* `p0..p3` (selectors `0x7c..0x7f`) are lane-mask registers.  `p0` is the
-  active mask: it holds the lanes that are still alive for this invocation.
+* `p0..p3` (selectors `0x7c..0x7f`) are lane-mask registers and any of them can
+  gate an instruction.  `p0` holds the lanes still alive for the invocation;
+  `p1..p3` hold the region masks the producer derives from it.
 * The mask can also live in `s0..s3`, which are ordinary allocatable registers
   used as lane-mask values.
 * A shader opens by installing a full-quad mask with the whole-quad-mask
@@ -153,21 +186,27 @@ The lane-mask mechanism is:
   the register is encoded in `INST_HI[7:0]` and the displacement in
   `INST_LO[31:0]`.
 
-Three hazards follow from that design and a producer must respect them:
+One hazard survives from the earlier reading of this section:
 
-1. **A lane mask does not survive a vector instruction.**  A mask must be folded
-   into the data as a vector value, or consumed by a single broadcasted
-   predicate, rather than kept live across vector ALU operations.
-2. **Vector memory and sampling instructions clobber lane masks.**  A mask that
-   must survive a load, store or sample has to be saved and restored around it.
-3. **SCC is short-lived.**  Consecutive compare instructions can be read stale;
+1. **SCC is short-lived.**  Consecutive compare instructions can be read stale;
    a consumer of the condition must be materialised before the next compare is
    issued, and a compare whose result is a scalar register (rather than SCC) is
    not the established form.
 
-Because masks are per-lane data, a divergent branch is expressed as a compare
-into a mask, a branch, and mask manipulation, not as an instruction-level
-predicate.
+The two mask hazards that used to be listed here — "a lane mask does not
+survive a vector instruction" and "vector memory and sampling clobber lane
+masks" — are **not** established as written.  The compute-pipe probe above kept
+the selected mask unchanged across a vector ALU operation and across a flat
+store, and the earlier X-1 probe kept a mask that was not selected unchanged
+across `s_wqm_b32`, `s_and_b32`, `barrier`, `v_mov_b32` and a vector store.
+What is still untested: the fragment pipe (WQM/helper lanes), the sampling and
+shared-memory forms, and whether a mask register that also serves as the
+selected mask of a *destination-writing* instruction behaves differently.
+
+Because masks are per-lane data but the branch is wave-wide, a divergent branch
+is expressed as a compare into a mask, a branch on that mask, and mask
+manipulation.  It is not an instruction-level predicate: `PJ2` selects the
+mask, it does not evaluate a condition.
 
 ## Immediate forms
 
@@ -344,7 +383,12 @@ RD8             result tuple
 
 ## UNRESOLVED
 
-* The semantics of `PJ2`.
+* The `PJ2` selector itself is settled (see [Conditional execution](#conditional-execution));
+  what stays open is narrower: the fragment pipe (WQM/helper lanes), the sampling and
+  shared-memory forms, and whether an instruction that both selects a mask and writes
+  that same register reads the old or the new value back.  The launch values of
+  `p1..p3` are undefined by measurement, not by documentation, and the whole-quad-mask
+  interaction with a region mask is untested.
 * The role of the special-value selector ranges `0x68..0x7b`, `0x81..0x9f` and
   `0xfb..0xfe`; they have observable values but no established ABI meaning.
 * Whether the constant-zero selector and its high form are equivalent in

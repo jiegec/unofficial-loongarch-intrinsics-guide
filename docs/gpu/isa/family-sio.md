@@ -45,7 +45,7 @@ unexercised.
 | `IA16`, `IK16`, `IJ16` | window offset: which output plane of the stream the transfer addresses |
 | `M.sioid1` | stream selector, printed `sio:0` or `sio:1`; both are real streams, so a zero here is a choice and not an absence |
 | `VA8` | ring channel index, held in a register (identifier form) |
-| `PJ2` | predicate position; see UNRESOLVED |
+| `PJ2` | mask selector over `p0..p3` ([Operands](operands.md#conditional-execution)) |
 
 Every row carries `M.channum12`, `M.sioid1` and `PJ2`; every row except
 `sioexport` carries a window offset field.
@@ -68,10 +68,11 @@ destination field names.
 
 ## UNRESOLVED
 
-* Nothing on `PJ2`: the earlier claim that no established producer predicates with it was
-  WRONG (corrected 2026-10-13) - a census of the closed producer's output counts all four
-  (p0 2772, p1 5244, p2 4290, p3 4142 in one whole linked program), which is what U5 records.
-  Per-lane gating is a separate matter and is done with a lane mask.
+* Nothing on the encoding of `PJ2`: it is the instruction's mask selector, the closed
+  producer uses all four (p0 2772, p1 5244, p2 4290, p3 4142 in one whole linked program),
+  and the selector semantics are measured ([Operands](operands.md#conditional-execution)).
+  What is untested for this family is only whether an SIO transfer is gated the same way
+  as the ALU and flat-memory forms.
 * The rows other than `siowrrot`, `siowrrot_imm` and `siordrot_id_c4` are not
   emitted by any established producer, so their operand roles come from the
   field layout rather than from observation.

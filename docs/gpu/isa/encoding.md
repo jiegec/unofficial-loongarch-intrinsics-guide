@@ -129,12 +129,12 @@ A conditional branch additionally carries its condition register in
 > is visible rather than silent.
 
 
-* Nothing: the `PJ2` field IS used as a predicate by an established producer, and the
-  earlier claim that it is not was WRONG (corrected 2026-10-13).  A census over the
-  closed producer's output counts all four as the leading operand of instructions -
-  p0 2772, p1 5244, p2 4290, p3 4142 in one whole linked program - which is exactly
-  what U5 already recorded: the four predicate registers are the masks, carried as each
-  instruction's first operand.
+* Nothing: `PJ2` is the per-instruction mask selector and its behaviour is measured.
+  The earlier claim that no producer uses it was WRONG (corrected 2026-10-13), and the
+  remaining semantic half closed on 2026-10-21: `PJ2=k` gates the instruction by `pK`,
+  the selected mask is an absolute lane set (not intersected with `p0`), it survives the
+  instruction, a compare can write a mask register and a branch can read one.  See
+  [Operands](operands.md#conditional-execution) for the measurement table.
 * The meaning of reserved bits: they are emitted at the row's base value, but
   whether the hardware requires that value is not established.
 * Whether the opcode fields of formats 9 and 10 (the 4-bit `INST_HI[26:23]`

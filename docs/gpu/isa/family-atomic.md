@@ -124,9 +124,10 @@ other instructions in the same invocation are UNRESOLVED.
   coordinate.
 * Whether the image forms other than the 32-bit swap are permanently inert or
   merely unobserved.
-* Narrowed, not closed.  The predicate field IS the per-instruction mask (`PJ2`), and an
+* Narrowed, not closed.  The predicate field is the per-instruction mask selector and
+  its semantics are settled ([Operands](operands.md#conditional-execution)); an
   established producer uses all four (p0 2772, p1 5244, p2 4290, p3 4142 in one whole
-  linked program); `bl1` and `bl2` are reachable booleans - the buffer forms' two
+  linked program).  `bl1` and `bl2` are reachable booleans - the buffer forms' two
   parameters, ordered bl2 then bl1 - and only `bl1` is used, on private spills.  What
   remains open is what the two memory behaviour bits MEAN.
 * Nothing: **they do not**.  U2 established it (producer static + graphics measurement,
