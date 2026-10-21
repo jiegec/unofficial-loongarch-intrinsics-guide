@@ -52,10 +52,10 @@ operand either and still write it.
 | `docs/gpu/**` | ~40 | prose pages |
 | other (`DEVELOPMENT.md`, `main.py`, ...) | ~24 | - |
 
-Inside the 737 description cells there were **872 distinct UNRESOLVED sentences**
+Inside the 735 description cells there were **872 distinct UNRESOLVED sentences**
 (1,511 occurrences), i.e. the same unknown is restated on every family member it
 applies to.  Closing one sentence closes every row that carries it.  **As of
-2026-10-13 the same measure is 737 distinct sentences and 971 occurrences**,
+2026-10-13 the same measure is 735 distinct sentences and 969 occurrences**,
 counted by the tracked definition in `check_doc_numbers.py`; the earlier pair is
 kept because it is what the snapshot said, not because it is smaller.
 
