@@ -383,9 +383,18 @@ def main() -> int:
     # value has a zero second byte, so the emitted grid never touches the field the row
     # is named for.  These sources vary it.  They are emitted here, after the per-row
     # branches, so the row keeps its generic vectors as well as these.
-    for a in (0xff00, 0x100, 0x7f00, 0x8000, 0xc000,
-              0x12345678, 0x7f7fffff, 0xffffffff, 0xffff):
-        out.append("v_fcvt_f32_u81" + "\t" + FP_POLICY + "\t" + hex(a))
+    for row, vals in (
+            ("v_fcvt_f32_u81", (0xff00, 0x100, 0x7f00, 0x8000, 0xc000,
+                              0x12345678, 0x7f7fffff, 0xffffffff, 0xffff)),
+            # byte 2 and byte 3 members: their grids used a zero source, so the byte
+            # position rested on the naming rule alone.  Set only their own byte.
+            ("v_fcvt_f32_u82", (0xff0000, 0x10000, 0x7f0000, 0x800000, 0xc00000,
+                              0x00ffff, 0x00fefdff)),
+            ("v_fcvt_f32_u83", (0xff000000, 0x1000000, 0x7f000000, 0x80000000,
+                              0xc0000000, 0xffffff)),
+    ):
+        for a in vals:
+            out.append(row + "\t" + FP_POLICY + "\t" + hex(a))
     print("\n".join(out))
     return 0
 
