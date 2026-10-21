@@ -326,6 +326,18 @@ def main() -> int:
         # all in the same column, since a 32-bit class is matched on the whole
         # word and a 16-bit one on either half.
         base = union_base(mnemonic, fmt)
+        # [HW 2026-10-22] the vector/scalar moves take a LANE SELECTOR in the second
+        # slot, not a general 32-bit value: selectors 0..3 pick a lane, and anything
+        # above is out of range - v_v2s_b32 returns 3 on the compute pipe and
+        # 0x80000000 on the fragment stage for 7, 0xff or 0x7fffffff, neither of which
+        # is the staged value.  The generic INT grid put three out-of-range selectors in
+        # every one of these rows, which is where its eighteen failures came from.
+        if (mnemonic in ("v_v2s_b32", "v_s2v_b32", "v_firstv2s_b32") and nin == 2):
+            for a in base:
+                for sel in (0, 1, 2, 3):
+                    out.append(mnemonic + chr(9) + "" + chr(9) +
+                               hex(a) + " " + hex(sel))
+            continue
         # [HW 2026-08-24] ldexp carries an integer exponent in the last
         # slot: bit-pattern floats there are meaningless (and the generic
         # grid made most v_ldexp rows unverifiable).  Use the INT grid
