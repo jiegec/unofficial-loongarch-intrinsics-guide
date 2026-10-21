@@ -47,7 +47,7 @@ operand either and still write it.
 
 | carrier | markers | note |
 |---|---|---|
-| `code/lg200-instructions.tsv` `description` cells | 737 rows | the authored source (`main.py` only reads it).  **560 as of 2026-10-13** - the snapshot above is kept, not rewritten; the drift check reads the later figure |
+| `code/lg200-instructions.tsv` `description` cells | 737 rows | the authored source (`main.py` only reads it).  **559 as of 2026-10-13** - the snapshot above is kept, not rewritten; the drift check reads the later figure |
 | `code/lg200/*.h` / `*.cpp` | 61 files, 68 occurrences | oracle headers and carrier notes.  **None of these is an independent claim.**  The explicit `[UNRESOLVED]` placeholder bodies are 0 (section 2b); every remaining occurrence is a POINTER - the observed-mode headers say in their own words that what the row leaves unresolved is stated in the tsv, e.g. `samp_c_d.h`: "What it established, and what it leaves UNRESOLVED, is stated in the `**Observed.**` and `**Boundaries.**` sections of this row in `code/lg200-instructions.tsv`".  So resolving the tsv rows resolves these, and no separate pass is needed. |
 | `docs/gpu/**` | ~40 | prose pages |
 | other (`DEVELOPMENT.md`, `main.py`, ...) | ~24 | - |

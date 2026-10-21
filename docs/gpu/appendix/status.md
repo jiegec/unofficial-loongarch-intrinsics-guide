@@ -42,7 +42,7 @@ record.
 
 | measure | start | now |
 |---|---|---|
-| rows stating an `UNRESOLVED` | 722 | **560** |
+| rows stating an `UNRESOLVED` | 722 | **559** |
 | distinct UNRESOLVED sentences | 872 | **722** (956 occurrences) |
 | explicit placeholder bodies in `code/lg200` | 11 | **0** |
 
