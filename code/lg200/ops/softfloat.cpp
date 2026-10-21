@@ -519,10 +519,39 @@ std::uint32_t sf_f16_f32(std::uint32_t a, FpPolicy policy) {
 }
 
 // ---- binary64 arithmetic (correctly rounded via Berkeley) ----------------------
+// [HW 2026-10-22] the 64-bit counterpart of sf_nan3: a signaling NaN first, then a quiet
+// one, each quieted on the way out with its sign and payload intact.  Added because the
+// f64 arithmetic had no such chooser and sf_add64 therefore never asked the question.
+static std::uint64_t sf_nan3_64(std::uint64_t x, std::uint64_t y, std::uint64_t z) {
+  const auto v_nan = [](std::uint64_t v) {
+    return (v & 0x7ff0000000000000ull) == 0x7ff0000000000000ull &&
+           (v & 0x000fffffffffffffull) != 0ull;
+  };
+  const auto v_snan = [&](std::uint64_t v) {
+    return v_nan(v) && (v & 0x0008000000000000ull) == 0ull;
+  };
+  const std::uint64_t q = 0x0008000000000000ull;
+  if (v_snan(x)) return x | q;
+  if (v_snan(y)) return y | q;
+  if (v_snan(z)) return z | q;
+  if (v_nan(x)) return x | q;
+  if (v_nan(y)) return y | q;
+  if (v_nan(z)) return z | q;
+  return 0ull;
+}
 std::uint64_t sf_add64(std::uint64_t a, std::uint64_t b, FpPolicy policy) {
+  // [HW 2026-10-22] the same two steps its f32 sibling has and this helper lacked.  An
+  // operand NaN propagates - a signaling one outranking a quiet one - and a COMPUTED NaN,
+  // as +inf + -inf makes, is the positive canonical.  Measured on v_add_f64: the pair
+  // (0x7ff8000000000000, 0x7ff0000000000001) returns 0x7ff8000000000001, and +inf + -inf
+  // returns 0x7ff8000000000000 where the oracle gave 0xfff8...
+  if (const std::uint64_t n = sf_nan3_64(a, b, 0ull)) return n;
   if (policy.daz) { a = flush64(a); b = flush64(b); }
   set_round(policy);
   std::uint64_t r = bk64(f64_add(mk64(a), mk64(b)));
+  if ((r & 0x7ff0000000000000ull) == 0x7ff0000000000000ull &&
+      (r & 0x000fffffffffffffull) != 0ull)
+    r = 0x7ff8000000000000ull;  // computed NaN -> positive canonical
   return policy.ftz ? flush64(r) : r;
 }
 std::uint64_t sf_sub64(std::uint64_t a, std::uint64_t b, FpPolicy policy) {
