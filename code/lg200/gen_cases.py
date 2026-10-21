@@ -392,9 +392,24 @@ def main() -> int:
                               0x00ffff, 0x00fefdff)),
             ("v_fcvt_f32_u83", (0xff000000, 0x1000000, 0x7f000000, 0x80000000,
                               0xc0000000, 0xffffff)),
+            # The f16 compares take TWO words: the vector word and the literal, and their
+            # grids never set the vector word's high half.  These set bits 31:16 to a
+            # NaN, an infinity and 1.0, so the mask flips if the high half is read.
+            ("v_cmp_imm_o_f16", ("0x7e000000 0x0", "0x7c000000 0x0",
+                               "0x3c000000 0x0", "0x7e000000 0x3800")),
+            ("v_cmp_imm_tru_f16", ("0x7e000000 0x0", "0x7c000000 0x0",
+                               "0x3c000000 0x0", "0x7e000000 0x3800")),
+            # v_fcvt_f32_i32 asked whether the tie-break is even, and called it unreadable
+            # because its boundary integers are not halfway at their magnitudes.  They
+            # can be: above 2^24 the spacing is 2, so an ODD integer is exactly
+            # halfway, and these five are.
+            ("v_fcvt_f32_i32", (0x01000001, 0x01000003, 0xff000001,
+                               0x02000002, 0xfe000002)),
+            ("v_fcvt_f32_u32", (0x01000001, 0x01000003, 0x02000002)),
     ):
         for a in vals:
-            out.append(row + "\t" + FP_POLICY + "\t" + hex(a))
+            src = a if isinstance(a, str) else hex(a)
+            out.append(row + chr(9) + FP_POLICY + chr(9) + src)
     print("\n".join(out))
     return 0
 

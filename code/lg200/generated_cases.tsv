@@ -81353,3 +81353,19 @@ v_fcvt_f32_u83	rtne|daz|ftz	0x7f000000	0x42fe0000
 v_fcvt_f32_u83	rtne|daz|ftz	0x80000000	0x43000000
 v_fcvt_f32_u83	rtne|daz|ftz	0xc0000000	0x43400000
 v_fcvt_f32_u83	rtne|daz|ftz	0xffffff	0x00000000
+v_cmp_imm_o_f16	rtne|daz|ftz	0x7e000000 0x0	0x0000ffff
+v_cmp_imm_o_f16	rtne|daz|ftz	0x7c000000 0x0	0x0000ffff
+v_cmp_imm_o_f16	rtne|daz|ftz	0x3c000000 0x0	0x0000ffff
+v_cmp_imm_o_f16	rtne|daz|ftz	0x7e000000 0x3800	0x0000ffff
+v_cmp_imm_tru_f16	rtne|daz|ftz	0x7e000000 0x0	0x0000ffff
+v_cmp_imm_tru_f16	rtne|daz|ftz	0x7c000000 0x0	0x0000ffff
+v_cmp_imm_tru_f16	rtne|daz|ftz	0x3c000000 0x0	0x0000ffff
+v_cmp_imm_tru_f16	rtne|daz|ftz	0x7e000000 0x3800	0x0000ffff
+v_fcvt_f32_i32	rtne|daz|ftz	0x1000001	0x4b800000
+v_fcvt_f32_i32	rtne|daz|ftz	0x1000003	0x4b800002
+v_fcvt_f32_i32	rtne|daz|ftz	0xff000001	0xcb7fffff
+v_fcvt_f32_i32	rtne|daz|ftz	0x2000002	0x4c000000
+v_fcvt_f32_i32	rtne|daz|ftz	0xfe000002	0xcbffffff
+v_fcvt_f32_u32	rtne|daz|ftz	0x1000001	0x4b800000
+v_fcvt_f32_u32	rtne|daz|ftz	0x1000003	0x4b800002
+v_fcvt_f32_u32	rtne|daz|ftz	0x2000002	0x4c000000
