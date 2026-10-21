@@ -76,7 +76,7 @@ The measured baseline is pinned by the matrix itself rather than by a date:
 row - 111.  The matrix measured THAT grid.
 
 Everything the 10-13 regeneration added is therefore oracle expectation, not reading:
-**457 rows grew, +62,969 vectors, about three quarters of the current grid**.  Two
+**457 rows grew, +62,957 vectors, about three quarters of the current grid**.  Two
 concrete consequences, both checked by hand:
 
 | vector | in the 10-10 grid? | therefore |
