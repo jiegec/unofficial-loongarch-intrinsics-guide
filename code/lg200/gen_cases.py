@@ -379,6 +379,13 @@ def main() -> int:
         for row in gen:
             out.append(mnemonic + "\t" + pol + "\t" +
                        " ".join(hex(v) for v in flat(row)))
+    # [HW 2026-10-22] v_fcvt_f32_u81 converts BYTE 1 of the source.  Every generic INT
+    # value has a zero second byte, so the emitted grid never touches the field the row
+    # is named for.  These sources vary it.  They are emitted here, after the per-row
+    # branches, so the row keeps its generic vectors as well as these.
+    for a in (0xff00, 0x100, 0x7f00, 0x8000, 0xc000,
+              0x12345678, 0x7f7fffff, 0xffffffff, 0xffff):
+        out.append("v_fcvt_f32_u81" + "\t" + FP_POLICY + "\t" + hex(a))
     print("\n".join(out))
     return 0
 
