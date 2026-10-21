@@ -51,13 +51,16 @@ record.
 Before a clause is settled by "hardware", answer three questions, all of them
 mechanically checkable with case_provenance.py:
 
-1. **Was it executed?**  Only vectors inside the measured baseline - the 10-10 grid
-   (4f26f81, 18,542 vectors) - may settle anything.  The 10-13 regeneration added
-   62,957 vectors that are oracle expectation, not reading.
-2. **How strong is the record?**  Of the 768 matrix rows, 631 were compared against
-   the oracle, 117 were merely OBSERVED (the hardware value recorded without an
-   independent comparison) and 20 ran nothing at all.  Observed is a weaker class
-   and a claim resting on it must say so - entry 16 was rewritten for exactly that.
+1. **Was it executed?**  As of the 2026-10-22 full PS run, yes for the whole grid: one
+   process, one session, all 85,873 vectors in 79.5 s.  Before that run the answer
+   depended on the vector - the 10-13 regeneration added up to 62,957 vectors that were
+   oracle expectation only - so a clause settled in that window had to name the grid it
+   rested on.
+2. **How strong is the record?**  Of the 768 PS rows, 629 were compared against the
+   oracle, 137 were merely OBSERVED (the hardware value recorded without an independent
+   comparison), one failed (`v_mbcnt_u32`, whose two pipes read different widths) and one
+   could not be enveloped.  Observed is a weaker class and a claim resting on it must say
+   so - entry 16 was rewritten for exactly that.
 3. **Is the artifact clean?**  Everything written after the 2026-10-13 01:42 trap
    carries "cannot open /dev/dri/renderD128".  The CS matrix has 377 HANG/FAULT
    rows, and that band IS the wedge, not 377 failing rows; read as evidence it says
@@ -75,14 +78,18 @@ The measured baseline is pinned by the matrix itself rather than by a date:
 (`4f26f81`, 18,542 vectors) carries 11 hand cases plus 100 generated vectors for that
 row - 111.  The matrix measured THAT grid.
 
-Everything the 10-13 regeneration added is therefore oracle expectation, not reading:
-**457 rows grew, +62,957 vectors, about three quarters of the current grid**.  Two
-concrete consequences, both checked by hand:
+Everything the 10-13 regeneration added was oracle expectation rather than reading, and
+for a while that was a real gap: at its worst the check reported **457 rows grew,
++62,957 vectors, about three quarters of the current grid**.  The **2026-10-22 full PS
+run** closed it - one process, one session, 768 rows in 79.5 s, 80,887 passes and the 11
+documented `v_mbcnt_u32` divergences - so the same check now reports
+**0 rows grew, +0 vectors** and the matrix covers all 85,873.  The two consequences worth
+remembering from when it did not:
 
 | vector | in the 10-10 grid? | therefore |
 |---|---|---|
 | `v_add_f32 0x80000000 0x80000000 -> 0x80000000` | yes | measured, so the zero-sign clauses stand |
-| `v_add_f32 0x0 0xffc00000 -> 0x7fc00000` | no | oracle only, so the NaN clause stays open (entry 36) |
+| `v_add_f32 0x0 0xffc00000 -> 0x7fc00000` | no, until the 10-22 run | the NaN clause it left open was settled by the probe that fixed `norm_nan32`, which took the row from 357/37 to 394/0 |
 
 ### What the remaining sentences are about
 
