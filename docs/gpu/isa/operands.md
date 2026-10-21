@@ -145,6 +145,10 @@ each row is again one submission:
 | immediate-form `v_add_imm_u32` under `PJ2=1`, `p1=0x55555555` | only the even lanes were written: the **vop-imm** layout gates like `vop` |
 | `store_sm_b32` under `PJ2=1`, cells pre-filled per lane | only the selected lanes' cells changed: the **shared-memory** layout gates |
 | `load_sm_b32` under `PJ2=1`, destination pre-filled per lane | only the selected lanes' destinations changed |
+| the same two instructions with `p1=0xaaaaaaaa` instead of `0x55555555` | the writing lanes flipped to the odd ones: the field names a register and that register's **contents** decide the lanes |
+| `v_add_imm_u32` under `PJ2=2` with `p2=0x0000ffff`; `store_sm_b32` under `PJ2=3` with `p3=0xf0f0f0f0` | lanes 0..15; and cells 4..7, 12..15, 20..23, 28..31: any of the four registers works for these layouts |
+| `store_sm_b32` under `PJ2=1` with `p1=0` while `p0=0xffffffff` | no cell changed: the selected register is used, `p0` does not leak in |
+| the encoded words of the gated and ungated forms of the same instruction | identical except `INST_HI[16]`, the low bit of the `HI[17:16]` selector: the gating really is the field, not a side effect of another operand |
 | gated shared-memory store, then read `p1` | still `0x55555555`: the mask survives a shared-memory access |
 | `czb p1, +1` with `p1=0` / `p1=0x55555555` | taken / not taken: `czb` reads a mask register, as `cb` does |
 | `s_wqm_b32 p2, p1` with `p1=1`; in place on `p1`; in place on `p0` | `p2 = 0xf` / `p1 = 0xf` / `p0 = 0xf`: the whole-quad transform takes and returns mask registers, including the live set |

@@ -1020,6 +1020,15 @@ int pj2(unsigned variant, std::uint32_t timeout_ms, bool dry_run) {
                 variant, program->bytes.size(), program->words.size(),
                 program->sgpr_high_water, program->vgpr_high_water,
                 program->listing.c_str());
+    // LGPU_DUMP_WORDS turns the listing into a word-per-instruction dump, so
+    // a control can be checked against the encoded field rather than the
+    // mnemonic: the emitter writes PJ2 at INST_HI[17:16] for these layouts,
+    // and only the selector bits may differ between two otherwise equal
+    // probes.
+    if (std::getenv("LGPU_DUMP_WORDS"))
+      for (std::size_t i = 0; i < program->words.size(); ++i)
+        std::printf("word %3zu: lo=0x%08x hi=0x%08x\n", i,
+                    program->words[i].lo, program->words[i].hi);
     return 0;
   }
 #if !defined(LGPU_HAVE_DRM)

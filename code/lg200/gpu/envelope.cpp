@@ -4134,8 +4134,87 @@ std::optional<EnvelopeProgram> build_cs_pj2_probe(unsigned variant,
       store_lane_results();
       break;
     }
+    case 59: {
+      // Control for 40: same selector (p1), complementary contents.  If the
+      // field really names the mask register, the written lanes flip to odd.
+      builder.s_mov_imm_b32(isa::sgpr(3), 0u);
+      builder.s_mov_imm_b32(isa::sgpr(15), 0xaaaaaaaau);
+      builder.v_mov_b32(isa::vgpr(10), isa::sgpr(3), isa::predicate(0));
+      builder.v_mov_b32(isa::vgpr(11), isa::sgpr(3), isa::predicate(0));
+      builder.s_mov_b32(isa::predicate(1), isa::sgpr(15));
+      builder.append(isa::McInst{
+          "v_add_imm_u32", "",
+          {isa::op_reg(isa::predicate(1)), isa::op_reg(isa::vgpr(10)),
+           isa::op_reg(isa::vgpr(11)), isa::op_imm(1u)}});
+      builder.v_mov_b32(isa::vgpr(8), isa::vgpr(10), isa::predicate(0));
+      store_lane_results();
+      break;
+    }
+    case 61: {
+      // A different selector with a different mask: PJ2=2, p2 = low half.
+      builder.s_mov_imm_b32(isa::sgpr(3), 0u);
+      builder.s_mov_imm_b32(isa::sgpr(15), 0x0000ffffu);
+      builder.v_mov_b32(isa::vgpr(10), isa::sgpr(3), isa::predicate(0));
+      builder.v_mov_b32(isa::vgpr(11), isa::sgpr(3), isa::predicate(0));
+      builder.s_mov_b32(isa::predicate(2), isa::sgpr(15));
+      builder.append(isa::McInst{
+          "v_add_imm_u32", "",
+          {isa::op_reg(isa::predicate(2)), isa::op_reg(isa::vgpr(10)),
+           isa::op_reg(isa::vgpr(11)), isa::op_imm(1u)}});
+      builder.v_mov_b32(isa::vgpr(8), isa::vgpr(10), isa::predicate(0));
+      store_lane_results();
+      break;
+    }
+    case 60:
+    case 62:
+    case 63:
+    case 64: {
+      // Shared-memory controls for 42.  60 = p1 complementary contents,
+      // 62 = PJ2=3 with a "low nibble of every byte" mask, 63 = PJ2=0 with the
+      // live mask (all lanes), 64 = PJ2=1 with an empty mask (nothing).
+      constexpr std::uint32_t kLdsBase = 0x20u;
+      constexpr std::uint32_t kFill = 0x11111111u;
+      builder.s_mov_imm_b32(isa::sgpr(3), kFill);
+      builder.s_mov_imm_b32(isa::sgpr(15), 2u);
+      builder.append(isa::McInst{"v_sll_b32", "",
+                                 {isa::op_reg(isa::predicate(0)),
+                                  isa::op_reg(isa::vgpr(11)),
+                                  isa::op_reg(isa::vgpr(0)),
+                                  isa::op_reg(isa::sgpr(15))}});
+      builder.append(isa::McInst{"v_add_imm_u32", "",
+                                 {isa::op_reg(isa::predicate(0)),
+                                  isa::op_reg(isa::vgpr(9)),
+                                  isa::op_reg(isa::vgpr(11)),
+                                  isa::op_imm(kLdsBase)}});
+      builder.v_mov_b32(isa::vgpr(8), isa::sgpr(3), isa::predicate(0));
+      builder.sm_op("store_sm_b32", isa::predicate(0), isa::vgpr(8),
+                    isa::vgpr(9));
+      builder.check_k_vm_vs_sm();
+      unsigned sel = 1;
+      const struct { unsigned variant; std::uint32_t mask; } kStages[] = {
+         {60, 0xaaaaaaaau}, {62, 0xf0f0f0f0u}, {63, 0xffffffffu},
+         {64, 0x00000000u}};
+      for (unsigned k = 0; k < 4; ++k)
+         if (kStages[k].variant == variant)
+            builder.s_mov_imm_b32(isa::sgpr(14), kStages[k].mask);
+      if (variant == 62)
+         sel = 3;
+      else if (variant == 63)
+         sel = 0;
+      builder.s_mov_b32(isa::predicate(sel), isa::sgpr(14));
+      builder.v_mov_b32(isa::vgpr(8), isa::sgpr(4), isa::predicate(sel));
+      builder.sm_op("store_sm_b32", isa::predicate(sel), isa::vgpr(8),
+                    isa::vgpr(9));
+      builder.check_k_vm_vs_sm();
+      builder.sm_op("load_sm_b32", isa::predicate(0), isa::vgpr(10),
+                    isa::vgpr(9));
+      builder.check_k_vm_vs_sm();
+      builder.v_mov_b32(isa::vgpr(8), isa::vgpr(10), isa::predicate(0));
+      store_lane_results();
+      break;
+    }
     default:
-      error = "unknown pj2 probe variant (expected 20..50, 53..58)";
+      error = "unknown pj2 probe variant (expected 20..50, 53..64)";
       return std::nullopt;
   }
 
