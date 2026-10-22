@@ -425,6 +425,12 @@ def main() -> int:
             # so the exact result is the 2^-23 residual that a multiply-then-add
             # would have rounded away to zero.  This is the shape that separates a
             # fused operation from two.
+            # v_mac_f32 asks how an inexact product is rounded against the accumulator.  Its
+            # grid has five all-normal cases and none separates the readings, so
+            # this one does: (1+2^-23)^2 is 1+2^-22+2^-46 exactly, the rounded
+            # product is 1+2^-22, and subtracting it leaves 0 for a multiply-then-add
+            # but the 2^-46 residual for a fused one.
+            ("v_mac_f32", ("0x3f800001 0x3f800001 0xbf800002",)),
             ("v_fma_f32", ("0x3f800001 0x3f800000 0xbf800000",)),
             ("v_fma_f64", ("0x1 0x3ff00000 0x0 0x3ff00000 0x0 0xbff00000",)),
             ("v_fma_f32", ("0x3f800000 0x3f800000 0x33800000",
