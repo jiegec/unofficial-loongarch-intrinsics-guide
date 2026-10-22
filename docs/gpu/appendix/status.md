@@ -6,7 +6,7 @@ the pages linked from each row; this page is the index.
 
 Verified together on 2026-10-12: chapter invariants hold (`check_gpu.py`: 768
 rows, 12 formats, 7 families, 33 state blocks), the table is intact (768 rows, 23
-columns, unique), the offline oracle passes (**768 instructions, 85,990
+columns, unique), the offline oracle passes (**768 instructions, 85,993
 vectors**), and the hardware runner builds.
 
 ## Phase 1 - the PS/CS carrier
@@ -42,8 +42,8 @@ record.
 
 | measure | start | now |
 |---|---|---|
-| rows stating an `UNRESOLVED` | 703 | **541** |
-| distinct UNRESOLVED sentences | 872 | **703** (929 occurrences) |
+| rows stating an `UNRESOLVED` | 703 | **537** |
+| distinct UNRESOLVED sentences | 872 | **703** (925 occurrences) |
 | explicit placeholder bodies in `code/lg200` | 11 | **0** |
 
 ### The rules for citing evidence (2026-10-13)
@@ -52,7 +52,7 @@ Before a clause is settled by "hardware", answer three questions, all of them
 mechanically checkable with case_provenance.py:
 
 1. **Was it executed?**  As of the 2026-10-22 full PS run, yes for the whole grid: one
-   process, one session, all 85,990 vectors in 79.5 s.  Before that run the answer
+   process, one session, all 85,993 vectors in 79.5 s.  Before that run the answer
    depended on the vector - the 10-13 regeneration added up to 62,957 vectors that were
    oracle expectation only - so a clause settled in that window had to name the grid it
    rested on.
@@ -83,7 +83,7 @@ for a while that was a real gap: at its worst the check reported **457 rows grew
 +62,957 vectors, about three quarters of the current grid**.  The **2026-10-22 full PS
 run** closed it - one process, one session, 768 rows in 79.5 s, 80,887 passes and the 11
 documented `v_mbcnt_u32` divergences - so the same check now reports
-**0 rows grew, +0 vectors** and the matrix covers all 85,990.  The two consequences worth
+**0 rows grew, +0 vectors** and the matrix covers all 85,993.  The two consequences worth
 remembering from when it did not:
 
 | vector | in the 10-10 grid? | therefore |
@@ -97,7 +97,7 @@ The remaining sentences are no longer a documentation problem: settled from
 recorded facts, they would be.  Grouped by the kind of question they are, and by
 the hardware-plan item that would settle each:
 
-Measured 2026-10-22: **703 distinct sentences, 929 occurrences** across the 541
+Measured 2026-10-22: **703 distinct sentences, 925 occurrences** across the 537
 rows that still carry the word.  An earlier version of this line said 786 and 1,048,
 from a keyword census that split sentences on the escaped newlines as if they were
 breaks; the tracked count above, which the drift check reads, is the one used here.
@@ -150,7 +150,7 @@ Boundary coverage of the required classes, as measured by `case_coverage.py`:
 |---|---|
 | before phase 4 | 398 |
 | per-format tables, f64 pairs, the full signed value space | 499 |
-| the atomic families, the `X0_16` false positive | 541 |
+| the atomic families, the `X0_16` false positive | 537 |
 | the immediate rows, the width-aware integer tables | 680 |
 | type-token selection, texture atomics, 64-bit integer compares | 710 |
 | the six-dword three-pair shape, the type union, pair low words | 753 |
@@ -178,7 +178,7 @@ hardware plan.
 
 `code/lg200/gpu/audit.py` reads the runner's own listings, not the source, so it audits
 the programs that were actually assembled.  Over a freshly regenerated corpus
-(`run_gpu.py --dry`, host only, 768 PASS / **85,990** rows in **54 s**; two runs, 53.7
+(`run_gpu.py --dry`, host only, 768 PASS / **85,993** rows in **54 s**; two runs, 53.7
 and 56.6, on 2026-10-13, replacing an earlier 23.4 s measurement taken before the 252
 rounding-mode cases were added) it reports **768
 programs audited, 0 refused, 0 problems**.
