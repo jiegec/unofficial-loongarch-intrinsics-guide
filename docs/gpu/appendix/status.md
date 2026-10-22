@@ -42,8 +42,8 @@ record.
 
 | measure | start | now |
 |---|---|---|
-| rows stating an `UNRESOLVED` | 711 | **551** |
-| distinct UNRESOLVED sentences | 872 | **711** (943 occurrences) |
+| rows stating an `UNRESOLVED` | 713 | **553** |
+| distinct UNRESOLVED sentences | 872 | **713** (945 occurrences) |
 | explicit placeholder bodies in `code/lg200` | 11 | **0** |
 
 ### The rules for citing evidence (2026-10-13)
@@ -97,19 +97,28 @@ The remaining sentences are no longer a documentation problem: settled from
 recorded facts, they would be.  Grouped by the kind of question they are, and by
 the hardware-plan item that would settle each:
 
-Measured 2026-10-13: **711 distinct sentences, 943 occurrences** across the 580
+Measured 2026-10-22: **713 distinct sentences, 945 occurrences** across the 553
 rows that still carry the word.  An earlier version of this line said 786 and 1,048,
 from a keyword census that split sentences on the escaped newlines as if they were
-breaks; the tracked count above, which the drift check reads, is the one used here,
-and the table below stays indicative because its kinds are assigned by first matching
-keyword.  The two definitions disagreeing inside one file is exactly the drift the
-check exists to catch, and it caught this one.
-rows that still carry the word.  The split below is by keyword with first-match, so
-the counts are indicative rather than exact - a sentence is attributed to the first
-kind it mentions - and the last row is what no keyword claimed.  Its 192 distinct
-sentences are one-off behavioural questions (a single encoding bit, whether a wrap
-carries, what a flag holds), which is why they are grouped rather than listed: they
-are the same kind of question as the rows above, answered one at a time.
+breaks; the tracked count above, which the drift check reads, is the one used here.
+
+This paragraph used to repeat half a sentence and carried a row count of 580 that no
+check read, both left behind by an earlier edit - the kind of damage a monitored
+figure prevents and an unmonitored one hides.
+
+The table below stays indicative because its kinds are assigned by first matching
+keyword: a sentence is attributed to the first kind it mentions, and the last row is
+what no keyword claimed - 227 occurrences of one-off behavioural questions (a single
+encoding bit, whether a wrap carries, what a flag holds), which is why they are
+grouped rather than listed.  They are the same kind of question as the rows above,
+answered one at a time.
+
+One question is shared rather than per-row and is deliberately not counted among
+these sentences: the **machine lane count**.  Sixteen `v_cmp` rows record that the
+destination holds one bit per lane, measured at 4, 8 and 16 lanes and narrowing to
+`(1<<lanes)-1`, and that the wave's own lane count is still not established.  No row
+can settle it - the lane-id read is observation-only - so it is tracked here instead
+of being repeated in sixteen descriptions as sixteen UNRESOLVEDs.
 
 | kind | occurrences | settled by |
 |---|---|---|
