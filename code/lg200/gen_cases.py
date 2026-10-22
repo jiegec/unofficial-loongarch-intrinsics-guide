@@ -436,6 +436,8 @@ def main() -> int:
             # v_mac_imm_f32 asks the same rounding question as v_mac_f32, and the same
             # construction separates a fused sum from a rounded product.  This row
             # carries no ftz, so the residual is a normal number either way.
+            # v_addc_u32 asks whether the incoming value is masked to 30 or 31 bits.            # A carry-in of zero makes the difference visible: bit 30 alone is carry 1            # under the 31-bit reading and 0 under the 30-bit one.
+            ("v_addc_u32", ("0x0 0x0 0x40000000", "0x0 0x0 0x80000000", "0x1 0x2 0x40000000")),
             # v_pack_imm_unorm16_f32 leaves the rounding of a non-representable value            # open.  0.25 x 65535 is 16383.75 and 0.125 x 65535 is 8191.875, so nearest            # rounding and truncation give different words; 1.5 is beyond the rail.
             ("v_pack_imm_unorm16_f32", ("0x3e800000 0x0", "0x3e000000 0x0", "0x3fc00000 0x0")),
             # The i16/u16 compares ask whether bits 31:16 enter.  For the signed rows a
