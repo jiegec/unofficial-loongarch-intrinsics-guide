@@ -413,6 +413,11 @@ def main() -> int:
             # zero result from a negative significand.
             # v_sub_f32 asks whether a denormal result can arise from normal operands; two
             # adjacent normals at the smallest magnitude differ by 2^-149, which is one.
+            # v_pack_u8_f32 asks how a source between zero and one maps, and whether a
+            # denormal flushes first.  0.5 returning 0 rules out half-up; 1.5 and
+            # 3.5 separate truncation from ties-to-even.
+            ("v_pack_u8_f32", ("0x3fc00000 0x0 0x0", "0x40600000 0x0 0x0",
+                              "0x1 0x0 0x0", "0x80000001 0x0 0x0")),
             ("v_sub_f32", ("0x800000 0x800001", "0x80800000 0x80800001",
                             "0x800000 0x7fffff")),
             ("v_ldexp_imm_f32", ("0x1 0x1e", "0x1 0xffffffe2", "0x1 0x0",
