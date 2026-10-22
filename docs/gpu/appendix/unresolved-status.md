@@ -47,15 +47,15 @@ operand either and still write it.
 
 | carrier | markers | note |
 |---|---|---|
-| `code/lg200-instructions.tsv` `description` cells | 737 rows | the authored source (`main.py` only reads it).  **553 as of 2026-10-13** - the snapshot above is kept, not rewritten; the drift check reads the later figure |
+| `code/lg200-instructions.tsv` `description` cells | 737 rows | the authored source (`main.py` only reads it).  **552 as of 2026-10-13** - the snapshot above is kept, not rewritten; the drift check reads the later figure |
 | `code/lg200/*.h` / `*.cpp` | 61 files, 68 occurrences | oracle headers and carrier notes.  **None of these is an independent claim.**  The explicit `[UNRESOLVED]` placeholder bodies are 0 (section 2b); every remaining occurrence is a POINTER - the observed-mode headers say in their own words that what the row leaves unresolved is stated in the tsv, e.g. `samp_c_d.h`: "What it established, and what it leaves UNRESOLVED, is stated in the `**Observed.**` and `**Boundaries.**` sections of this row in `code/lg200-instructions.tsv`".  So resolving the tsv rows resolves these, and no separate pass is needed. |
 | `docs/gpu/**` | ~40 | prose pages |
 | other (`DEVELOPMENT.md`, `main.py`, ...) | ~24 | - |
 
-Inside the 714 description cells there were **872 distinct UNRESOLVED sentences**
+Inside the 713 description cells there were **872 distinct UNRESOLVED sentences**
 (1,511 occurrences), i.e. the same unknown is restated on every family member it
 applies to.  Closing one sentence closes every row that carries it.  **As of
-2026-10-13 the same measure is 714 distinct sentences and 946 occurrences**,
+2026-10-13 the same measure is 713 distinct sentences and 945 occurrences**,
 counted by the tracked definition in `check_doc_numbers.py`; the earlier pair is
 kept because it is what the snapshot said, not because it is smaller.
 
@@ -66,7 +66,7 @@ kept because it is what the snapshot said, not because it is smaller.
 | 1 | "one bit per lane or a replicated all-ones value" | **71** | **hardware**: the `v_cmp_eq_i32` case set passes at 4, 8 **and** 16 lanes on the CS carrier, so the destination narrows to `(1<<lanes)-1` at each lane count; a replicated all-ones value would return `0xffffffff` everywhere and is excluded.  Consistent with the row's own header ("writes the lane mask") and with LCO's model (`lco_abi.h`: a lane-mask register is 32 bits, one register = one wave). | 2026-10-12 |
 | 2 | `INST_HI[15:0]` ("whose role is UNRESOLVED") | 49 | **static**: the field is the named operand `X0_16` (ISA layout).  Neither the closed producer nor any u-l-i-g case sets it: all ~350 `load.sm`/`store.sm` instances in the producer's own `ockl` bytecode carry no immediate operand, and every `load_sm_*` case passes a zero second input.  So it is present-but-unexercised; recorded as such rather than guessed. | 2026-10-12 |
 | 3 | "The destination word above bit 15 ... are UNRESOLVED" | **20** | **hardware**: the 16-bit compare case set passes unchanged at 4, 8, 16 and **32** lanes, and the 32-lane all-true expectation is `0xffffffff` - so bits above 15 carry lanes 16-31, they are not cleared. | 2026-10-12 |
-| 4 | "Whether a signalling NaN differs from a quiet NaN is UNRESOLVED" | **20** | **hardware**: +qNaN (`0x7fc00000`), +sNaN (`0x7f800001`) and -sNaN (`0xff800001`) take the identical branch - `v_cmp_lt_f32`/`v_cmp_o_f32` return 0, `v_cmp_u_f32` sets every lane - while a non-NaN operand takes the other branch.  Pinned as `CASE(snan, ...)` vectors in those three mnemonics; offline `make verify` passes (768 instructions, 20714 vectors). | 2026-10-12 |
+| 4 | "Whether a signalling NaN differs from a quiet NaN is UNRESOLVED" | **20** | **hardware**: +qNaN (`0x7fc00000`), +sNaN (`0x7f800001`) and -sNaN (`0xff800001`) take the identical branch - `v_cmp_lt_f32`/`v_cmp_o_f32` return 0, `v_cmp_u_f32` sets every lane - while a non-NaN operand takes the other branch.  Pinned as `CASE(snan, ...)` vectors in those three mnemonics; offline `make verify` passes (768 instructions, 20713 vectors). | 2026-10-12 |
 | 5 | "The values exercised at the operand width are UNRESOLVED" | **14** | **static**: the row's own vectors already carry the width extremes (`0xffffffff`, `0x80000000`/`0x7fffffff`, the u64 wrap); the exhaustive grid excludes `atomic_*` as side-effecting (`gen_cases.py`), so the coverage is the case list, not the grid. | 2026-10-12 |
 | 6 | "Lanes reaching one address are serialised in an undefined order; which intermediate value a lane observes is UNRESOLVED" | **20** | **by design + hardware**: the per-lane intermediate value is *architecturally undefined*, not merely unmeasured - the reference carrier leaves the returned old value unverified across lanes and compares only the post-atomic cell.  Measured: the same vectors pass unchanged at 1, 2, 4 and 8 colliding lanes. | 2026-10-12 |
 | 7 | "Whether a signalling NaN is quieted or raises a flag" | **30** | **hardware + ISA**: a compare yields a mask, not an FP value, and that mask is identical for sNaN and qNaN (measured); flag raising is *not observable* - no instruction reads the FP exception flags (`flag` only updates flag state, `getreg` reads environment registers). | 2026-10-12 |

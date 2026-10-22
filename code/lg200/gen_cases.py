@@ -406,6 +406,14 @@ def main() -> int:
             ("v_fcvt_f32_i32", (0x01000001, 0x01000003, 0xff000001,
                                0x02000002, 0xfe000002)),
             ("v_fcvt_f32_u32", (0x01000001, 0x01000003, 0x02000002)),
+            # v_ldexp_imm_f32 takes a full 32-bit INTEGER exponent, and its grid carries
+            # only the boundary exponents, so whether a denormal significand is
+            # flushed before scaling was untested.  Small positive and negative
+            # exponents separate the two readings; the last pair tests the sign of a
+            # zero result from a negative significand.
+            ("v_ldexp_imm_f32", ("0x1 0x1e", "0x1 0xffffffe2", "0x1 0x0",
+                                  "0x3f800000 0x1e", "0x3f800000 0xffffffe2",
+                                  "0xbf800000 0xff7fffff")),
     ):
         for a in vals:
             src = a if isinstance(a, str) else hex(a)
