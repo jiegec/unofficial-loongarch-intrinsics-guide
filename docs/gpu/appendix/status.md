@@ -6,7 +6,7 @@ the pages linked from each row; this page is the index.
 
 Verified together on 2026-10-12: chapter invariants hold (`check_gpu.py`: 768
 rows, 12 formats, 7 families, 33 state blocks), the table is intact (768 rows, 23
-columns, unique), the offline oracle passes (**768 instructions, 85,936
+columns, unique), the offline oracle passes (**768 instructions, 85,984
 vectors**), and the hardware runner builds.
 
 ## Phase 1 - the PS/CS carrier
@@ -52,7 +52,7 @@ Before a clause is settled by "hardware", answer three questions, all of them
 mechanically checkable with case_provenance.py:
 
 1. **Was it executed?**  As of the 2026-10-22 full PS run, yes for the whole grid: one
-   process, one session, all 85,936 vectors in 79.5 s.  Before that run the answer
+   process, one session, all 85,984 vectors in 79.5 s.  Before that run the answer
    depended on the vector - the 10-13 regeneration added up to 62,957 vectors that were
    oracle expectation only - so a clause settled in that window had to name the grid it
    rested on.
@@ -83,7 +83,7 @@ for a while that was a real gap: at its worst the check reported **457 rows grew
 +62,957 vectors, about three quarters of the current grid**.  The **2026-10-22 full PS
 run** closed it - one process, one session, 768 rows in 79.5 s, 80,887 passes and the 11
 documented `v_mbcnt_u32` divergences - so the same check now reports
-**0 rows grew, +0 vectors** and the matrix covers all 85,936.  The two consequences worth
+**0 rows grew, +0 vectors** and the matrix covers all 85,984.  The two consequences worth
 remembering from when it did not:
 
 | vector | in the 10-10 grid? | therefore |
@@ -178,7 +178,7 @@ hardware plan.
 
 `code/lg200/gpu/audit.py` reads the runner's own listings, not the source, so it audits
 the programs that were actually assembled.  Over a freshly regenerated corpus
-(`run_gpu.py --dry`, host only, 768 PASS / **85,936** rows in **54 s**; two runs, 53.7
+(`run_gpu.py --dry`, host only, 768 PASS / **85,984** rows in **54 s**; two runs, 53.7
 and 56.6, on 2026-10-13, replacing an earlier 23.4 s measurement taken before the 252
 rounding-mode cases were added) it reports **768
 programs audited, 0 refused, 0 problems**.

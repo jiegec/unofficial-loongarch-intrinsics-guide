@@ -436,6 +436,26 @@ def main() -> int:
             # v_mac_imm_f32 asks the same rounding question as v_mac_f32, and the same
             # construction separates a fused sum from a rounded product.  This row
             # carries no ftz, so the residual is a normal number either way.
+            # f16 compares read the low half only, as the oracle comment says.  Putting a
+            # qNaN in bits 31:16 above an ordinary value means the ordered predicates
+            # must follow the low half; the second vector makes the low half an
+            # infinity so the direction of the comparison is exercised too.
+            ("v_cmp_eq_f16", ("0x7c003c00 0x3c00", "0x7c007c00 0x7c00", "0x00003c00 0x3c00")),
+            ("v_cmp_f_f16", ("0x7c003c00 0x3c00", "0x7c007c00 0x7c00", "0x00003c00 0x3c00")),
+            ("v_cmp_ge_f16", ("0x7c003c00 0x3c00", "0x7c007c00 0x7c00", "0x00003c00 0x3c00")),
+            ("v_cmp_gt_f16", ("0x7c003c00 0x3c00", "0x7c007c00 0x7c00", "0x00003c00 0x3c00")),
+            ("v_cmp_le_f16", ("0x7c003c00 0x3c00", "0x7c007c00 0x7c00", "0x00003c00 0x3c00")),
+            ("v_cmp_lg_f16", ("0x7c003c00 0x3c00", "0x7c007c00 0x7c00", "0x00003c00 0x3c00")),
+            ("v_cmp_lt_f16", ("0x7c003c00 0x3c00", "0x7c007c00 0x7c00", "0x00003c00 0x3c00")),
+            ("v_cmp_neq_f16", ("0x7c003c00 0x3c00", "0x7c007c00 0x7c00", "0x00003c00 0x3c00")),
+            ("v_cmp_nge_f16", ("0x7c003c00 0x3c00", "0x7c007c00 0x7c00", "0x00003c00 0x3c00")),
+            ("v_cmp_ngt_f16", ("0x7c003c00 0x3c00", "0x7c007c00 0x7c00", "0x00003c00 0x3c00")),
+            ("v_cmp_nle_f16", ("0x7c003c00 0x3c00", "0x7c007c00 0x7c00", "0x00003c00 0x3c00")),
+            ("v_cmp_nlg_f16", ("0x7c003c00 0x3c00", "0x7c007c00 0x7c00", "0x00003c00 0x3c00")),
+            ("v_cmp_nlt_f16", ("0x7c003c00 0x3c00", "0x7c007c00 0x7c00", "0x00003c00 0x3c00")),
+            ("v_cmp_o_f16", ("0x7c003c00 0x3c00", "0x7c007c00 0x7c00", "0x00003c00 0x3c00")),
+            ("v_cmp_tru_f16", ("0x7c003c00 0x3c00", "0x7c007c00 0x7c00", "0x00003c00 0x3c00")),
+            ("v_cmp_u_f16", ("0x7c003c00 0x3c00", "0x7c007c00 0x7c00", "0x00003c00 0x3c00")),
             ("v_mac_imm_f32", ("0x3f800001 0x3f800001 0xbf800002",)),
             ("v_fma_legacy_f32", ("0x3f800000 0x3f800000 0x33800000",
                                     "0x40000000 0x3f800000 0x34000000",
