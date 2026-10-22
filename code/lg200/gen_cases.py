@@ -436,6 +436,17 @@ def main() -> int:
             # v_mac_imm_f32 asks the same rounding question as v_mac_f32, and the same
             # construction separates a fused sum from a rounded product.  This row
             # carries no ftz, so the residual is a normal number either way.
+            # The i16/u16 compares ask whether bits 31:16 enter.  For the signed rows a
+            # junk high half above 0x8000 keeps the low half at -32768, so a
+            # word-level compare of the same junk would answer the other way.
+            ("v_cmp_lt_i16", ("0x12348000 0x0",)),
+            ("v_cmp_le_i16", ("0x12348000 0x0",)),
+            ("v_cmp_lg_i16", ("0x12348000 0x0",)),
+            # For the unsigned rows the low half is a small number under a high half
+            # that makes the whole word huge, which reverses a word-level compare.
+            ("v_cmp_lt_u16", ("0xffff0001 0x2",)),
+            ("v_cmp_le_u16", ("0xffff0001 0x2",)),
+            ("v_cmp_lg_u16", ("0xffff0001 0x2",)),
             # v_cmp_imm_u_f16 is the unordered predicate, so a NaN stacked in bits 31:16            # would make it TRUE where an ordered row would go false.  The two-word form            # puts the value in the low half and the NaN above it.
             ("v_cmp_imm_u_f16", ("0x7c003c00 0x3c00", "0x7c007c00 0x7c00", "0x00003c00 0x3c00")),
             # v_sub_imm_f32 and v_subrev_imm_f32 both leave the denormal operand, the denormal            # difference and an infinity literal open.  Two adjacent normals at the smallest            # magnitude differ by 2^-149, which is a denormal, so the flush shows on both sides;            # the infinity literal fixes which operand the direction is taken from.
