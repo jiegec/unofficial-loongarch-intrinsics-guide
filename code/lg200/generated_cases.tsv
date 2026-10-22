@@ -81369,6 +81369,12 @@ v_fcvt_f32_i32	rtne|daz|ftz	0xfe000002	0xcbffffff
 v_fcvt_f32_u32	rtne|daz|ftz	0x1000001	0x4b800000
 v_fcvt_f32_u32	rtne|daz|ftz	0x1000003	0x4b800002
 v_fcvt_f32_u32	rtne|daz|ftz	0x2000002	0x4c000000
+v_sub_imm_f32	rtne|daz|ftz	0x800001 0x800000	0x00000000
+v_sub_imm_f32	rtne|daz|ftz	0x1 0x0	0x00000000
+v_sub_imm_f32	rtne|daz|ftz	0x3f800000 0x7f800000	0xff800000
+v_subrev_imm_f32	rtne|daz|ftz	0x800001 0x800000	0x80000000
+v_subrev_imm_f32	rtne|daz|ftz	0x1 0x0	0x00000000
+v_subrev_imm_f32	rtne|daz|ftz	0x3f800000 0x7f800000	0x7f800000
 v_cmp_eq_f16	rtne|daz|ftz	0x7c003c00 0x3c00	0x0000ffff
 v_cmp_eq_f16	rtne|daz|ftz	0x7c007c00 0x7c00	0x0000ffff
 v_cmp_eq_f16	rtne|daz|ftz	0x00003c00 0x3c00	0x0000ffff

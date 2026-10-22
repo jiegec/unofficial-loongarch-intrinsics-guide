@@ -436,6 +436,9 @@ def main() -> int:
             # v_mac_imm_f32 asks the same rounding question as v_mac_f32, and the same
             # construction separates a fused sum from a rounded product.  This row
             # carries no ftz, so the residual is a normal number either way.
+            # v_sub_imm_f32 and v_subrev_imm_f32 both leave the denormal operand, the denormal            # difference and an infinity literal open.  Two adjacent normals at the smallest            # magnitude differ by 2^-149, which is a denormal, so the flush shows on both sides;            # the infinity literal fixes which operand the direction is taken from.
+            ("v_sub_imm_f32", ("0x800001 0x800000", "0x1 0x0", "0x3f800000 0x7f800000")),
+            ("v_subrev_imm_f32", ("0x800001 0x800000", "0x1 0x0", "0x3f800000 0x7f800000")),
             # f16 compares read the low half only, as the oracle comment says.  Putting a
             # qNaN in bits 31:16 above an ordinary value means the ordered predicates
             # must follow the low half; the second vector makes the low half an
