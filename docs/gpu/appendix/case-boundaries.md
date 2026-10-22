@@ -52,7 +52,7 @@ Parse through `cases.py` instead of counting a file.
 
 **The split, measured independently (2026-10-22).**  A count that does not use the parser
 agrees with it exactly: 4,540 hand-written `CASE`/`CASE_FP` lines across the 768 `.cpp`
-files plus 81,384 rows in `generated_cases.tsv` is 85,924, which is what `parse_case_files`
+files plus 81,391 rows in `generated_cases.tsv` is 85,931, which is what `parse_case_files`
 returns.  So the merge is complete, and that is worth stating because the sum is the only
 thing here that does not depend on the parser being right.
 

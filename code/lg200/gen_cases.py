@@ -416,6 +416,22 @@ def main() -> int:
             # v_pack_u8_f32 asks how a source between zero and one maps, and whether a
             # denormal flushes first.  0.5 returning 0 rules out half-up; 1.5 and
             # 3.5 separate truncation from ties-to-even.
+            # v_fma_f32 and v_fma_f64 both leave the tie-break open, and an exact halfway
+            # result needs a constructible one: a*b exact and c half an ulp of it.
+            # 1.0*1.0 + 2^-24 lands exactly between 1.0 and 1.0+2^-23, and the 2.0
+            # pair does the same at a wider ulp; the third case is the negative
+            # half, so the tie-break is read from both sides of zero.
+            # Cancellation: the product is 1+2^-23 and c removes its leading bits,
+            # so the exact result is the 2^-23 residual that a multiply-then-add
+            # would have rounded away to zero.  This is the shape that separates a
+            # fused operation from two.
+            ("v_fma_f32", ("0x3f800001 0x3f800000 0xbf800000",)),
+            ("v_fma_f64", ("0x1 0x3ff00000 0x0 0x3ff00000 0x0 0xbff00000",)),
+            ("v_fma_f32", ("0x3f800000 0x3f800000 0x33800000",
+                            "0x40000000 0x3f800000 0x34000000",
+                            "0x3f800000 0x3f800000 0xb3800000")),
+            ("v_fma_f64", ("0x0 0x3ff00000 0x0 0x3ff00000 0x0 0x3ca00000",
+                            "0x0 0x40000000 0x0 0x3ff00000 0x0 0x3cb00000")),
             ("v_pack_u8_f32", ("0x3fc00000 0x0 0x0", "0x40600000 0x0 0x0",
                               "0x1 0x0 0x0", "0x80000001 0x0 0x0")),
             ("v_sub_f32", ("0x800000 0x800001", "0x80800000 0x80800001",
