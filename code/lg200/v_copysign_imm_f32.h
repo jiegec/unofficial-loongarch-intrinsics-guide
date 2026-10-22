@@ -1,4 +1,4 @@
-// v_copysign_imm_f32 -- Copies the sign of the literal onto an f32 magnitude: `d = copysign(a, imm)`.
+// v_copysign_imm_f32 -- Takes the magnitude from the literal and the sign from the register source: `d = copysign(imm, a)`.
 //
 
 // [HW 2026-10-13] the same flushes as v_copysign_f32: both operands and the result, with

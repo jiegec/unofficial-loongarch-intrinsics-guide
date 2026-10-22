@@ -42,8 +42,8 @@ record.
 
 | measure | start | now |
 |---|---|---|
-| rows stating an `UNRESOLVED` | 706 | **549** |
-| distinct UNRESOLVED sentences | 872 | **706** (938 occurrences) |
+| rows stating an `UNRESOLVED` | 705 | **549** |
+| distinct UNRESOLVED sentences | 872 | **705** (937 occurrences) |
 | explicit placeholder bodies in `code/lg200` | 11 | **0** |
 
 ### The rules for citing evidence (2026-10-13)
@@ -97,7 +97,7 @@ The remaining sentences are no longer a documentation problem: settled from
 recorded facts, they would be.  Grouped by the kind of question they are, and by
 the hardware-plan item that would settle each:
 
-Measured 2026-10-22: **706 distinct sentences, 938 occurrences** across the 549
+Measured 2026-10-22: **705 distinct sentences, 937 occurrences** across the 549
 rows that still carry the word.  An earlier version of this line said 786 and 1,048,
 from a keyword census that split sentences on the escaped newlines as if they were
 breaks; the tracked count above, which the drift check reads, is the one used here.
