@@ -411,6 +411,10 @@ def main() -> int:
             # flushed before scaling was untested.  Small positive and negative
             # exponents separate the two readings; the last pair tests the sign of a
             # zero result from a negative significand.
+            # v_sub_f32 asks whether a denormal result can arise from normal operands; two
+            # adjacent normals at the smallest magnitude differ by 2^-149, which is one.
+            ("v_sub_f32", ("0x800000 0x800001", "0x80800000 0x80800001",
+                            "0x800000 0x7fffff")),
             ("v_ldexp_imm_f32", ("0x1 0x1e", "0x1 0xffffffe2", "0x1 0x0",
                                   "0x3f800000 0x1e", "0x3f800000 0xffffffe2",
                                   "0xbf800000 0xff7fffff")),
