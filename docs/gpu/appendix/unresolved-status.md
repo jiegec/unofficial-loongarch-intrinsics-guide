@@ -158,7 +158,7 @@ an ISA question, and it is recorded here so the item is not left implicit.
 
 Still open in the code layer: `load_sm_matrix_x{1,2,4}` (plane/lane layout) and
 `load_v_buff_fmt*` / `store_v_buff_fmt*` (descriptor format decode), 19 lines
-in total.  Offline `make verify` passes throughout (768 instructions, 20732
+in total.  Offline `make verify` passes throughout (768 instructions, 85,920
 vectors).
 
 ## 3. Editing rules used
@@ -178,7 +178,7 @@ vectors).
 
 ## 5. Remaining
 
-The rest of the 872 sentences are grouped by family in the accompanying
+The rest of the 713 sentences are grouped by family in the accompanying
 inventory (loonggpu `tmp/unresolved-inventory.tsv`).  The largest repeated
 classes still open are: signalling-vs-quiet NaN, buffer/texel descriptor
 format decode, out-of-bounds access behaviour, operand-width extremes, and

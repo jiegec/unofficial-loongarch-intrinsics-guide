@@ -97,6 +97,11 @@ def main() -> int:
         # gen_cases.targets() is the row set the boundary grid is built for.  The
         # page states its size, so it is read from the generator rather than typed.
         'targets': len(gen_cases.targets()),
+        # Prose figures nothing watched until 2026-10-22: the vector total was stated in
+        # plain text on two pages and the split as an independent sum on a third.
+        'generated-rows': len((ROOT / 'generated_cases.tsv').read_text().splitlines()),
+        'hand-cases': sum(len(re.findall(r'^\s*CASE(?:_FP)?\(', f.read_text(), re.M))
+                           for f in sorted(ROOT.glob('*.cpp'))),
     }
     checks = [
         ('unresolved.md', r'([0-9]+) of the 768', 'rows-unresolved'),
@@ -118,6 +123,11 @@ def main() -> int:
                                 r'\*\*launch-shape\*\*', 'launch-shape'),
         ('unresolved-status.md', r'\*\*([0-9]+) as of 2026-10-13\*\*', 'rows-unresolved'),
         ('unresolved-status.md', r'is ([0-9]+) distinct sentences', 'sentences'),
+        ('unresolved-status.md', r'The rest of the ([0-9]+) sentences', 'sentences'),
+        ('status.md', r'oracle passes \(\*\*768 instructions, ([0-9,]+)', 'vectors'),
+        ('unresolved-status.md', r'passes throughout \(768 instructions, ([0-9,]+)', 'vectors'),
+        ('case-boundaries.md', r'files plus ([0-9,]+) rows in `generated_cases.tsv`', 'generated-rows'),
+        ('case-boundaries.md', r'([0-9,]+) hand-written `CASE`', 'hand-cases'),
         ('unresolved-status.md', r'distinct sentences and ([0-9,]+) occurrences', 'occurrences'),
     ]
     bad = 0

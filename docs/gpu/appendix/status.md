@@ -6,7 +6,7 @@ the pages linked from each row; this page is the index.
 
 Verified together on 2026-10-12: chapter invariants hold (`check_gpu.py`: 768
 rows, 12 formats, 7 families, 33 state blocks), the table is intact (768 rows, 23
-columns, unique), the offline oracle passes (**768 instructions, 83,253
+columns, unique), the offline oracle passes (**768 instructions, 85,920
 vectors**), and the hardware runner builds.
 
 ## Phase 1 - the PS/CS carrier
