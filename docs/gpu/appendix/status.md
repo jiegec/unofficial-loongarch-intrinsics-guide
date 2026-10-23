@@ -42,8 +42,8 @@ record.
 
 | measure | start | now |
 |---|---|---|
-| rows stating an `UNRESOLVED` | 697 | **526** |
-| distinct UNRESOLVED sentences | 872 | **697** (923 occurrences) |
+| rows stating an `UNRESOLVED` | 695 | **525** |
+| distinct UNRESOLVED sentences | 872 | **695** (921 occurrences) |
 | explicit placeholder bodies in `code/lg200` | 11 | **0** |
 
 ### The rules for citing evidence (2026-10-13)
@@ -97,7 +97,7 @@ The remaining sentences are no longer a documentation problem: settled from
 recorded facts, they would be.  Grouped by the kind of question they are, and by
 the hardware-plan item that would settle each:
 
-Measured 2026-10-22: **697 distinct sentences, 923 occurrences** across the 526
+Measured 2026-10-22: **695 distinct sentences, 921 occurrences** across the 525
 rows that still carry the word.  An earlier version of this line said 786 and 1,048,
 from a keyword census that split sentences on the escaped newlines as if they were
 breaks; the tracked count above, which the drift check reads, is the one used here.
@@ -150,7 +150,7 @@ Boundary coverage of the required classes, as measured by `case_coverage.py`:
 |---|---|
 | before phase 4 | 398 |
 | per-format tables, f64 pairs, the full signed value space | 499 |
-| the atomic families, the `X0_16` false positive | 526 |
+| the atomic families, the `X0_16` false positive | 525 |
 | the immediate rows, the width-aware integer tables | 680 |
 | type-token selection, texture atomics, 64-bit integer compares | 710 |
 | the six-dword three-pair shape, the type union, pair low words | 753 |
