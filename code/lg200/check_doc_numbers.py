@@ -76,6 +76,33 @@ def run(script, cwd):
     return p.stdout + p.stderr
 
 
+
+WHY = ('no case', 'no vector', 'cannot', 'not observable', 'carrier', 'not reachable',
+       'observation-only', 'launch state', 'encoding', 'not settable', 'no experiment',
+       'the protocol', 'not answerable', 'does not stage', 'decoder census',
+       'decoder should reject', 'belong to the launch', 'reaches that address',
+       'pair base of its own', 'are not staged', 'no vector varies them',
+       'answers rather than a run', 'reports a flag')
+
+
+def explained_rows():
+    """Rows whose every UNRESOLVED sentence states a reason, in itself or the next one."""
+    total = 0
+    path = TSV
+    for row in csv.DictReader(open(path), delimiter=chr(9)):
+        text = row['description'].replace(chr(92) + 'n', ' ')
+        sents = [s.strip() for s in re.split(r'(?<=[.])\s+', text) if s.strip()]
+
+        def why(s):
+            return any(w in s.lower() for w in WHY)
+        bare = [s for i, s in enumerate(sents)
+                if 'UNRESOLVED' in s and not why(s)
+                and not (i + 1 < len(sents) and why(sents[i + 1]))]
+        if any('UNRESOLVED' in s for s in sents) and not bare:
+            total += 1
+    return total
+
+
 def main() -> int:
     rows, sents, occ = unresolved_counts()
     cov = run('case_coverage.py', ROOT)
@@ -100,6 +127,11 @@ def main() -> int:
         # Prose figures nothing watched until 2026-10-22: the vector total was stated in
         # plain text on two pages and the split as an independent sum on a third.
         'generated-rows': len((ROOT / 'generated_cases.tsv').read_text().splitlines()),
+        # A row whose every open clause names the layer that cannot settle it is
+        # explained even though it is not resolved.  This is the number the
+        # campaign's objective turns on now, so it is read from the table rather
+        # than typed into prose.
+        'explained-rows': explained_rows(),
         'hand-cases': sum(len(re.findall(r'^\s*CASE(?:_FP)?\(', f.read_text(), re.M))
                            for f in sorted(ROOT.glob('*.cpp'))),
     }
@@ -107,6 +139,7 @@ def main() -> int:
         ('unresolved.md', r'([0-9]+) of the 768', 'rows-unresolved'),
         ('status.md', r'\\?\| rows stating an .UNRESOLVED. \| [0-9]+ \| \*\*([0-9]+)\*\*', 'rows-unresolved'),
         ('status.md', r'distinct UNRESOLVED sentences \| [0-9]+ \| \*\*([0-9]+)\*\*', 'sentences'),
+        ('status.md', r'rows whose every open clause states a reason \| \u2014 \| \*\*([0-9]+)\*\*', 'explained-rows'),
         # The pattern used to be (1,[0-9]+), which assumed a thousands separator and
         # could not match once the count fell below a thousand on 2026-10-13.  The
         # status.md copy and the unresolved-status.md one now accept both forms.
