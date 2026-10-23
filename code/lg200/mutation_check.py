@@ -25,7 +25,7 @@ so it could not fail on an over-claim, which is the defect it exists to find.
 
 THE ELEVEN GATES, ACCOUNTED FOR (2026-10-13):
 
-  proven in this tool (27): set_desc, check_doc_numbers, header_sync, check_gpu,
+  proven in this tool (28): set_desc, check_doc_numbers, header_sync, check_gpu,
                             run_cases, format_audit, bench_doc_check,
                             rule_dupe_check, md_table_check, check_all.sh,
                             fp_mode_audit, case_provenance, addr_scan, gate_check,
@@ -154,6 +154,7 @@ def suite_accounting():
     accounted |= {"audit", "enc_probe"}
     # The count in the prose is a number in prose, and it drifted while it was updated
     # by hand.  It is compared with the table now.
+    bad = 0
     mc = pathlib.Path(__file__).read_text(encoding="utf-8")
     said = re.search(r"proven in this tool [(]([0-9]+)[)]", mc)
     if said and int(said.group(1)) != len(CASES):
@@ -295,7 +296,22 @@ def mutate_observe_reason(text):
     return text.replace('read input-plane values', 'read the values', 1)
 
 
+
+
+def mutate_coverage_claim(text):
+    """Restore a clause that claims a value is untested while its own cases carry it.
+
+    The original sentence said the multiplicand 0x80000000 was untested, and six of the row's
+    own vectors exercise exactly that value.  Turning the settled sentence back into the claim is
+    the defect coverage_claims.py exists to catch.
+    """
+    return text.replace(
+        'Whether the wrap interacts with the addend near the 2^32 boundary stays UNRESOLVED.',
+        'Whether a multiplicand of 0x80000000 is special is UNRESOLVED, because no case covers it.', 1)
 CASES = [
+    ("coverage_claims.py", "code/lg200-instructions.tsv", mutate_coverage_claim,
+     "python3 code/lg200/coverage_claims.py"),
+
     ("set_desc.py --check", "code/lg200-instructions.tsv", mutate_tsv,
      "cd code/lg200 && python3 set_desc.py --check"),
     ("check_doc_numbers.py", "docs/gpu/appendix/status.md", mutate_doc,
