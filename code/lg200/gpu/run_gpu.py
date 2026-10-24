@@ -292,7 +292,8 @@ def run_batch(mnemonics, by, dry, timeout_s, env=None):
 # multiply a hardware campaign that costs a cold boot per fault for one number.
 # v_cmp_eq_f32 and v_cmpclass_f32 add a mixed and a partly-set case.
 LANE_MASK_PROBES = ("v_cmp_tru_f32", "v_cmp_f_f32", "v_cmp_eq_f32",
-                    "v_cmpclass_f32")
+                    "v_cmpclass_f32", "v_cmp_eq_i32", "v_cmp_eq_u32",
+                    "v_cmp_f_i32", "v_cmp_gt_u64")
 
 
 def lane_sensitive(universe) -> list:
