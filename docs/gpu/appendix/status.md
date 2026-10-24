@@ -42,9 +42,9 @@ record.
 
 | measure | start | now |
 |---|---|---|
-| rows stating an `UNRESOLVED` | 675 | **509** |
-| distinct UNRESOLVED sentences | 872 | **675** (914 occurrences) |
-| rows whose every open clause states a reason | — | **416** |
+| rows stating an `UNRESOLVED` | 673 | **509** |
+| distinct UNRESOLVED sentences | 872 | **673** (912 occurrences) |
+| rows whose every open clause states a reason | — | **418** |
 | explicit placeholder bodies in `code/lg200` | 11 | **0** |
 
 ### The rules for citing evidence (2026-10-13)
@@ -98,7 +98,7 @@ The remaining sentences are no longer a documentation problem: settled from
 recorded facts, they would be.  Grouped by the kind of question they are, and by
 the hardware-plan item that would settle each:
 
-Measured 2026-10-22: **675 distinct sentences, 914 occurrences** across the 509
+Measured 2026-10-22: **673 distinct sentences, 912 occurrences** across the 509
 rows that still carry the word.  An earlier version of this line said 786 and 1,048,
 from a keyword census that split sentences on the escaped newlines as if they were
 breaks; the tracked count above, which the drift check reads, is the one used here.
@@ -152,7 +152,7 @@ Boundary coverage of the required classes, as measured by `case_coverage.py`:
 | before phase 4 | 398 |
 | per-format tables, f64 pairs, the full signed value space | 499 |
 | the atomic families, the `X0_16` false positive | 509 |
-| the immediate rows, the width-aware integer tables | 675 |
+| the immediate rows, the width-aware integer tables | 673 |
 | type-token selection, texture atomics, 64-bit integer compares | 710 |
 | the six-dword three-pair shape, the type union, pair low words | 753 |
 | the sub-word loads | 765 |
