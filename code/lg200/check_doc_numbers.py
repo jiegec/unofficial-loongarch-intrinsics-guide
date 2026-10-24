@@ -82,7 +82,7 @@ WHY = ('no case', 'no vector', 'cannot', 'not observable', 'carrier', 'not reach
        'the protocol', 'not answerable', 'does not stage', 'decoder census',
        'decoder should reject', 'belong to the launch', 'reaches that address',
        'pair base of its own', 'are not staged', 'no vector varies them',
-       'answers rather than a run', 'reports a flag')
+       'answers rather than a run', 'reports a flag', 'case protocol')
 
 
 def explained_rows():
