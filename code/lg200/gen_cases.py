@@ -436,6 +436,9 @@ def main() -> int:
             # v_mac_imm_f32 asks the same rounding question as v_mac_f32, and the same
             # construction separates a fused sum from a rounded product.  This row
             # carries no ftz, so the residual is a normal number either way.
+            # v_mad_u32 asks whether the wrap interacts with the addend near the
+            # 2^32 boundary: 0xffffffff times one plus one crosses it exactly.
+            ("v_mad_u32", ("0xffffffff 0x1 0x1", "0x2 0x80000000 0x1", "0x1 0xffffffff 0xffffffff")),
             # The two fp-to-int rows ask what happens at a tie that also sits on the clamp
             # boundary, and what a negative fraction between -1 and 0 gives.
             ("v_fcvt_i32_f64", ("0xffe00000 0x41dfffff", "0x0 0xbfe00000")),
