@@ -82,7 +82,11 @@ WHY = ('no case', 'no vector', 'cannot', 'not observable', 'carrier', 'not reach
        'the protocol', 'not answerable', 'does not stage', 'decoder census',
        'decoder should reject', 'belong to the launch', 'reaches that address',
        'pair base of its own', 'are not staged', 'no vector varies them',
-       'answers rather than a run', 'reports a flag', 'case protocol')
+       'answers rather than a run', 'reports a flag', 'case protocol',
+       'not settled by running it', 'records behaviour without deciding',
+       'nothing observable reports', 'not something a vector',
+       'carries a prefix across', 'a partial fault is not something',
+       'offsets and the sampled state')
 
 
 def explained_rows():
