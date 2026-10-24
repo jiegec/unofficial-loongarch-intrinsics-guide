@@ -44,7 +44,7 @@ record.
 |---|---|---|
 | rows stating an `UNRESOLVED` | 668 | **505** |
 | distinct UNRESOLVED sentences | 872 | **668** (907 occurrences) |
-| rows whose every open clause states a reason | — | **452** |
+| rows whose every open clause states a reason | — | **459** |
 | explicit placeholder bodies in `code/lg200` | 11 | **0** |
 
 ### The rules for citing evidence (2026-10-13)
