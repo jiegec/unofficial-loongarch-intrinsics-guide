@@ -42,9 +42,9 @@ record.
 
 | measure | start | now |
 |---|---|---|
-| rows stating an `UNRESOLVED` | 668 | **506** |
-| distinct UNRESOLVED sentences | 872 | **668** (907 occurrences) |
-| rows whose every open clause states a reason | — | **443** |
+| rows stating an `UNRESOLVED` | 667 | **505** |
+| distinct UNRESOLVED sentences | 872 | **667** (906 occurrences) |
+| rows whose every open clause states a reason | — | **444** |
 | explicit placeholder bodies in `code/lg200` | 11 | **0** |
 
 ### The rules for citing evidence (2026-10-13)
@@ -75,7 +75,7 @@ UNRESOLVED, and says which of the three it is missing.
 `case_provenance.py` answers this mechanically.  The hardware matrix records a
 per-row row count, and comparing it with the grid shows how much has been added since.
 The measured baseline is pinned by the matrix itself rather than by a date:
-`v_add_f32` row says row=111 with detail `PASS gen2506`, and the 10-10 grid
+`v_add_f32` row says row=111 with detail `PASS gen2505`, and the 10-10 grid
 (`4f26f81`, 18,542 vectors) carries 11 hand cases plus 100 generated vectors for that
 row - 111.  The matrix measured THAT grid.
 
@@ -98,7 +98,7 @@ The remaining sentences are no longer a documentation problem: settled from
 recorded facts, they would be.  Grouped by the kind of question they are, and by
 the hardware-plan item that would settle each:
 
-Measured 2026-10-22: **668 distinct sentences, 907 occurrences** across the 506
+Measured 2026-10-22: **667 distinct sentences, 906 occurrences** across the 505
 rows that still carry the word.  An earlier version of this line said 786 and 1,048,
 from a keyword census that split sentences on the escaped newlines as if they were
 breaks; the tracked count above, which the drift check reads, is the one used here.
@@ -151,8 +151,8 @@ Boundary coverage of the required classes, as measured by `case_coverage.py`:
 |---|---|
 | before phase 4 | 398 |
 | per-format tables, f64 pairs, the full signed value space | 499 |
-| the atomic families, the `X0_16` false positive | 506 |
-| the immediate rows, the width-aware integer tables | 668 |
+| the atomic families, the `X0_16` false positive | 505 |
+| the immediate rows, the width-aware integer tables | 667 |
 | type-token selection, texture atomics, 64-bit integer compares | 710 |
 | the six-dword three-pair shape, the type union, pair low words | 753 |
 | the sub-word loads | 765 |

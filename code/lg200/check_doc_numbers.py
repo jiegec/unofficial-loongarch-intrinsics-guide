@@ -86,7 +86,7 @@ WHY = ('no case', 'no vector', 'cannot', 'not observable', 'carrier', 'not reach
        'not settled by running it', 'records behaviour without deciding',
        'nothing observable reports', 'not something a vector',
        'carries a prefix across', 'a partial fault is not something',
-       'offsets and the sampled state')
+       'offsets and the sampled state', 'not derivable', 'depends on the format')
 
 
 def explained_rows():
