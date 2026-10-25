@@ -9,3 +9,5 @@
 - `code/untest.py`: list untested intrinsics.
 - `code/gen_measure.py`: generate `measure.h` to measure latency and throughput of instructions.
 - `code/Makefile`: use `make run` to validate C implementations against hardware, use `make run-measure` to measure latency and throughput.
+- `docs/diagram/gen.py`: generate the per-instruction SVG diagrams in `docs/diagram/`.
+- `tools/verify_diagrams.py`: check every diagram against the reference implementation in `code/` (needs a host C++ compiler). Run `python3 tools/verify_diagrams.py` to check all diagrams, or pass diagram names to check a subset.

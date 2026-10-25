@@ -2153,6 +2153,10 @@ Other `imm` encodings raise an INE exception.
 
     def lasx_128_lane_doc(entry):
         ret, name, args, desc, operation, body = entry
+        diagram = ""
+        diagram_name = name.lstrip("_")
+        if os.path.exists(f"docs/diagram/{diagram_name}.svg"):
+            diagram = f"![](../diagram/{diagram_name}.svg)"
         return f"""
 ## {ret} {name} ({args})
 
@@ -2168,6 +2172,8 @@ CPU Flags: LASX
 ### Description
 
 {desc}
+
+{diagram}
 
 This helper intrinsic does not name a distinct LASX instruction. Depending on the operation and optimization, it may lower to a no-op, a register move, or an existing LASX permutation instruction such as `xvpermi.q`.
 

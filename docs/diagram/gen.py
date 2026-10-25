@@ -7,6 +7,8 @@ row_space = 100
 index_x = 20
 arg_x = 100
 desc_y_off = 15
+WIDTH = {"b": 8, "bu": 8, "h": 16, "hu": 16, "w": 32, "wu": 32, "d": 64, "du": 64, "q": 128, "qu": 128}
+
 element_x = 10
 element_x_unit = 2
 col_space = -1
@@ -57,7 +59,7 @@ def add_note(f, text, y=28):
     print(f'<text x="10" y="{y}" font-family="monospace">{text}</text>', file=f)
 
 
-def add_box(f, arg, desc, indices=None, el=None, indicator=None):
+def add_box(f, arg, desc, indices=None, el=None, indicator=None, count=None, fills=None):
     global col_index
     if el is not None:
         saved_elen = elen
@@ -75,10 +77,12 @@ def add_box(f, arg, desc, indices=None, el=None, indicator=None):
         file=f,
     )
     # add element rects
-    for i in range(vlen // elen):
+    n_el = count if count is not None else vlen // elen
+    for i in range(n_el):
         per_element_x = element_x_unit * elen
+        fill = "white" if fills is None else fills[i]
         print(
-            f'<rect x="{x_base + element_x + per_element_x * i}" y="{row_space * row_index - 10}" width="{per_element_x}" height="{box_height}" fill="white" stroke="blue" />',
+            f'<rect x="{x_base + element_x + per_element_x * i}" y="{row_space * row_index - 10}" width="{per_element_x}" height="{box_height}" fill="{fill}" stroke="blue" />',
             file=f,
         )
         if indices is not None:
@@ -94,11 +98,59 @@ def add_box(f, arg, desc, indices=None, el=None, indicator=None):
             file=f,
         )
         print(
-            f'<text x="{x_base + element_x + element_x_unit * vlen}" y="{row_space * row_index - 20}" text-anchor="end">lower</text>',
+            f'<text x="{x_base + element_x + element_x_unit * elen * n_el}" y="{row_space * row_index - 20}" text-anchor="end">lower</text>',
             file=f,
         )
     if el is not None:
         set_elen(saved_elen)
+
+
+scalar_width = 90
+
+
+def add_scalar_box(f, arg, desc, label, stroke="black"):
+    """A single non-vector cell (GPR or memory location)."""
+    global col_index
+    x_base = arg_x + col_index * col_space
+    col_index += 1
+    print(
+        f'<text x="{x_base}" y="{row_space * row_index}" text-anchor="end" font-style="italic">{arg}</text>',
+        file=f,
+    )
+    print(
+        f'<text x="{x_base}" y="{row_space * row_index + desc_y_off}" text-anchor="end">{desc}</text>',
+        file=f,
+    )
+    print(
+        f'<rect x="{x_base + element_x}" y="{row_space * row_index - 10}" width="{scalar_width}" height="{box_height}" fill="white" stroke="{stroke}" />',
+        file=f,
+    )
+    print(
+        f'<text x="{x_base + element_x + scalar_width // 2}" y="{row_space * row_index - 10 + box_height // 2}" text-anchor="middle" dominant-baseline="middle">{label}</text>',
+        file=f,
+    )
+
+
+def add_line_vec_to_scalar(f, from_row, from_col, from_index, to_row, to_col):
+    x_base = arg_x + from_col * col_space
+    per_element_x = element_x_unit * elen
+    x1 = x_base + element_x + per_element_x * from_index + per_element_x // 2
+    y1 = row_space * from_row - 10 + box_height
+    x_base = arg_x + to_col * col_space
+    x2 = x_base + element_x + scalar_width // 2
+    y2 = row_space * to_row - 10
+    print(f'<line x1="{x1}" y1="{y1}" x2="{x2}" y2="{y2}" stroke="black" />', file=f)
+
+
+def add_line_scalar_to_vec(f, from_row, from_col, to_row, to_col, to_index):
+    x_base = arg_x + from_col * col_space
+    x1 = x_base + element_x + scalar_width // 2
+    y1 = row_space * from_row - 10 + box_height
+    x_base = arg_x + to_col * col_space
+    per_element_x = element_x_unit * elen
+    x2 = x_base + element_x + per_element_x * to_index + per_element_x // 2
+    y2 = row_space * to_row - 10
+    print(f'<line x1="{x1}" y1="{y1}" x2="{x2}" y2="{y2}" stroke="black" />', file=f)
 
 
 def add_line(
@@ -803,6 +855,174 @@ def gen_widen():
             )
 
 
+
+
+def gen_gpr():
+    """Transfers between GPR and vector registers."""
+    global elen, vlen
+
+    # vinsgr2vr / xvinsgr2vr: insert the low bits of a GPR into one lane
+    for vl, prefix, names in [
+        (128, "v", ["b", "h", "w", "d"]),
+        (256, "xv", ["w", "d"]),
+    ]:
+        for name in names:
+            el, n = WIDTH[name], vl // WIDTH[name]
+            elen = el
+            vlen = vl
+            with open(f"{prefix}insgr2vr_{name}.svg", "w") as f:
+                init(f, 2, 2)
+                add_note(f, "imm = 1 (destination lane index)")
+                add_row(f)
+                add_box(f, "a", "data", indices=list(range(n - 1, -1, -1)))
+                add_scalar_box(f, "rj", "GPR", "value")
+                add_row(f)
+                add_box(f, "ret", "returns", indices=list(range(n - 1, -1, -1)))
+                for i in range(n):
+                    if i != 1:
+                        add_line(f, 1, 0, rev_pos(i, n), 2, 0, rev_pos(i, n))
+                add_line_scalar_to_vec(f, 1, 1, 2, 0, rev_pos(1, n))
+                end(f)
+
+    # vreplgr2vr / xvreplgr2vr: broadcast the low bits of a GPR
+    for vl, prefix, names in [
+        (128, "v", ["b", "h", "w", "d"]),
+        (256, "xv", ["b", "h", "w", "d"]),
+    ]:
+        for name in names:
+            el, n = WIDTH[name], vl // WIDTH[name]
+            elen = el
+            vlen = vl
+            with open(f"{prefix}replgr2vr_{name}.svg", "w") as f:
+                init(f, 2, 1)
+                add_row(f)
+                add_scalar_box(f, "rj", "GPR", "value")
+                add_row(f)
+                add_box(f, "ret", "returns", indices=list(range(n - 1, -1, -1)))
+                for i in range(n):
+                    add_line_scalar_to_vec(f, 1, 0, 2, 0, rev_pos(i, n))
+                end(f)
+
+    # vpickve2gr / xvpickve2gr: move one lane to a GPR with extension
+    for vl, prefix, names in [
+        (128, "v", ["b", "bu", "h", "hu", "w", "wu", "d", "du"]),
+        (256, "xv", ["w", "wu", "d", "du"]),
+    ]:
+        for name in names:
+            el, n = WIDTH[name], vl // WIDTH[name]
+            elen = el
+            vlen = vl
+            with open(f"{prefix}pickve2gr_{name}.svg", "w") as f:
+                init(f, 2, 1)
+                add_note(f, "imm = 1 (source lane index)")
+                add_row(f)
+                add_box(f, "a", "data", indices=list(range(n - 1, -1, -1)))
+                add_row(f)
+                add_scalar_box(f, "rd", "GPR", "value")
+                add_line_vec_to_scalar(f, 1, 0, rev_pos(1, n), 2, 0)
+                end(f)
+
+
+def gen_mem():
+    """Transfers between memory and vector registers."""
+    global elen, vlen
+
+    # vldrepl / xvldrepl: load one element from memory and broadcast it
+    for vl, prefix in [(128, "v"), (256, "xv")]:
+        for name in ["b", "h", "w", "d"]:
+            el, n = WIDTH[name], vl // WIDTH[name]
+            elen = el
+            vlen = vl
+            with open(f"{prefix}ldrepl_{name}.svg", "w") as f:
+                init(f, 2, 1)
+                add_row(f)
+                add_scalar_box(f, "mem", "memory", f"{el}-bit")
+                add_row(f)
+                add_box(f, "ret", "returns", indices=list(range(n - 1, -1, -1)))
+                for i in range(n):
+                    add_line_scalar_to_vec(f, 1, 0, 2, 0, rev_pos(i, n))
+                end(f)
+
+    # vstelm / xvstelm: store one lane to memory
+    for vl, prefix in [(128, "v"), (256, "xv")]:
+        for name in ["b", "h", "w", "d"]:
+            el, n = WIDTH[name], vl // WIDTH[name]
+            elen = el
+            vlen = vl
+            with open(f"{prefix}stelm_{name}.svg", "w") as f:
+                init(f, 2, 1)
+                add_note(f, "lane = 1 (source lane index)")
+                add_row(f)
+                add_box(f, "data", "data", indices=list(range(n - 1, -1, -1)))
+                add_row(f)
+                add_scalar_box(f, "mem", "memory", f"{el}-bit")
+                add_line_vec_to_scalar(f, 1, 0, rev_pos(1, n), 2, 0)
+                end(f)
+
+
+
+def gen_lasx_128():
+    """LASX helpers that shuffle whole 128-bit halves around."""
+    global elen, vlen
+    unspecified = "#eeeeee"
+
+    def emit(name, rows, build):
+        global elen, vlen
+        elen = 128
+        vlen = 256
+        with open(f"{name}.svg", "w") as f:
+            init(f, rows, 2)
+            build(f)
+            end(f)
+
+    def cast(f):
+        add_row(f)
+        add_box(f, "a", "128-bit", indices=["a"], count=1, indicator=False)
+        add_row(f)
+        add_box(f, "ret", "returns", indices=["a", "?"], count=2,
+                fills=["white", unspecified], indicator=False)
+        add_line(f, 1, 0, 0, 2, 0, 0)
+
+    def extract(high):
+        def build(f):
+            add_row(f)
+            add_box(f, "a", "data", indices=["1", "0"], indicator=False)
+            add_row(f)
+            add_box(f, "ret", "returns",
+                    indices=["hi" if high else "lo"], count=1, indicator=False)
+            add_line(f, 1, 0, 0 if high else 1, 2, 0, 0)
+        return build
+
+    def insert(high):
+        def build(f):
+            target = 0 if high else 1
+            add_row(f)
+            add_box(f, "a", "data", indices=["1", "0"], indicator=False)
+            add_box(f, "b", "128-bit", indices=["b"], count=1, indicator=False)
+            add_row(f)
+            add_box(f, "ret", "returns", indices=["1", "0"], indicator=False)
+            add_line(f, 1, 0, 1 - target, 2, 0, 1 - target)
+            add_line(f, 1, 1, 0, 2, 0, target)
+        return build
+
+    def concat(f):
+        add_row(f)
+        add_box(f, "lo", "128-bit", indices=["lo"], count=1, indicator=False)
+        add_box(f, "hi", "128-bit", indices=["hi"], count=1, indicator=False)
+        add_row(f)
+        add_box(f, "ret", "returns", indices=["hi", "lo"], indicator=False)
+        add_line(f, 1, 0, 0, 2, 0, 1)
+        add_line(f, 1, 1, 0, 2, 0, 0)
+
+    for suffix in ["", "_d", "_s"]:
+        emit("lasx_cast_128" + suffix, 2, cast)
+        emit("lasx_extract_128_lo" + suffix, 2, extract(False))
+        emit("lasx_extract_128_hi" + suffix, 2, extract(True))
+        emit("lasx_insert_128_lo" + suffix, 2, insert(False))
+        emit("lasx_insert_128_hi" + suffix, 2, insert(True))
+        emit("lasx_concat_128" + suffix, 2, concat)
+
+
 if __name__ == "__main__":
     import os
 
@@ -823,3 +1043,6 @@ if __name__ == "__main__":
     gen_lasx_ins_pickve()
     gen_vextrins()
     gen_widen()
+    gen_gpr()
+    gen_mem()
+    gen_lasx_128()
