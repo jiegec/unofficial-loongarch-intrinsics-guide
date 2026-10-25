@@ -57,6 +57,30 @@ def short_name(heading):
     return heading.split("(")[0].strip().split()[-1]
 
 
+def section_of(name):
+    """Section of the alphabetical index an intrinsic belongs to."""
+    for prefix, label, skip in (
+        ("__lsx_", "LSX_", "v"),
+        ("__lasx_", "LASX_", "xv"),
+    ):
+        if name.startswith(prefix):
+            rest = name[len(prefix):]
+            for token in (skip, skip[:1]):
+                if token and rest.startswith(token):
+                    rest = rest[len(token):]
+                    break
+            if rest:
+                return label + rest[0].upper()
+            return label + "_"
+    return name.lstrip("_")[:1].upper() or "_"
+
+
+def section_key(name):
+    section = section_of(name)
+    return (0 if section.startswith("LSX_") else
+            1 if section.startswith("LASX_") else 2, section, name.lower())
+
+
 def slug(name):
     """File name for an intrinsic; intrinsic names are already filename safe."""
     return re.sub(r"[^A-Za-z0-9_.-]", "_", name)
@@ -97,23 +121,35 @@ def main():
         with open(os.path.join(OUT_DIR, filename), "w") as f:
             f.write("\n".join(lines))
 
-    # index page, grouped by first letter of the name without leading underscores
-    entries = sorted(written, key=lambda f: f.lstrip("_").lower())
+    # index page: LSX and LASX get one section per mnemonic letter, so that the
+    # list does not end up with a single huge "L" section
+    entries = sorted(written, key=lambda f: section_key(f[: -len(".md")]))
+    sections = {}
+    for filename in entries:
+        name = filename[: -len(".md")]
+        sections.setdefault(section_of(name), []).append((name, filename))
+
+    order = [f"LSX_{c}" for c in "ABCDEFGHIJKLMNOPQRSTUVWXYZ"]
+    order += [f"LASX_{c}" for c in "ABCDEFGHIJKLMNOPQRSTUVWXYZ"]
+    order += list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+    order += sorted(set(sections) - set(order))
+
     lines = [
         "# Intrinsics in Alphabetical Order",
         "",
         f"{len(entries)} intrinsics, one page each. "
         "See also the grouped pages linked from the home page.",
         "",
+        "LSX and LASX intrinsics are grouped by the first letter of the "
+        "operation name (the letter after the `v`/`xv` prefix), for example "
+        "`__lsx_vadd_b` is listed under LSX_A.",
     ]
-    current = None
-    for filename in entries:
-        name = filename[: -len(".md")]
-        letter = name.lstrip("_")[0].upper()
-        if letter != current:
-            current = letter
-            lines += ["", f"## {letter}", ""]
-        lines.append(f"- [{name}]({filename})")
+    for section in order:
+        if section not in sections:
+            continue
+        lines += ["", f"## {section} ({len(sections[section])})", ""]
+        for name, filename in sections[section]:
+            lines.append(f"- [{name}]({filename})")
     lines.append("")
 
     with open(os.path.join(OUT_DIR, "index.md"), "w") as f:
