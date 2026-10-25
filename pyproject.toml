@@ -12,8 +12,9 @@ mkdocs = "^1.5.3"
 mkdocs-macros-plugin = "^1.0.5"
 mkdocs-glightbox = "^0.5.2"
 mkdocs-llmstxt = "^0.5.0"
-# selectolax 1.0 is incompatible with mkdocs-glightbox 0.5.2: images are dropped.
-selectolax = ">=0.3.29,<1.0"
+# selectolax 1.0.1 is incompatible with mkdocs-glightbox 0.5.2: images are dropped.
+# 1.0.2 fixes the DOM regression; require it explicitly.
+selectolax = ">=1.0.2,<1.1"
 
 [build-system]
 requires = ["poetry-core"]
