@@ -10,6 +10,9 @@ This is the Unofficial LoongArch Intrinsics Guide by Jiajie Chen et al. The docu
 
 Beyond SIMD intrinsics, this guide also documents the **LBT** (LoongArch Binary Translation) instruction set, used for emulating x86, ARM, and MIPS ISAs. See the [LBT Basics](lbt_basics.md) page for an overview.
 
+Every intrinsic also has its own page, listed alphabetically in
+[Intrinsics in Alphabetical Order](intrinsic/index.md).
+
 The guide provides pseudo code for the SIMD intrinsics. The code assumes that the elements of the LSX/LASX vector registers can be accessed via members of a `union`:
 
 ```cpp

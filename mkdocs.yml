@@ -17,5 +17,15 @@ plugins:
         Unofficial LoongArch Intrinsics Guide:
         - "*.md"
 
+hooks:
+  # generate docs/intrinsic/*.md (one page per intrinsic) before building
+  - tools/gen_intrinsic_pages_hook.py
+
 extra_css:
   - main.css
+
+# one page per intrinsic, reachable from intrinsic/index.md and search,
+# but not repeated in the sidebar of every page
+not_in_nav: |
+  /intrinsic/*
+  !/intrinsic/index.md

@@ -66,6 +66,15 @@ for line in open('code/examples.md', 'r'):
         examples[name].append(f"{expr}\n={res}")
 
 # depends on implementation of env.macro()
+def doc_pages():
+    """Source pages that define intrinsics (skip generated per-intrinsic pages)."""
+    return [
+        path
+        for path in glob.glob("docs/*/*.md")
+        if os.path.dirname(path) != os.path.join("docs", "intrinsic")
+    ]
+
+
 def my_macro(env):
     def wrap(fn):
         def vfn(*args):
@@ -2719,7 +2728,7 @@ static inline {ret} {name} ({args}) {{
     @env.macro
     def all_intrinsics(render=True):
         result = []
-        for file in glob.glob("docs/*/*.md"):
+        for file in doc_pages():
             for line in open(file, "r"):
                 if line.startswith("#"):
                     title = line[1:].strip()
@@ -2790,7 +2799,7 @@ static inline {ret} {name} ({args}) {{
     @env.macro
     def all_groups():
         result = []
-        for file in glob.glob("docs/*/*.md"):
+        for file in doc_pages():
             for line in open(file, "r"):
                 if line.startswith("#"):
                     title = line[1:].strip()
