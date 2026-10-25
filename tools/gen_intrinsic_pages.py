@@ -81,6 +81,20 @@ def section_key(name):
             1 if section.startswith("LASX_") else 2, section, name.lower())
 
 
+DESCRIPTION_RE = re.compile(r"### Description\s*\n+(.+?)(?:\n|$)")
+
+
+def first_paragraph(markdown):
+    """First line of the Description section, used in the alphabetical index."""
+    match = DESCRIPTION_RE.search(markdown)
+    if match is None:
+        return ""
+    text = match.group(1).strip()
+    if text.startswith(("```", "|", "-", "#")):
+        return ""
+    return text
+
+
 def slug(name):
     """File name for an intrinsic; intrinsic names are already filename safe."""
     return re.sub(r"[^A-Za-z0-9_.-]", "_", name)
@@ -95,12 +109,14 @@ def main():
         os.remove(stale)
 
     written = set()
+    descriptions = {}
     for entry in intrinsics:
         name = short_name(entry["name"])
         filename = slug(name) + ".md"
         if filename in written:
             continue
         written.add(filename)
+        descriptions[filename] = first_paragraph(entry["markdown"])
 
         ext = entry["extension"].lower()
         group = entry["group"]
@@ -149,7 +165,11 @@ def main():
             continue
         lines += ["", f"## {section} ({len(sections[section])})", ""]
         for name, filename in sections[section]:
-            lines.append(f"- [{name}]({filename})")
+            entry = f"- [{name}]({filename})"
+            description = descriptions.get(filename)
+            if description:
+                entry += f" — {description}"
+            lines.append(entry)
     lines.append("")
 
     with open(os.path.join(OUT_DIR, "index.md"), "w") as f:
