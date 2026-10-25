@@ -1,0 +1,53 @@
+# \_\_lsx_vmulwev_h_bu_b
+
+LSX intrinsic · group: [Integer Computation](https://jia.je/unofficial-loongarch-intrinsics-guide/lsx/integer_computation/index.md)
+
+### Synopsis
+
+```
+__m128i __lsx_vmulwev_h_bu_b (__m128i a, __m128i b)
+#include <lsxintrin.h>
+Instruction: vmulwev.h.bu.b vr, vr, vr
+CPU Flags: LSX
+```
+
+### Description
+
+Multiply the even-positioned unsigned 8-bit elements in `a` and the corresponding signed 8-bit elements in `b`, extending both to 16-bit, and save the 16-bit result in `dst`.
+
+### Operation
+
+```
+for (int i = 0; i < 8; i++) {
+  dst.half[i] = (u16)(u8)a.byte[2 * i] * (s16)(s8)b.byte[2 * i];
+}
+
+// Expands to:
+
+if (0) {
+  dst.half[0] = ((u16)((u8)a.byte[0])) * ((s16)((s8)b.byte[0]));
+  dst.half[1] = ((u16)((u8)a.byte[2])) * ((s16)((s8)b.byte[2]));
+  dst.half[2] = ((u16)((u8)a.byte[4])) * ((s16)((s8)b.byte[4]));
+  dst.half[3] = ((u16)((u8)a.byte[6])) * ((s16)((s8)b.byte[6]));
+  dst.half[4] = ((u16)((u8)a.byte[8])) * ((s16)((s8)b.byte[8]));
+  dst.half[5] = ((u16)((u8)a.byte[10])) * ((s16)((s8)b.byte[10]));
+  dst.half[6] = ((u16)((u8)a.byte[12])) * ((s16)((s8)b.byte[12]));
+  dst.half[7] = ((u16)((u8)a.byte[14])) * ((s16)((s8)b.byte[14]));
+}
+```
+
+Tested on real machine.
+
+### Latency and Throughput
+
+| CPU      | µarch  | Latency | Throughput (IPC) |
+| -------- | ------ | ------- | ---------------- |
+| 3C5000   | LA464  | 4       | 2                |
+| 3A6000   | LA664  | 4       | 2                |
+| 3C6000   | LA664  | 4       | 2                |
+| 2K1000LA | LA264  | 4       | 1                |
+| 2K3000   | LA364E | 4       | 1                |
+
+______________________________________________________________________
+
+[All intrinsics in alphabetical order](https://jia.je/unofficial-loongarch-intrinsics-guide/intrinsic/index.md)

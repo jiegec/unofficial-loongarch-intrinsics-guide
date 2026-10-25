@@ -1,0 +1,40 @@
+<svg version="1.1"
+     width="400" height="250"
+     xmlns="http://www.w3.org/2000/svg">
+<text x="20" y="100">(1)</text>
+<text x="100" y="100" text-anchor="end" font-style="italic">a</text>
+<text x="100" y="115" text-anchor="end">data</text>
+<rect x="110" y="90" width="64" height="26" fill="white" stroke="blue" />
+<text x="142" y="103" text-anchor="middle" dominant-baseline="middle">3</text>
+<rect x="174" y="90" width="64" height="26" fill="white" stroke="blue" />
+<text x="206" y="103" text-anchor="middle" dominant-baseline="middle">2</text>
+<rect x="238" y="90" width="64" height="26" fill="white" stroke="blue" />
+<text x="270" y="103" text-anchor="middle" dominant-baseline="middle">1</text>
+<rect x="302" y="90" width="64" height="26" fill="white" stroke="blue" />
+<text x="334" y="103" text-anchor="middle" dominant-baseline="middle">0</text>
+<text x="110" y="80" text-anchor="begin">upper</text>
+<text x="366" y="80" text-anchor="end">lower</text>
+<text x="20" y="200">(2)</text>
+<text x="100" y="200" text-anchor="end" font-style="italic">ret</text>
+<text x="100" y="215" text-anchor="end">returns</text>
+<rect x="110" y="190" width="64" height="26" fill="white" stroke="blue" />
+<rect x="174" y="190" width="64" height="26" fill="white" stroke="blue" />
+<rect x="238" y="190" width="64" height="26" fill="white" stroke="blue" />
+<rect x="302" y="190" width="64" height="26" fill="white" stroke="blue" />
+<line x1="142" y1="116" x2="142" y2="190" stroke="black" />
+<line x1="142" y1="116" x2="206" y2="190" stroke="black" />
+<line x1="142" y1="116" x2="270" y2="190" stroke="black" />
+<line x1="142" y1="116" x2="334" y2="190" stroke="black" />
+<line x1="206" y1="116" x2="142" y2="190" stroke="black" />
+<line x1="206" y1="116" x2="206" y2="190" stroke="black" />
+<line x1="206" y1="116" x2="270" y2="190" stroke="black" />
+<line x1="206" y1="116" x2="334" y2="190" stroke="black" />
+<line x1="270" y1="116" x2="142" y2="190" stroke="black" />
+<line x1="270" y1="116" x2="206" y2="190" stroke="black" />
+<line x1="270" y1="116" x2="270" y2="190" stroke="black" />
+<line x1="270" y1="116" x2="334" y2="190" stroke="black" />
+<line x1="334" y1="116" x2="142" y2="190" stroke="black" />
+<line x1="334" y1="116" x2="206" y2="190" stroke="black" />
+<line x1="334" y1="116" x2="270" y2="190" stroke="black" />
+<line x1="334" y1="116" x2="334" y2="190" stroke="black" />
+</svg>

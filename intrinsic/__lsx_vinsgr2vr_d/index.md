@@ -1,0 +1,40 @@
+# \_\_lsx_vinsgr2vr_d
+
+LSX intrinsic · group: [Misc](https://jia.je/unofficial-loongarch-intrinsics-guide/lsx/misc/index.md)
+
+### Synopsis
+
+```
+__m128i __lsx_vinsgr2vr_d (__m128i a, long int b, imm0_1 imm)
+#include <lsxintrin.h>
+Instruction: vinsgr2vr.d vr, r, imm
+CPU Flags: LSX
+```
+
+### Description
+
+Insert the low 64 bits of `b` into lane `imm` of `a`; the other lanes are unchanged.
+
+### Operation
+
+```
+for (int i = 0; i < 2; i++) {
+  dst.dword[i] = (i == imm) ? b : a.dword[i];
+}
+```
+
+Tested on real machine.
+
+### Latency and Throughput
+
+| CPU      | µarch  | Latency | Throughput (IPC) |
+| -------- | ------ | ------- | ---------------- |
+| 3C5000   | LA464  | 1       | 1                |
+| 3A6000   | LA664  | 1       | 1                |
+| 3C6000   | LA664  | 1       | 1                |
+| 2K1000LA | LA264  | 1       | 1                |
+| 2K3000   | LA364E | 1       | 1                |
+
+______________________________________________________________________
+
+[All intrinsics in alphabetical order](https://jia.je/unofficial-loongarch-intrinsics-guide/intrinsic/index.md)

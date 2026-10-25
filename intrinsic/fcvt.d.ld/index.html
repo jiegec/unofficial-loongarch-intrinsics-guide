@@ -1,0 +1,383 @@
+<!DOCTYPE html><html class="writer-html5" lang="en"><head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="canonical" href="https://jia.je/unofficial-loongarch-intrinsics-guide/intrinsic/fcvt.d.ld/">
+      <link rel="shortcut icon" href="../../img/favicon.ico">
+    <title>fcvt.d.ld - Unofficial LoongArch Intrinsics Guide</title>
+    <link rel="stylesheet" href="../../css/theme.css">
+    <link rel="stylesheet" href="../../css/theme_extra.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css">
+        <link href="../../main.css" rel="stylesheet">
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "fcvt.d.ld";
+        var mkdocs_page_input_path = "intrinsic/fcvt.d.ld.md";
+        var mkdocs_page_url = "/unofficial-loongarch-intrinsics-guide/intrinsic/fcvt.d.ld/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+<link href="../../assets/stylesheets/glightbox.min.css" rel="stylesheet"><script src="../../assets/javascripts/glightbox.min.js"></script><style id="glightbox-style">
+            html.glightbox-open { overflow: initial; height: 100%; }
+            .gslide-title { margin-top: 0px; user-select: text; }
+            .gslide-desc { color: #666; user-select: text; }
+            .gslide-image img { background: white; }
+        </style></head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> Unofficial LoongArch Intrinsics Guide
+        </a>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Unofficial LoongArch Intrinsics Guide</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../latency_throughput/">Latency and Throughput of Instructions</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../lbt_basics/">LoongArch LBT Basics</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../loongarch_simd_basics/">LoongArch SIMD Basics</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../migrating_avx/">Migrating from AVX to LASX</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../migrating_sse/">Migrating from SSE to LSX</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../viewer/">Browse All Intrinsics</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Intrinsic</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../">Intrinsics in Alphabetical Order</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Lasx</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lasx/bitwise_operations/">Bitwise Operations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lasx/branch/">Branch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lasx/float_comparison/">Floating Point Comparison</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lasx/float_computation/">Floating Point Computation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lasx/float_conversion/">Floating Point Conversion</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lasx/float_misc/">Floating Point Misc</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lasx/fma/">Fused Multiply-Add</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lasx/integer_comparison/">Integer Comparison</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lasx/integer_computation/">Integer Computation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lasx/logical/">Logical</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lasx/memory/">Memory Load &amp; Store</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lasx/misc/">Misc</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lasx/permutation/">Permutation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lasx/shift/">Shift</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lasx/shuffling/">Shuffling</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lasx/undocumented/">Undocumented Intrinsics</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Lbt</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lbt/arm_integer/">ARM Integer</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lbt/arm_logical/">ARM Logical</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lbt/arm_misc/">ARM Misc</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lbt/arm_shift/">ARM Shift</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lbt/integer/">LBT Integer</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lbt/jump/">LBT Jump</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lbt/mips_memory/">MIPS Memory</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lbt/state/">LBT State Transfer</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lbt/x86_fpu/">x86 FPU</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lbt/x86_integer/">x86 Integer</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lbt/x86_logical/">x86 Logical</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lbt/x86_misc/">x86 Misc</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lbt/x86_shift/">x86 Shift</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Lsx</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/bitwise_operations/">Bitwise Operations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/branch/">Branch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/float_comparison/">Floating Point Comparison</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/float_computation/">Floating Point Computation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/float_conversion/">Floating Point Conversion</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/float_misc/">Floating Point Misc</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/fma/">Fused Multiply-Add</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/integer_comparison/">Integer Comparison</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/integer_computation/">Integer Computation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/logical/">Logical</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/memory/">Memory Load &amp; Store</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/misc/">Misc</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/permutation/">Permutation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/shift/">Shift</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/shuffling/">Shuffling</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/undocumented/">Undocumented Intrinsics</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">Unofficial LoongArch Intrinsics Guide</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">fcvt.d.ld</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="fcvtdld">fcvt.d.ld</h1>
+<p>LBT intrinsic · group: <a href="../../lbt/x86_fpu/">x86 FPU</a></p>
+<h3 id="synopsis">Synopsis</h3>
+<pre><code>Instruction: fcvt.d.ld fd, fj, fk
+CPU Flags: LBT
+</code></pre>
+<h3 id="description">Description</h3>
+<p>Convert x87 80-bit extended precision value (upper 16 bits in <code>fj</code>, lower 64 bits in <code>fk</code>) to double-precision floating point, store in <code>fd</code>.</p>
+<h3 id="operation">Operation</h3>
+<pre><code class="language-c++">uint64_t lo = a; // J[63] | fraction[62:0]
+uint64_t hi = b; // sign[15] | exponent[14:0]
+
+unsigned sign = (hi &gt;&gt; 15) &amp; 1;
+int64_t exp_x87 = hi &amp; 0x7FFF;
+unsigned j_bit = (lo &gt;&gt; 63) &amp; 1;
+uint64_t man_x87 = lo &amp; 0x7FFFFFFFFFFFFFFFULL;
+
+// Build the full 64-bit significand: J_bit.fraction
+uint64_t full = ((uint64_t)j_bit &lt;&lt; 63) | man_x87;
+
+// Re-bias exponent from x87 extended (16383) to double (1023).
+// Round 63-bit fraction to 52 bits with round-to-nearest-even.
+unsigned exp_d;
+uint64_t man_d;
+if (exp_x87 == 0x7FFF &amp;&amp; j_bit == 1) {
+  // True infinity or NaN with J=1.  Hardware always produces a
+  // quiet NaN by setting bit 51 of the mantissa.
+  man_d = man_x87 &gt;&gt; 11;
+  man_d |= (1ULL &lt;&lt; 51); // ensure QNaN
+  if (man_x87 == 0) {
+    // x87 infinity (fraction is zero) → double infinity (mantissa zero)
+    man_d = 0;
+  }
+  exp_d = 0x7FF;
+} else if (exp_x87 == 0 &amp;&amp; j_bit == 0) {
+  // Pseudo-denormal or zero: J=0 with zero exponent.  Hardware
+  // treats all of these as zero (pseudo-denormals flush to zero).
+  exp_d = 0;
+  man_d = 0;
+} else if (j_bit == 0) {
+  // Unnormal or pseudo-NaN: J=0 with non-zero exponent is an
+  // invalid x87 encoding.  Hardware produces the default quiet
+  // NaN (sign=0, mantissa=0x8000000000000, exponent=0x7FF).
+  sign = 0;
+  exp_d = 0x7FF;
+  man_d = 0x8000000000000ULL;
+} else {
+  int64_t rebias = exp_x87 - 16383 + 1023;
+  if (rebias &gt;= 0x7FF) {
+    // Overflow to infinity.
+    exp_d = 0x7FF;
+    man_d = 0;
+  } else if (rebias &lt;= 0) {
+    // Underflow: produce double denormal.
+    // Right-shift the full 64-bit significand, then RNE to 52 bits.
+    int shift = 1 - (int)rebias;
+    exp_d = 0;
+    int rshift =
+        11 + shift; // total right-shift for 64-bit -&gt; denormal mantissa
+
+    // Handle rshift &gt;= 64 separately: all bits discarded.
+    if (rshift &gt;= 64) {
+      // Result before rounding is zero.  RNE rounds up to the smallest
+      // denormal (man_d=1) only when rshift == 64 and full &gt; 2^63
+      // (guard=1, sticky=1 -&gt; round up).  Ties (full == 2^63, guard=1,
+      // sticky=0, LSB=0) and all rshift &gt; 64 cases round down to 0.
+      man_d = (rshift == 64 &amp;&amp; full &gt; (1ULL &lt;&lt; 63)) ? 1 : 0;
+    } else {
+      uint64_t result = full &gt;&gt; rshift;
+      uint64_t lost = full &amp; ((1ULL &lt;&lt; rshift) - 1);
+      uint64_t half = 1ULL &lt;&lt; (rshift - 1);
+
+      // Round-to-nearest-even on the discarded bits
+      if (lost &gt; half || (lost == half &amp;&amp; (result &amp; 1))) {
+        result++;
+      }
+
+      // If rounding overflowed past the denormal boundary, it becomes
+      // the smallest normal number (biased exponent 1, mantissa 0).
+      if (result &amp; ((uint64_t)1 &lt;&lt; 52)) {
+        // overflow to smallest normal
+        exp_d = 1;
+        man_d = 0;
+      } else {
+        man_d = result &amp; 0x000FFFFFFFFFFFFFULL;
+      }
+    }
+  } else {
+    // Normal case: round 64-bit significand to 53 bits, then strip
+    // the implicit leading 1 to get the 52-bit double mantissa.
+    exp_d = (unsigned)rebias;
+    uint64_t result53 = full &gt;&gt; 11;  // top 53 bits (bit 52 = implicit 1)
+    uint64_t lost = full &amp; 0x7FFULL; // bottom 11 bits
+    uint64_t half = 0x400ULL;
+
+    // Round-to-nearest-even
+    if (lost &gt; half || (lost == half &amp;&amp; (result53 &amp; 1))) {
+      result53++;
+      if (result53 &amp; (1ULL &lt;&lt; 53)) {
+        // Carry into bit 53 → significand wrapped to 2.0.
+        // Renormalize and adjust exponent.
+        result53 &gt;&gt;= 1;
+        exp_d++;
+        if (exp_d &gt;= 0x7FF) {
+          // Overflowed to infinity.
+          exp_d = 0x7FF;
+          result53 = 0;
+        }
+      }
+    }
+    man_d = result53 &amp; 0x000FFFFFFFFFFFFFULL;
+  }
+}
+
+// Recombine: sign[63] | exponent[62:52] | fraction[51:0]
+dst = ((uint64_t)sign &lt;&lt; 63) | ((uint64_t)exp_d &lt;&lt; 52) | man_d;
+</code></pre>
+<p>Tested on real machine.</p>
+<h3 id="latency-and-throughput">Latency and Throughput</h3>
+<table>
+<thead>
+<tr>
+<th>CPU</th>
+<th>µarch</th>
+<th>Latency</th>
+<th>Throughput (IPC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3C5000</td>
+<td>LA464</td>
+<td>4</td>
+<td>2</td>
+</tr>
+<tr>
+<td>3C6000</td>
+<td>LA664</td>
+<td>4</td>
+<td>4</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p><a href="../">All intrinsics in alphabetical order</a></p>
+              
+            </div>
+          </div><footer>
+
+  <hr>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p>Copyright © 2023-2026 Jiajie Chen</p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+
+
+<script id="init-glightbox">const lightbox = GLightbox({"touchNavigation": true, "loop": false, "zoomable": true, "draggable": true, "openEffect": "zoom", "closeEffect": "zoom", "slideEffect": "slide"});
+</script></body></html>

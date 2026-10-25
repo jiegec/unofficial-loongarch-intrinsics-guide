@@ -1,0 +1,62 @@
+# \_\_lsx_vmaddwev_h_b
+
+LSX intrinsic · group: [Integer Computation](https://jia.je/unofficial-loongarch-intrinsics-guide/lsx/integer_computation/index.md)
+
+### Synopsis
+
+```
+__m128i __lsx_vmaddwev_h_b (__m128i a, __m128i b, __m128i c)
+#include <lsxintrin.h>
+Instruction: vmaddwev.h.b vr, vr, vr
+CPU Flags: LSX
+```
+
+### Description
+
+Multiply the even-positioned signed 8-bit elements in `b` and the corresponding signed 8-bit elements in `c`, extending both to 16-bit, and add the product to the 16-bit elements in `a`.
+
+### Operation
+
+```
+for (int i = 0; i < 8; i++) {
+  dst.half[i] =
+      (s16)(s8)b.byte[2 * i] * (s16)(s8)c.byte[2 * i] + (s16)a.half[i];
+}
+
+// Expands to:
+
+if (0) {
+  dst.half[0] =
+      (((s16)((s8)b.byte[0])) * ((s16)((s8)c.byte[0]))) + ((s16)a.half[0]);
+  dst.half[1] =
+      (((s16)((s8)b.byte[2])) * ((s16)((s8)c.byte[2]))) + ((s16)a.half[1]);
+  dst.half[2] =
+      (((s16)((s8)b.byte[4])) * ((s16)((s8)c.byte[4]))) + ((s16)a.half[2]);
+  dst.half[3] =
+      (((s16)((s8)b.byte[6])) * ((s16)((s8)c.byte[6]))) + ((s16)a.half[3]);
+  dst.half[4] =
+      (((s16)((s8)b.byte[8])) * ((s16)((s8)c.byte[8]))) + ((s16)a.half[4]);
+  dst.half[5] =
+      (((s16)((s8)b.byte[10])) * ((s16)((s8)c.byte[10]))) + ((s16)a.half[5]);
+  dst.half[6] =
+      (((s16)((s8)b.byte[12])) * ((s16)((s8)c.byte[12]))) + ((s16)a.half[6]);
+  dst.half[7] =
+      (((s16)((s8)b.byte[14])) * ((s16)((s8)c.byte[14]))) + ((s16)a.half[7]);
+}
+```
+
+Tested on real machine.
+
+### Latency and Throughput
+
+| CPU      | µarch  | Latency | Throughput (IPC) |
+| -------- | ------ | ------- | ---------------- |
+| 3C5000   | LA464  | 4       | 2                |
+| 3A6000   | LA664  | 4       | 2                |
+| 3C6000   | LA664  | 4       | 2                |
+| 2K1000LA | LA264  | 4       | 1                |
+| 2K3000   | LA364E | 4       | 1                |
+
+______________________________________________________________________
+
+[All intrinsics in alphabetical order](https://jia.je/unofficial-loongarch-intrinsics-guide/intrinsic/index.md)

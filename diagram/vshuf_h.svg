@@ -1,0 +1,254 @@
+<svg version="1.1"
+     width="700" height="450"
+     xmlns="http://www.w3.org/2000/svg">
+<text x="20" y="100">(1)</text>
+<text x="100" y="100" text-anchor="end" font-style="italic">b</text>
+<text x="100" y="115" text-anchor="end">data</text>
+<rect x="110" y="90" width="32" height="26" fill="white" stroke="blue" />
+<text x="126" y="103" text-anchor="middle" dominant-baseline="middle">15</text>
+<rect x="142" y="90" width="32" height="26" fill="white" stroke="blue" />
+<text x="158" y="103" text-anchor="middle" dominant-baseline="middle">14</text>
+<rect x="174" y="90" width="32" height="26" fill="white" stroke="blue" />
+<text x="190" y="103" text-anchor="middle" dominant-baseline="middle">13</text>
+<rect x="206" y="90" width="32" height="26" fill="white" stroke="blue" />
+<text x="222" y="103" text-anchor="middle" dominant-baseline="middle">12</text>
+<rect x="238" y="90" width="32" height="26" fill="white" stroke="blue" />
+<text x="254" y="103" text-anchor="middle" dominant-baseline="middle">11</text>
+<rect x="270" y="90" width="32" height="26" fill="white" stroke="blue" />
+<text x="286" y="103" text-anchor="middle" dominant-baseline="middle">10</text>
+<rect x="302" y="90" width="32" height="26" fill="white" stroke="blue" />
+<text x="318" y="103" text-anchor="middle" dominant-baseline="middle">9</text>
+<rect x="334" y="90" width="32" height="26" fill="white" stroke="blue" />
+<text x="350" y="103" text-anchor="middle" dominant-baseline="middle">8</text>
+<text x="110" y="80" text-anchor="begin">upper</text>
+<text x="366" y="80" text-anchor="end">lower</text>
+<text x="400" y="100" text-anchor="end" font-style="italic">c</text>
+<text x="400" y="115" text-anchor="end">data</text>
+<rect x="410" y="90" width="32" height="26" fill="white" stroke="blue" />
+<text x="426" y="103" text-anchor="middle" dominant-baseline="middle">7</text>
+<rect x="442" y="90" width="32" height="26" fill="white" stroke="blue" />
+<text x="458" y="103" text-anchor="middle" dominant-baseline="middle">6</text>
+<rect x="474" y="90" width="32" height="26" fill="white" stroke="blue" />
+<text x="490" y="103" text-anchor="middle" dominant-baseline="middle">5</text>
+<rect x="506" y="90" width="32" height="26" fill="white" stroke="blue" />
+<text x="522" y="103" text-anchor="middle" dominant-baseline="middle">4</text>
+<rect x="538" y="90" width="32" height="26" fill="white" stroke="blue" />
+<text x="554" y="103" text-anchor="middle" dominant-baseline="middle">3</text>
+<rect x="570" y="90" width="32" height="26" fill="white" stroke="blue" />
+<text x="586" y="103" text-anchor="middle" dominant-baseline="middle">2</text>
+<rect x="602" y="90" width="32" height="26" fill="white" stroke="blue" />
+<text x="618" y="103" text-anchor="middle" dominant-baseline="middle">1</text>
+<rect x="634" y="90" width="32" height="26" fill="white" stroke="blue" />
+<text x="650" y="103" text-anchor="middle" dominant-baseline="middle">0</text>
+<text x="410" y="80" text-anchor="begin">upper</text>
+<text x="666" y="80" text-anchor="end">lower</text>
+<text x="20" y="200">(2)</text>
+<text x="100" y="200" text-anchor="end" font-style="italic">temp</text>
+<text x="100" y="215" text-anchor="end">merged</text>
+<rect x="110" y="190" width="32" height="26" fill="white" stroke="blue" />
+<text x="126" y="203" text-anchor="middle" dominant-baseline="middle">15</text>
+<rect x="142" y="190" width="32" height="26" fill="white" stroke="blue" />
+<text x="158" y="203" text-anchor="middle" dominant-baseline="middle">14</text>
+<rect x="174" y="190" width="32" height="26" fill="white" stroke="blue" />
+<text x="190" y="203" text-anchor="middle" dominant-baseline="middle">13</text>
+<rect x="206" y="190" width="32" height="26" fill="white" stroke="blue" />
+<text x="222" y="203" text-anchor="middle" dominant-baseline="middle">12</text>
+<rect x="238" y="190" width="32" height="26" fill="white" stroke="blue" />
+<text x="254" y="203" text-anchor="middle" dominant-baseline="middle">11</text>
+<rect x="270" y="190" width="32" height="26" fill="white" stroke="blue" />
+<text x="286" y="203" text-anchor="middle" dominant-baseline="middle">10</text>
+<rect x="302" y="190" width="32" height="26" fill="white" stroke="blue" />
+<text x="318" y="203" text-anchor="middle" dominant-baseline="middle">9</text>
+<rect x="334" y="190" width="32" height="26" fill="white" stroke="blue" />
+<text x="350" y="203" text-anchor="middle" dominant-baseline="middle">8</text>
+<rect x="366" y="190" width="32" height="26" fill="white" stroke="blue" />
+<text x="382" y="203" text-anchor="middle" dominant-baseline="middle">7</text>
+<rect x="398" y="190" width="32" height="26" fill="white" stroke="blue" />
+<text x="414" y="203" text-anchor="middle" dominant-baseline="middle">6</text>
+<rect x="430" y="190" width="32" height="26" fill="white" stroke="blue" />
+<text x="446" y="203" text-anchor="middle" dominant-baseline="middle">5</text>
+<rect x="462" y="190" width="32" height="26" fill="white" stroke="blue" />
+<text x="478" y="203" text-anchor="middle" dominant-baseline="middle">4</text>
+<rect x="494" y="190" width="32" height="26" fill="white" stroke="blue" />
+<text x="510" y="203" text-anchor="middle" dominant-baseline="middle">3</text>
+<rect x="526" y="190" width="32" height="26" fill="white" stroke="blue" />
+<text x="542" y="203" text-anchor="middle" dominant-baseline="middle">2</text>
+<rect x="558" y="190" width="32" height="26" fill="white" stroke="blue" />
+<text x="574" y="203" text-anchor="middle" dominant-baseline="middle">1</text>
+<rect x="590" y="190" width="32" height="26" fill="white" stroke="blue" />
+<text x="606" y="203" text-anchor="middle" dominant-baseline="middle">0</text>
+<text x="20" y="300">(3)</text>
+<text x="100" y="300" text-anchor="end" font-style="italic">a</text>
+<text x="100" y="315" text-anchor="end">indices</text>
+<rect x="110" y="290" width="32" height="26" fill="white" stroke="blue" />
+<rect x="142" y="290" width="32" height="26" fill="white" stroke="blue" />
+<rect x="174" y="290" width="32" height="26" fill="white" stroke="blue" />
+<rect x="206" y="290" width="32" height="26" fill="white" stroke="blue" />
+<rect x="238" y="290" width="32" height="26" fill="white" stroke="blue" />
+<rect x="270" y="290" width="32" height="26" fill="white" stroke="blue" />
+<rect x="302" y="290" width="32" height="26" fill="white" stroke="blue" />
+<rect x="334" y="290" width="32" height="26" fill="white" stroke="blue" />
+<text x="20" y="400">(4)</text>
+<text x="100" y="400" text-anchor="end" font-style="italic">ret</text>
+<text x="100" y="415" text-anchor="end">returns</text>
+<rect x="110" y="390" width="32" height="26" fill="white" stroke="blue" />
+<rect x="142" y="390" width="32" height="26" fill="white" stroke="blue" />
+<rect x="174" y="390" width="32" height="26" fill="white" stroke="blue" />
+<rect x="206" y="390" width="32" height="26" fill="white" stroke="blue" />
+<rect x="238" y="390" width="32" height="26" fill="white" stroke="blue" />
+<rect x="270" y="390" width="32" height="26" fill="white" stroke="blue" />
+<rect x="302" y="390" width="32" height="26" fill="white" stroke="blue" />
+<rect x="334" y="390" width="32" height="26" fill="white" stroke="blue" />
+<line x1="126" y1="116" x2="126" y2="190" stroke="black" />
+<line x1="426" y1="116" x2="382" y2="190" stroke="black" />
+<line x1="158" y1="116" x2="158" y2="190" stroke="black" />
+<line x1="458" y1="116" x2="414" y2="190" stroke="black" />
+<line x1="190" y1="116" x2="190" y2="190" stroke="black" />
+<line x1="490" y1="116" x2="446" y2="190" stroke="black" />
+<line x1="222" y1="116" x2="222" y2="190" stroke="black" />
+<line x1="522" y1="116" x2="478" y2="190" stroke="black" />
+<line x1="254" y1="116" x2="254" y2="190" stroke="black" />
+<line x1="554" y1="116" x2="510" y2="190" stroke="black" />
+<line x1="286" y1="116" x2="286" y2="190" stroke="black" />
+<line x1="586" y1="116" x2="542" y2="190" stroke="black" />
+<line x1="318" y1="116" x2="318" y2="190" stroke="black" />
+<line x1="618" y1="116" x2="574" y2="190" stroke="black" />
+<line x1="350" y1="116" x2="350" y2="190" stroke="black" />
+<line x1="650" y1="116" x2="606" y2="190" stroke="black" />
+<line x1="126" y1="216" x2="126" y2="290" stroke="black" />
+<line x1="126" y1="216" x2="158" y2="290" stroke="black" />
+<line x1="126" y1="216" x2="190" y2="290" stroke="black" />
+<line x1="126" y1="216" x2="222" y2="290" stroke="black" />
+<line x1="126" y1="216" x2="254" y2="290" stroke="black" />
+<line x1="126" y1="216" x2="286" y2="290" stroke="black" />
+<line x1="126" y1="216" x2="318" y2="290" stroke="black" />
+<line x1="126" y1="216" x2="350" y2="290" stroke="black" />
+<line x1="158" y1="216" x2="126" y2="290" stroke="black" />
+<line x1="158" y1="216" x2="158" y2="290" stroke="black" />
+<line x1="158" y1="216" x2="190" y2="290" stroke="black" />
+<line x1="158" y1="216" x2="222" y2="290" stroke="black" />
+<line x1="158" y1="216" x2="254" y2="290" stroke="black" />
+<line x1="158" y1="216" x2="286" y2="290" stroke="black" />
+<line x1="158" y1="216" x2="318" y2="290" stroke="black" />
+<line x1="158" y1="216" x2="350" y2="290" stroke="black" />
+<line x1="190" y1="216" x2="126" y2="290" stroke="black" />
+<line x1="190" y1="216" x2="158" y2="290" stroke="black" />
+<line x1="190" y1="216" x2="190" y2="290" stroke="black" />
+<line x1="190" y1="216" x2="222" y2="290" stroke="black" />
+<line x1="190" y1="216" x2="254" y2="290" stroke="black" />
+<line x1="190" y1="216" x2="286" y2="290" stroke="black" />
+<line x1="190" y1="216" x2="318" y2="290" stroke="black" />
+<line x1="190" y1="216" x2="350" y2="290" stroke="black" />
+<line x1="222" y1="216" x2="126" y2="290" stroke="black" />
+<line x1="222" y1="216" x2="158" y2="290" stroke="black" />
+<line x1="222" y1="216" x2="190" y2="290" stroke="black" />
+<line x1="222" y1="216" x2="222" y2="290" stroke="black" />
+<line x1="222" y1="216" x2="254" y2="290" stroke="black" />
+<line x1="222" y1="216" x2="286" y2="290" stroke="black" />
+<line x1="222" y1="216" x2="318" y2="290" stroke="black" />
+<line x1="222" y1="216" x2="350" y2="290" stroke="black" />
+<line x1="254" y1="216" x2="126" y2="290" stroke="black" />
+<line x1="254" y1="216" x2="158" y2="290" stroke="black" />
+<line x1="254" y1="216" x2="190" y2="290" stroke="black" />
+<line x1="254" y1="216" x2="222" y2="290" stroke="black" />
+<line x1="254" y1="216" x2="254" y2="290" stroke="black" />
+<line x1="254" y1="216" x2="286" y2="290" stroke="black" />
+<line x1="254" y1="216" x2="318" y2="290" stroke="black" />
+<line x1="254" y1="216" x2="350" y2="290" stroke="black" />
+<line x1="286" y1="216" x2="126" y2="290" stroke="black" />
+<line x1="286" y1="216" x2="158" y2="290" stroke="black" />
+<line x1="286" y1="216" x2="190" y2="290" stroke="black" />
+<line x1="286" y1="216" x2="222" y2="290" stroke="black" />
+<line x1="286" y1="216" x2="254" y2="290" stroke="black" />
+<line x1="286" y1="216" x2="286" y2="290" stroke="black" />
+<line x1="286" y1="216" x2="318" y2="290" stroke="black" />
+<line x1="286" y1="216" x2="350" y2="290" stroke="black" />
+<line x1="318" y1="216" x2="126" y2="290" stroke="black" />
+<line x1="318" y1="216" x2="158" y2="290" stroke="black" />
+<line x1="318" y1="216" x2="190" y2="290" stroke="black" />
+<line x1="318" y1="216" x2="222" y2="290" stroke="black" />
+<line x1="318" y1="216" x2="254" y2="290" stroke="black" />
+<line x1="318" y1="216" x2="286" y2="290" stroke="black" />
+<line x1="318" y1="216" x2="318" y2="290" stroke="black" />
+<line x1="318" y1="216" x2="350" y2="290" stroke="black" />
+<line x1="350" y1="216" x2="126" y2="290" stroke="black" />
+<line x1="350" y1="216" x2="158" y2="290" stroke="black" />
+<line x1="350" y1="216" x2="190" y2="290" stroke="black" />
+<line x1="350" y1="216" x2="222" y2="290" stroke="black" />
+<line x1="350" y1="216" x2="254" y2="290" stroke="black" />
+<line x1="350" y1="216" x2="286" y2="290" stroke="black" />
+<line x1="350" y1="216" x2="318" y2="290" stroke="black" />
+<line x1="350" y1="216" x2="350" y2="290" stroke="black" />
+<line x1="382" y1="216" x2="126" y2="290" stroke="black" />
+<line x1="382" y1="216" x2="158" y2="290" stroke="black" />
+<line x1="382" y1="216" x2="190" y2="290" stroke="black" />
+<line x1="382" y1="216" x2="222" y2="290" stroke="black" />
+<line x1="382" y1="216" x2="254" y2="290" stroke="black" />
+<line x1="382" y1="216" x2="286" y2="290" stroke="black" />
+<line x1="382" y1="216" x2="318" y2="290" stroke="black" />
+<line x1="382" y1="216" x2="350" y2="290" stroke="black" />
+<line x1="414" y1="216" x2="126" y2="290" stroke="black" />
+<line x1="414" y1="216" x2="158" y2="290" stroke="black" />
+<line x1="414" y1="216" x2="190" y2="290" stroke="black" />
+<line x1="414" y1="216" x2="222" y2="290" stroke="black" />
+<line x1="414" y1="216" x2="254" y2="290" stroke="black" />
+<line x1="414" y1="216" x2="286" y2="290" stroke="black" />
+<line x1="414" y1="216" x2="318" y2="290" stroke="black" />
+<line x1="414" y1="216" x2="350" y2="290" stroke="black" />
+<line x1="446" y1="216" x2="126" y2="290" stroke="black" />
+<line x1="446" y1="216" x2="158" y2="290" stroke="black" />
+<line x1="446" y1="216" x2="190" y2="290" stroke="black" />
+<line x1="446" y1="216" x2="222" y2="290" stroke="black" />
+<line x1="446" y1="216" x2="254" y2="290" stroke="black" />
+<line x1="446" y1="216" x2="286" y2="290" stroke="black" />
+<line x1="446" y1="216" x2="318" y2="290" stroke="black" />
+<line x1="446" y1="216" x2="350" y2="290" stroke="black" />
+<line x1="478" y1="216" x2="126" y2="290" stroke="black" />
+<line x1="478" y1="216" x2="158" y2="290" stroke="black" />
+<line x1="478" y1="216" x2="190" y2="290" stroke="black" />
+<line x1="478" y1="216" x2="222" y2="290" stroke="black" />
+<line x1="478" y1="216" x2="254" y2="290" stroke="black" />
+<line x1="478" y1="216" x2="286" y2="290" stroke="black" />
+<line x1="478" y1="216" x2="318" y2="290" stroke="black" />
+<line x1="478" y1="216" x2="350" y2="290" stroke="black" />
+<line x1="510" y1="216" x2="126" y2="290" stroke="black" />
+<line x1="510" y1="216" x2="158" y2="290" stroke="black" />
+<line x1="510" y1="216" x2="190" y2="290" stroke="black" />
+<line x1="510" y1="216" x2="222" y2="290" stroke="black" />
+<line x1="510" y1="216" x2="254" y2="290" stroke="black" />
+<line x1="510" y1="216" x2="286" y2="290" stroke="black" />
+<line x1="510" y1="216" x2="318" y2="290" stroke="black" />
+<line x1="510" y1="216" x2="350" y2="290" stroke="black" />
+<line x1="542" y1="216" x2="126" y2="290" stroke="black" />
+<line x1="542" y1="216" x2="158" y2="290" stroke="black" />
+<line x1="542" y1="216" x2="190" y2="290" stroke="black" />
+<line x1="542" y1="216" x2="222" y2="290" stroke="black" />
+<line x1="542" y1="216" x2="254" y2="290" stroke="black" />
+<line x1="542" y1="216" x2="286" y2="290" stroke="black" />
+<line x1="542" y1="216" x2="318" y2="290" stroke="black" />
+<line x1="542" y1="216" x2="350" y2="290" stroke="black" />
+<line x1="574" y1="216" x2="126" y2="290" stroke="black" />
+<line x1="574" y1="216" x2="158" y2="290" stroke="black" />
+<line x1="574" y1="216" x2="190" y2="290" stroke="black" />
+<line x1="574" y1="216" x2="222" y2="290" stroke="black" />
+<line x1="574" y1="216" x2="254" y2="290" stroke="black" />
+<line x1="574" y1="216" x2="286" y2="290" stroke="black" />
+<line x1="574" y1="216" x2="318" y2="290" stroke="black" />
+<line x1="574" y1="216" x2="350" y2="290" stroke="black" />
+<line x1="606" y1="216" x2="126" y2="290" stroke="black" />
+<line x1="606" y1="216" x2="158" y2="290" stroke="black" />
+<line x1="606" y1="216" x2="190" y2="290" stroke="black" />
+<line x1="606" y1="216" x2="222" y2="290" stroke="black" />
+<line x1="606" y1="216" x2="254" y2="290" stroke="black" />
+<line x1="606" y1="216" x2="286" y2="290" stroke="black" />
+<line x1="606" y1="216" x2="318" y2="290" stroke="black" />
+<line x1="606" y1="216" x2="350" y2="290" stroke="black" />
+<line x1="126" y1="316" x2="126" y2="390" stroke="black" />
+<line x1="158" y1="316" x2="158" y2="390" stroke="black" />
+<line x1="190" y1="316" x2="190" y2="390" stroke="black" />
+<line x1="222" y1="316" x2="222" y2="390" stroke="black" />
+<line x1="254" y1="316" x2="254" y2="390" stroke="black" />
+<line x1="286" y1="316" x2="286" y2="390" stroke="black" />
+<line x1="318" y1="316" x2="318" y2="390" stroke="black" />
+<line x1="350" y1="316" x2="350" y2="390" stroke="black" />
+</svg>

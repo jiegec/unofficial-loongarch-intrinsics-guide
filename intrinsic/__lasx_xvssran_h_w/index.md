@@ -1,0 +1,51 @@
+# \_\_lasx_xvssran_h_w
+
+LASX intrinsic · group: [Shift](https://jia.je/unofficial-loongarch-intrinsics-guide/lasx/shift/index.md)
+
+### Synopsis
+
+```
+__m256i __lasx_xvssran_h_w (__m256i a, __m256i b)
+#include <lasxintrin.h>
+Instruction: xvssran.h.w xr, xr, xr
+CPU Flags: LASX
+```
+
+### Description
+
+Arithmetic right shift each signed 32-bit element in `a` by the corresponding element of `b` modulo 32, saturate the result to signed 16-bit, write it into the lower half of each 128-bit lane of `dst`, and zero the upper half.
+
+### Operation
+
+```
+for (int i = 0; i < 8; i++) {
+  if (i < 4) {
+    s32 temp = (s32)a.word[i] >> (b.word[i] & 31);
+    dst.half[i] = clamp<s32>(temp, -32768, 32767);
+  } else {
+    dst.half[i] = 0;
+  }
+}
+for (int i = 8; i < 16; i++) {
+  if (i < 12) {
+    s32 temp = (s32)a.word[i - 4] >> (b.word[i - 4] & 31);
+    dst.half[i] = clamp<s32>(temp, -32768, 32767);
+  } else {
+    dst.half[i] = 0;
+  }
+}
+```
+
+Tested on real machine.
+
+### Latency and Throughput
+
+| CPU    | µarch | Latency | Throughput (IPC) |
+| ------ | ----- | ------- | ---------------- |
+| 3C5000 | LA464 | 4       | 1                |
+| 3A6000 | LA664 | 4       | 2                |
+| 3C6000 | LA664 | 4       | 2                |
+
+______________________________________________________________________
+
+[All intrinsics in alphabetical order](https://jia.je/unofficial-loongarch-intrinsics-guide/intrinsic/index.md)

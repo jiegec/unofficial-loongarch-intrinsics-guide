@@ -1,0 +1,38 @@
+# \_\_lasx_xvslei_hu
+
+LASX intrinsic · group: [Integer Comparison](https://jia.je/unofficial-loongarch-intrinsics-guide/lasx/integer_comparison/index.md)
+
+### Synopsis
+
+```
+__m256i __lasx_xvslei_hu (__m256i a, imm0_31 imm)
+#include <lasxintrin.h>
+Instruction: xvslei.hu xr, xr, imm
+CPU Flags: LASX
+```
+
+### Description
+
+Compare the unsigned 16-bit elements in `a` and the zero-extended `imm`, store all-ones to `dst` if corresponding element in `a` is less than or equal to `imm`, zero otherwise.
+
+### Operation
+
+```
+for (int i = 0; i < 16; i++) {
+  dst.half[i] = ((u16)a.half[i] <= imm) ? 0xFFFF : 0;
+}
+```
+
+Tested on real machine.
+
+### Latency and Throughput
+
+| CPU    | µarch | Latency | Throughput (IPC) |
+| ------ | ----- | ------- | ---------------- |
+| 3C5000 | LA464 | 1       | 2                |
+| 3A6000 | LA664 | 1       | 4                |
+| 3C6000 | LA664 | 1       | 4                |
+
+______________________________________________________________________
+
+[All intrinsics in alphabetical order](https://jia.je/unofficial-loongarch-intrinsics-guide/intrinsic/index.md)

@@ -1,0 +1,58 @@
+# \_\_lasx_xvftintrz_w_d
+
+LASX intrinsic · group: [Floating Point Conversion](https://jia.je/unofficial-loongarch-intrinsics-guide/lasx/float_conversion/index.md)
+
+### Synopsis
+
+```
+__m256i __lasx_xvftintrz_w_d (__m256d a, __m256d b)
+#include <lasxintrin.h>
+Instruction: xvftintrz.w.d xr, xr, xr
+CPU Flags: LASX
+```
+
+### Description
+
+For each 128-bit lane, convert double-precision floating point elements in the corresponding lane of `a` into the upper half and elements in `b` into the lower half, as signed 32-bit integers, rounding towards zero.
+
+### Operation
+
+```
+for (int i = 0; i < 4; i++) {
+  dst.word[i] = (i < 2)
+                    ? (s32)b.fp64[i]
+                    : (s32)a.fp64[i - 2]; // rounding mode is not expressed in C
+}
+for (int i = 4; i < 8; i++) {
+  dst.word[i] = (i < 6)
+                    ? (s32)b.fp64[i - 2]
+                    : (s32)a.fp64[i - 4]; // rounding mode is not expressed in C
+}
+
+// Expands to:
+
+if (0) {
+  dst.word[0] = (s32)b.fp64[0];
+  dst.word[1] = (s32)b.fp64[1];
+  dst.word[2] = (s32)a.fp64[0];
+  dst.word[3] = (s32)a.fp64[1];
+  dst.word[4] = (s32)b.fp64[2];
+  dst.word[5] = (s32)b.fp64[3];
+  dst.word[6] = (s32)a.fp64[2];
+  dst.word[7] = (s32)a.fp64[3];
+}
+```
+
+Tested on real machine.
+
+### Latency and Throughput
+
+| CPU    | µarch | Latency | Throughput (IPC) |
+| ------ | ----- | ------- | ---------------- |
+| 3C5000 | LA464 | 5       | 1                |
+| 3A6000 | LA664 | 5       | 2                |
+| 3C6000 | LA664 | 5       | 2                |
+
+______________________________________________________________________
+
+[All intrinsics in alphabetical order](https://jia.je/unofficial-loongarch-intrinsics-guide/intrinsic/index.md)

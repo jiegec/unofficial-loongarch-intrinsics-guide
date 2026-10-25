@@ -1,0 +1,366 @@
+<!DOCTYPE html><html class="writer-html5" lang="en"><head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="canonical" href="https://jia.je/unofficial-loongarch-intrinsics-guide/intrinsic/__lsx_vldi/">
+      <link rel="shortcut icon" href="../../img/favicon.ico">
+    <title>__lsx_vldi - Unofficial LoongArch Intrinsics Guide</title>
+    <link rel="stylesheet" href="../../css/theme.css">
+    <link rel="stylesheet" href="../../css/theme_extra.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css">
+        <link href="../../main.css" rel="stylesheet">
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "__lsx_vldi";
+        var mkdocs_page_input_path = "intrinsic/__lsx_vldi.md";
+        var mkdocs_page_url = "/unofficial-loongarch-intrinsics-guide/intrinsic/__lsx_vldi/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+<link href="../../assets/stylesheets/glightbox.min.css" rel="stylesheet"><script src="../../assets/javascripts/glightbox.min.js"></script><style id="glightbox-style">
+            html.glightbox-open { overflow: initial; height: 100%; }
+            .gslide-title { margin-top: 0px; user-select: text; }
+            .gslide-desc { color: #666; user-select: text; }
+            .gslide-image img { background: white; }
+        </style></head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> Unofficial LoongArch Intrinsics Guide
+        </a>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Unofficial LoongArch Intrinsics Guide</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../latency_throughput/">Latency and Throughput of Instructions</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../lbt_basics/">LoongArch LBT Basics</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../loongarch_simd_basics/">LoongArch SIMD Basics</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../migrating_avx/">Migrating from AVX to LASX</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../migrating_sse/">Migrating from SSE to LSX</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../viewer/">Browse All Intrinsics</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Intrinsic</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../">Intrinsics in Alphabetical Order</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Lasx</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lasx/bitwise_operations/">Bitwise Operations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lasx/branch/">Branch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lasx/float_comparison/">Floating Point Comparison</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lasx/float_computation/">Floating Point Computation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lasx/float_conversion/">Floating Point Conversion</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lasx/float_misc/">Floating Point Misc</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lasx/fma/">Fused Multiply-Add</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lasx/integer_comparison/">Integer Comparison</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lasx/integer_computation/">Integer Computation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lasx/logical/">Logical</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lasx/memory/">Memory Load &amp; Store</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lasx/misc/">Misc</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lasx/permutation/">Permutation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lasx/shift/">Shift</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lasx/shuffling/">Shuffling</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lasx/undocumented/">Undocumented Intrinsics</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Lbt</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lbt/arm_integer/">ARM Integer</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lbt/arm_logical/">ARM Logical</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lbt/arm_misc/">ARM Misc</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lbt/arm_shift/">ARM Shift</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lbt/integer/">LBT Integer</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lbt/jump/">LBT Jump</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lbt/mips_memory/">MIPS Memory</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lbt/state/">LBT State Transfer</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lbt/x86_fpu/">x86 FPU</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lbt/x86_integer/">x86 Integer</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lbt/x86_logical/">x86 Logical</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lbt/x86_misc/">x86 Misc</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lbt/x86_shift/">x86 Shift</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Lsx</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/bitwise_operations/">Bitwise Operations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/branch/">Branch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/float_comparison/">Floating Point Comparison</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/float_computation/">Floating Point Computation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/float_conversion/">Floating Point Conversion</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/float_misc/">Floating Point Misc</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/fma/">Fused Multiply-Add</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/integer_comparison/">Integer Comparison</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/integer_computation/">Integer Computation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/logical/">Logical</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/memory/">Memory Load &amp; Store</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/misc/">Misc</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/permutation/">Permutation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/shift/">Shift</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/shuffling/">Shuffling</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../lsx/undocumented/">Undocumented Intrinsics</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">Unofficial LoongArch Intrinsics Guide</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">__lsx_vldi</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="__lsx_vldi">__lsx_vldi</h1>
+<p>LSX intrinsic · group: <a href="../../lsx/misc/">Misc</a></p>
+<h3 id="synopsis">Synopsis</h3>
+<pre><code class="language-c++">__m128i __lsx_vldi (imm_n1024_1023 imm)
+#include &lt;lsxintrin.h&gt;
+Instruction: vldi vr, imm
+CPU Flags: LSX
+</code></pre>
+<h3 id="description">Description</h3>
+<p>Initialize <code>dst</code> using predefined patterns:</p>
+<ul>
+<li><code>imm[12:10]=0b000</code>: broadcast <code>imm[7:0]</code> as 8-bit elements to all lanes</li>
+<li><code>imm[12:10]=0b001</code>: broadcast sign-extended <code>imm[9:0]</code> as 16-bit elements to all lanes</li>
+<li><code>imm[12:10]=0b010</code>: broadcast sign-extended <code>imm[9:0]</code> as 32-bit elements to all lanes</li>
+<li><code>imm[12:10]=0b011</code>: broadcast sign-extended <code>imm[9:0]</code> as 64-bit elements to all lanes</li>
+<li><code>imm[12:8]=0b10000</code>: broadcast <code>imm[7:0]</code> as 32-bit elements to all lanes</li>
+<li><code>imm[12:8]=0b10001</code>: broadcast <code>imm[7:0] &lt;&lt; 8</code> as 32-bit elements to all lanes</li>
+<li><code>imm[12:8]=0b10010</code>: broadcast <code>imm[7:0] &lt;&lt; 16</code> as 32-bit elements to all lanes</li>
+<li><code>imm[12:8]=0b10011</code>: broadcast <code>imm[7:0] &lt;&lt; 24</code> as 32-bit elements to all lanes</li>
+<li><code>imm[12:8]=0b10100</code>: broadcast <code>imm[7:0]</code> as 16-bit elements to all lanes</li>
+<li><code>imm[12:8]=0b10101</code>: broadcast <code>imm[7:0] &lt;&lt; 8</code> as 16-bit elements to all lanes</li>
+<li><code>imm[12:8]=0b10110</code>: broadcast <code>(imm[7:0] &lt;&lt; 8) | 0xFF</code> as 32-bit elements to all lanes</li>
+<li><code>imm[12:8]=0b10111</code>: broadcast <code>(imm[7:0] &lt;&lt; 16) | 0xFFFF</code> as 32-bit elements to all lanes</li>
+<li><code>imm[12:8]=0b11000</code>: broadcast <code>imm[7:0]</code> as 8-bit elements to all lanes</li>
+<li><code>imm[12:8]=0b11001</code>: repeat each bit of <code>imm[7:0]</code> eight times, with <code>imm[7]</code> in the most significant byte and <code>imm[0]</code> in the least significant byte, and broadcast the result as 64-bit elements to all lanes</li>
+<li><code>imm[12:8]=0b11010</code>: broadcast <code>(imm[7] &lt;&lt; 31) | ((1-imm[6]) &lt;&lt; 30) | ((imm[6] * 0x1F) &lt;&lt; 25) | (imm[5:0] &lt;&lt; 19)</code> as 32-bit elements to all lanes</li>
+<li><code>imm[12:8]=0b11011</code>: broadcast <code>(imm[7] &lt;&lt; 31) | ((1-imm[6]) &lt;&lt; 30) | ((imm[6] * 0x1F) &lt;&lt; 25) | (imm[5:0] &lt;&lt; 19)</code> as 64-bit elements to all lanes</li>
+<li><code>imm[12:8]=0b11100</code>: broadcast <code>(imm[7] &lt;&lt; 63) | ((1-imm[6]) &lt;&lt; 62) | ((imm[6] * 0xFF) &lt;&lt; 54) | (imm[5:0] &lt;&lt; 48)</code> as 64-bit elements to all lanes</li>
+</ul>
+<p>Other <code>imm</code> encodings raise an INE exception.</p>
+<h3 id="operation">Operation</h3>
+<pre><code class="language-c++">u64 imm12_10 = (imm &gt;&gt; 10) &amp; 0b111;
+u64 imm12_8 = (imm &gt;&gt; 8) &amp; 0b11111;
+u64 imm9_0 = imm &amp; 0x3FF;
+s64 simm9_0 = ((s64)imm9_0 &lt;&lt; 54) &gt;&gt; 54;
+u64 imm7_0 = imm &amp; 0xFF;
+u64 imm7 = (imm &gt;&gt; 7) &amp; 0x1;
+u64 imm6 = (imm &gt;&gt; 6) &amp; 0x1;
+u64 imm5 = (imm &gt;&gt; 5) &amp; 0x1;
+u64 imm5_0 = imm &amp; 0x3F;
+u64 imm4 = (imm &gt;&gt; 4) &amp; 0x1;
+u64 imm3 = (imm &gt;&gt; 3) &amp; 0x1;
+u64 imm2 = (imm &gt;&gt; 2) &amp; 0x1;
+u64 imm1 = (imm &gt;&gt; 1) &amp; 0x1;
+u64 imm0 = imm &amp; 0x1;
+
+u64 broadcast_value;
+u64 broadcast_width;
+if (imm12_10 == 0b000) {
+  broadcast_value = imm7_0;
+  broadcast_width = 8;
+} else if (imm12_10 == 0b001) {
+  broadcast_value = simm9_0;
+  broadcast_width = 16;
+} else if (imm12_10 == 0b010) {
+  broadcast_value = simm9_0;
+  broadcast_width = 32;
+} else if (imm12_10 == 0b011) {
+  broadcast_value = simm9_0;
+  broadcast_width = 64;
+} else if (imm12_8 == 0b10000) {
+  broadcast_value = imm7_0;
+  broadcast_width = 32;
+} else if (imm12_8 == 0b10001) {
+  broadcast_value = imm7_0 &lt;&lt; 8;
+  broadcast_width = 32;
+} else if (imm12_8 == 0b10010) {
+  broadcast_value = imm7_0 &lt;&lt; 16;
+  broadcast_width = 32;
+} else if (imm12_8 == 0b10011) {
+  broadcast_value = imm7_0 &lt;&lt; 24;
+  broadcast_width = 32;
+} else if (imm12_8 == 0b10100) {
+  broadcast_value = imm7_0;
+  broadcast_width = 16;
+} else if (imm12_8 == 0b10101) {
+  broadcast_value = imm7_0 &lt;&lt; 8;
+  broadcast_width = 16;
+} else if (imm12_8 == 0b10110) {
+  broadcast_value = (imm7_0 &lt;&lt; 8) | 0xFF;
+  broadcast_width = 32;
+} else if (imm12_8 == 0b10111) {
+  broadcast_value = (imm7_0 &lt;&lt; 16) | 0xFFFF;
+  broadcast_width = 32;
+} else if (imm12_8 == 0b11000) {
+  broadcast_value = imm7_0;
+  broadcast_width = 8;
+} else if (imm12_8 == 0b11001) {
+  broadcast_value = imm0 * 0xFF + imm1 * 0xFF00 + imm2 * 0xFF0000 +
+                    imm3 * 0xFF000000 + imm4 * 0xFF00000000 +
+                    imm5 * 0xFF0000000000 + imm6 * 0xFF000000000000 +
+                    imm7 * 0xFF00000000000000;
+  broadcast_width = 64;
+} else if (imm12_8 == 0b11010) {
+  broadcast_value = (imm7 &lt;&lt; 31) | ((1 - imm6) &lt;&lt; 30) | ((imm6 * 0x1F) &lt;&lt; 25) |
+                    (imm5_0 &lt;&lt; 19);
+  broadcast_width = 32;
+} else if (imm12_8 == 0b11011) {
+  broadcast_value = (imm7 &lt;&lt; 31) | ((1 - imm6) &lt;&lt; 30) | ((imm6 * 0x1F) &lt;&lt; 25) |
+                    (imm5_0 &lt;&lt; 19);
+  broadcast_width = 64;
+} else if (imm12_8 == 0b11100) {
+  broadcast_value = (imm7 &lt;&lt; 63) | ((1 - imm6) &lt;&lt; 62) | ((imm6 * 0xFF) &lt;&lt; 54) |
+                    (imm5_0 &lt;&lt; 48);
+  broadcast_width = 64;
+}
+
+if (broadcast_width == 8) {
+  for (int i = 0; i &lt; 16; i++) {
+    dst.byte[i] = broadcast_value;
+  }
+} else if (broadcast_width == 16) {
+  for (int i = 0; i &lt; 8; i++) {
+    dst.half[i] = broadcast_value;
+  }
+} else if (broadcast_width == 32) {
+  for (int i = 0; i &lt; 4; i++) {
+    dst.word[i] = broadcast_value;
+  }
+} else if (broadcast_width == 64) {
+  for (int i = 0; i &lt; 2; i++) {
+    dst.dword[i] = broadcast_value;
+  }
+}
+</code></pre>
+<p>Tested on real machine.</p>
+<hr>
+<p><a href="../">All intrinsics in alphabetical order</a></p>
+              
+            </div>
+          </div><footer>
+
+  <hr>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p>Copyright © 2023-2026 Jiajie Chen</p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+
+
+<script id="init-glightbox">const lightbox = GLightbox({"touchNavigation": true, "loop": false, "zoomable": true, "draggable": true, "openEffect": "zoom", "closeEffect": "zoom", "slideEffect": "slide"});
+</script></body></html>

@@ -1,0 +1,48 @@
+# \_\_lsx_vmaddwod_q_du
+
+LSX intrinsic · group: [Integer Computation](https://jia.je/unofficial-loongarch-intrinsics-guide/lsx/integer_computation/index.md)
+
+### Synopsis
+
+```
+__m128i __lsx_vmaddwod_q_du (__m128i a, __m128i b, __m128i c)
+#include <lsxintrin.h>
+Instruction: vmaddwod.q.du vr, vr, vr
+CPU Flags: LSX
+```
+
+### Description
+
+Multiply the odd-positioned unsigned 64-bit elements in `b` and the corresponding unsigned 64-bit elements in `c`, extending both to 128-bit, and add the product to the 128-bit elements in `a`.
+
+### Operation
+
+```
+for (int i = 0; i < 1; i++) {
+  dst.qword[i] = (u128)(u64)b.dword[2 * i + 1] * (u128)(u64)c.dword[2 * i + 1] +
+                 (u128)a.qword[i];
+}
+
+// Expands to:
+
+if (0) {
+  dst.qword[0] = (((u128)((u64)b.dword[1])) * ((u128)((u64)c.dword[1]))) +
+                 ((u128)a.qword[0]);
+}
+```
+
+Tested on real machine.
+
+### Latency and Throughput
+
+| CPU      | µarch  | Latency | Throughput (IPC) |
+| -------- | ------ | ------- | ---------------- |
+| 3C5000   | LA464  | 7       | 1.14             |
+| 3A6000   | LA664  | 7       | 1.14             |
+| 3C6000   | LA664  | 7       | 1.14             |
+| 2K1000LA | LA264  | 6       | 1                |
+| 2K3000   | LA364E | 6       | 1                |
+
+______________________________________________________________________
+
+[All intrinsics in alphabetical order](https://jia.je/unofficial-loongarch-intrinsics-guide/intrinsic/index.md)

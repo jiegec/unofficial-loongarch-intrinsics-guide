@@ -1,0 +1,46 @@
+# \_\_lsx_vextl_q_d
+
+LSX intrinsic · group: [Misc](https://jia.je/unofficial-loongarch-intrinsics-guide/lsx/misc/index.md)
+
+### Synopsis
+
+```
+__m128i __lsx_vextl_q_d (__m128i a)
+#include <lsxintrin.h>
+Instruction: vextl.q.d vr, vr
+CPU Flags: LSX
+```
+
+### Description
+
+Sign-extend 64-bit elements in the lower half of every 128-bit vector of `a` to 128-bit.
+
+### Operation
+
+```
+for (int i = 0; i < 1; i++) {
+  dst.qword[i] = (s128)(s64)a.dword[i];
+}
+
+// Expands to:
+
+if (0) {
+  dst.qword[0] = (s128)((s64)a.dword[0]);
+}
+```
+
+Tested on real machine.
+
+### Latency and Throughput
+
+| CPU      | µarch  | Latency | Throughput (IPC) |
+| -------- | ------ | ------- | ---------------- |
+| 3C5000   | LA464  | 1       | 2                |
+| 3A6000   | LA664  | 1       | 4                |
+| 3C6000   | LA664  | 1       | 4                |
+| 2K1000LA | LA264  | 1       | 1                |
+| 2K3000   | LA364E | 1       | 1                |
+
+______________________________________________________________________
+
+[All intrinsics in alphabetical order](https://jia.je/unofficial-loongarch-intrinsics-guide/intrinsic/index.md)
