@@ -1,6 +1,7 @@
 <svg version="1.1"
-     width="1250" height="250"
+     width="1250" height="450"
      xmlns="http://www.w3.org/2000/svg">
+<text x="10" y="40" font-family="monospace">imm = 0x10 (imm[7:4]=1, imm[3:0]=0)</text>
 <text x="20" y="100">(1)</text>
 <text x="100" y="100" text-anchor="end" font-style="italic">a</text>
 <text x="100" y="115" text-anchor="end">data</text>
@@ -237,4 +238,241 @@
 <line x1="134" y1="116" x2="134" y2="190" stroke="black" />
 <line x1="118" y1="116" x2="118" y2="190" stroke="black" />
 <line x1="933" y1="116" x2="342" y2="190" stroke="black" />
+<text x="10" y="240" font-family="monospace">imm = 0xef (imm[7:4]=14, imm[3:0]=15)</text>
+<text x="20" y="300">(3)</text>
+<text x="100" y="300" text-anchor="end" font-style="italic">a</text>
+<text x="100" y="315" text-anchor="end">data</text>
+<rect x="110" y="290" width="16" height="26" fill="white" stroke="blue" />
+<text x="118" y="303" text-anchor="middle" dominant-baseline="middle">31</text>
+<rect x="126" y="290" width="16" height="26" fill="white" stroke="blue" />
+<text x="134" y="303" text-anchor="middle" dominant-baseline="middle">30</text>
+<rect x="142" y="290" width="16" height="26" fill="white" stroke="blue" />
+<text x="150" y="303" text-anchor="middle" dominant-baseline="middle">29</text>
+<rect x="158" y="290" width="16" height="26" fill="white" stroke="blue" />
+<text x="166" y="303" text-anchor="middle" dominant-baseline="middle">28</text>
+<rect x="174" y="290" width="16" height="26" fill="white" stroke="blue" />
+<text x="182" y="303" text-anchor="middle" dominant-baseline="middle">27</text>
+<rect x="190" y="290" width="16" height="26" fill="white" stroke="blue" />
+<text x="198" y="303" text-anchor="middle" dominant-baseline="middle">26</text>
+<rect x="206" y="290" width="16" height="26" fill="white" stroke="blue" />
+<text x="214" y="303" text-anchor="middle" dominant-baseline="middle">25</text>
+<rect x="222" y="290" width="16" height="26" fill="white" stroke="blue" />
+<text x="230" y="303" text-anchor="middle" dominant-baseline="middle">24</text>
+<rect x="238" y="290" width="16" height="26" fill="white" stroke="blue" />
+<text x="246" y="303" text-anchor="middle" dominant-baseline="middle">23</text>
+<rect x="254" y="290" width="16" height="26" fill="white" stroke="blue" />
+<text x="262" y="303" text-anchor="middle" dominant-baseline="middle">22</text>
+<rect x="270" y="290" width="16" height="26" fill="white" stroke="blue" />
+<text x="278" y="303" text-anchor="middle" dominant-baseline="middle">21</text>
+<rect x="286" y="290" width="16" height="26" fill="white" stroke="blue" />
+<text x="294" y="303" text-anchor="middle" dominant-baseline="middle">20</text>
+<rect x="302" y="290" width="16" height="26" fill="white" stroke="blue" />
+<text x="310" y="303" text-anchor="middle" dominant-baseline="middle">19</text>
+<rect x="318" y="290" width="16" height="26" fill="white" stroke="blue" />
+<text x="326" y="303" text-anchor="middle" dominant-baseline="middle">18</text>
+<rect x="334" y="290" width="16" height="26" fill="white" stroke="blue" />
+<text x="342" y="303" text-anchor="middle" dominant-baseline="middle">17</text>
+<rect x="350" y="290" width="16" height="26" fill="white" stroke="blue" />
+<text x="358" y="303" text-anchor="middle" dominant-baseline="middle">16</text>
+<rect x="366" y="290" width="16" height="26" fill="white" stroke="blue" />
+<text x="374" y="303" text-anchor="middle" dominant-baseline="middle">15</text>
+<rect x="382" y="290" width="16" height="26" fill="white" stroke="blue" />
+<text x="390" y="303" text-anchor="middle" dominant-baseline="middle">14</text>
+<rect x="398" y="290" width="16" height="26" fill="white" stroke="blue" />
+<text x="406" y="303" text-anchor="middle" dominant-baseline="middle">13</text>
+<rect x="414" y="290" width="16" height="26" fill="white" stroke="blue" />
+<text x="422" y="303" text-anchor="middle" dominant-baseline="middle">12</text>
+<rect x="430" y="290" width="16" height="26" fill="white" stroke="blue" />
+<text x="438" y="303" text-anchor="middle" dominant-baseline="middle">11</text>
+<rect x="446" y="290" width="16" height="26" fill="white" stroke="blue" />
+<text x="454" y="303" text-anchor="middle" dominant-baseline="middle">10</text>
+<rect x="462" y="290" width="16" height="26" fill="white" stroke="blue" />
+<text x="470" y="303" text-anchor="middle" dominant-baseline="middle">9</text>
+<rect x="478" y="290" width="16" height="26" fill="white" stroke="blue" />
+<text x="486" y="303" text-anchor="middle" dominant-baseline="middle">8</text>
+<rect x="494" y="290" width="16" height="26" fill="white" stroke="blue" />
+<text x="502" y="303" text-anchor="middle" dominant-baseline="middle">7</text>
+<rect x="510" y="290" width="16" height="26" fill="white" stroke="blue" />
+<text x="518" y="303" text-anchor="middle" dominant-baseline="middle">6</text>
+<rect x="526" y="290" width="16" height="26" fill="white" stroke="blue" />
+<text x="534" y="303" text-anchor="middle" dominant-baseline="middle">5</text>
+<rect x="542" y="290" width="16" height="26" fill="white" stroke="blue" />
+<text x="550" y="303" text-anchor="middle" dominant-baseline="middle">4</text>
+<rect x="558" y="290" width="16" height="26" fill="white" stroke="blue" />
+<text x="566" y="303" text-anchor="middle" dominant-baseline="middle">3</text>
+<rect x="574" y="290" width="16" height="26" fill="white" stroke="blue" />
+<text x="582" y="303" text-anchor="middle" dominant-baseline="middle">2</text>
+<rect x="590" y="290" width="16" height="26" fill="white" stroke="blue" />
+<text x="598" y="303" text-anchor="middle" dominant-baseline="middle">1</text>
+<rect x="606" y="290" width="16" height="26" fill="white" stroke="blue" />
+<text x="614" y="303" text-anchor="middle" dominant-baseline="middle">0</text>
+<text x="110" y="280" text-anchor="begin">upper</text>
+<text x="622" y="280" text-anchor="end">lower</text>
+<text x="675" y="300" text-anchor="end" font-style="italic">b</text>
+<text x="675" y="315" text-anchor="end">data</text>
+<rect x="685" y="290" width="16" height="26" fill="white" stroke="blue" />
+<text x="693" y="303" text-anchor="middle" dominant-baseline="middle">31</text>
+<rect x="701" y="290" width="16" height="26" fill="white" stroke="blue" />
+<text x="709" y="303" text-anchor="middle" dominant-baseline="middle">30</text>
+<rect x="717" y="290" width="16" height="26" fill="white" stroke="blue" />
+<text x="725" y="303" text-anchor="middle" dominant-baseline="middle">29</text>
+<rect x="733" y="290" width="16" height="26" fill="white" stroke="blue" />
+<text x="741" y="303" text-anchor="middle" dominant-baseline="middle">28</text>
+<rect x="749" y="290" width="16" height="26" fill="white" stroke="blue" />
+<text x="757" y="303" text-anchor="middle" dominant-baseline="middle">27</text>
+<rect x="765" y="290" width="16" height="26" fill="white" stroke="blue" />
+<text x="773" y="303" text-anchor="middle" dominant-baseline="middle">26</text>
+<rect x="781" y="290" width="16" height="26" fill="white" stroke="blue" />
+<text x="789" y="303" text-anchor="middle" dominant-baseline="middle">25</text>
+<rect x="797" y="290" width="16" height="26" fill="white" stroke="blue" />
+<text x="805" y="303" text-anchor="middle" dominant-baseline="middle">24</text>
+<rect x="813" y="290" width="16" height="26" fill="white" stroke="blue" />
+<text x="821" y="303" text-anchor="middle" dominant-baseline="middle">23</text>
+<rect x="829" y="290" width="16" height="26" fill="white" stroke="blue" />
+<text x="837" y="303" text-anchor="middle" dominant-baseline="middle">22</text>
+<rect x="845" y="290" width="16" height="26" fill="white" stroke="blue" />
+<text x="853" y="303" text-anchor="middle" dominant-baseline="middle">21</text>
+<rect x="861" y="290" width="16" height="26" fill="white" stroke="blue" />
+<text x="869" y="303" text-anchor="middle" dominant-baseline="middle">20</text>
+<rect x="877" y="290" width="16" height="26" fill="white" stroke="blue" />
+<text x="885" y="303" text-anchor="middle" dominant-baseline="middle">19</text>
+<rect x="893" y="290" width="16" height="26" fill="white" stroke="blue" />
+<text x="901" y="303" text-anchor="middle" dominant-baseline="middle">18</text>
+<rect x="909" y="290" width="16" height="26" fill="white" stroke="blue" />
+<text x="917" y="303" text-anchor="middle" dominant-baseline="middle">17</text>
+<rect x="925" y="290" width="16" height="26" fill="white" stroke="blue" />
+<text x="933" y="303" text-anchor="middle" dominant-baseline="middle">16</text>
+<rect x="941" y="290" width="16" height="26" fill="white" stroke="blue" />
+<text x="949" y="303" text-anchor="middle" dominant-baseline="middle">15</text>
+<rect x="957" y="290" width="16" height="26" fill="white" stroke="blue" />
+<text x="965" y="303" text-anchor="middle" dominant-baseline="middle">14</text>
+<rect x="973" y="290" width="16" height="26" fill="white" stroke="blue" />
+<text x="981" y="303" text-anchor="middle" dominant-baseline="middle">13</text>
+<rect x="989" y="290" width="16" height="26" fill="white" stroke="blue" />
+<text x="997" y="303" text-anchor="middle" dominant-baseline="middle">12</text>
+<rect x="1005" y="290" width="16" height="26" fill="white" stroke="blue" />
+<text x="1013" y="303" text-anchor="middle" dominant-baseline="middle">11</text>
+<rect x="1021" y="290" width="16" height="26" fill="white" stroke="blue" />
+<text x="1029" y="303" text-anchor="middle" dominant-baseline="middle">10</text>
+<rect x="1037" y="290" width="16" height="26" fill="white" stroke="blue" />
+<text x="1045" y="303" text-anchor="middle" dominant-baseline="middle">9</text>
+<rect x="1053" y="290" width="16" height="26" fill="white" stroke="blue" />
+<text x="1061" y="303" text-anchor="middle" dominant-baseline="middle">8</text>
+<rect x="1069" y="290" width="16" height="26" fill="white" stroke="blue" />
+<text x="1077" y="303" text-anchor="middle" dominant-baseline="middle">7</text>
+<rect x="1085" y="290" width="16" height="26" fill="white" stroke="blue" />
+<text x="1093" y="303" text-anchor="middle" dominant-baseline="middle">6</text>
+<rect x="1101" y="290" width="16" height="26" fill="white" stroke="blue" />
+<text x="1109" y="303" text-anchor="middle" dominant-baseline="middle">5</text>
+<rect x="1117" y="290" width="16" height="26" fill="white" stroke="blue" />
+<text x="1125" y="303" text-anchor="middle" dominant-baseline="middle">4</text>
+<rect x="1133" y="290" width="16" height="26" fill="white" stroke="blue" />
+<text x="1141" y="303" text-anchor="middle" dominant-baseline="middle">3</text>
+<rect x="1149" y="290" width="16" height="26" fill="white" stroke="blue" />
+<text x="1157" y="303" text-anchor="middle" dominant-baseline="middle">2</text>
+<rect x="1165" y="290" width="16" height="26" fill="white" stroke="blue" />
+<text x="1173" y="303" text-anchor="middle" dominant-baseline="middle">1</text>
+<rect x="1181" y="290" width="16" height="26" fill="white" stroke="blue" />
+<text x="1189" y="303" text-anchor="middle" dominant-baseline="middle">0</text>
+<text x="685" y="280" text-anchor="begin">upper</text>
+<text x="1197" y="280" text-anchor="end">lower</text>
+<text x="20" y="400">(4)</text>
+<text x="100" y="400" text-anchor="end" font-style="italic">ret</text>
+<text x="100" y="415" text-anchor="end">returns</text>
+<rect x="110" y="390" width="16" height="26" fill="white" stroke="blue" />
+<text x="118" y="403" text-anchor="middle" dominant-baseline="middle">31</text>
+<rect x="126" y="390" width="16" height="26" fill="white" stroke="blue" />
+<text x="134" y="403" text-anchor="middle" dominant-baseline="middle">30</text>
+<rect x="142" y="390" width="16" height="26" fill="white" stroke="blue" />
+<text x="150" y="403" text-anchor="middle" dominant-baseline="middle">29</text>
+<rect x="158" y="390" width="16" height="26" fill="white" stroke="blue" />
+<text x="166" y="403" text-anchor="middle" dominant-baseline="middle">28</text>
+<rect x="174" y="390" width="16" height="26" fill="white" stroke="blue" />
+<text x="182" y="403" text-anchor="middle" dominant-baseline="middle">27</text>
+<rect x="190" y="390" width="16" height="26" fill="white" stroke="blue" />
+<text x="198" y="403" text-anchor="middle" dominant-baseline="middle">26</text>
+<rect x="206" y="390" width="16" height="26" fill="white" stroke="blue" />
+<text x="214" y="403" text-anchor="middle" dominant-baseline="middle">25</text>
+<rect x="222" y="390" width="16" height="26" fill="white" stroke="blue" />
+<text x="230" y="403" text-anchor="middle" dominant-baseline="middle">24</text>
+<rect x="238" y="390" width="16" height="26" fill="white" stroke="blue" />
+<text x="246" y="403" text-anchor="middle" dominant-baseline="middle">23</text>
+<rect x="254" y="390" width="16" height="26" fill="white" stroke="blue" />
+<text x="262" y="403" text-anchor="middle" dominant-baseline="middle">22</text>
+<rect x="270" y="390" width="16" height="26" fill="white" stroke="blue" />
+<text x="278" y="403" text-anchor="middle" dominant-baseline="middle">21</text>
+<rect x="286" y="390" width="16" height="26" fill="white" stroke="blue" />
+<text x="294" y="403" text-anchor="middle" dominant-baseline="middle">20</text>
+<rect x="302" y="390" width="16" height="26" fill="white" stroke="blue" />
+<text x="310" y="403" text-anchor="middle" dominant-baseline="middle">19</text>
+<rect x="318" y="390" width="16" height="26" fill="white" stroke="blue" />
+<text x="326" y="403" text-anchor="middle" dominant-baseline="middle">18</text>
+<rect x="334" y="390" width="16" height="26" fill="white" stroke="blue" />
+<text x="342" y="403" text-anchor="middle" dominant-baseline="middle">17</text>
+<rect x="350" y="390" width="16" height="26" fill="white" stroke="blue" />
+<text x="358" y="403" text-anchor="middle" dominant-baseline="middle">16</text>
+<rect x="366" y="390" width="16" height="26" fill="white" stroke="blue" />
+<text x="374" y="403" text-anchor="middle" dominant-baseline="middle">15</text>
+<rect x="382" y="390" width="16" height="26" fill="white" stroke="blue" />
+<text x="390" y="403" text-anchor="middle" dominant-baseline="middle">14</text>
+<rect x="398" y="390" width="16" height="26" fill="white" stroke="blue" />
+<text x="406" y="403" text-anchor="middle" dominant-baseline="middle">13</text>
+<rect x="414" y="390" width="16" height="26" fill="white" stroke="blue" />
+<text x="422" y="403" text-anchor="middle" dominant-baseline="middle">12</text>
+<rect x="430" y="390" width="16" height="26" fill="white" stroke="blue" />
+<text x="438" y="403" text-anchor="middle" dominant-baseline="middle">11</text>
+<rect x="446" y="390" width="16" height="26" fill="white" stroke="blue" />
+<text x="454" y="403" text-anchor="middle" dominant-baseline="middle">10</text>
+<rect x="462" y="390" width="16" height="26" fill="white" stroke="blue" />
+<text x="470" y="403" text-anchor="middle" dominant-baseline="middle">9</text>
+<rect x="478" y="390" width="16" height="26" fill="white" stroke="blue" />
+<text x="486" y="403" text-anchor="middle" dominant-baseline="middle">8</text>
+<rect x="494" y="390" width="16" height="26" fill="white" stroke="blue" />
+<text x="502" y="403" text-anchor="middle" dominant-baseline="middle">7</text>
+<rect x="510" y="390" width="16" height="26" fill="white" stroke="blue" />
+<text x="518" y="403" text-anchor="middle" dominant-baseline="middle">6</text>
+<rect x="526" y="390" width="16" height="26" fill="white" stroke="blue" />
+<text x="534" y="403" text-anchor="middle" dominant-baseline="middle">5</text>
+<rect x="542" y="390" width="16" height="26" fill="white" stroke="blue" />
+<text x="550" y="403" text-anchor="middle" dominant-baseline="middle">4</text>
+<rect x="558" y="390" width="16" height="26" fill="white" stroke="blue" />
+<text x="566" y="403" text-anchor="middle" dominant-baseline="middle">3</text>
+<rect x="574" y="390" width="16" height="26" fill="white" stroke="blue" />
+<text x="582" y="403" text-anchor="middle" dominant-baseline="middle">2</text>
+<rect x="590" y="390" width="16" height="26" fill="white" stroke="blue" />
+<text x="598" y="403" text-anchor="middle" dominant-baseline="middle">1</text>
+<rect x="606" y="390" width="16" height="26" fill="white" stroke="blue" />
+<text x="614" y="403" text-anchor="middle" dominant-baseline="middle">0</text>
+<line x1="614" y1="316" x2="614" y2="390" stroke="black" />
+<line x1="598" y1="316" x2="598" y2="390" stroke="black" />
+<line x1="582" y1="316" x2="582" y2="390" stroke="black" />
+<line x1="566" y1="316" x2="566" y2="390" stroke="black" />
+<line x1="550" y1="316" x2="550" y2="390" stroke="black" />
+<line x1="534" y1="316" x2="534" y2="390" stroke="black" />
+<line x1="518" y1="316" x2="518" y2="390" stroke="black" />
+<line x1="502" y1="316" x2="502" y2="390" stroke="black" />
+<line x1="486" y1="316" x2="486" y2="390" stroke="black" />
+<line x1="470" y1="316" x2="470" y2="390" stroke="black" />
+<line x1="454" y1="316" x2="454" y2="390" stroke="black" />
+<line x1="438" y1="316" x2="438" y2="390" stroke="black" />
+<line x1="422" y1="316" x2="422" y2="390" stroke="black" />
+<line x1="406" y1="316" x2="406" y2="390" stroke="black" />
+<line x1="374" y1="316" x2="374" y2="390" stroke="black" />
+<line x1="949" y1="316" x2="390" y2="390" stroke="black" />
+<line x1="358" y1="316" x2="358" y2="390" stroke="black" />
+<line x1="342" y1="316" x2="342" y2="390" stroke="black" />
+<line x1="326" y1="316" x2="326" y2="390" stroke="black" />
+<line x1="310" y1="316" x2="310" y2="390" stroke="black" />
+<line x1="294" y1="316" x2="294" y2="390" stroke="black" />
+<line x1="278" y1="316" x2="278" y2="390" stroke="black" />
+<line x1="262" y1="316" x2="262" y2="390" stroke="black" />
+<line x1="246" y1="316" x2="246" y2="390" stroke="black" />
+<line x1="230" y1="316" x2="230" y2="390" stroke="black" />
+<line x1="214" y1="316" x2="214" y2="390" stroke="black" />
+<line x1="198" y1="316" x2="198" y2="390" stroke="black" />
+<line x1="182" y1="316" x2="182" y2="390" stroke="black" />
+<line x1="166" y1="316" x2="166" y2="390" stroke="black" />
+<line x1="150" y1="316" x2="150" y2="390" stroke="black" />
+<line x1="118" y1="316" x2="118" y2="390" stroke="black" />
+<line x1="693" y1="316" x2="134" y2="390" stroke="black" />
 </svg>

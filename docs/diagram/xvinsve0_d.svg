@@ -1,6 +1,7 @@
 <svg version="1.1"
      width="1250" height="250"
      xmlns="http://www.w3.org/2000/svg">
+<text x="10" y="28" font-family="monospace">imm = 1 (destination lane index)</text>
 <text x="20" y="100">(1)</text>
 <text x="100" y="100" text-anchor="end" font-style="italic">a</text>
 <text x="100" y="115" text-anchor="end">data</text>

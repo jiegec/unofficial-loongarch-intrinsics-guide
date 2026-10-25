@@ -53,7 +53,11 @@ def set_elen(el):
     elen = el
 
 
-def add_box(f, arg, desc, indices=None, el=None):
+def add_note(f, text, y=28):
+    print(f'<text x="10" y="{y}" font-family="monospace">{text}</text>', file=f)
+
+
+def add_box(f, arg, desc, indices=None, el=None, indicator=None):
     global col_index
     if el is not None:
         saved_elen = elen
@@ -84,7 +88,7 @@ def add_box(f, arg, desc, indices=None, el=None):
             )
 
     # add upper/lower indicator
-    if row_index == 1:
+    if row_index == 1 if indicator is None else indicator:
         print(
             f'<text x="{x_base + element_x}" y="{row_space * row_index - 20}" text-anchor="begin">upper</text>',
             file=f,
@@ -622,6 +626,7 @@ def gen_lasx_ins_pickve():
         vlen = 256
         with open(f"xvinsve0_{name}.svg", "w") as f:
             init(f, 2, 2)
+            add_note(f, "imm = 1 (destination lane index)")
             add_row(f)
             add_box(f, "a", "data", indices=indices)
             add_box(f, "b", "data", indices=indices)
@@ -639,6 +644,7 @@ def gen_lasx_ins_pickve():
             vlen = 256
             with open(filename, "w") as f:
                 init(f, 2, 1)
+                add_note(f, "imm = 1 (source lane index)")
                 add_row(f)
                 add_box(f, "a", "data", indices=indices)
                 add_row(f)
@@ -651,44 +657,58 @@ def gen_vextrins():
     global elen, vlen
     for vl, prefix in [(128, "v"), (256, "xv")]:
         for el, name in [(64, "d"), (32, "w"), (16, "h"), (8, "b")]:
-            elen = el
-            vlen = vl
             n = vl // el
             n_lane = 128 // el
             lanes = vl // 128
             indices = list(range(n - 1, -1, -1))
+            src_bits = (128 // el).bit_length() - 1
+            src_field = "imm[0]" if src_bits == 1 else f"imm[{src_bits - 1}:0]"
+            dst_field = "imm[4]" if src_bits == 1 else f"imm[{3 + src_bits}:4]"
+            if n_lane <= 2:
+                examples = [(0, 1), (1, 0)]
+            else:
+                examples = [(0, 1), (n_lane - 1, n_lane - 2)]
+
+            elen = el
+            vlen = vl
             with open(f"{prefix}extrins_{name}.svg", "w") as f:
-                init(f, 2, 2)
-                add_row(f)
-                add_box(f, "a", "data", indices=indices)
-                add_box(f, "b", "data", indices=indices)
-                add_row(f)
-                add_box(f, "ret", "returns", indices=indices)
-                for lane in range(lanes):
-                    base = lane * n_lane
-                    for i in range(n_lane):
-                        if i != 1:
-                            add_line(
-                                f,
-                                1,
-                                0,
-                                rev_pos(base + i, n),
-                                2,
-                                0,
-                                rev_pos(base + i, n),
-                            )
-                    add_line(
+                init(f, 4, 2)
+                for k, (src, dstidx) in enumerate(examples):
+                    row_in = 2 * k + 1
+                    row_out = 2 * k + 2
+                    add_note(
                         f,
-                        1,
-                        1,
-                        rev_pos(base, n),
-                        2,
-                        0,
-                        rev_pos(base + 1, n),
+                        f"imm = 0x{dstidx * 16 + src:02x} ({dst_field}={dstidx}, {src_field}={src})",
+                        y=row_space * row_in - 60,
                     )
+                    add_row(f)
+                    add_box(f, "a", "data", indices=indices, indicator=True)
+                    add_box(f, "b", "data", indices=indices, indicator=True)
+                    add_row(f)
+                    add_box(f, "ret", "returns", indices=indices)
+                    for lane in range(lanes):
+                        base = lane * n_lane
+                        for i in range(n_lane):
+                            if i != dstidx:
+                                add_line(
+                                    f,
+                                    row_in,
+                                    0,
+                                    rev_pos(base + i, n),
+                                    row_out,
+                                    0,
+                                    rev_pos(base + i, n),
+                                )
+                        add_line(
+                            f,
+                            row_in,
+                            1,
+                            rev_pos(base + src, n),
+                            row_out,
+                            0,
+                            rev_pos(base + dstidx, n),
+                        )
                 end(f)
-
-
 
 
 def gen_widen():
@@ -765,6 +785,7 @@ def gen_widen():
 
     # VEXT2XV: widen the lowest part of a 256-bit register
     for del_, dstname, sel, srcname in [
+        (16, "h", 8, "b"),
         (32, "w", 8, "b"),
         (64, "d", 8, "b"),
         (64, "d", 16, "h"),

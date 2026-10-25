@@ -1,6 +1,7 @@
 <svg version="1.1"
-     width="700" height="250"
+     width="700" height="450"
      xmlns="http://www.w3.org/2000/svg">
+<text x="10" y="40" font-family="monospace">imm = 0x10 (imm[5:4]=1, imm[1:0]=0)</text>
 <text x="20" y="100">(1)</text>
 <text x="100" y="100" text-anchor="end" font-style="italic">a</text>
 <text x="100" y="115" text-anchor="end">data</text>
@@ -41,4 +42,45 @@
 <line x1="206" y1="116" x2="206" y2="190" stroke="black" />
 <line x1="142" y1="116" x2="142" y2="190" stroke="black" />
 <line x1="634" y1="116" x2="270" y2="190" stroke="black" />
+<text x="10" y="240" font-family="monospace">imm = 0x23 (imm[5:4]=2, imm[1:0]=3)</text>
+<text x="20" y="300">(3)</text>
+<text x="100" y="300" text-anchor="end" font-style="italic">a</text>
+<text x="100" y="315" text-anchor="end">data</text>
+<rect x="110" y="290" width="64" height="26" fill="white" stroke="blue" />
+<text x="142" y="303" text-anchor="middle" dominant-baseline="middle">3</text>
+<rect x="174" y="290" width="64" height="26" fill="white" stroke="blue" />
+<text x="206" y="303" text-anchor="middle" dominant-baseline="middle">2</text>
+<rect x="238" y="290" width="64" height="26" fill="white" stroke="blue" />
+<text x="270" y="303" text-anchor="middle" dominant-baseline="middle">1</text>
+<rect x="302" y="290" width="64" height="26" fill="white" stroke="blue" />
+<text x="334" y="303" text-anchor="middle" dominant-baseline="middle">0</text>
+<text x="110" y="280" text-anchor="begin">upper</text>
+<text x="366" y="280" text-anchor="end">lower</text>
+<text x="400" y="300" text-anchor="end" font-style="italic">b</text>
+<text x="400" y="315" text-anchor="end">data</text>
+<rect x="410" y="290" width="64" height="26" fill="white" stroke="blue" />
+<text x="442" y="303" text-anchor="middle" dominant-baseline="middle">3</text>
+<rect x="474" y="290" width="64" height="26" fill="white" stroke="blue" />
+<text x="506" y="303" text-anchor="middle" dominant-baseline="middle">2</text>
+<rect x="538" y="290" width="64" height="26" fill="white" stroke="blue" />
+<text x="570" y="303" text-anchor="middle" dominant-baseline="middle">1</text>
+<rect x="602" y="290" width="64" height="26" fill="white" stroke="blue" />
+<text x="634" y="303" text-anchor="middle" dominant-baseline="middle">0</text>
+<text x="410" y="280" text-anchor="begin">upper</text>
+<text x="666" y="280" text-anchor="end">lower</text>
+<text x="20" y="400">(4)</text>
+<text x="100" y="400" text-anchor="end" font-style="italic">ret</text>
+<text x="100" y="415" text-anchor="end">returns</text>
+<rect x="110" y="390" width="64" height="26" fill="white" stroke="blue" />
+<text x="142" y="403" text-anchor="middle" dominant-baseline="middle">3</text>
+<rect x="174" y="390" width="64" height="26" fill="white" stroke="blue" />
+<text x="206" y="403" text-anchor="middle" dominant-baseline="middle">2</text>
+<rect x="238" y="390" width="64" height="26" fill="white" stroke="blue" />
+<text x="270" y="403" text-anchor="middle" dominant-baseline="middle">1</text>
+<rect x="302" y="390" width="64" height="26" fill="white" stroke="blue" />
+<text x="334" y="403" text-anchor="middle" dominant-baseline="middle">0</text>
+<line x1="334" y1="316" x2="334" y2="390" stroke="black" />
+<line x1="270" y1="316" x2="270" y2="390" stroke="black" />
+<line x1="142" y1="316" x2="142" y2="390" stroke="black" />
+<line x1="442" y1="316" x2="206" y2="390" stroke="black" />
 </svg>

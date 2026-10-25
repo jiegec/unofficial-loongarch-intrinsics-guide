@@ -1,6 +1,7 @@
 <svg version="1.1"
-     width="700" height="250"
+     width="700" height="450"
      xmlns="http://www.w3.org/2000/svg">
+<text x="10" y="40" font-family="monospace">imm = 0x10 (imm[6:4]=1, imm[2:0]=0)</text>
 <text x="20" y="100">(1)</text>
 <text x="100" y="100" text-anchor="end" font-style="italic">a</text>
 <text x="100" y="115" text-anchor="end">data</text>
@@ -69,4 +70,73 @@
 <line x1="158" y1="116" x2="158" y2="190" stroke="black" />
 <line x1="126" y1="116" x2="126" y2="190" stroke="black" />
 <line x1="650" y1="116" x2="318" y2="190" stroke="black" />
+<text x="10" y="240" font-family="monospace">imm = 0x67 (imm[6:4]=6, imm[2:0]=7)</text>
+<text x="20" y="300">(3)</text>
+<text x="100" y="300" text-anchor="end" font-style="italic">a</text>
+<text x="100" y="315" text-anchor="end">data</text>
+<rect x="110" y="290" width="32" height="26" fill="white" stroke="blue" />
+<text x="126" y="303" text-anchor="middle" dominant-baseline="middle">7</text>
+<rect x="142" y="290" width="32" height="26" fill="white" stroke="blue" />
+<text x="158" y="303" text-anchor="middle" dominant-baseline="middle">6</text>
+<rect x="174" y="290" width="32" height="26" fill="white" stroke="blue" />
+<text x="190" y="303" text-anchor="middle" dominant-baseline="middle">5</text>
+<rect x="206" y="290" width="32" height="26" fill="white" stroke="blue" />
+<text x="222" y="303" text-anchor="middle" dominant-baseline="middle">4</text>
+<rect x="238" y="290" width="32" height="26" fill="white" stroke="blue" />
+<text x="254" y="303" text-anchor="middle" dominant-baseline="middle">3</text>
+<rect x="270" y="290" width="32" height="26" fill="white" stroke="blue" />
+<text x="286" y="303" text-anchor="middle" dominant-baseline="middle">2</text>
+<rect x="302" y="290" width="32" height="26" fill="white" stroke="blue" />
+<text x="318" y="303" text-anchor="middle" dominant-baseline="middle">1</text>
+<rect x="334" y="290" width="32" height="26" fill="white" stroke="blue" />
+<text x="350" y="303" text-anchor="middle" dominant-baseline="middle">0</text>
+<text x="110" y="280" text-anchor="begin">upper</text>
+<text x="366" y="280" text-anchor="end">lower</text>
+<text x="400" y="300" text-anchor="end" font-style="italic">b</text>
+<text x="400" y="315" text-anchor="end">data</text>
+<rect x="410" y="290" width="32" height="26" fill="white" stroke="blue" />
+<text x="426" y="303" text-anchor="middle" dominant-baseline="middle">7</text>
+<rect x="442" y="290" width="32" height="26" fill="white" stroke="blue" />
+<text x="458" y="303" text-anchor="middle" dominant-baseline="middle">6</text>
+<rect x="474" y="290" width="32" height="26" fill="white" stroke="blue" />
+<text x="490" y="303" text-anchor="middle" dominant-baseline="middle">5</text>
+<rect x="506" y="290" width="32" height="26" fill="white" stroke="blue" />
+<text x="522" y="303" text-anchor="middle" dominant-baseline="middle">4</text>
+<rect x="538" y="290" width="32" height="26" fill="white" stroke="blue" />
+<text x="554" y="303" text-anchor="middle" dominant-baseline="middle">3</text>
+<rect x="570" y="290" width="32" height="26" fill="white" stroke="blue" />
+<text x="586" y="303" text-anchor="middle" dominant-baseline="middle">2</text>
+<rect x="602" y="290" width="32" height="26" fill="white" stroke="blue" />
+<text x="618" y="303" text-anchor="middle" dominant-baseline="middle">1</text>
+<rect x="634" y="290" width="32" height="26" fill="white" stroke="blue" />
+<text x="650" y="303" text-anchor="middle" dominant-baseline="middle">0</text>
+<text x="410" y="280" text-anchor="begin">upper</text>
+<text x="666" y="280" text-anchor="end">lower</text>
+<text x="20" y="400">(4)</text>
+<text x="100" y="400" text-anchor="end" font-style="italic">ret</text>
+<text x="100" y="415" text-anchor="end">returns</text>
+<rect x="110" y="390" width="32" height="26" fill="white" stroke="blue" />
+<text x="126" y="403" text-anchor="middle" dominant-baseline="middle">7</text>
+<rect x="142" y="390" width="32" height="26" fill="white" stroke="blue" />
+<text x="158" y="403" text-anchor="middle" dominant-baseline="middle">6</text>
+<rect x="174" y="390" width="32" height="26" fill="white" stroke="blue" />
+<text x="190" y="403" text-anchor="middle" dominant-baseline="middle">5</text>
+<rect x="206" y="390" width="32" height="26" fill="white" stroke="blue" />
+<text x="222" y="403" text-anchor="middle" dominant-baseline="middle">4</text>
+<rect x="238" y="390" width="32" height="26" fill="white" stroke="blue" />
+<text x="254" y="403" text-anchor="middle" dominant-baseline="middle">3</text>
+<rect x="270" y="390" width="32" height="26" fill="white" stroke="blue" />
+<text x="286" y="403" text-anchor="middle" dominant-baseline="middle">2</text>
+<rect x="302" y="390" width="32" height="26" fill="white" stroke="blue" />
+<text x="318" y="403" text-anchor="middle" dominant-baseline="middle">1</text>
+<rect x="334" y="390" width="32" height="26" fill="white" stroke="blue" />
+<text x="350" y="403" text-anchor="middle" dominant-baseline="middle">0</text>
+<line x1="350" y1="316" x2="350" y2="390" stroke="black" />
+<line x1="318" y1="316" x2="318" y2="390" stroke="black" />
+<line x1="286" y1="316" x2="286" y2="390" stroke="black" />
+<line x1="254" y1="316" x2="254" y2="390" stroke="black" />
+<line x1="222" y1="316" x2="222" y2="390" stroke="black" />
+<line x1="190" y1="316" x2="190" y2="390" stroke="black" />
+<line x1="126" y1="316" x2="126" y2="390" stroke="black" />
+<line x1="426" y1="316" x2="158" y2="390" stroke="black" />
 </svg>
