@@ -366,6 +366,53 @@ while depth and stencil resolve run through CPU transfers.
 * Cube maps are described as layered 2D images; there is no separate cube-array
   layer selection.
 
+### Cube sampling
+
+A cube sample is projected **in the shader**, not by the sampler: the sampler is
+handed the three projected values `{s, t, face}` and never the raw direction.
+Four vector instructions do the projection, and a compliant producer emits all
+four (verified on the closed GL driver, whose compiled fragment shader contains
+exactly this sequence for `texture(samplerCube, dir)`):
+
+```
+v_cubema_f32    v_ma,   dir.x, dir.y, dir.z     ; twice the dominant component
+v_cubes_f32     v_s,    dir.x, dir.y, dir.z
+v_cubet_f32     v_t,    dir.x, dir.y, dir.z
+v_cubeface_f32  v_face, dir.x, dir.y, dir.z
+v_abs_f32       v_ma,   v_ma
+v_rcp_f32       v_inv,  v_ma
+v_fma_f32       v_s,    v_s, v_inv, bias        ; s = sc * (1/ma) + bias
+v_fma_f32       v_t,    v_t, v_inv, bias        ; t = tc * (1/ma) + bias
+samp            ...,    v_s, v_t, v_face, ...
+```
+
+* **`v_cubema_f32` returns twice the dominant component**, so `sc * (1/ma)` is
+  already the half-scale face coordinate in [-0.5, 0.5] and the bias that maps it
+  into [0, 1] is **0.5**.  The closed GL driver programs **1.5** here, which is
+  the same half-scale coordinate plus a further +1.0 normalisation offset that
+  its sampler state carries.  The constant is therefore coupled to the
+  descriptor convention, not to the instruction: programming 1.5 against a
+  plain normalised (image type 13, 2D-array) descriptor pushes the coordinate
+  out of the unit square and the sample clamps to the face edge.
+* The **implicit** form takes a three-register tuple and no derivatives
+  (`samp dst, v_s-v_face, ...`); the texture unit derives the level itself (see
+  the bullet above).  Supplying derivatives of the *direction* instead
+  (`samp_d`) computes a meaningless level for a cube, because the quantity the
+  metric needs is the quotient-rule projection onto the face, not the
+  direction's own derivative - observed to land on the far mip level and render
+  a cube sample as one flat colour.
+* The **explicit** form is `samp_l` with a fourth register carrying the level:
+  `samp_l dst, v_s-v_t, v_face, v_lod, ...`.
+* Face selection ties are resolved **`|z| >= |t| >= |s|`**, with `-0.0` counted
+  as negative by its sign bit and denormal inputs flushed; see
+  `oracle_cubeface` in `code/lg200/ops/oracle.cpp`.  A producer that instead
+  prefers `s` on ties disagrees with the hardware on every exact tie, which is
+  where cube image comparisons concentrate their failures.
+* Wrap modes are applied **inside the face**; the sampler does not blend across
+  a face boundary unless the producer implements a seamless remap itself.  The
+  closed GL driver does not: a footprint straddling the face edge repeats the
+  edge texel.
+
 ## Limits
 
 | Limit | Value |
