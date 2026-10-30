@@ -108,13 +108,53 @@ operand, and move between that memory and registers:
 * Loads and stores of 8, 16, 32 and 64 bits, with an explicit offset.
 * A coefficient load used by the fragment interpolation path, which reads one
   coefficient vector from a base register plus a slot index.
-* Matrix forms — `load_sm_matrix_x1`, `x2` and `x4` — that read one, two or four
-  planes.  The single-plane form reads element `n` of a four-column matrix into
-  lane `n`, with the row pitch taken from the caller's per-lane address stride
-  rather than from each lane's own address; the encoded destination byte is the
-  tuple start and must be aligned to the tuple width.  The mapping of the planes
-  onto registers in the multi-plane forms, and the intra-plane layout, are
-  UNRESOLVED; `x4` was measured to write more than four registers.
+* Matrix forms - `load_sm_matrix_x1`, `x2` and `x4` - that read one, two or four
+  planes, one word per lane per plane, into 1, 2 or 4 **contiguous** registers at the
+  encoded destination (the tuple start must be aligned to the width).  Measured
+  2026-10-30 with sentinels in the destination registers and a window whose every cell
+  held its own byte address, at 4, 8, 16, 20, 24, 28, 32, 48 and 64 lanes, with `s` the per-lane address
+  stride in bytes:
+
+      byte = base + 8*s*w + 4*(lane & 3) + s*(lane >> 2)      w = 0..3
+
+  i.e. element `(lane & 3)` of row `(lane >> 2)`, and the second plane sits **8*s**
+  past the first (0x20 with the 4-byte stride a producer uses).
+
+  | form | registers | planes that read this window | lanes for a complete fill |
+  |---|---|---|---|
+  | `x1` | v4 | 0 | 4 (measured) |
+  | `x2` | v4, v5 | 0, 1 | **16** |
+  | `x4` | v4..v7 | 0..3 | **32** |
+
+  **The window is only reachable when the launch is wide enough for the fragment, and
+  the fill grows plane by plane instead of switching on at one width.**  Widening the
+  same `x4` read: 4 and 8 lanes fill plane 0 only; 16 lanes fill planes 0-1; 20 lanes
+  also fill plane 2, for lanes 0-15 only; 24 lanes fill planes 0-2; 28 lanes fill plane 3
+  for lanes 0-19 only; 32, 48 and 64 lanes fill all four (0x20/0x40/0x60/0x80 in the same
+  window, identical at all three widths).  The missing cells hold two alternating words
+  that belong to no part of this launch and repeat exactly across runs: those lanes'
+  plane reads never land in the declared window - not at any offset, base (0x20/0x420),
+  stride (4/8/16), declared size (4/16/32 KiB) or content (dense tags, or one constant
+  everywhere): six controls, all bit-identical.  The rule behind the partial fill is
+  UNRESOLVED; only the widths above are guaranteed.
+
+  Encoding (vendor assembler): `load.sm.matrix.xN pdst, <tuple>, vJ, <off0>` -
+  **four** operands.  The destination tuple is `INST_LO[31:24]`, the address is
+  `INST_LO[23:16]`, and `off0` is an `X0_16` immediate at `INST_HI[15:0]`, the same
+  field `load_sm_b32` carries its offset in (`load.sm.matrix.x1 p0, v13, v12, 4` ->
+  `[00,00,0c,0d, 04,00,c4,20]`).  The tuple start is the raw register index, an
+  unaligned tuple (`x2` odd, `x4` not a multiple of four) is rejected outright, and the
+  address register may also be the first destination register.
+  `LOONGGPU_DELTA`: this tree's row has no operand for `off0`, so the codec always
+  emits `imm = 0` - byte-identical to the vendor's zero form, but unable to express an
+  offset.
+
+  A vendor producer confirms the shape from the other side: the shipped cuBLASLt Tensile
+  GEMM contains 650 `load.sm.matrix.x4` whose four words all feed `v_fma.f32` (tile
+  rows 0x40, blocks 0x400, two loads 0x100 apart, `check sm` before the arithmetic), and its
+  workgroup is 16x16 = 256 work-items - far wider than the 32 lanes the form needs, which
+  is why it sees no restriction at all.
+
 * Swizzle forms that load or store a 64-bit element with a permutation, where the
   unit of the offset, the permutation's action on address versus data, and
   whether it is an involution are UNRESOLVED.

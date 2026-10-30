@@ -62,8 +62,8 @@ Two properties of this register matter:
 Two mask rows relate the scalar domain to the lanes of a wave: one computes a
 mask covering whole quads, used when helper lanes have to be enabled for
 derivative work, and one derives a lane mask from a quad mask.  Both produce lane
-masks, so their results are subject to the same lifetime rules as vector compare
-results.
+masks, which are ordinary registers: a mask keeps its value until something writes
+it again.
 
 ## Scalar memory
 

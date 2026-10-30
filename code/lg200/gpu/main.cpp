@@ -387,11 +387,48 @@ std::vector<std::uint8_t> cs_implicit_block(const std::uint32_t group[3],
 // prevent.
 constexpr std::uint32_t kComputeLaunchSgprs = 14;
 
+// A program that executes a shared-memory instruction must declare an LDS
+// window.
+//
+// This preflight exists because its absence cost three pipe resets: the request
+// filler below never copied program.shared_bytes into the submit request, so
+// every shared-memory row this carrier has ever built ran with a zero-byte
+// window and faulted inside the compute pipe (measured: store_sm_b32 lat 4 and
+// atomic_sm_add_u32 lat 256 both at 0x100084000).  A windowless shared-memory
+// launch is not a measurable configuration, it is a malformed one, and no
+// carrier may submit without a preflight that the launch state is legal.
+//
+// The check is "present", not "large enough": the LDS offsets live in VGPRs, so
+// the program's real footprint is not statically knowable here.  What is
+// knowable is the pair that was actually wrong - a shared-memory instruction
+// with no window declared at all.
+bool cs_lds_preflight(const lgpu::envelope::EnvelopeProgram& program,
+                      std::uint32_t declared, std::string& why) {
+  const bool uses_lds = program.listing.find("_sm_") != std::string::npos;
+  if (uses_lds && declared == 0) {
+    why = "the program executes a shared-memory instruction but the launch "
+          "declares a zero-byte LDS window; set program.shared_bytes in the "
+          "builder (the row cannot be measured without one)";
+    return false;
+  }
+  return true;
+}
+
 void cs_fill_request(lgpu::drm::ComputeSubmitRequest& request,
                      const lgpu::envelope::EnvelopeProgram& program,
                      std::uint32_t output_bytes) {
   request.text = program.bytes;
   request.output_size = output_bytes;
+  // The declared LDS window.  This is the ONLY place it is copied from the
+  // program into the submit request, and it used to be nowhere: it was set for
+  // the pj2 probe only, so every csbench row that used shared memory ran with
+  // shared_segment_size = 0 while its own builder had declared bytes.  The
+  // descriptor then described a launch with no LDS region, and the row faulted
+  // inside the compute pipe - which read as "LDS does not work on this pipe"
+  // when it was really "this runner never told the descriptor about the window".
+  // Whatever a builder declares now reaches .kd +0x1c and rsrc0's
+  // granulated_shm_size without any per-runner plumbing.
+  request.shared_segment_size = program.shared_bytes;
   request.num_sgprs = std::max<std::uint32_t>(program.sgpr_high_water,
                                              kComputeLaunchSgprs);
   // A VGPR count of zero would declare an allocation the wave cannot have.
@@ -517,6 +554,16 @@ int csrun(const std::string& mnemonic, bool dry_run) {
   return 3;
 #else
   if (!cs_preflight("csrun")) return 5;
+  {
+    // Same preflight as the bench path: a shared-memory instruction with no
+    // declared window is a malformed launch, not a case whose result can be
+    // read.  program->shared_bytes is the value cs_fill_request copies below.
+    std::string why;
+    if (!cs_lds_preflight(*program, program->shared_bytes, why)) {
+      std::fprintf(stderr, "csrun: %s: %s\n", mnemonic.c_str(), why.c_str());
+      return 4;
+    }
+  }
   std::uint32_t max_offset = 0;
   for (const auto& c : program->cases) {
     for (const auto off : c.offsets)
@@ -1003,6 +1050,102 @@ int csmask(unsigned variant, std::uint32_t timeout_ms, bool dry_run) {
 #endif
 }
 
+// U-4 / U-6 / U-7: the three probes the LCO review left blocked.  One command,
+// one submission, a fixed output layout per probe - and a printer that names
+// the offsets, so a reader never has to reconstruct them from the builder.
+int csp(const char* probe, unsigned variant, std::uint32_t timeout_ms,
+        bool dry_run) {
+  std::string error;
+  std::uint32_t group[3];
+  cs_group(group);
+  const unsigned lanes = group[0] * group[1] * group[2];
+  std::optional<lgpu::envelope::EnvelopeProgram> program;
+  if (std::strcmp(probe, "divchk") == 0)
+    program = lgpu::envelope::build_cs_divergent_check_probe(variant, error,
+                                                             lanes);
+  else if (std::strcmp(probe, "matrix") == 0)
+    program = lgpu::envelope::build_cs_matrix_probe(variant, error, lanes);
+  else if (std::strcmp(probe, "masklife") == 0)
+    program = lgpu::envelope::build_cs_mask_lifetime_probe(variant, error,
+                                                           lanes);
+  else {
+    std::fprintf(stderr, "csp: unknown probe '%s' (divchk|matrix|masklife)\n",
+                 probe);
+    return 2;
+  }
+  if (!program) {
+    std::fprintf(stderr, "csp: %s\n", error.c_str());
+    return 2;
+  }
+  std::printf("csp probe=%s variant=%u lanes=%u lds=%u bytes=%zu "
+              "instructions=%zu\n",
+              probe, variant, lanes, program->shared_bytes,
+              program->bytes.size(), program->words.size());
+  if (dry_run) {
+    std::printf("%s", program->listing.c_str());
+    if (std::getenv("LGPU_DUMP_WORDS"))
+      for (std::size_t i = 0; i < program->words.size(); ++i)
+        std::printf("word %3zu: lo=0x%08x hi=0x%08x\n", i,
+                    program->words[i].lo, program->words[i].hi);
+    return 0;
+  }
+#if !defined(LGPU_HAVE_DRM)
+  std::fprintf(stderr, "csp: drm submit layer not built (LGPU_HAVE_DRM)\n");
+  return 3;
+#else
+  if (!cs_preflight("csp")) return 5;
+  lgpu::drm::ComputeSubmitRequest request;
+  cs_fill_request(request, *program, 0x1000);
+  // The carriers stage their own sentinel cells (and the matrix probe stages
+  // none: it fills LDS from the shader); dropping the list here would make
+  // every "did the lane write the sentinel" readback a zero.
+  request.output_preload = program->arg_preloads;
+  request.timeout_ms = timeout_ms;
+  const auto report = lgpu::drm::submit_compute(request);
+  if (report.status != lgpu::drm::ComputeSubmitReport::Status::Clean) {
+    cs_print_wedge(report, "csp");
+    return 3;
+  }
+  auto dword = [&](std::size_t i) -> std::uint32_t {
+    std::uint32_t v = 0;
+    if (4 * i + 4 <= report.output.size())
+      std::memcpy(&v, report.output.data() + 4 * i, 4);
+    return v;
+  };
+  auto record = [&](const char* label, std::uint32_t base) {
+    std::printf("  %s:", label);
+    for (unsigned l = 0; l < lanes && l < 32; ++l)
+      std::printf(" %08x", dword(base / 4 + l));
+    std::printf("\n");
+  };
+  if (std::strcmp(probe, "divchk") == 0) {
+    std::printf("armA store=0x%08x read=0x%08x | armB store=0x%08x "
+                "read=0x%08x | round2 read=0x%08x | p0=0x%08x\n",
+                dword(0x40 / 4), dword(0x44 / 4), dword(0x48 / 4),
+                dword(0x4c / 4), dword(0x54 / 4), dword(0x50 / 4));
+    record("armA lanes", 0x200);
+    record("armB lanes", 0x300);
+  } else if (std::strcmp(probe, "matrix") == 0) {
+    record("c0", 0x100);
+    record("c1", 0x200);
+    record("c2", 0x300);
+    record("c3", 0x400);
+    // The x4 form is declared as four registers, but u-l-i-g records that it
+    // writes more than four, so four more are recorded as well.
+    record("c4", 0x500);
+    record("c5", 0x600);
+    record("c6", 0x700);
+    record("c7", 0x800);
+  } else {
+    std::printf("p0=0x%08x p1=0x%08x p2=0x%08x p3=0x%08x\n",
+                dword(4), dword(5), dword(6), dword(7));
+  }
+  std::printf("  signal=0x%016llx\n",
+              static_cast<unsigned long long>(report.signal_value));
+  return 0;
+#endif
+}
+
 // E-1: PJ2 is the per-instruction mask selector.  Each variant stages known
 // p0/p1 contents and reports, per lane, whether the instruction under test
 // wrote.  Output: p0..p3 at 0..12, the post-test p1 at 0x10, the branch
@@ -1180,6 +1323,27 @@ int csbench_run(const std::string& mnemonic, const std::string& kind,
     return 2;
   }
   if (reps == 0) return 2;
+  // The declared window is resolved ONCE, so the preflight and every submission
+  // below carry the same number.  CSBENCH_SHARED is the diagnostic override
+  // described at its use site: it can force a window onto a program with no
+  // shared-memory instruction (the discriminator experiment), which is why the
+  // preflight runs after it.
+  std::uint32_t declared_shared = program->shared_bytes;
+  if (const char *forced = std::getenv("CSBENCH_SHARED"))
+    declared_shared =
+        static_cast<std::uint32_t>(std::strtoul(forced, nullptr, 0));
+  {
+    std::string why;
+    if (!cs_lds_preflight(*program, declared_shared, why)) {
+      std::fprintf(stderr, "csbench: %s: %s\n", mnemonic.c_str(), why.c_str());
+      return 4;
+    }
+    if (program->listing.find("_sm_") != std::string::npos)
+      std::fprintf(stderr,
+                   "csbench: %s: LDS window %u bytes, program executes "
+                   "shared-memory instructions\n",
+                   mnemonic.c_str(), declared_shared);
+  }
 #if !defined(LGPU_HAVE_DRM)
   std::fprintf(stderr, "csbench: drm submit layer not built (LGPU_HAVE_DRM)\n");
   return 3;
@@ -1190,6 +1354,12 @@ int csbench_run(const std::string& mnemonic, const std::string& kind,
   for (unsigned rep = 0; rep < reps; ++rep) {
     lgpu::drm::ComputeSubmitRequest request;
     cs_fill_request(request, *program, 256);
+    // Already resolved and preflighted above.  CSBENCH_SHARED exists to separate
+    // the two halves of an LDS failure with one submission each - a declared
+    // window carrying no shared-memory instruction (CSBENCH_SHARED=512 on a flat
+    // row) versus a shared-memory instruction with no window - and is never a
+    // production setting.
+    request.shared_segment_size = declared_shared;
     request.dump_signal = true;
     request.persistent_session = persistent;
     const auto t0 = std::chrono::steady_clock::now();
@@ -1824,6 +1994,16 @@ int main(int argc, char** argv) {
             : 8000u;
     return csmask(variant, tmo, dry_run);
   }
+  if (argc >= 4 && std::strcmp(argv[1], "csp") == 0) {
+    const bool dry_run = std::strcmp(argv[argc - 1], "--dry-run") == 0;
+    const unsigned variant =
+        static_cast<unsigned>(std::strtoul(argv[3], nullptr, 0));
+    const std::uint32_t tmo =
+        argc >= 5 && !dry_run
+            ? static_cast<std::uint32_t>(std::strtoul(argv[4], nullptr, 0))
+            : 8000u;
+    return csp(argv[2], variant, tmo, dry_run);
+  }
   if (argc >= 3 && std::strcmp(argv[1], "pj2") == 0) {
     const unsigned variant =
         static_cast<unsigned>(std::strtoul(argv[2], nullptr, 0));
@@ -1874,6 +2054,8 @@ int main(int argc, char** argv) {
   std::fprintf(stderr,
                "usage: lgpu-gpu --matrix | lgpu-gpu run <m> [--dry-run] | "
                "lgpu-gpu bench <m> lat|tp <copies> <reps> [--dry-run] | "
-               "lgpu-gpu csbench <m> lat|tp [copies] [reps] [--dry-run]\n");
+               "lgpu-gpu csbench <m> lat|tp [copies] [reps] [--dry-run] | "
+               "lgpu-gpu csp <divchk|matrix|masklife> <variant> [timeout] "
+               "[--dry-run]\n");
   return 2;
 }

@@ -213,9 +213,17 @@ The lane-mask mechanism is:
   hardware adds the scalar register that field selects. Measured on the compute pipe:
   every case returned expected + `0x000b0000`, and that is exactly the `s0` the
   prelude stages as the result-store descriptor base. On graphics, where the packet
-  hydrates `s0` to zero, the term is absent. Whether the selected scalar is the whole
-  implicit input stays UNRESOLVED - one further implicit term survives, with the byte
-  pattern `0xff` at every lane count - so it is recorded as open rather than guessed at.
+  hydrates `s0` to zero, the term is absent.
+
+  That scalar is the **whole** implicit input.  The one further implicit term this
+  page used to leave open - a `0xff` byte pattern at every lane count - is not a
+  property of the row: with the carrier zeroing the selected scalar, all four
+  `v_dp4a_*` forms pass their case vectors on the compute pipe (103/103 each,
+  `code/lg200/gpu/README.md`), and the `0xff` reading belonged to `v_mbcnt_u32` on
+  the graphics carrier (0x103 where graphics reads 0x1ff, at every lane count) and
+  does not reproduce on the compute carrier (41/41 there, 2026-10-30).  So it says
+  that the carriers stage lanes/exec differently, not that the instruction has a
+  second hidden addend.
 * A scalar condition is the SCC bit: compare instructions write it, and
   add-with-carry, subtract-with-borrow and scalar select read it back as their
   third source.
@@ -230,21 +238,9 @@ One hazard survives from the earlier reading of this section:
    issued, and a compare whose result is a scalar register (rather than SCC) is
    not the established form.
 
-The two mask hazards that used to be listed here — "a lane mask does not
-survive a vector instruction" and "vector memory and sampling clobber lane
-masks" — are **not** established as written.  The probes above kept the selected
-mask unchanged across a vector ALU operation, a flat store, a shared-memory
-access and a fragment-stage vector store, and the earlier X-1 probe kept a mask
-that was not selected unchanged across `s_wqm_b32`, `s_and_b32`, `barrier`,
-`v_mov_b32` and a vector store.  A destination-writing instruction that also
-selects its own destination is safe: the selector is read before the write.
-
-What is still untested is the part no carrier can currently stage: whether the
-**texture/sampling** forms and the **SIO** transfers gate by `PJ2` the way the
-ALU, flat and shared-memory forms do.  The structured carrier refuses the
-texture family (there is no way to bind a valid image and sampler tuple for a
-single-instruction run) and no SIO transfer was ever executed under a mask, so
-both stay open rather than inferred from the layouts that do carry the field.
+A lane mask register value written into
+`p0`-`p3` stays there until an instruction writes that mask again, so a compare
+result can be consumed many instructions later.  
 
 Because masks are per-lane data but the branch is wave-wide, a divergent branch
 is expressed as a compare into a mask, a branch on that mask, and mask
@@ -330,7 +326,7 @@ ordinary operands will size the resource tuple from the wrong bit.
 
 The exact arithmetic of `mod2` and `clmp1` is UNRESOLVED beyond their names - and the
 reason is stronger than "every producer emits fixed values": neither appears anywhere
-in the producer's intrinsic layer, and in two whole linked programs (~30,000 lines
+in the producer's intrinsic layer, and in two whole linked programs (`30,000 lines
 each, runtime libraries included) the disassembler prints no `mod2`, `clmp1`, `dmask`
 or `un` at all, which means the producer emits all of them at ZERO.  The `bl1`/`bl2`
 pair is a different case and is now separated out: both ARE reachable, as the two
@@ -478,7 +474,7 @@ RD8             result tuple
   is execution, not description: the carrier cannot stage a buffer descriptor, so no
   sub-word buffer access has ever been run.
 * The alignment rule for a two-register pair - **narrowed by the producer's output**, not
-  decided.  Across two whole linked programs (~30,000 lines each, runtime libraries
+  decided.  Across two whole linked programs (`30,000 lines each, runtime libraries
   included) every multi-register vector operand starts at an even register: 5,481
   occurrences drawing on 21 distinct bases, and not one odd base.  That is usage evidence
   and not a requirement - the allocator may simply never produce an odd base - so the

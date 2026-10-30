@@ -287,7 +287,8 @@ bool is_implicit_scc_family(const std::string& mnemonic) {
 // closed driver states the same model: the compare/lane-mask pool keeps its
 // results in the ordinary SGPR window and reads them back from s8
 // (lco_register_allocation.c), and the hardware evaluates a compare under the
-// current exec mask (lco_spill.c).  The SCC-compare family does not need this
+// lane mask the instruction selects (lco_spill.c).  The SCC-compare family does
+// not need this
 // because it materialises 0xffff with an explicit s_select.
 bool is_lane_mask_family(const std::string& mnemonic) {
   return mnemonic.rfind("v_cmp", 0) == 0;
@@ -3613,7 +3614,8 @@ std::optional<EnvelopeProgram> build_cs_mask_probe(unsigned variant,
   Builder builder;
   emit_env_prelude(builder, env);
   // Stage the magic into a scratch SGPR, then write it through the predicate
-  // destination field.  p0 is the live exec mask; variant 0 never touches it.
+  // destination field.  p0 holds the launch lane mask; variant 0 never touches
+  // it.
   builder.s_mov_imm_b32(isa::sgpr(4),
                         variant == 8 ? 0xdeadbeefu : kMagic);
   if (variant != 6)

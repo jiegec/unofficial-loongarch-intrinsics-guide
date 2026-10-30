@@ -916,13 +916,51 @@ bool encode_instruction(const std::string& mnemonic, const std::vector<Operand>&
     return true;
   }
   if (mnemonic == "check") {
-    if (operands.size() != 1 ||
-        operands[0].kind != OperandKind::Raw ||
-        operands[0].text != "k vm vs sm") {
-      error = "check only supports the defined 'k vm vs sm' flags";
+    // The domain is LO[3:0] - the row's own operand list is
+    // X0_1@INST_LO[0];M.vm1@INST_LO[1];X1_2@INST_LO[3:2], i.e. k(1), vm(2),
+    // vs(4), sm(8) - so every combination is representable and the hardware
+    // takes them as values, not as spellings: the vendor producer emits 0x1,
+    // 0x2, 0x3, 0x4, 0x8 and 0xf, and its mem_fence(CLK_GLOBAL_MEM_FENCE)
+    // lowers to "check k|vm|vs" (0x7).  This used to accept only the literal
+    // "k vm vs sm" text and return the 0xf template, which made every other
+    // domain - including the global-only fence the compiler emits - impossible
+    // to assemble.
+    std::uint32_t domain = 0;
+    for (const auto& op : operands) {
+      if (op.kind != OperandKind::Raw) {
+        error = "check takes a domain spelled from k, vm, vs, sm";
+        return false;
+      }
+      for (std::size_t i = 0; i < op.text.size();) {
+        while (i < op.text.size() && (op.text[i] == ' ' || op.text[i] == '|' ||
+                                      op.text[i] == ','))
+          ++i;
+        if (i >= op.text.size()) break;
+        const std::size_t start = i;
+        while (i < op.text.size() && op.text[i] != ' ' && op.text[i] != '|' &&
+               op.text[i] != ',')
+          ++i;
+        const std::string token = op.text.substr(start, i - start);
+        if (token == "k") {
+          domain |= 0x1u;
+        } else if (token == "vm") {
+          domain |= 0x2u;
+        } else if (token == "vs") {
+          domain |= 0x4u;
+        } else if (token == "sm") {
+          domain |= 0x8u;
+        } else {
+          error = "check domain token '" + token +
+                  "' is not one of k, vm, vs, sm";
+          return false;
+        }
+      }
+    }
+    if (domain == 0) {
+      error = "check needs at least one of k, vm, vs, sm";
       return false;
     }
-    out = EncodedInst{row->template_lo, row->template_hi};
+    out = EncodedInst{(row->template_lo & ~0xfu) | domain, row->template_hi};
     return true;
   }
   if (mnemonic == "sioexport") {
@@ -948,10 +986,17 @@ bool decode_instruction(std::uint32_t lo, std::uint32_t hi, DecodedInst& out,
   }
   const std::string mnemonic = row->mnemonic;
   if (mnemonic == "check") {
-    if (lo == 0x0000000fu && hi == 0x40320000u) {
+    // The domain is LO[3:0] (k=1, vm=2, vs=4, sm=8), so the decode has to cover
+    // all sixteen values the row can encode, not just the 0xf corpus form.
+    if (hi == 0x40320000u && (lo & ~0xfu) == 0u && lo != 0u) {
+      std::string text;
+      if (lo & 0x1u) text += "k";
+      if (lo & 0x2u) text += text.empty() ? "vm" : " vm";
+      if (lo & 0x4u) text += text.empty() ? "vs" : " vs";
+      if (lo & 0x8u) text += text.empty() ? "sm" : " sm";
       out.mnemonic = "check";
-      out.operands = {op_raw("k vm vs sm")};
-      out.assembly = "check k vm vs sm";
+      out.operands = {op_raw(text)};
+      out.assembly = "check " + text;
       return true;
     }
     error = "check flags outside the defined tuple";

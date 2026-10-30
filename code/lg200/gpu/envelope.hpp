@@ -192,7 +192,7 @@ std::optional<EnvelopeProgram> build_cs_probe(std::string& error,
                                              unsigned lanes);
 
 // U-2 / P0-R10 raw-shader sequence probe (LCO X-1): write a magic value into
-// the saved lane-mask predicate p1, optionally disturb the live exec mask p0,
+// the saved lane-mask predicate p1, optionally disturb the lane mask p0,
 // then read p1/p0/p2/p3 back and store them at output offsets 0/4/8/12.
 // Variants: 0 = plain write/read, 1 = s_wqm_b32 p0,p0, 2 = narrow p0 with
 // s_and_b32, 3 = barrier, 4 = write p2/p3 as well.  p1 is expected to read the
@@ -213,6 +213,39 @@ std::optional<EnvelopeProgram> build_cs_mask_probe(unsigned variant,
 std::optional<EnvelopeProgram> build_cs_pj2_probe(unsigned variant,
                                                   std::string& error,
                                                   unsigned lanes);
+
+// U-4: is "check" legal inside a mask-narrowed region?  Two arms, each narrowing
+// from the launch's own mask, each storing a constant to its own cell and
+// loading it back, and each recording which lanes ran it.  Output: 0x40/0x44 =
+// arm A's stored value / readback, 0x48/0x4c = arm B's, 0x50 = the restored p0,
+// 0x200 + 4*lane = arm A's lane record, 0x300 + 4*lane = arm B's (pre-filled
+// with 0xdeadbeef).  Variants: 0 = no check between the store and the load
+// (control), 1 = check k|vm|vs|sm inside arm A, 2 = check vm, 3 = check k,
+// 4 = a check in both arms, 5 = one convergent check before the arms (control
+// for 1), 6 = arm B (odd lanes) first, 7 = like 1 with the full launch mask
+// (separates "diverged" from "check present").
+std::optional<EnvelopeProgram> build_cs_divergent_check_probe(unsigned variant,
+                                                              std::string& error,
+                                                              unsigned lanes);
+
+// U-6: what do the matrix loads read?  Fills 64 LDS cells with
+// 0xab000000 | index, then reads one dword per lane and records it at
+// 0x100 + 4*lane (0x200/0x300/0x400 hold components 1..3 for the x2/x4 forms).
+// Variants: 0 = load_sm_b32 control, 1 = matrix_x1 at a 4-byte stride,
+// 2 = matrix_x2, 3 = matrix_x4, 4 = matrix_x1 at a 16-byte stride, 5 =
+// matrix_x1 with the same address in every lane.
+std::optional<EnvelopeProgram> build_cs_matrix_probe(unsigned variant,
+                                                     std::string& error,
+                                                     unsigned lanes);
+
+// U-7: does a lane mask survive N unrelated operations?  Writes the magic into
+// p1, runs N disturbances, then reads p0..p3 back to 0x10/0x14/0x18/0x1c.
+// Variant is 100*class + N; class 1 = vector ALU, 2 = flat vector store,
+// 3 = LDS store+load, 4 = check, 5 = barrier, 6 = a compare writing p2,
+// 7 = the mixed chain of all six per round.
+std::optional<EnvelopeProgram> build_cs_mask_lifetime_probe(unsigned variant,
+                                                            std::string& error,
+                                                            unsigned lanes);
 
 // The same mask-register sequence through the graphics PS carrier (4x4 = 16
 // lanes, fragment stage).  Same write/read mechanism and output offsets; the

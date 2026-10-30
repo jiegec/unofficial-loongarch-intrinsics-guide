@@ -136,9 +136,16 @@ describes the instruction, not any particular producer.
 ## Matrix reads
 
 `load_sm_matrix_x1`, `load_sm_matrix_x2` and `load_sm_matrix_x4` read a matrix
-plane from the workgroup allocation into a register tuple.  The single-plane
-form's per-lane layout is measured; the addressing they share is described with
-the [memory and image family](family-memory.md#shared-memory).
+plane from the workgroup allocation into a register tuple.
+
+Measured 2026-10-30: the tuple is contiguous and its width is 1/2/4; plane 0 is
+`base + 4*(lane&3) + s*(lane>>2)`, plane 1 is 8*s further.  The fill grows with the
+number of active lanes rather than switching on at one width: `x1` is complete at 4
+lanes, `x2` at 16 and `x4` at 32, while 20/24/28 lanes fill `x4` only partially (plane 2
+for lanes 0-15 at 20; all three planes at 24; plane 3 for lanes 0-19 at 28) and the
+missing cells are words from outside the launch, not window data.  The rule behind the
+partial fill is UNRESOLVED; the widths above are the guaranteed ones - see
+[the memory family](family-memory.md#shared-memory).
 
 ## Family map
 

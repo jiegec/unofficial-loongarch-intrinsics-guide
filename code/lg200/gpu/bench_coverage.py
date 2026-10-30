@@ -30,8 +30,9 @@ ISA = ROOT.parent.parent / "lg200-instructions.tsv"
 
 # family -> (prefixes, why the bench has no template for it)
 FAMILIES = [
-    (("atomic_sm", "load_sm", "store_sm", "copy_sm"),
-     "shared memory (LDS)", "needs an LDS window"),
+    (("atomic_sm_cmpswap",),
+     "shared memory (LDS) compare-swap",
+     "the compare-swap operand pair is not verified on the compute pipe"),
     (("atomic_v_flat", "load_v_flat", "store_v_flat", "load_s_flat",
       "store_s_flat"), "flat memory", "needs a flat address operand"),
     (("atomic_v_buff", "load_v_buff", "store_v_buff", "load_s_buff",

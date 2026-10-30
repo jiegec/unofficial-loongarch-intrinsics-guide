@@ -74,7 +74,7 @@ def verdict(m, wins, skipped, notes=None):
     # threw that number away and made 20 control rows look unmeasurable in both
     # columns.  A row measured in one kind is now PARTIAL and reports what it has.
     _fam, _why = _bench_reason(m)
-    reason = ("not benchable on the compute carrier"
+    reason = ("the bench builder refuses this row on the compute pipe"
               if not _why else "%s: %s" % (_fam, _why))
     got, missing = {}, []
     for kind in ("lat", "tp"):
@@ -110,26 +110,67 @@ def main() -> int:
     if "--limit" in sys.argv:
         ms = ms[:int(sys.argv[sys.argv.index("--limit") + 1])]
     out = Path(sys.argv[sys.argv.index("--out") + 1]) if "--out" in sys.argv else OUT
-    verdicts, retry = {}, []
-    for i in range(0, len(ms), CHUNK):
-        chunk = ms[i:i + CHUNK]
+    # ---- the coverage gate -------------------------------------------------
+    #
+    # bench_coverage.classify() already answers "what does this row need that
+    # the compute carrier cannot supply?", and until 2026-10-30 that answer was
+    # only used to label the CSV *after* the fact.  It has to gate the
+    # submission: on 2026-10-30 the sweep's first row was atomic_sm_add_u32,
+    # classify() said "shared memory (LDS): needs an LDS window", the row was
+    # submitted anyway, its builder emitted an LDS access while the launch
+    # declared no shared memory, and that one submission took CPIPE down
+    # (unresolvable fault, quarantine, recovery whose post-reset verification
+    # timed out).  Every one of the 768 rows then reported SKIP or FAULT while
+    # exactly one of them had actually broken the device.
+    #
+    # --allow names a row to submit anyway.  Trying a known-expensive row is a
+    # deliberate act on a watched device, not something a default sweep does.
+    allow = set()
+    if "--allow" in sys.argv:
+        allow = {x for x in sys.argv[sys.argv.index("--allow") + 1].split(",") if x}
+    gated = {}
+    for m in ms:
+        fam, why = _bench_reason(m)
+        if why and m not in allow:
+            gated[m] = "%s: %s" % (fam, why)
+    runnable = [m for m in ms if m not in gated]
+    verdicts = {}
+    for m, why in gated.items():
+        verdicts[m] = ("SKIP", "", "", why)
+    print("  %d gated by the coverage map, %d runnable"
+          % (len(gated), len(runnable)), file=sys.stderr)
+
+    stopped_at = None
+    for i in range(0, len(runnable), CHUNK):
+        chunk = runnable[i:i + CHUNK]
         wins, skipped, faulted, notes = run_batch(chunk)
         for m in chunk:
             if m not in faulted:
                 verdicts[m] = verdict(m, wins, skipped, notes)
         if faulted:
-            print("  chunk %d: transient fault on %s" % (i, sorted(faulted)),
+            # Fail fast.  A submission that does not come back clean means the
+            # device may already be unusable, and the rest of this loop would
+            # then be 47 chunks of submissions to a dead pipe - which is how one
+            # row's fault became "0 OK of 768".  Stop, name the row, and do not
+            # retry it: the same failing case is not submitted twice.
+            stopped_at = sorted(faulted)[0]
+            for m in faulted:
+                verdicts[m] = ("FAULT", "", "",
+                               "submission did not come back clean; the sweep "
+                               "stopped at this row rather than continue into a "
+                               "device that may already be down")
+            print("  STOP: %s failed; not submitting anything else" % stopped_at,
                   file=sys.stderr)
-            retry.extend(sorted(faulted))
-        print("  %d/%d" % (min(i + CHUNK, len(ms)), len(ms)), file=sys.stderr)
-    for m in retry:
-        wins, skipped, faulted, notes = run_batch([m])
-        if m in faulted:
-            verdicts[m] = ("FAULT", "", "", "submission failed twice, in isolated processes")
-        else:
-            verdicts[m] = verdict(m, wins, skipped, notes)
-        print("  retry %s -> %s" % (m, verdicts[m][0]), file=sys.stderr)
-    rows = [(m,) + verdicts.get(m, ("NO-DATA", "", "", "not measured")) for m in ms]
+            break
+        print("  %d/%d" % (min(i + CHUNK, len(runnable)), len(runnable)),
+              file=sys.stderr)
+
+    # A row that was never submitted must not borrow a reason from the coverage
+    # map: "not measured" and "known unmeasurable" are different facts, and
+    # reporting the second for the first is what made the 2026-10-30 sweep read
+    # as 724 legitimate skips.
+    unrun = "not measured: the sweep stopped at %s" % stopped_at if stopped_at             else "not measured"
+    rows = [(m,) + verdicts.get(m, ("NO-DATA", "", "", unrun)) for m in ms]
     out.write_text("mnemonic\tstatus\tlat_ticks_per_op\ttp_ticks_per_op\tnote\n"
                    + "".join("\t".join(r) + "\n" for r in rows))
     ok = sum(1 for r in rows if r[1] == "OK")

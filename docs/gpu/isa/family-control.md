@@ -175,9 +175,25 @@ address form of the global side, and the ordering requirements are UNRESOLVED.
   defines.  What each operation does to its literal is still open.
 * The transfer granularity and address form of the shared-memory copies.
 * The `flag` and `rfe` forms.
-* Whether `check` may be placed inside divergent code.  The second half of this bullet
-  is now partly answered: the class operand is driven by the fence scope - `sm` exactly
+* Whether `check` may be placed inside divergent code: **answered, and it may** (below).  The operand side of this is
+  now settled twice over: the class bits are driven by the fence scope - `sm` exactly
   when the local side is named, `k|vm|vs` for the global side - and no zero operand
-  appeared in five scope probes.  What makes the producer emit a zero, and what the
-  hardware orders then, stays open and needs a device.
+  appeared in five scope probes; and the field is `INST_LO[3:0]` with k=1, vm=2,
+  vs=4, sm=8, so all sixteen combinations are representable and the producer's
+  `check k`, `check vm`, `check vs`, `check k|vm|vs` (7) and `check k|vm|vs|sm` (15)
+  all encode (2026-10-30: `check vm` → `lo=0x00000002 hi=0x40320000`; this tree's
+  codec used to accept only the 15 spelling, which silently made a global-only
+  fence unassemblable).
+
+  **Placement: answered - `check` may sit inside a narrowed region, and it is
+  load-bearing there.** On this machine "divergent" has a specific meaning: there is
+  no per-lane branch (`cb`/`czb` test a mask register wave-wide), so a divergent
+  region IS a narrowed `p0`.  With the region narrowed from the launch's own mask, a
+  store followed by a load of the same address reads back correctly when one `check`
+  sits *between* them inside the region, and reads stale when there is none or when
+  the `check` is placed convergently before the region - a check outside a region
+  cannot order that region's work.  `p0` comes back exactly, lanes that ran no arm
+  keep their sentinels, and nothing hangs, so `check` is not a lane rendezvous.
+  With no `check` at all the load simply reads stale data: the check is what orders
+  the pair, and nothing else does.
 * Whether the barrier has any effect outside a compute workgroup.

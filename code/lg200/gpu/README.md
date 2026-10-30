@@ -296,6 +296,16 @@ stores to the same offset, so which lane's value comes back is not established).
     python3 run_gpu.py --pipe cs --mnemonic v_add_u32
     python3 run_gpu.py --pipe cs      # the whole universe
 
+**If `csprobe` reports `loonggpu_userq_create(COMPUTE) failed` on a freshly
+booted machine, it is the kernel, not this harness and not a wedge.**  The
+signature in `dmesg` is `pd-hw-all: v0..v3 = 0 (programmed: v1=0x...)` followed
+by `CPIPE quarantined ... compute is refused until recovery`: the reserved DRM
+VMID was handed over before its page-directory base reached
+`VM_CONTEXT<n>_PAGE_TABLE_BASE_ADDR`, so the first compute access faults
+unmapped and the pipe is quarantined.  `csverify` still passes, because the
+stream is correct; rebooting does not clear it (measured 2026-10-29 across two
+boots).  Fix the PD programming at VMID handover, then rerun the ladder above.
+
 `--pipe cs` executes **685 of the 768 mnemonics**; the other 83 are reported as
 `SKIP-ENVELOPE` with the reason rather than assembled into a stream, in two
 groups:
@@ -421,7 +431,7 @@ Evidence, all host-side:
   keeps compare results in the ordinary SGPR window - *not* the `0x7c-0x7f`
   predicate space - and records that "the S5 probes read them back from s8";
   reading s8 is what this carrier already does.  `lco_spill.c` records that
-  "the hardware evaluates a compare under the current exec mask".
+  "the hardware evaluates a compare under the lane mask the instruction selects".
 * The saved CS matrix shows the pattern exactly: every `v_cmp*` row whose
   oracle mask is non-zero FAILs and every zero-mask row PASSes.  `v_cmp_f_f32`
   (all-zero) passes 102/102 while `v_cmp_tru_f32` (all-ones) fails 0/102.
@@ -878,3 +888,95 @@ works when the GPU is wedged.
 A disagreement means one of the two encoders is wrong, and it is worth knowing
 which before an instruction reaches hardware - the carriers emit scaffolding
 around every case, so a wrong scaffolding encoding corrupts results silently.
+
+
+## The compute pipe: measured facts (2026-10-30)
+
+### Launch contract
+
+A shared-memory launch is three descriptor words plus two constants, all five pinned
+against the vendor runtime's own instructions (see `loongvk_kd.h` in the Mesa tree):
+
+| carrier | value | evidence |
+|---|---|---|
+| `.kd` +0x1c | declared LDS bytes | vendor copies the AQL `group_segment_size` here every dispatch |
+| `rsrc0` bits 20:10 | `(bytes*8 + 0x3F8) & 0x1FFC00` | the vendor's own `slli 3 / addi 1016 / bstrpick / bstrins` |
+| MCS aperture +8 | `0x00010000` (`lds_base = 1<<48` >> 32) | live capture; KMD `kcd_init_apertures_lg2xx` |
+| MCS aperture +12 | `0x00020000` (`scratch_base = 2<<48` >> 32) | as above |
+| nothing else | no CPU-side LDS init, no LDS base in kernarg | a vendor `__local` kernel addresses LDS with plain byte offsets |
+
+`finalize_program()` declares the window from the program itself, and
+`cs_lds_preflight()` refuses to submit a shared-memory program with a zero-byte window.
+
+### Two things that break a launch
+
+* **No `exit`.** The wave runs off the end of the code BO, the CP fetches
+  `kCsTextVa + 0x4000` - the next 16 KiB page, which is not mapped - and the fault is
+  unresolvable. Measured at exactly that address, invariant to the declared window, the
+  program's length and the presence of `check`. Every builder ends with `nop; exit`.
+* **A shared-memory instruction with no declared window.** See above.
+
+### The sweep: 768 rows, one clean boot, 0 faults
+
+531 OK, 237 SKIP. `run_bench.py` runs `csbench` at K=256 and K=2048 and reports
+`(win(2048) - win(256)) / 1792` ticks per operation, which removes the fixed launch cost
+(~1517 ticks, the same as `v_add_f32 lat 4`). `lat` is an 8-way dependency chain, `tp`
+independent streams.
+
+| family | rows OK | lat / tp (ticks per op) |
+|---|---|---|
+| vector | 372 | 1.6-17.0 / 1.9-5.6 |
+| scalar | 119 | 1.6-8.2 / 1.9-3.1 |
+| shared memory | 40 | below |
+
+| row group | lat | tp |
+|---|---|---|
+| `load_sm_b32/u8/i8/u16/i16/swizzle_b64` | 3.98-4.07 | 3.98-4.03 |
+| `store_sm_b32/b16/b8` | 8.96-9.00 (store + load back) | 4.78-5.12 |
+| `store_sm_b64`, `store_sm_swizzle_b64` | 11.0 | 7.0 |
+| `atomic_sm_*` 32-bit | 8.94-9.10 | 8.94-9.02 |
+| `atomic_sm_*` 64-bit | 14.9-15.2 | 14.9-15.2 |
+| `atomic_sm_rsub_u32/u64` | 1.69 / 1.73 | 1.75 / 1.62 |
+| transcendental (`v_sqrt/v_rcp/v_log2/v_exp2/v_sin`) | ~17.0 | ~5.6 |
+
+The LDS atomics have `lat == tp`, so they are throughput-bound, not chain-bound; and
+`atomic_sm_rsub_*` lands in the ALU/nop band, which agrees with the correctness carrier's
+finding that those two rows do not write the cell. `store_sm_*`'s `lat` column is a
+store+load round trip (`bench_note()` says so per row).
+
+### Probes: `csp`
+
+    ./build/lgpu-gpu csp divchk   <0..8|20..25|30..35> [timeout] [--dry-run]
+    ./build/lgpu-gpu csp matrix   <0..11>              [timeout] [--dry-run]
+    ./build/lgpu-gpu csp masklife <100*class+N>        [timeout] [--dry-run]
+
+One submission per variant, fixed output layout, `dmesg` checked between variants.
+
+* `divchk` - is `check` legal inside a mask-narrowed (divergent) region? Two arms, each
+  narrowing from the launch's own mask, each recording which lanes ran it (`0x200`/`0x300`,
+  pre-filled `0xdeadbeef`), each storing a constant, optionally running one `check`, and
+  loading it back at `0x40/0x44` (arm A) and `0x48/0x4c` (arm B); `0x50` is the restored
+  `p0`, `0x54` a second round's readback.
+* `matrix` - what do the matrix plane loads read? 4 KiB window, every cell holds its own
+  byte address, sentinels `0xdead000c` in v4..v11, one dword per lane recorded at
+  `0x100*(c+1)`. Run it with `LGPU_CS_GROUP=8,1,1` or more: with four work-items the row
+  term of the addressing model is identically zero.
+* `masklife` - write a magic into `p1`, run N disturbances of one class (1 vector ALU,
+  2 flat store, 3 LDS store+load, 4 `check`, 5 `barrier`, 6 a compare writing `p2`),
+  class 7 the mixed chain, then read `p0..p3` back to `0x10..0x1c`.
+* `LGPU_DP4A_S0=<k>` biases the hidden addend of `v_dp4a_*` instead of zeroing it, so
+  "the addend is the selected scalar and nothing else" can be re-tested as expected+k.
+
+### Results these probes produced
+
+| question | answer |
+|---|---|
+| `check` inside a narrowed region | legal and effective: with one inside, a store followed by a load of the same address reads back correctly; with none (or with one placed *before* the region) the readback is stale |
+| ordering without a `check` | same-address flat store then load reads stale data; the `check` is what orders the pair |
+| `load_sm_matrix_x1/x2/x4` | write 1/2/4 **contiguous** aligned registers; plane 0 = `base + 4*(lane&3) + s*(lane>>2)`, plane 1 = +8*s. The window is only reachable when the launch is wide enough, and the fill is graded: `x1` complete at 4 lanes, `x2` at 16, `x4` at **32** - 16 lanes fill 2 planes, 20 lanes 3 (plane 2 for lanes 0-15), 24 lanes 3, 28 lanes 3 plus plane 3 for lanes 0-19, 32/48/64 all four (identical numbers); the missing cells are words from outside the launch |
+| lane masks | ordinary registers: a value written into `p0`-`p3` stays until that mask is written again - there is no expiry rule |
+| `v_dp4a_*` addend | the scalar selected by `LO[23:16]`; four forms pass 103/103 on both pipes with it zeroed |
+
+The ISA-level statements live in `docs/gpu/isa/family-control.md` (check placement),
+`family-memory.md` (matrix loads), `operands.md` (mask registers) and `family-vector.md`
+(matrix reads).
