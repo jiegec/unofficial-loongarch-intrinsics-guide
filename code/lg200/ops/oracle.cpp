@@ -1865,16 +1865,21 @@ std::uint32_t oracle_mbcnt_u32(std::uint32_t v, std::uint32_t mask) {
 std::uint32_t oracle_threadid_u32(std::uint32_t) { return 0u; }
 std::uint32_t oracle_select_b32(std::uint32_t src0, std::uint32_t src1,
                                std::uint32_t src2) {
-  // [HW 2026-08-25] the GA11 condition is read as a 16-bit value (the
-  // low half of the staged register): cond16 == 0 selects src1,
-  // cond16 == 0xffff selects src0, everything else returns src0|src1.
-  // Verified on ~30 probe rows (condition low16 rule; high half is
-  // ignored); the middle branch is an UNRESOLVED hardware quirk, not
-  // the documented select.
-  const std::uint32_t cond = src2 & 0xffffu;
-  if (cond == 0u) return src1;
-  if (cond == 0xffffu) return src0;
-  return src0 | src1;
+  // [HW 2026-11-02] A per-lane select: bit <lane> of src2 picks src0, and the
+  // cleared lanes keep src1.  Measured on the compute carrier with
+  // src0=0x11111111, src1=0x22222222 and src2=0x55555555: lanes 0 and 2 held
+  // 0x11111111 while lanes 1 and 3 held 0x22222222 in the same instruction,
+  // which no uniform rule can produce.  The same answer comes out when src2
+  // names a lane-mask register (raw selector 0x7c) holding those bits.  This
+  // oracle evaluates one lane - lane 0, as oracle_threadid_u32 does - so bit 0
+  // is the question it answers.
+  //
+  // Superseded: an earlier note recorded a 16-bit wave-uniform rule (0 -> src1,
+  // 0xffff -> src0, anything else src0|src1).  That reading came from a probe
+  // that did not stage the operands in canonical order; the canonical form is
+  // "v_select_b32 p0, vd, a, b, c", the PJ2 selector first, so the condition
+  // landed in a different operand field.
+  return (src2 & 1u) != 0u ? src0 : src1;
 }
 std::uint32_t oracle_movindex_b32(std::uint32_t, std::uint32_t) { return 0; }
 std::uint32_t oracle_s_sub_u32(std::uint32_t a, std::uint32_t b) { return a - b; }

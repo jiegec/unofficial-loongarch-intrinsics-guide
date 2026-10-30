@@ -3722,6 +3722,340 @@ std::optional<EnvelopeProgram> build_cs_mask_probe(unsigned variant,
   return program;
 }
 
+// Records one dword per lane: data goes to arg Va + base + 4 * lane, which is
+// the layout every "per lane" probe in this chapter uses.  The address pair is
+// the audit's designated result pair (v26:v27) and the lane id is v0, which the
+// compute launch supplies.
+static void emit_lane_record(Builder& builder, const CarrierEnv& env,
+                             const isa::Reg& data, std::uint32_t base) {
+  const std::uint64_t va = env.arg_va + base;
+  builder.s_mov_imm_b32(isa::sgpr(16), static_cast<std::uint32_t>(va));
+  builder.v_mov_b32(isa::vgpr(26), isa::sgpr(16), isa::predicate(0));
+  builder.s_mov_imm_b32(isa::sgpr(16), static_cast<std::uint32_t>(va >> 32));
+  builder.v_mov_b32(isa::vgpr(27), isa::sgpr(16), isa::predicate(0));
+  builder.s_mov_imm_b32(isa::sgpr(15), 2u);
+  builder.append(isa::McInst{"v_sll_b32", "",
+                             {isa::op_reg(isa::predicate(0)),
+                              isa::op_reg(isa::vgpr(28)), isa::op_reg(isa::vgpr(0)),
+                              isa::op_reg(isa::sgpr(15))}});
+  builder.append(isa::McInst{
+      "v_add_imm_u32", "",
+      {isa::op_reg(isa::predicate(0)), isa::op_reg(isa::vgpr(26)),
+       isa::op_reg(isa::vgpr(28)),
+       isa::op_imm(static_cast<std::uint32_t>(va))}});
+  builder.store_v_flat("store_v_flat_b32", isa::predicate(0), data,
+                       isa::vgpr(26, 2), isa::sgpr(20, 2));
+}
+
+// U-4: is "check" legal inside a mask-narrowed region?  Two arms, each narrowing
+// from the launch's own mask, each storing a constant to its own cell and
+// loading it back, and each recording which lanes ran it.  Arm A takes the even
+// lanes, arm B the odd ones, so a lane record that shows both means the arms did
+// not narrow at all.  Variants: 0 = no check between store and load (control),
+// 1 = check k|vm|vs|sm inside arm A, 2 = check vm, 3 = check k, 4 = a check in
+// both arms, 5 = one convergent check before the arms, 6 = arm B first,
+// 7 = like 1 with the full launch mask.
+std::optional<EnvelopeProgram> build_cs_divergent_check_probe(unsigned variant,
+                                                              std::string& error,
+                                                              unsigned lanes) {
+  if (variant > 7) {
+    error = "unknown divergent-check variant (expected 0..7)";
+    return std::nullopt;
+  }
+  constexpr std::uint32_t kArmA = 0x11110000u;
+  constexpr std::uint32_t kArmB = 0x22220000u;
+  constexpr std::uint32_t kEven = 0x55555555u;
+  constexpr std::uint32_t kOdd = 0xaaaaaaaau;
+  constexpr std::uint32_t kArmACell = 0x40;
+  constexpr std::uint32_t kArmBCell = 0x48;
+  constexpr std::uint32_t kRestored = 0x50;
+  constexpr std::uint32_t kRoundTwo = 0x54;
+  constexpr std::uint32_t kArmALanes = 0x200;
+  constexpr std::uint32_t kArmBLanes = 0x300;
+
+  const CarrierEnv env = CarrierEnv::compute(lanes);
+  Builder builder;
+  emit_env_prelude(builder, env);
+  builder.s_mov_imm_b32(isa::sgpr(4), kArmA);
+  builder.s_mov_imm_b32(isa::sgpr(5), kArmB);
+  builder.s_mov_imm_b32(isa::sgpr(6), kEven);
+  builder.s_mov_imm_b32(isa::sgpr(7), kOdd);
+  // The launch mask, kept so both arms narrow from it and the readback at 0x50
+  // shows what the arms left behind.
+  builder.append(isa::McInst{"s_mov_b32", "(scc)",
+                             {isa::op_reg(isa::sgpr(9)),
+                              isa::op_raw_selector(0x7c)}});
+
+  auto check = [&](const char* what) {
+    builder.append(isa::McInst{"check", "", {isa::op_raw(what)}});
+  };
+  if (variant == 5)
+    builder.check_k_vm_vs_sm();
+
+  EnvelopeProgram program;
+  program.probe = true;
+  for (unsigned l = 0; l < lanes; ++l) {
+    program.arg_preloads.emplace_back(kArmALanes + 4 * l, 0xdeadbeefu);
+    program.arg_preloads.emplace_back(kArmBLanes + 4 * l, 0xdeadbeefu);
+  }
+
+  auto run_arm = [&](std::uint32_t value_sgpr, std::uint32_t mask_sgpr,
+                     std::uint32_t cell, std::uint32_t lane_cell,
+                     bool check_full, bool check_vm, bool check_k) {
+    // Narrow from the launch mask unless the variant wants the whole wave.
+    if (mask_sgpr != 0) {
+      builder.append(isa::McInst{"s_mov_b32", "(scc)",
+                                 {isa::op_reg(isa::predicate(0)),
+                                  isa::op_reg(isa::sgpr(9))}});
+      builder.append(isa::McInst{"s_and_b32", "(scc)",
+                                 {isa::op_reg(isa::predicate(0)),
+                                  isa::op_raw_selector(0x7c),
+                                  isa::op_reg(isa::sgpr(mask_sgpr))}});
+    }
+    builder.v_mov_b32(isa::vgpr(8), isa::sgpr(value_sgpr), isa::predicate(0));
+    emit_result_store(builder, env, isa::vgpr(8), isa::vgpr(0), cell);
+    if (check_full)
+      builder.check_k_vm_vs_sm();
+    if (check_vm)
+      check("vm");
+    if (check_k)
+      check("k");
+    // Read the cell back: the store and the load are what a narrowed region has
+    // to survive.
+    emit_absolute_pair(builder, isa::vgpr(26), isa::vgpr(27), isa::sgpr(16),
+                       env.arg_va + cell);
+    builder.load_v_flat("load_v_flat_b32", isa::predicate(0), isa::vgpr(10),
+                        isa::vgpr(26, 2), isa::sgpr(20, 2));
+    emit_result_store(builder, env, isa::vgpr(10), isa::vgpr(0), cell + 4);
+    // Which lanes ran this arm.
+    emit_lane_record(builder, env, isa::vgpr(8), lane_cell);
+  };
+
+  const bool full_mask = variant == 7;
+  const bool arm_a_first = variant != 6;
+  auto arm_a = [&]() {
+    run_arm(4, full_mask ? 0 : 6, kArmACell, kArmALanes,
+            variant == 1 || variant == 4 || variant == 7,
+            variant == 2, variant == 3);
+  };
+  auto arm_b = [&]() { run_arm(5, 7, kArmBCell, kArmBLanes, variant == 4, false, false); };
+
+  if (arm_a_first) {
+    arm_a();
+    builder.append(isa::McInst{"s_mov_b32", "(scc)",
+                               {isa::op_reg(isa::predicate(0)),
+                                isa::op_reg(isa::sgpr(9))}});
+    arm_b();
+  } else {
+    arm_b();
+    builder.append(isa::McInst{"s_mov_b32", "(scc)",
+                               {isa::op_reg(isa::predicate(0)),
+                                isa::op_reg(isa::sgpr(9))}});
+    arm_a();
+  }
+
+  // What the arms left in p0, and a second read of arm A's cell: a lane that had
+  // to restore the mask itself shows up as a different round-two value.
+  builder.append(isa::McInst{"s_mov_b32", "(scc)",
+                             {isa::op_reg(isa::sgpr(10)),
+                              isa::op_raw_selector(0x7c)}});
+  builder.v_mov_b32(isa::vgpr(8), isa::sgpr(10), isa::predicate(0));
+  emit_result_store(builder, env, isa::vgpr(8), isa::vgpr(0), kRestored);
+  emit_absolute_pair(builder, isa::vgpr(26), isa::vgpr(27), isa::sgpr(16),
+                     env.arg_va + kArmACell);
+  builder.load_v_flat("load_v_flat_b32", isa::predicate(0), isa::vgpr(10),
+                      isa::vgpr(26, 2), isa::sgpr(20, 2));
+  emit_result_store(builder, env, isa::vgpr(10), isa::vgpr(0), kRoundTwo);
+
+  builder.check_k_vm_vs_sm();
+  builder.nop();
+  builder.exit();
+  if (!finalize_program(builder, program, error)) return std::nullopt;
+  return program;
+}
+
+// U-6: what do the matrix loads read?  Fills 64 LDS cells with
+// 0xab000000 | index, then reads one dword per lane and records it.
+std::optional<EnvelopeProgram> build_cs_matrix_probe(unsigned variant,
+                                                     std::string& error,
+                                                     unsigned lanes) {
+  if (variant > 5) {
+    error = "unknown matrix variant (expected 0..5)";
+    return std::nullopt;
+  }
+  if (lanes == 0 || lanes > 64) {
+    error = "matrix probe: lanes must be 1..64";
+    return std::nullopt;
+  }
+  const CarrierEnv env = CarrierEnv::compute(lanes);
+  Builder builder;
+  emit_env_prelude(builder, env);
+
+  // Fill every cell with 0xab000000 | index, one cell per lane per pass.
+  const unsigned passes = (64 + lanes - 1) / lanes;
+  for (unsigned pass = 0; pass < passes; ++pass) {
+    const unsigned base = pass * lanes;
+    builder.s_mov_imm_b32(isa::sgpr(15), 2u);
+    builder.append(isa::McInst{"v_sll_b32", "",
+                               {isa::op_reg(isa::predicate(0)),
+                                isa::op_reg(isa::vgpr(9)), isa::op_reg(isa::vgpr(0)),
+                                isa::op_reg(isa::sgpr(15))}});
+    builder.append(isa::McInst{"v_add_imm_u32", "",
+                               {isa::op_reg(isa::predicate(0)),
+                                isa::op_reg(isa::vgpr(9)), isa::op_reg(isa::vgpr(9)),
+                                isa::op_imm(4u * base)}});
+    builder.append(isa::McInst{"v_srl_b32", "",
+                               {isa::op_reg(isa::predicate(0)),
+                                isa::op_reg(isa::vgpr(11)), isa::op_reg(isa::vgpr(9)),
+                                isa::op_reg(isa::sgpr(15))}});
+    builder.s_mov_imm_b32(isa::sgpr(15), 0xab000000u);
+    builder.append(isa::McInst{"v_or_b32", "",
+                               {isa::op_reg(isa::predicate(0)),
+                                isa::op_reg(isa::vgpr(10)), isa::op_reg(isa::vgpr(11)),
+                                isa::op_reg(isa::sgpr(15))}});
+    builder.sm_op("store_sm_b32", isa::predicate(0), isa::vgpr(10), isa::vgpr(9));
+    builder.check_k_vm_vs_sm();
+  }
+
+  // The address the load under test uses.
+  const unsigned shift = variant == 4 ? 4u : 2u;  // 16-byte stride, else 4
+  builder.s_mov_imm_b32(isa::sgpr(15), shift);
+  builder.append(isa::McInst{"v_sll_b32", "",
+                             {isa::op_reg(isa::predicate(0)),
+                              isa::op_reg(isa::vgpr(9)), isa::op_reg(isa::vgpr(0)),
+                              isa::op_reg(isa::sgpr(15))}});
+  if (variant == 5) {
+    // Every lane reads the same cell.
+    builder.s_mov_imm_b32(isa::sgpr(15), 0u);
+    builder.v_mov_b32(isa::vgpr(9), isa::sgpr(15), isa::predicate(0));
+  }
+  switch (variant) {
+    case 0:
+      builder.sm_op("load_sm_b32", isa::predicate(0), isa::vgpr(12),
+                    isa::vgpr(9));
+      break;
+    case 1:
+    case 4:
+    case 5:
+      builder.sm_op("load_sm_matrix_x1", isa::predicate(0), isa::vgpr(12),
+                    isa::vgpr(9));
+      break;
+    case 2:
+      builder.sm_op("load_sm_matrix_x2", isa::predicate(0), isa::vgpr(12, 2),
+                    isa::vgpr(9));
+      break;
+    case 3:
+      builder.sm_op("load_sm_matrix_x4", isa::predicate(0), isa::vgpr(12, 4),
+                    isa::vgpr(9));
+      break;
+    default:
+      break;
+  }
+  builder.check_k_vm_vs_sm();
+  // Eight component streams: the x4 form is declared as four registers, but
+  // u-l-i-g records that it writes more, so the next four are recorded too.
+  for (unsigned c = 0; c < 8; ++c)
+    emit_lane_record(builder, env, isa::vgpr(12 + c), 0x100 + 0x100 * c);
+  builder.check_k_vm_vs_sm();
+  builder.nop();
+  builder.exit();
+  EnvelopeProgram program;
+  program.probe = true;
+  // 64 dwords of shared memory are staged and read through the matrix forms.
+  program.shared_bytes = 512;
+  if (!finalize_program(builder, program, error)) return std::nullopt;
+  return program;
+}
+
+// U-7: does a lane mask survive N unrelated operations?  Writes the magic into
+// p1, runs N disturbances, then reads p0..p3 back.  Variant is 100*class + N;
+// class 1 = vector ALU, 2 = flat vector store, 3 = LDS store+load, 4 = check,
+// 5 = barrier, 6 = a compare writing p2, 7 = the mixed chain of all six.
+std::optional<EnvelopeProgram> build_cs_mask_lifetime_probe(unsigned variant,
+                                                            std::string& error,
+                                                            unsigned lanes) {
+  constexpr std::uint32_t kMagic = 0x5a5aa5a5u;
+  constexpr std::uint32_t kMirror = 0x3c3cc3c3u;
+  const unsigned klass = variant / 100;
+  const unsigned count = variant % 100;
+  if (klass < 1 || klass > 7) {
+    error = "unknown mask-lifetime class (expected 100*1..7 + N)";
+    return std::nullopt;
+  }
+  const CarrierEnv env = CarrierEnv::compute(lanes);
+  Builder builder;
+  emit_env_prelude(builder, env);
+  builder.s_mov_imm_b32(isa::sgpr(4), kMagic);
+  builder.s_mov_imm_b32(isa::sgpr(5), kMirror);
+  builder.s_mov_b32(isa::predicate(1), isa::sgpr(4));
+  // Scratch the disturbances write through: an LDS cell and a dword of the
+  // result window (0x20 is not read by this probe).
+  builder.s_mov_imm_b32(isa::sgpr(15), 0x20u);
+  builder.v_mov_b32(isa::vgpr(9), isa::sgpr(15), isa::predicate(0));
+  builder.v_mov_b32(isa::vgpr(8), isa::sgpr(4), isa::predicate(0));
+
+  auto disturb = [&](unsigned what) {
+    switch (what) {
+      case 1:
+        builder.v_mov_b32(isa::vgpr(8), isa::sgpr(5), isa::predicate(0));
+        break;
+      case 2:
+        emit_result_store(builder, env, isa::vgpr(8), isa::vgpr(0), 0x20);
+        break;
+      case 3:
+        builder.sm_op("store_sm_b32", isa::predicate(0), isa::vgpr(8),
+                      isa::vgpr(9));
+        builder.check_k_vm_vs_sm();
+        builder.sm_op("load_sm_b32", isa::predicate(0), isa::vgpr(11),
+                      isa::vgpr(9));
+        builder.check_k_vm_vs_sm();
+        break;
+      case 4:
+        builder.check_k_vm_vs_sm();
+        break;
+      case 5:
+        builder.append(isa::McInst{"barrier", "", {}});
+        break;
+      case 6:
+        // A compare writing p2: a different mask register than the one under
+        // test.
+        builder.append(isa::McInst{
+            "v_cmp_eq_u32", "",
+            {isa::op_reg(isa::predicate(0)), isa::op_reg(isa::predicate(2)),
+             isa::op_reg(isa::vgpr(0)), isa::op_reg(isa::vgpr(0))}});
+        break;
+      default:
+        break;
+    }
+  };
+  for (unsigned i = 0; i < count; ++i) {
+    if (klass == 7) {
+      for (unsigned what = 1; what <= 6; ++what) disturb(what);
+    } else {
+      disturb(klass);
+    }
+  }
+
+  // p0..p3 back, four dwords at 0x10..0x1c.
+  for (unsigned i = 0; i < 4; ++i)
+    builder.append(isa::McInst{"s_mov_b32", "(scc)",
+                               {isa::op_reg(isa::sgpr(8 + i)),
+                                isa::op_raw_selector(0x7c + i)}});
+  for (unsigned i = 0; i < 4; ++i) {
+    builder.v_mov_b32(isa::vgpr(8), isa::sgpr(8 + i), isa::predicate(0));
+    emit_result_store(builder, env, isa::vgpr(8), isa::vgpr(0), 0x10 + 4 * i);
+  }
+  builder.check_k_vm_vs_sm();
+  builder.nop();
+  builder.exit();
+  EnvelopeProgram program;
+  program.probe = true;
+  // Class 3 and the mixed chain stage one cell in shared memory.
+  if (klass == 3 || klass == 7) program.shared_bytes = 512;
+  if (!finalize_program(builder, program, error)) return std::nullopt;
+  return program;
+}
+
 // E-1: the PJ2 selector.  Each variant stages known p0/p1/p2/p3 contents,
 // then runs one instruction whose PJ2 names p1/p2/p3 and records which lanes
 // it actually wrote.  The record is out[0x100 + 4*lane] = v8, so the result
@@ -4245,8 +4579,39 @@ std::optional<EnvelopeProgram> build_cs_pj2_probe(unsigned variant,
       store_lane_results();
       break;
     }
+    case 65:
+    case 66: {
+      // Is v_select_b32's condition a per-lane bit test or a uniform value?
+      // The condition sits in s12 / in p0 (raw selector 0x7c), both holding
+      // 0x55555555; the two sources are distinct words and the destination is
+      // filled with a third, so a lane that does not write stays visible.  A
+      // per-lane test leaves 0x11111111 in even lanes and 0x22222222 in odd
+      // ones; the uniform rule gives 0x33333333 (src0|src1) in every lane.
+      builder.s_mov_imm_b32(isa::sgpr(10), 0x11111111u);
+      builder.s_mov_imm_b32(isa::sgpr(11), 0x22222222u);
+      builder.s_mov_imm_b32(isa::sgpr(12), kHalf);
+      // A prefill that is neither source nor their OR, so an unwritten lane is
+      // distinguishable from either select result.
+      builder.s_mov_imm_b32(isa::sgpr(13), 0xdeadbeefu);
+      builder.s_mov_b32(isa::predicate(0), isa::sgpr(5));
+      builder.v_mov_b32(isa::vgpr(8), isa::sgpr(13), isa::predicate(0));
+      builder.v_mov_b32(isa::vgpr(10), isa::sgpr(10), isa::predicate(0));
+      builder.v_mov_b32(isa::vgpr(11), isa::sgpr(11), isa::predicate(0));
+      // The gate stays open (every lane executes) so the only thing the result
+      // can show is what the select itself does with a mixed condition word.
+      builder.s_mov_b32(isa::predicate(0), isa::sgpr(5));
+      builder.append(isa::McInst{
+          "v_select_b32", "",
+          {isa::op_reg(isa::predicate(0)), isa::op_reg(isa::vgpr(8)),
+           isa::op_reg(isa::vgpr(10)), isa::op_reg(isa::vgpr(11)),
+           variant == 65 ? isa::op_reg(isa::sgpr(12))
+                         : isa::op_raw_selector(0x7c)}});
+      builder.s_mov_b32(isa::predicate(0), isa::sgpr(5));
+      store_lane_results();
+      break;
+    }
     default:
-      error = "unknown pj2 probe variant (expected 20..50, 53..64)";
+      error = "unknown pj2 probe variant (expected 20..50, 53..66)";
       return std::nullopt;
   }
 
