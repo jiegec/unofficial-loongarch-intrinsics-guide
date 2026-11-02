@@ -74,6 +74,37 @@ copies each four-channel result out of the hardware's fixed destination sequence
 before issuing a later read. The sequence and its wrap are documented in
 [SIO](sio.md#reading-channels).
 
+## Compiler control-flow and distance IO contracts
+
+These are compiler requirements for composing correct GS programs; they do not
+add instruction semantics to the hardware ABI.
+
+Clip and cull distances are compact scalar arrays. Logical element `i` occupies
+component `i mod 4` of slot `base + floor(i / 4)`. Before lowering dereferences
+to IO instructions, the compiler must lower indirect compact-array accesses to
+constant component accesses. Treating a scalar index as a vec4 slot offset reads
+the wrong distance. Gallium and Vulkan use the same LCO IO preparation rule,
+including the standalone compiler entry point. The resulting constant loads can
+be selected by a balanced conditional tree; dynamic vertex selection remains a
+separate operation on the packed input selectors.
+
+An emit recipe can split a selected block and append its continuation after the
+original NIR blocks. Phi sources must therefore follow **selected CFG predecessor
+order**, with each value attached to the actual predecessor that supplies it.
+NIR block indices alone cannot order those operands. Swapping the preheader and
+latch operands can reset a loop induction variable on every iteration and make
+a finite shader run indefinitely.
+
+Register allocation must also use the selected CFG. A value live on entry must
+have a register before local scratch definitions execute, even if its first
+textual definition appears in a later block. Its lifetime includes blocks that
+carry it to a successor without reading it. In particular, a block placed after
+the last textual use can execute before that use; freeing the register at the
+last textual read lets the incoming edge destroy the value. These rules apply
+to both the interval allocator and the fallback instruction walk. LCO regression
+tests cover appended emit preheaders, loop-carried values, and backward layout
+edges in acyclic control flow.
+
 ## Geometry output record
 
 The record equations below describe the current implementation, including paths
@@ -203,11 +234,10 @@ still be refused when its LG200 record cannot be represented.
 
 ## Unresolved behavior
 
-* The SIO0 ring window and actual producer/consumer position are confirmed for
-  passing shapes, but the clipping CTS case
-  `clip_cull_distance_dynamic_index.vert_geom.1_7` still times out after
-  multiple different compiler/ABI inputs. It remains quarantined and is not a
-  passing case.
+* The selected 64-case GS clip/cull CTS matrix passes after correcting phi
+  edge ordering, compact indirect IO lowering, and register lifetimes. This
+  establishes those composed pipelines, not every possible distance-output
+  shape or ring-capacity boundary.
 * Geometry invocations with different per-invocation dynamic emit counts are
   not proven. The selector's current runtime descriptor path broadcasts an
   ordinal from the first active lane; this does not define a correct shared
@@ -248,15 +278,27 @@ conformance.
 | Multi-site and width probes | 30 deterministic site/attribute cases | 30 pass |
 | Distance output probes | 12 cases: 1/4/8 distances, static/runtime point and triangle output | 10 pass, 2 fail; both failures are single-distance point output with point size enabled, using static/runtime emission |
 | Piglit geometry corpus | 37 cases | 24 pass, 1 fail (`max-input-components`), 12 skip |
-| Vulkan CTS geometry matrix | 199 cases | 177 pass, 12 fail, 10 NotSupported, no GPU fault in this matrix |
+| Vulkan CTS geometry matrix | 199 cases | 179 pass, 10 fail, 10 NotSupported, no GPU fault in this matrix |
+| Vulkan CTS clip/cull matrix | 64 `vert_geom` cases, static/dynamic indexing, with/without fragment distance reads | 64 pass, no GPU fault |
 
-The Vulkan failures include per-invocation dynamic emission, some basic varying
-output cases, and layered readback/render-to-all cases. The separate
+The remaining geometry failures include per-invocation dynamic emission,
+some basic varying output cases, and layered rendering. Layered readback remains
+intermittent; a passing retry does not establish a repair. Previously isolated
+secondary command buffer cases are included in the full geometry matrix.
+
+The earlier timeout in
 `dEQP-VK.clipping.user_defined.clip_cull_distance_dynamic_index.vert_geom.1_7`
-case timed out in an isolated run and triggered a graphics-ring reset; the
-health control passed after recovery. It remains an unresolved failure, not a
-NotSupported case. Exact case logs and binary hashes are kept by the Mesa
-worktree in its GS review artifacts and quarantine ledger.
+was caused by reversed phi-edge values after emit selection. It now passes;
+its historical fault and recovery records remain in the quarantine ledger.
+The subsequent distance failures exposed compact-array addressing and register
+lifetime errors, corrected independently of the SIO record formulas.
+
+Eight geometry NotSupported cases request 64 or 127 invocations, beyond the
+current 32-invocation limit encoded by the five-bit `N - 1` field. Two 1D-array
+readback cases are rejected by the depth/stencil image-dimensionality query.
+Supporting either group requires implementation and validation; changing the
+advertised limits alone would not provide that support. Exact case logs and
+binary hashes are kept in the Mesa worktree's GS review artifacts.
 
 The deterministic regression sources are under
 `src/mesa/src/loonggpu/compiler/tests/geometry/`. The point matrix checks all
