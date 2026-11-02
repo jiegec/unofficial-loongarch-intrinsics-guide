@@ -105,6 +105,50 @@ to both the interval allocator and the fallback instruction walk. LCO regression
 tests cover appended emit preheaders, loop-carried values, and backward layout
 edges in acyclic control flow.
 
+## Ordering and execution masks
+
+`check` waits for work already issued in the domains selected by
+`INST_LO[3:0]`. The domain bits are scalar/kernel memory `1`, vector memory `2`,
+vector stores `4`, and shared memory `8`; `15` selects all four. The encoding
+and divergent-region experiments are described in
+[Control and flow: Ordering](../isa/family-control.md#ordering).
+It is not a host completion fence or a lane rendezvous. A check before entering
+a narrowed region cannot order work subsequently issued inside that region.
+
+For geometry programs, constant-root and layer-filter scalar loads use domain
+`1`. The individual domain needed by SIO writes and emits remains
+**UNRESOLVED**; LCO uses the full mask for waits covering these producers.
+SIO staging must be ordered before the interface consumes it, and storage must
+remain valid until the operation that reads it completes. An explicit operand
+list alone is insufficient to describe that lifetime: channel-slot selectors
+also name descriptor registers, and `PJ2` names the execution-mask register.
+
+The compiler may narrow a wait only if it accounts for every producer that can
+reach it, including predecessor blocks. It must recompute the domain after
+instruction scheduling or other producer changes. Keeping an earlier scalar-only
+mask after an SIO producer has been introduced can leave interface work pending.
+In LCO IR, `check_domain = 0` means **unassigned**, with a default encoded mask of
+`15`; it does not mean the emitted instruction waits for no domains. The diagnostic
+`LOONG_CHECK_DOMAIN` setting changes this fallback only. It does not override
+an explicit narrowed domain, and an encoded zero has no established producer
+contract.
+
+Post-allocation scheduling must retain the implicit `PJ2` dependency. A load
+cannot move above the instruction that installs its selected predicate register,
+even when its address and destination registers are independent of that write.
+The same distinction between explicit values and interface state applies when
+reviewing wait placement and descriptor reuse.
+
+Full-domain checks do not by themselves establish layered-rendering correctness.
+The composed program also depends on record layout, primitive cuts, layer replay,
+attachment visibility, and host resource lifetime. Intermittent layered readback
+failures remain open; full-domain waits and additional waits immediately after
+runtime emits have both been tested without eliminating them. A fixed sequence
+of separate CTS processes exposes failures after particular preceding geometry
+workloads. Removing the synthetic eight-vertex prefix can make that short
+sequence pass while regressing the broader geometry suite, so neither a passing
+isolated readback nor prefix removal establishes a correct record protocol.
+
 ## Geometry output record
 
 The record equations below describe the current implementation, including paths
