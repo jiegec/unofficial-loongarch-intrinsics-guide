@@ -97,6 +97,7 @@ nav:
       - Shaders:
           - Shader ABI: gpu/shader/abi.md
           - Stage Interfaces: gpu/shader/stages.md
+          - Geometry Stage: gpu/shader/geometry.md
           - Registers and Allocation: gpu/shader/registers.md
           - Descriptors: gpu/shader/descriptors.md
           - SIO: gpu/shader/sio.md

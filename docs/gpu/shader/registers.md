@@ -65,6 +65,21 @@ A launch value is read, not written: the inputs above are live at entry and a
 shader that overwrites one before using it loses it.  The register files are not
 otherwise pre-loaded.
 
+## Geometry window lifetimes
+
+Geometry window maintenance must preserve `s4:s5` while any later uniform or
+push-constant load can use the constant root. A scalar register reserved for a
+launch descriptor is not available as execution-mask scratch simply because
+an earlier load has finished. The compiler uses an allocated temporary for the
+saved mask, so later loads and nested control flow retain the root.
+
+The current output recipe uses `v33` as its window counter, `v35` as separator
+state, `v19` for the final separator copy, and `v45` for the emit index.
+Descriptor-channel writes implicitly overwrite the VGPR with that channel
+number. They must not overlap live window state or payload values. These are
+compiler assignments; [Geometry Stage](geometry.md#staging-registers-and-static-site-capacity)
+separates them from launch registers and record addresses.
+
 ## Size rules
 
 The shader-info record's size fields must satisfy:

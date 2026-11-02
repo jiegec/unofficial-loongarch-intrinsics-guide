@@ -30,6 +30,7 @@ travels, so the directory tree and the navigation agree:
 | [Stage interfaces](shader/stages.md) | how to write each stage, end to end |
 | [Registers and allocation](shader/registers.md) | the register files, the reserved windows and the size rules |
 | [Descriptors](shader/descriptors.md) | buffer, image, sampler and attribute records, bit by bit |
+| [Geometry Stage](shader/geometry.md) | geometry record formulas, staging and validation boundaries |
 | [SIO](shader/sio.md) | the channel interface between stages and the pipeline |
 | *Instruction set* | layer 3's encoding |
 | [Instruction encoding](isa/encoding.md) | the instruction word, the formats and the mask discipline |

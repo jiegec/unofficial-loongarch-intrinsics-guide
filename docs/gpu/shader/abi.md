@@ -114,19 +114,17 @@ per draw so that stale entries cannot survive.
 
 ### Geometry
 
-The geometry stage reads its input window from the SIO0 ring as four-channel
-reads, with the channel carrying either a component of the position record or
-`4 + base * 4 + component` for a varying.  Input vertex selectors arrive packed
-in `v0`.
+Geometry runs in slot 3 with shader type 4. Input vertex selectors arrive
+packed in `v0`; the stage reads the preceding vertex shader's SIO0 record and
+writes its output into SIO1. The output record's window width, export count,
+position size, stride, attributes, and thread field must agree between the
+compiler and host state.
 
-Output vertices are emitted with the emit instructions: one emit per output
-vertex, with the last one terminating the primitive.  Each emit is followed by
-an ordering operation, because the next emit's payload must not overwrite the
-previous one's registers.  The stream header is updated with the emitted count
-before the final export.
-
-There is no attribute descriptor table for the geometry stage: its inputs are
-ring channels and its outputs are written to the SIO1 ring.
+[Geometry Stage](geometry.md) defines the input layout, output formulas,
+staging-register lifetimes, emit/cut distinction, defaults, and known limits.
+It also identifies which rules are current compiler policy and which shapes
+remain unverified or failing. The geometry stage has no vertex attribute
+descriptor table; its inputs are ring channels.
 
 ### Streamout
 

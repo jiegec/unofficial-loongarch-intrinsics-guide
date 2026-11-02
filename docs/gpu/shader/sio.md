@@ -3,7 +3,9 @@
 SIO is the channel-addressed interface between a shader and the fixed-function
 stages around it.  It carries vertex output, geometry input, geometry output and
 fragment colour output without going through memory.  A transfer names a stream,
-a channel slot and a window size; there is no address and no descriptor.
+a channel slot and a window size. There is no memory pointer operand, but
+geometry writes use an implicit descriptor held in the VGPR selected by the
+channel number. See [Writing channels](#writing-channels).
 
 ## Streams
 
@@ -20,14 +22,15 @@ them with an export; a consumer reads them back.  The window is described by the
 instruction itself, so every write and every read carries the size of the window
 it addresses:
 
-* the geometry input window is `(varying_count + 2) * 4` channels, at least 12,
-  and the read instruction carries that count;
+* the geometry input window must cover the producer position payload and
+  generic varying quads; the shared implementation formula and units are in
+  [Geometry Stage](geometry.md#vertex-to-geometry-input);
 * a geometry output window holds the position record, one record per varying and
-  a header slot, and the last slot is rewritten with the emitted-vertex counter
+  a header slot, and that header is rewritten with the emitted-vertex counter
   before the export.
 
-The window size is the record the producer commits; a consumer may declare it at
-least that large, and the two must agree on the value.
+The window width is part of the record layout. Producer and consumer must
+agree on it; a larger consumer window is not automatically compatible.
 
 * The closed GL driver's geometry stage for a shader that forwards one clip
   distance and one varying (the `gs-forward-clip` case of the LG200 geometry
@@ -49,7 +52,7 @@ Geometry input channel layout:
 | Channels | Content |
 |----------|---------|
 | 0-3 | position; one four-channel read at channel 0 returns `xyzw` |
-| `4 + 4b + c` | component `c` of the varying whose output base is `b` |
+| `position_channels + 4b + c` | component `c` of generic varying ordinal `b`, excluding distance payload slots; see [Geometry Stage](geometry.md#vertex-to-geometry-input) |
 
 A read that does not move forward in the ring stalls every later export of the
 stage, so reads are issued in ascending channel order even when the program
@@ -112,19 +115,27 @@ architecture, where the read instruction selects its own destination.
 ## Emitting
 
 `v_emit3` and `v_emit2` emit the vertex staged in the output window.  Both take
-the emit index in `GK11`, an argument in `GA11`, and the number of payload chunks
-of that emit in `VJ8`.
+the emit index through `GK11`, the record argument through `GA11`, and a
+separator VGPR selector in `VJ8`. `VJ8` names a register; it is not an immediate
+chunk count. The current compiler uses `v35` for that separator register.
+These are geometry-stage observations, beyond the fragment runner's observed-mode instruction vectors.
 
 The two opcodes select the stream shape, not the primitive cut: `v_emit2` belongs
 to point and line streams and `v_emit3` to triangle streams.  Emitting a line
 stream with `v_emit3` loses the first segment of every strip, because the
 hardware assembles triangle records and only the cut resets them.  The cut is a
-separate step: after an emit the producer writes a zero separator, rotates the
+separate step: window maintenance masks and writes the separator, rotates/restores the
 active lane mask, advances the vertex counter, and orders before the next emit.
+`EndPrimitive` resets the primitive separator separately. A runtime emitter
+must preserve separator state between vertices of the same strip.
 
 ## Export
 
-`sioexport` commits a channel count from one stream to the stage output.  The
+`sioexport` commits an export count from one stream to the stage output.
+For geometry, this count is an encoded record quantity and need not equal the
+SIO transfer window width. For example, the measured three-varying Multi
+record uses window 128 and export count 125. The [record formulas](geometry.md#geometry-output-record)
+keep these quantities distinct.  The
 count must match what the stage produced: a vertex stage exports position
 channels plus varying channels, a fragment stage exports its colour channels plus
 one if it wrote depth, and the geometry stage rewrites its header slot with the

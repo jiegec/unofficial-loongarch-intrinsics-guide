@@ -93,16 +93,19 @@ Runs in the geometry slot with shader type 4.
 | `s4:s5` | constant root |
 | `s6:s7` | image and sampler descriptor root |
 
-Input data is read from the SIO0 ring in four-channel reads, in ascending
-channel order.  A position component is read from its own channel; a varying
-component is read from channel `4 + base * 4 + component`, where `base` is the
-varying's output base.
+Input data is read from SIO0 in ordered four-channel transfers. Generic
+varyings follow the producer's entire position and distance payload. The
+producer and consumer must use the same linked input layout and window width.
 
-Output: write a vertex's varying records to the SIO1 ring, then emit the vertex.
-Every emit must be followed by an ordering operation, because the next emit's
-payload would otherwise overwrite registers that are still in flight.  The
-stream header is updated with the emitted count before the final export.  There
-is no attribute descriptor table for this stage: its inputs are ring channels.
+Output payloads are staged into SIO1 before each emit; the separator and
+emitted-vertex count are maintained independently of the primitive opcode.
+`v_emit2` is used for points and lines, and `v_emit3` for triangles. The header
+is updated before the final export. Window maintenance must preserve the
+constant root in `s4:s5`, including across later UBO loads.
+
+The formulas, register choices, driver defaults, and unresolved shapes are in
+[Geometry Stage](geometry.md). There is no vertex attribute descriptor table
+for this stage: its inputs are ring channels.
 
 ## Streamout
 
