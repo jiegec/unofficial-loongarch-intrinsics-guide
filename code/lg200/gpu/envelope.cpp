@@ -1166,6 +1166,54 @@ std::optional<EnvelopeProgram> build_generic(
     if (has_vcc_output && env.lanes > 0 && expect.size() > 1) {
       expect[1] &= active_mask;
     }
+    // [HW 2026-11-03] Above one wave this is only half the story: at a compute
+    // group of 16 lanes the three carry rows fail 22, 18 and 17 vectors, and the
+    // failing set is the multi-bit bitmaps - the same wave granularity the atomic
+    // read-back shows, because VCC is a wave register and the later wave's store
+    // is what survives.  The matrix runs four lanes in compute and sixteen in
+    // graphics, both single-wave, and those compare exactly (137/127/124 in
+    // graphics, the same in compute at 4 and 8 lanes).  Not modelled above one
+    // wave; recorded rather than guessed.
+    // The three carry/borrow rows that READ the RD8 pair as a third source
+    // (v_addc_u32, v_subb_u32, v_subbrev_u32) are the only alu-carry rows whose
+    // first word is a function of the launch width: each lane's result depends
+    // on one bit of the staged bitmap, and the carrier reads the OR over the
+    // executing lanes.  The 16-lane oracle word is therefore not what a
+    // narrower compute launch reads back when the bitmap has no bit among its
+    // lanes (x=0x8000 at four lanes: the oracle says 0xffffffff/0x8000, that
+    // launch says 0/0).  Re-evaluate both words at env.lanes, exactly as the
+    // oracle does at sixteen, so a boundary row is launch-width independent.
+    // v_add_u32/v_sub_u32 only WRITE the pair and keep the masked word above.
+    const bool vcc_input = mnemonic == "v_addc_u32" ||
+                           mnemonic == "v_subb_u32" ||
+                           mnemonic == "v_subbrev_u32";
+    if (vcc_input && env.lanes > 0 && expect.size() > 1 &&
+        row.inputs.size() >= 3) {
+      const std::uint32_t lhs = row.inputs[0];
+      const std::uint32_t rhs = row.inputs[1];
+      const std::uint32_t third = row.inputs[2];
+      std::uint32_t first = 0u;
+      std::uint32_t second = 0u;
+      for (unsigned lane = 0u; lane < env.lanes && lane < 32u; ++lane) {
+        const std::uint32_t bit = (third >> lane) & 1u;
+        if (mnemonic == "v_addc_u32") {
+          const std::uint64_t wide =
+              static_cast<std::uint64_t>(lhs) + rhs + bit;
+          first |= static_cast<std::uint32_t>(wide);
+          second |= static_cast<std::uint32_t>(wide >> 32) << lane;
+        } else if (mnemonic == "v_subb_u32") {
+          const std::uint64_t sub = static_cast<std::uint64_t>(rhs) + bit;
+          first |= lhs - static_cast<std::uint32_t>(sub);
+          second |= (static_cast<std::uint64_t>(lhs) < sub ? 1u : 0u) << lane;
+        } else {
+          const std::uint64_t sub = static_cast<std::uint64_t>(lhs) + bit;
+          first |= rhs - static_cast<std::uint32_t>(sub);
+          second |= (static_cast<std::uint64_t>(rhs) < sub ? 1u : 0u) << lane;
+        }
+      }
+      expect[0] = first;
+      expect[1] = second;
+    }
     // v_mbcnt_u32 is the one row whose whole result, not just its mask, is a
     // function of the launch width: its popcount window is lanes-1 bits (see
     // mbcnt_window).  The case vectors are the four-lane instance, which is what
@@ -4811,6 +4859,20 @@ void emit_carry_readback(Builder& builder, const CarrierEnv& env,
 
 }  // namespace
 
+const char* carry_family_mnemonic(CarryFamily family) {
+  switch (family) {
+    case CarryFamily::subb: return "v_subb_u32";
+    case CarryFamily::subbrev: return "v_subbrev_u32";
+    default: return "v_addc_u32";
+  }
+}
+
+// +1: the third-source bit makes the destination base+1 (carry); -1: base-1
+// (borrow).
+std::int32_t carry_family_want_delta(CarryFamily family) {
+  return family == CarryFamily::addc ? 1 : -1;
+}
+
 unsigned carry_arm_count() { return kCarryArmCount; }
 
 const char* carry_arm_label(unsigned arm) {
@@ -4828,11 +4890,17 @@ unsigned carry_arm_nops(unsigned arm) {
 std::uint32_t carry_arm_cell(unsigned arm) {
   return kCarryCellBase + kCarryCellStride * arm;
 }
-std::uint32_t carry_dst_base(unsigned arm) {
-  return kCarryA + carry_arm_b(arm);
+std::uint32_t carry_dst_base(CarryFamily family, unsigned arm) {
+  const std::uint32_t b = carry_arm_b(arm);
+  switch (family) {
+    case CarryFamily::subb: return kCarryA - b;
+    case CarryFamily::subbrev: return b - kCarryA;
+    default: return kCarryA + b;
+  }
 }
 
-CarryExpect carry_expect(unsigned arm, unsigned hypothesis, unsigned lanes) {
+CarryExpect carry_expect(CarryFamily family, unsigned arm,
+                         unsigned hypothesis, unsigned lanes) {
   CarryExpect e{};
   if (arm >= kCarryArmCount) return e;
   const CarryArm& a = kCarryArms[arm];
@@ -4861,11 +4929,22 @@ CarryExpect carry_expect(unsigned arm, unsigned hypothesis, unsigned lanes) {
   }
   std::uint32_t carried = 0u;
   for (unsigned i = 0; i < lanes && i < 32; ++i) {
-    const std::uint64_t wide = static_cast<std::uint64_t>(kCarryA) + a.b +
-                               ((cin >> i) & 1u);
-    if ((wide >> 32) != 0u) carried |= 1u << i;
+    const std::uint32_t c = (cin >> i) & 1u;
+    if (family == CarryFamily::addc) {
+      const std::uint64_t wide =
+          static_cast<std::uint64_t>(kCarryA) + a.b + c;
+      if ((wide >> 32) != 0u) carried |= 1u << i;
+    } else if (family == CarryFamily::subb) {
+      if (static_cast<std::uint64_t>(kCarryA) <
+          static_cast<std::uint64_t>(a.b) + c)
+        carried |= 1u << i;
+    } else {
+      if (static_cast<std::uint64_t>(a.b) <
+          static_cast<std::uint64_t>(kCarryA) + c)
+        carried |= 1u << i;
+    }
   }
-  e.base = kCarryA + a.b;
+  e.base = carry_dst_base(family, arm);
   e.dst_mask = cin & active;
   // A stale pair is not written at all, so its low word still holds X; every
   // other model writes the per-lane carry-out mask it just produced.
@@ -4875,7 +4954,8 @@ CarryExpect carry_expect(unsigned arm, unsigned hypothesis, unsigned lanes) {
   return e;
 }
 
-std::optional<EnvelopeProgram> build_cs_carry_probe(unsigned first_arm,
+std::optional<EnvelopeProgram> build_cs_carry_probe(CarryFamily family,
+                                                    unsigned first_arm,
                                                     unsigned arm_count,
                                                     std::string& error,
                                                     unsigned lanes) {
@@ -4911,7 +4991,7 @@ std::optional<EnvelopeProgram> build_cs_carry_probe(unsigned first_arm,
     builder.s_mov_imm_b32(isa::vcc(6), arm.x);
     builder.s_mov_imm_b32(isa::sgpr(7), 0u);
     builder.append_target(isa::McInst{
-        "v_addc_u32", "",
+        carry_family_mnemonic(family), "",
         {isa::op_reg(isa::predicate(0)), isa::op_reg(isa::vgpr(10)),
          isa::op_reg(isa::vgpr(8)), isa::op_reg(isa::vgpr(12)),
          isa::op_reg(isa::vcc(6))}});

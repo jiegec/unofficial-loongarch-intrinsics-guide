@@ -285,6 +285,14 @@ std::optional<EnvelopeProgram> build_cs_mask_lifetime_probe(unsigned variant,
 // third-source constant, nop distance) and the expectation model live beside
 // the builder in envelope.cpp, so a measured row and its prediction cannot
 // drift apart.
+// Which alu-carry row the P1 probe drives.  The arm table is shared; the
+// family decides the mnemonic, the base (a+b, a-b or b-a) and which side of
+// the destination word means "the third-source bit reached this lane"
+// (+1 for a carry, -1 for a borrow).
+enum class CarryFamily : unsigned { addc = 0, subb = 1, subbrev = 2 };
+const char* carry_family_mnemonic(CarryFamily family);
+std::int32_t carry_family_want_delta(CarryFamily family);
+
 struct CarryExpect {
   std::uint32_t base;      // a + b: what a lane reads with no carry-in
   std::uint32_t dst_mask;  // lanes whose destination word is base + 1
@@ -301,12 +309,13 @@ unsigned carry_arm_nops(unsigned arm);
 // Argument-BO offset of the arm's block: +0x00 s6, +0x04 s7, +0x08 p0, +0x0c
 // p1, +0x10 + 4*lane the destination word (one cell per lane).
 std::uint32_t carry_arm_cell(unsigned arm);
-std::uint32_t carry_dst_base(unsigned arm);
+std::uint32_t carry_dst_base(CarryFamily family, unsigned arm);
 
 // hypothesis: 0 = H1 per-lane low word, 1 = H2 stale pair, 2 = H3 high word,
 // 3 = H4 one scalar flag.  Everything is a function of (arm, hypothesis,
 // lanes): no device state is involved, so the table is checkable host-side.
-CarryExpect carry_expect(unsigned arm, unsigned hypothesis, unsigned lanes);
+CarryExpect carry_expect(CarryFamily family, unsigned arm, unsigned hypothesis,
+                          unsigned lanes);
 
 // Builds the arm window [first_arm, first_arm + arm_count).  Every arm emits the
 // same preamble (the result BO's descriptor in s0-s3, a = 0xffffffff, b, the v9
@@ -316,7 +325,8 @@ CarryExpect carry_expect(unsigned arm, unsigned hypothesis, unsigned lanes);
 // s7, p0 (selector 0x7c), p1 (0x7d) and the destination word per lane.  The
 // destination cells are preloaded with 0xdeadbeef, so a lane that did not
 // execute is not read as a lane that carried to zero.
-std::optional<EnvelopeProgram> build_cs_carry_probe(unsigned first_arm,
+std::optional<EnvelopeProgram> build_cs_carry_probe(CarryFamily family,
+                                                    unsigned first_arm,
                                                     unsigned arm_count,
                                                     std::string& error,
                                                     unsigned lanes);

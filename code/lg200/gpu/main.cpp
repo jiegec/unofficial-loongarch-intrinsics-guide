@@ -1224,7 +1224,8 @@ int csp(const char* probe, unsigned variant, std::uint32_t timeout_ms,
 // models without opening the device, so a measured row can be compared with its
 // prediction; the arm list lives in envelope.cpp (carry_arm_*), next to the
 // builder that emits it.
-int carry(int only_arm, std::uint32_t timeout_ms, bool dry_run, bool expect) {
+int carry(lgpu::envelope::CarryFamily family, int only_arm,
+          std::uint32_t timeout_ms, bool dry_run, bool expect) {
   std::uint32_t group[3];
   cs_group(group);
   const unsigned lanes = group[0] * group[1] * group[2];
@@ -1239,13 +1240,20 @@ int carry(int only_arm, std::uint32_t timeout_ms, bool dry_run, bool expect) {
     // measured tsv, with a leading hypothesis column so the four tables can
     // stay in one stream.
     static const char* const kHyp[4] = {"H1", "H2", "H3", "H4"};
-    std::printf("# lanes=%u  dst = lanes whose destination word is base+1; "
-                "base = 0xffffffff + b\n", lanes);
+    std::printf("# lanes=%u family=%s  dst = lanes whose destination word is "
+                "base%+d; base = %s\n", lanes,
+                lgpu::envelope::carry_family_mnemonic(family),
+                lgpu::envelope::carry_family_want_delta(family),
+                family == lgpu::envelope::CarryFamily::addc
+                    ? "0xffffffff + b"
+                    : (family == lgpu::envelope::CarryFamily::subb
+                           ? "0xffffffff - b"
+                           : "b - 0xffffffff"));
     std::printf("hyp\tarm\tx\ts6\ts7\tdst\tp0\tp1\n");
     for (unsigned h = 0; h < 4; ++h) {
       for (unsigned a = 0; a < arms; ++a) {
         if (only_arm >= 0 && static_cast<unsigned>(only_arm) != a) continue;
-        const auto e = lgpu::envelope::carry_expect(a, h, lanes);
+        const auto e = lgpu::envelope::carry_expect(family, a, h, lanes);
         std::printf("%s\t%s\t0x%08x\t0x%08x\t0x%08x\t0x%04x\t0x%08x\t?\n",
                     kHyp[h], lgpu::envelope::carry_arm_label(a),
                     lgpu::envelope::carry_arm_x(a), e.s6, e.s7, e.dst_mask,
@@ -1258,8 +1266,8 @@ int carry(int only_arm, std::uint32_t timeout_ms, bool dry_run, bool expect) {
   std::string error;
   const unsigned first = only_arm < 0 ? 0u : static_cast<unsigned>(only_arm);
   const unsigned count = only_arm < 0 ? arms : 1u;
-  auto program =
-      lgpu::envelope::build_cs_carry_probe(first, count, error, lanes);
+  auto program = lgpu::envelope::build_cs_carry_probe(family, first, count,
+                                                     error, lanes);
   if (!program) {
     std::fprintf(stderr, "carry: %s\n", error.c_str());
     return 2;
@@ -1309,7 +1317,7 @@ int carry(int only_arm, std::uint32_t timeout_ms, bool dry_run, bool expect) {
                 lgpu::envelope::carry_arm_x(a),
                 lgpu::envelope::carry_arm_b(a),
                 lgpu::envelope::carry_arm_nops(a),
-                lgpu::envelope::carry_dst_base(a), cell, cell + 4u,
+                lgpu::envelope::carry_dst_base(family, a), cell, cell + 4u,
                 cell + 8u, cell + 12u, cell + 0x10u,
                 cell + 0x10u + 4u * (lanes - 1));
   }
@@ -1317,8 +1325,10 @@ int carry(int only_arm, std::uint32_t timeout_ms, bool dry_run, bool expect) {
   for (unsigned k = 0; k < count; ++k) {
     const unsigned a = first + k;
     const std::uint32_t cell = lgpu::envelope::carry_arm_cell(a);
-    const std::uint32_t base = lgpu::envelope::carry_dst_base(a);
-    const std::uint32_t want = base + 1u;
+    const std::uint32_t base = lgpu::envelope::carry_dst_base(family, a);
+    const std::uint32_t want = static_cast<std::uint32_t>(
+        static_cast<std::int64_t>(base) +
+        lgpu::envelope::carry_family_want_delta(family));
     std::uint32_t mask = 0;
     unsigned outliers = 0;
     for (unsigned l = 0; l < lanes; ++l) {
@@ -2211,18 +2221,32 @@ int main(int argc, char** argv) {
   if (argc >= 2 && std::strcmp(argv[1], "carry") == 0) {
     const bool dry_run = std::strcmp(argv[argc - 1], "--dry-run") == 0;
     const bool expect = std::strcmp(argv[argc - 1], "--expect") == 0;
-    // carry [arm] [timeout] [--expect|--dry-run]: the first bare word is the
-    // arm (omitted = every arm), the second the timeout.
+    // carry [addc|subb|subbrev] [arm] [timeout] [--expect|--dry-run]: the
+    // first bare word may name the family, the next one is the arm (omitted =
+    // every arm), the one after that the timeout.
+    auto family = lgpu::envelope::CarryFamily::addc;
     int only_arm = -1;
     std::uint32_t tmo = 8000u;
     for (int i = 2; i < argc; ++i) {
       if (argv[i][0] == '-') continue;
+      if (only_arm < 0 && std::strcmp(argv[i], "addc") == 0) {
+        family = lgpu::envelope::CarryFamily::addc;
+        continue;
+      }
+      if (only_arm < 0 && std::strcmp(argv[i], "subb") == 0) {
+        family = lgpu::envelope::CarryFamily::subb;
+        continue;
+      }
+      if (only_arm < 0 && std::strcmp(argv[i], "subbrev") == 0) {
+        family = lgpu::envelope::CarryFamily::subbrev;
+        continue;
+      }
       if (only_arm < 0)
         only_arm = static_cast<int>(std::strtol(argv[i], nullptr, 0));
       else
         tmo = static_cast<std::uint32_t>(std::strtoul(argv[i], nullptr, 0));
     }
-    return carry(only_arm, tmo, dry_run, expect);
+    return carry(family, only_arm, tmo, dry_run, expect);
   }
   if (argc >= 3 && std::strcmp(argv[1], "pj2") == 0) {
     const unsigned variant =
@@ -2278,7 +2302,7 @@ int main(int argc, char** argv) {
                "lgpu-gpu csp <divchk|matrix|masklife> <variant> [timeout] "
                "[--dry-run]\n");
   std::fprintf(stderr,
-               "       lgpu-gpu carry [arm] [timeout] [--expect|--dry-run] "
-               "(P1: the alu-carry second word)\n");
+               "       lgpu-gpu carry [addc|subb|subbrev] [arm] [timeout] "
+               "[--expect|--dry-run] (P1: the alu-carry second word)\n");
   return 2;
 }
