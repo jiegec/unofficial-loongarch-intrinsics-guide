@@ -660,6 +660,49 @@ std::uint64_t sm_final_n(const std::string& op, bool sgn, std::uint64_t initial,
   return v;
 }
 
+// The old-value dword a multi-lane atomic leaves in the result cell.
+//
+// Every lane stores its own returned old value to the SAME result dword, and the
+// host reads that dword back as the bitwise OR of the lanes (measured, and the
+// reason the corpus' float oracles say s|(s+1)).  The multiset of values the
+// lanes return is the chain this walks: lane k sees the cell after k
+// applications.  For add/sub/inc/dec/sethi the chain is arithmetic, for
+// and/or/xor/min/max/swap every lane after the first sees the fixed point, and
+// cmpswap returns the post-swap value after the first exchange.  None of it
+// depends on the ORDER the lanes are serviced, so the OR is a function of the
+// lane count alone - which is why this can be compared instead of recorded.
+std::uint64_t sm_old_or(const std::string& op, bool sgn, std::uint64_t initial,
+                        std::uint64_t a, std::uint64_t b, unsigned lanes) {
+  std::uint64_t v = initial;
+  std::uint64_t acc = 0;
+  for (unsigned lane = 0; lane < lanes; ++lane) {
+    acc |= v;
+    v = atomic_apply(op, sgn, v, a, b);
+  }
+  return acc;
+}
+
+// The 32-bit form of that OR, with the same 32-bit signed pre-extension
+// atomic_final_n applies to min/max (a 32-bit -1 must compare as -1, not as
+// 0xffffffff in a 64-bit register).
+std::uint32_t atomic_old_or_32(const std::string& op, std::uint64_t init,
+                               std::uint64_t src, bool sgn,
+                               std::uint64_t swap, unsigned lanes) {
+  std::uint64_t v = init, a = src;
+  if (sgn && (op == "min" || op == "max")) {
+    v = static_cast<std::uint64_t>(
+        static_cast<std::int64_t>(static_cast<std::int32_t>(v)));
+    a = static_cast<std::uint64_t>(
+        static_cast<std::int64_t>(static_cast<std::int32_t>(a)));
+  }
+  std::uint32_t acc = 0;
+  for (unsigned lane = 0; lane < lanes; ++lane) {
+    acc |= static_cast<std::uint32_t>(v);
+    v = atomic_apply(op, sgn, v, a, swap);
+  }
+  return acc;
+}
+
 // ---- launch environment ------------------------------------------------
 //
 // One program shape, two dispatch engines.  The instruction stream, the source
@@ -2294,14 +2337,20 @@ std::optional<EnvelopeProgram> build_flat(const std::string& mnemonic,
         builder.s_mov_imm_b32(imm_temp, def.inputs[1]);
         builder.v_mov_b32(data_v, imm_temp, isa::predicate(0));
         if (cmpswap32) {
-          // cmpswap stages the compare dword in v9 (v8:v9 pair, mirroring
-          // the buff template); v9 is the flat result-store address, so it
-          // is zeroed again before the readback stores below.
+          // cmpswap stages {compare, swap} in the v8:v9 data pair, exactly as
+          // the buff template does (envelope.cpp:1707-1712).  This used to
+          // stage the swap dword into v16 - the result-store ADDRESS register -
+          // and zero it four instructions later, so v9 never carried the swap
+          // value and 105 of 117 vectors failed at a single lane, where no lane
+          // race can explain anything.
           builder.s_mov_imm_b32(imm_temp, def.inputs[2]);
-          builder.v_mov_b32(isa::vgpr(16), imm_temp, isa::predicate(0));
-          builder.atomic_v_flat(mnemonic, isa::predicate(0),
-                                isa::vgpr(8, 2), addr_pair, flat_base,
-                                isa::vgpr(8, 2));
+          builder.v_mov_b32(isa::vgpr(9), imm_temp, isa::predicate(0));
+          // The old word comes back in the VD8 destination, which the other
+          // 32-bit rows read from result_v (v10) - passing the DATA pair as
+          // the destination instead left v10 untouched, so the compared old
+          // dword was whatever v10 last held.
+          builder.atomic_v_flat(mnemonic, isa::predicate(0), result_v,
+                                addr_pair, flat_base, isa::vgpr(8, 2));
         } else {
           builder.atomic_v_flat(mnemonic, isa::predicate(0), result_v,
                                 addr_pair, flat_base, data_v);
@@ -2371,8 +2420,13 @@ std::optional<EnvelopeProgram> build_flat(const std::string& mnemonic,
           cmpswap64 ? (static_cast<std::uint64_t>(def.inputs[4]) |
                        (static_cast<std::uint64_t>(def.inputs[5]) << 32))
                     : 0u;
+      // "atomic_v_flat_" is fourteen characters, not thirteen: reading the op
+      // from 13 leaves a leading '_' and makes find('_', 13) return 13 itself,
+      // so the slice is EMPTY and atomic_apply falls through to "unchanged".
+      // Every 64-bit row then expected its cell not to move, and 33 of 39
+      // add_i64 vectors failed against a cell that had moved by exactly src.
       const std::string op = mnemonic.substr(
-          13, mnemonic.find('_', 13) - 13);
+          14, mnemonic.find('_', 14) - 14);
       const bool sgn = mnemonic.find("_i64") != std::string::npos;
       const std::uint64_t fin =
           sm_final_n(op, sgn, cell, src64, swap64, env.lanes);
@@ -2382,9 +2436,25 @@ std::optional<EnvelopeProgram> build_flat(const std::string& mnemonic,
       off += 16u;
       continue;
     } else if (is_atomic) {
-      // old value at off, post-atomic cell at off+4
+      // Old value at off, post-atomic cell at off+4.  Neither is a single-lane
+      // quantity: every lane applies the same RMW to the one cell the address
+      // broadcasts, so both dwords are functions of the LANE COUNT alone -
+      // the cell walks the chain, and the old-value dword is the OR of the
+      // chain's pre-values (see atomic_old_or_32).
       bc.offsets.push_back(off);
       bc.offsets.push_back(off + 4);
+      const std::string op = mnemonic.substr(
+          14, mnemonic.find('_', 14) - 14);
+      const bool sgn = mnemonic.find("_i32") != std::string::npos;
+      const std::uint32_t cell = def.inputs[0];
+      const std::uint32_t src = def.inputs[1];
+      const std::uint32_t swap = def.inputs.size() >= 3 ? def.inputs[2] : 0u;
+      bc.expected.push_back(
+          atomic_old_or_32(op, cell, src, sgn, swap, env.lanes));
+      bc.expected.push_back(atomic_final_n(op, cell, src, sgn, swap, env.lanes));
+      program.cases.push_back(std::move(bc));
+      off += 8u;
+      continue;
     } else {
       for (std::uint8_t part = 0; part < width; ++part)
         bc.offsets.push_back(off + 4 * part);
@@ -3657,17 +3727,34 @@ std::optional<EnvelopeProgram> build_carrier_env(
   // of 3 with every word reading back 0x00000000 - nothing reached the address at all.
   // Both are defects to fix in the model and the carrier, not spellings to widen.
   // b32, b64 and b128 pass 9/9, 9/9 and 3/3 with the same round-trip.
-  const bool flat_atomic32 =
-      mnemonic.rfind("atomic_v_flat", 0) == 0 &&
-      (ends_with(mnemonic, "_b32") || ends_with(mnemonic, "_i32") ||
-       ends_with(mnemonic, "_u32"));
-  const bool flat_lanes_ok = !flat_atomic32 || env.lanes == 1;
+  // [HW 2026-11-03] The family split further than the paragraph above assumed,
+  // and the split is measured, not argued:
+  //
+  //  - a LOAD's expectation is the host-staged window, and it reads that
+  //    window: b32 9/9, b64 9/9, b96 3/3 and b128 3/3 pass on BOTH pipes with
+  //    the comparison on.  The "input-plane values change with the 0x530
+  //    toggle" sentence described the SUBWORD loads, not the family.
+  //  - a 32-bit ATOMIC's two result dwords are functions of the lane count,
+  //    not lane races to be avoided: the cell walks the chain every lane
+  //    applies and the old-value dword is the OR of that chain's pre-values
+  //    (atomic_old_or_32).  With both modelled, all 25 flat atomic rows pass
+  //    on both pipes - add_i32 39/39, cmpswap_b32 and _b64 117/117 and 116/116,
+  //    inc/dec 40/40, min/max 39/39 - which is also what proves the model:
+  //    a wrong lane count or a wrong OR cannot pass 1,000 vectors across two
+  //    different launch widths.
+  //  - the SUBWORD forms are still defects, and they stay observed: i8/u8/
+  //    i16/u16 loads fail 6-7 of 13 and b8/b16/b96 stores fail 6/4/2, the same
+  //    numbers at one lane and at sixteen, so no lane race explains them.
+  const bool flat_subword_defect =
+      mnemonic == "load_v_flat_i8" || mnemonic == "load_v_flat_u8" ||
+      mnemonic == "load_v_flat_i16" || mnemonic == "load_v_flat_u16" ||
+      mnemonic == "store_v_flat_b8" || mnemonic == "store_v_flat_b16" ||
+      mnemonic == "store_v_flat_b96";
   // Experiment knob (README, "Environment knobs"), not a stable interface: it
-  // compares the rest of the family in one watched session instead of recording
-  // it.  The measurement wants LGPU_CS_GROUP=1,1,1 alongside it.
+  // re-enables the comparison for a subword row in one watched session.
   const bool flat_compare =
-      flat_roundtrip ||
-      (flat_family && flat_lanes_ok && std::getenv("LGPU_FLAT_COMPARE"));
+      flat_roundtrip || (flat_family && !flat_subword_defect) ||
+      (flat_family && std::getenv("LGPU_FLAT_COMPARE"));
   const bool launch_state =
       (flat_family && !flat_compare) ||
       mnemonic.rfind("load_sm_matrix_", 0) == 0 ||
