@@ -964,6 +964,24 @@ TexStage emit_tex_prelude(Builder& builder, EnvelopeProgram& program,
               env.sampler_tuple, isa::sgpr(scratch_sgpr)};
   builder.s_mov_imm_b32(st.imm_temp, 0u);
   builder.v_mov_b32(isa::vgpr(0), st.imm_temp, isa::predicate(0));
+  // [HW 2026-11-03 / cs_skip] A compute dispatch has no hydrated resource
+  // tuple, and the two pointers involved are different BOs: s[6:7] is the
+  // KERNARG VA, while the tuple words are staged by the host in the OUTPUT BO;
+  // the kernarg block is zero beyond its implicit block, so loading through
+  // s[6:7] reads twelve ZERO words - a T# whose base is 0.  The descriptor is a
+  // register operand on both pipes (RK9x8 / RA8x4), so the same words are
+  // assembled from immediates here, exactly as emit_store_desc and
+  // emit_load_desc do for the buffer descriptors on this pipe.  The graphics
+  // path is unchanged.
+  if (env.flat_store) {
+    for (unsigned i = 0; i < 8; ++i)
+      builder.s_mov_imm_b32(isa::sgpr(env.image_tuple.index + i), tdesc[i]);
+    if (sdesc != nullptr)
+      for (unsigned i = 0; i < 4; ++i)
+        builder.s_mov_imm_b32(isa::sgpr(env.sampler_tuple.index + i), sdesc[i]);
+    builder.check_k_vm_vs_sm();
+    return st;
+  }
   for (unsigned i = 0; i < 8; ++i)
     program.arg_preloads.emplace_back(carrier::kRsdTable + 4 * i, tdesc[i]);
   builder.sflat_load("load_s_flat_w8", st.tdesc_regs,
@@ -3725,7 +3743,19 @@ std::optional<EnvelopeProgram> build_carrier_env(
     const std::string& mnemonic, const std::vector<EnvelopeCase>& rows,
     const CarrierEnv& env, std::string& error) {
   const CarrierRoute route = route_mnemonic(mnemonic);
-  if (route.reason != nullptr && env.flat_store) {
+  // [HW 2026-11-03 / cs_skip] The T#/S# refusal was a statement about the
+  // LAUNCH, not about the operand.  The descriptor is an eight- or four-scalar
+  // register window carrying base, dimensions, format, type, layout and mip
+  // bounds, and the graphics side does not get it from the packet either - the
+  // packet supplies a POINTER to memory the carrier itself wrote.  Those rows
+  // compare and pass on graphics today, which is what makes them the test of
+  // the same path on compute.
+  const bool tuple_family =
+      route.family == CarrierRoute::Family::TexAtomic ||
+      route.family == CarrierRoute::Family::TexStore ||
+      route.family == CarrierRoute::Family::Tex ||
+      route.family == CarrierRoute::Family::Samp;
+  if (route.reason != nullptr && env.flat_store && !tuple_family) {
     error = std::string("compute carrier has no ") + mnemonic +
             ": " + route.reason;
     return std::nullopt;
