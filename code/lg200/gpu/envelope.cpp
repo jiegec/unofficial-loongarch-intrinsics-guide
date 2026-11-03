@@ -2750,6 +2750,50 @@ std::optional<EnvelopeProgram> build_samp(const std::string& mnemonic,
 // (non-terminating), only-pre = the instruction terminated the wave
 // (exit/trap/s_endpgm/rfe family).  The runner reports PASS when the fence
 // completes cleanly (either outcome is the observed hardware behavior).
+// The outcome each control row's own description requires of the sentinel pair.
+// This is what turns "the wave survived" into a falsifiable claim: a row whose
+// text says the instruction writes no register and changes no control-flow
+// state has its post store executed (survived); a row whose text says control
+// leaves for the trap path, for a register-indirect target, or for an end of
+// invocation does not (terminated).  The zero-displacement transfers (b, cb,
+// czb) and the balanced jump-stack pair are survived by their own displacement
+// rule - a zero displacement continues at the next instruction - so their
+// outcome does not depend on the condition register the launch hydrates.
+//   rfe stays at 0: its row says the pair is the "return state" and the
+//   transfer follows "the encoded displacement", which with a zero displacement
+//   predicts the next instruction, while the carrier stages the pair as the
+//   target (a pair of zeroes faulted the fetch at 0x8 - measured).  The two
+//   readings disagree, so no outcome is derived here; settling it is a probe,
+//   not an expectation.
+static int control_expectation(const std::string& m) {
+  static const char* const kSurvived[] = {
+      "nop",   "barrier", "check", "flag",  "getpc", "getreg",
+      "jpush", "jpop",    "b",     "cb",    "czb",   "prefix_sw",
+      "prefix_tp4", "prefix_tp8", "copy_sm_from_global",
+      "copy_sm_to_global"};
+  for (const char* s : kSurvived) {
+    if (m == s) return 1;
+  }
+  static const char* const kTerminated[] = {"exit", "jirl", "trap"};
+  for (const char* s : kTerminated) {
+    if (m == s) return 2;
+  }
+  return 0;
+}
+
+// True for the rows the tables describe as writing no register.  Those are the
+// ones a canary can test: a value staged before the instruction and read back
+// after it must still be the staged value.
+static bool control_canary(const std::string& m) {
+  static const char* const kNoWrite[] = {
+      "nop", "barrier", "check", "flag", "prefix_sw", "prefix_tp4",
+      "prefix_tp8", "copy_sm_from_global", "copy_sm_to_global"};
+  for (const char* s : kNoWrite) {
+    if (m == s) return true;
+  }
+  return false;
+}
+
 std::optional<EnvelopeProgram> build_control(const std::string& mnemonic,
                                              const std::vector<EnvelopeCase>&,
                                              const CarrierEnv& env,
@@ -2782,6 +2826,19 @@ std::optional<EnvelopeProgram> build_control(const std::string& mnemonic,
     }
   }
   constexpr std::uint32_t kPre = 0x40, kPost = 0x44;
+  // Canary cells.  "No register is written" (nop), "reads no register and
+  // writes none" (barrier) and "no value result" (check, flag, prefix_*,
+  // copy_sm_*) are claims about a value that is already in a register, so the
+  // vector that tests them stages a value, runs the instruction, and reads the
+  // register back - the expectation is the staged value, derived from the
+  // sentence, not from a readback.  s22/s23 and v9/v10 sit outside every window
+  // this carrier and emit_result_store touch (v0 the zero address, v8 the
+  // sentinel, v26/v27 with s20/s21 the flat store's own pair), so no other part
+  // of the program can account for a value that is not the staged one.
+  constexpr std::uint32_t kCanaryV = 0x48, kCanaryS = 0x4c;
+  constexpr std::uint32_t kCanaryVVal = 0x5a5a1111u;
+  constexpr std::uint32_t kCanarySVal = 0xa5a52222u;
+  const bool canary = control_canary(mnemonic);
   Builder builder;
   emit_env_prelude(builder, env);
   const isa::Reg zero_address = isa::vgpr(0);
@@ -2790,6 +2847,12 @@ std::optional<EnvelopeProgram> build_control(const std::string& mnemonic,
   builder.s_mov_imm_b32(imm_temp, 0x11111111u);
   builder.v_mov_b32(isa::vgpr(8), imm_temp, isa::predicate(0));
   emit_result_store(builder, env, isa::vgpr(8), zero_address, kPre);
+  if (canary) {
+    // staged before the instruction under test, read back after it
+    builder.s_mov_imm_b32(isa::sgpr(22), kCanarySVal);
+    builder.s_mov_imm_b32(isa::sgpr(23), kCanaryVVal);
+    builder.v_mov_b32(isa::vgpr(9), isa::sgpr(23), isa::predicate(0));
+  }
   // the instruction under test, with its fixed carrier operands (values
   // don't matter for control semantics; the point is observed execution)
   std::vector<isa::Operand> ctl_ops;
@@ -2880,6 +2943,13 @@ std::optional<EnvelopeProgram> build_control(const std::string& mnemonic,
   } else {
     builder.append_target(isa::McInst{mnemonic, "", std::move(ctl_ops)});
   }
+  if (canary) {
+    // The instruction under test has run (or, for a terminating row, has not
+    // let control reach here at all); both canaries are read out now.
+    emit_result_store(builder, env, isa::vgpr(9), zero_address, kCanaryV);
+    builder.v_mov_b32(isa::vgpr(10), isa::sgpr(22), isa::predicate(0));
+    emit_result_store(builder, env, isa::vgpr(10), zero_address, kCanaryS);
+  }
   builder.s_mov_imm_b32(imm_temp, 0x22222222u);
   builder.v_mov_b32(isa::vgpr(8), imm_temp, isa::predicate(0));
   emit_result_store(builder, env, isa::vgpr(8), zero_address, kPost);
@@ -2889,12 +2959,20 @@ std::optional<EnvelopeProgram> build_control(const std::string& mnemonic,
 
   EnvelopeProgram program;
   program.control = true;
+  program.control_expect = control_expectation(mnemonic);
   if (!finalize_program(builder, program, error)) return std::nullopt;
-  // a synthetic case so the runner reads pre/post back
+  // a synthetic case so the runner reads pre/post back; the canary dwords, when
+  // the row carries them, are ordinary expected values
   BuiltCase bc;
   bc.id = "control";
   bc.offsets = {kPre, kPost};
   bc.expected = {0x11111111u, 0x22222222u};
+  if (canary) {
+    bc.offsets.push_back(kCanaryV);
+    bc.offsets.push_back(kCanaryS);
+    bc.expected.push_back(kCanaryVVal);
+    bc.expected.push_back(kCanarySVal);
+  }
   program.cases.push_back(std::move(bc));
   return program;
 }

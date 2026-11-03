@@ -43,6 +43,15 @@ struct EnvelopeProgram {
   // control = sentinel observation semantics (survived vs terminated).
   bool probe = false;
   bool control = false;
+  // Which outcome the control carrier's sentinel pair must show.  The outcome
+  // is carried by the row's own description, not by the hardware: a control row
+  // that accepts either outcome can never fail, so none of the 20 rows in this
+  // family asserts anything.  0 = the row settles neither (the run records the
+  // outcome and claims nothing), 1 = survived (the instruction leaves the
+  // carrier's control flow alone, so the post store executes), 2 = terminated
+  // (it transfers control somewhere that is not the next instruction, so the
+  // post store does not execute).
+  int control_expect = 0;
   // Observe mode: the carrier executes and reports the readback values
   // without value comparison (SIO file contents are not oracle-able).
   bool observe = false;

@@ -57,10 +57,11 @@ mechanically checkable with case_provenance.py:
    depended on the vector - the 10-13 regeneration added up to 62,957 vectors that were
    oracle expectation only - so a clause settled in that window had to name the grid it
    rested on.
-2. **How strong is the record?**  Of the 768 PS rows, 629 were compared against the
-   oracle, 137 were merely OBSERVED (the hardware value recorded without an independent
-   comparison), one failed (`v_mbcnt_u32`, whose two pipes read different widths) and one
-   could not be enveloped.  Observed is a weaker class and a claim resting on it must say
+2. **How strong is the record?**  Of the 768 PS rows, 649 were compared against the
+   oracle, 117 were merely OBSERVED (the hardware value recorded without an independent
+   comparison), two rows fail - `v_mbcnt_u32`, whose two pipes read different widths, and
+   `v_addc_u32`, whose carry-out word the hardware spells 0x1 where `v_add_u32` spells the
+   same bit 0xffff - and one could not be enveloped.  Observed is a weaker class and a claim resting on it must say
    so - entry 16 was rewritten for exactly that.
 3. **Is the artifact clean?**  Everything written after the 2026-10-13 01:42 trap
    carries "cannot open /dev/dri/renderD128".  The CS matrix has 377 HANG/FAULT

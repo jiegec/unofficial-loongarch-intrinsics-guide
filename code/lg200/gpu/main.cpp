@@ -276,8 +276,9 @@ int compare_cases(const lgpu::envelope::EnvelopeProgram& program,
       continue;
     }
     if (program.control) {
-      // control carrier: fence clean + pre sentinel present = observed
-      // execution (survived vs terminated is the outcome, not a failure)
+      // Control carrier: the pre sentinel present means the instruction was
+      // reached, and the post sentinel present means control came back to the
+      // next instruction (survived) rather than leaving (terminated).
       std::uint32_t pre = 0, post = 0;
       if (c.offsets.size() >= 1 && c.offsets[0] + 4 <= result.size())
         std::memcpy(&pre, result.data() + c.offsets[0], 4);
@@ -285,14 +286,54 @@ int compare_cases(const lgpu::envelope::EnvelopeProgram& program,
         std::memcpy(&post, result.data() + c.offsets[1], 4);
       const bool survived = pre == 0x11111111u && post == 0x22222222u;
       const bool terminated = pre == 0x11111111u && post == 0x00000000u;
-      if (pre == 0x11111111u && (survived || terminated)) {
+      if (pre != 0x11111111u || (!survived && !terminated)) {
+        std::printf("FAIL %s: pre=0x%08x post=0x%08x (no clean observation)\n",
+                    c.id.c_str(), pre, post);
+        ++failures;
+        continue;
+      }
+      if (program.control_expect == 0) {
+        // The row settles neither outcome, so recording which one happened is
+        // all this run can claim.
         std::printf("PASS %s (%s)\n", c.id.c_str(),
                     survived ? "survived" : "terminated");
         continue;
       }
-      std::printf("FAIL %s: pre=0x%08x post=0x%08x (no clean observation)\n",
-                  c.id.c_str(), pre, post);
-      ++failures;
+      if (survived != (program.control_expect == 1)) {
+        std::printf("FAIL %s: expected %s, got %s\n", c.id.c_str(),
+                    program.control_expect == 1 ? "survived" : "terminated",
+                    survived ? "survived" : "terminated");
+        ++failures;
+        continue;
+      }
+      // Canary dwords (offsets 2 and up) are ordinary value comparisons against
+      // the value the carrier staged before the instruction.
+      bool ok = true;
+      for (std::size_t k = 2; k < c.offsets.size() && k < c.expected.size();
+           ++k) {
+        const std::uint32_t off = c.offsets[k];
+        if (off + 4 > result.size()) {
+          std::printf("FAIL %s: readback too small for offset 0x%x\n",
+                      c.id.c_str(), off);
+          ok = false;
+          break;
+        }
+        std::uint32_t actual = 0;
+        std::memcpy(&actual, result.data() + off, 4);
+        if (actual != c.expected[k]) {
+          std::printf("FAIL %s: offset 0x%x expected 0x%08x got 0x%08x\n",
+                      c.id.c_str(), off, c.expected[k], actual);
+          ok = false;
+          break;
+        }
+      }
+      if (!ok) {
+        ++failures;
+        continue;
+      }
+      // A bare verdict line, because a row whose outcome and canaries are
+      // asserted is a compared row and run_gpu.py counts "^PASS <id>$".
+      std::printf("PASS %s\n", c.id.c_str());
       continue;
     }
     for (std::size_t k = 0; k < c.offsets.size(); ++k) {
