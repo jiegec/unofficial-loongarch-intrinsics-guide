@@ -239,6 +239,16 @@ must not request fifteen raster varying planes or lose captured components.
 This separation is a compiler/driver ABI contract, not an increase in the
 hardware raster record limits below.
 
+Shader selection must track whether capture targets are active, including
+temporary changes made by the driver. In Gallium, an internal query drain draw
+can hide the targets without changing the bound application state. A cache
+indexed only by that state's generation can then retain the shader variant
+with capture stores disabled when the application draw resumes. Feedback
+activity must therefore participate in shader selection independently of the
+bound-state generation, for both vertex-only and geometry pipelines. This is
+a driver cache contract; it does not change the SIO record layout or provide
+ordering between buffer stores and rasterization.
+
 ### Captured point size
 
 `PointSize` keeps its fixed-function payload quad even when transform feedback
