@@ -132,13 +132,8 @@ nav:
           - Control and Ordering: gpu/isa/families/control.md
           - SIO and Export: gpu/isa/families/sio.md
           - Interpolation: gpu/isa/families/interpolation.md
-          - Reference: gpu/isa/reference.md
-      - Appendices:
-          - Glossary: gpu/appendices/glossary.md
-          - UNRESOLVED Register: gpu/appendices/unresolved.md
-          - Walkthrough: gpu/appendices/walkthrough.md
-          - Performance: gpu/appendices/performance.md
-          - Machine Rows:
+          - Instruction Reference:
+              - Overview: gpu/isa/reference.md
               - Vector ALU: gpu/instructions/vector-alu.md
               - Scalar ALU: gpu/instructions/scalar-alu.md
               - Memory and Image: gpu/instructions/memory-image.md
@@ -146,3 +141,8 @@ nav:
               - Control and Ordering: gpu/instructions/control-prefix.md
               - SIO and Export: gpu/instructions/sio-export.md
               - Interpolation: gpu/instructions/interpolation.md
+      - Appendices:
+          - Glossary: gpu/appendices/glossary.md
+          - UNRESOLVED Register: gpu/appendices/unresolved.md
+          - Walkthrough: gpu/appendices/walkthrough.md
+          - Performance: gpu/appendices/performance.md
