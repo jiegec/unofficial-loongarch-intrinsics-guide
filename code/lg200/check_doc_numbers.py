@@ -158,7 +158,7 @@ def main() -> int:
         ('case-boundaries.md', r'still \*\*([0-9]+)\*\*', 'targets'),
         ('case-boundaries.md', r'The \*\*([0-9]+)\*\* that remain are ' +
                                 r'\*\*launch-shape\*\*', 'launch-shape'),
-        ('unresolved-status.md', r'\*\*([0-9]+) as of 2026-10-13\*\*', 'rows-unresolved'),
+        ('unresolved-status.md', r'\*\*([0-9]+) as of 2026-1[01]-[0-9]{2}\*\*', 'rows-unresolved'),
         ('unresolved-status.md', r'is ([0-9]+) distinct sentences', 'sentences'),
         ('unresolved-status.md', r'The rest of the ([0-9]+) sentences', 'sentences'),
         ('status.md', r'oracle passes \(\*\*768 instructions, ([0-9,]+)', 'vectors'),

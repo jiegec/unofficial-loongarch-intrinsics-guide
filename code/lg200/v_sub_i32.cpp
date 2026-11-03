@@ -11,4 +11,7 @@ CASE(zero-minus-one, 0x0, 0x1, 0xffffffff)
 CASE(neg-neg, 0xffffffff, 0xfffffffe, 0x1)
 CASE(min-minus-one, 0x80000000, 0x1, 0x7fffffff)
 CASE(max-minus-min, 0x7fffffff, 0x80000000, 0xffffffff)
+CASE(borrow-chain-into-sign, 0x80000000, 0x80000001, 0xffffffff)
+CASE(mid-underflow-no-clamp, 0x40000000, 0x80000000, 0xc0000000)
+CASE(mid-pair-minus-one, 0x40000000, 0x40000001, 0xffffffff)
 LG200_CASE_END
