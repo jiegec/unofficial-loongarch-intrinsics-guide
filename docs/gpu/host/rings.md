@@ -104,4 +104,4 @@ its fence. A pipeline that reuses a slot earlier can overwrite a command word
 that the command processor has not consumed.
 
 > UNRESOLVED: the exact read-cursor update granularity of each pipe, and whether
-> a partially consumed packet can be observed by the producer.
+> a partially consumed packet can be seen by the producer.
