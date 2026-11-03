@@ -3799,7 +3799,18 @@ std::optional<EnvelopeProgram> build_carrier_env(
   const bool flat_roundtrip =
       flat_family &&
       (mnemonic == "store_v_flat_b32" || mnemonic == "store_v_flat_b64" ||
-       mnemonic == "store_v_flat_b128");
+       mnemonic == "store_v_flat_b128" ||
+       // [HW 2026-11-03] b8 and b16 join it: their model was the b32 identity,
+       // which is why b16's 0x7fffffff read back 0x0000ffff and b8's 0x12345678
+       // read back 0x00000078 - the store writes the low byte/halfword and the
+       // rest of the word keeps whatever the window held.  With the model fixed
+       // the round trip is exact on a zeroed window.
+       mnemonic == "store_v_flat_b8" || mnemonic == "store_v_flat_b16" ||
+       // [HW 2026-11-03] b96 joins them once its ENCODING was corrected: the
+       // table emitted 0x50980000 with bit 29 reserved, while all five siblings
+       // emit 0x70.. with bit 29 fixed.  Raising it to 0x70980000 makes the
+       // store land - 3 of 3 on both pipes, where it had written nothing at all.
+       mnemonic == "store_v_flat_b96");
   // [HW 2026-11-03] b16 and b96 are NOT in that set, and the comparison is why.
   // Compared, b16 fails 4 of 12: a 0x7fffffff datum reads back 0x0000ffff, so the
   // store writes the low half and the oracle returns the whole dword.  b96 fails 2
@@ -3833,9 +3844,9 @@ std::optional<EnvelopeProgram> build_carrier_env(
   // The STORES stay: b8 and b16 are the same identity defect in the other
   // direction (the hardware writes only the low byte/halfword, so the readback
   // keeps the rest of the word) and b96 writes nothing at all.
-  const bool flat_subword_defect =
-      mnemonic == "store_v_flat_b8" || mnemonic == "store_v_flat_b16" ||
-      mnemonic == "store_v_flat_b96";
+  // The subword defect set is empty: b8/b16 were model repairs, b96 was the
+  // instruction word.  Kept as a named predicate so the next defect has a home.
+  const bool flat_subword_defect = false;
   // Experiment knob (README, "Environment knobs"), not a stable interface: it
   // re-enables the comparison for a subword row in one watched session.
   // [HW 2026-11-03] A launch wider than one wave cannot grade an atomic's
