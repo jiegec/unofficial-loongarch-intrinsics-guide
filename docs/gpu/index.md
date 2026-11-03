@@ -1,100 +1,66 @@
-# Loongson GPU (LG200)
+# Loongson LG200 Graphics and Compute
 
-This section documents the Loongson GPU shader instruction set and its
-graphical ABI: enough to write a driver, and enough to understand what the
-hardware does at the level of a command, a state object, a descriptor and an
-instruction.
+This manual describes the Loongson LG200 GPU: its command interface, its
+graphics pipeline, its shader programming model and its instruction set. It is
+written for driver and compiler engineers who know graphics and instruction-set
+architecture but have no prior knowledge of this device.
 
-## How this section is organised
+## Scope
 
-The chapters are grouped by the layer they describe, in the order a command
-travels, so the directory tree and the navigation agree:
+The manual covers the LG200 graphics and compute engines from the user-space
+interface down to the shader instruction. It includes:
 
-| Part | What it answers |
-|------|-----------------|
-| [Generation profile](chips/lg200.md) | the values and limits of one chip generation |
-| [Glossary](concepts/glossary.md) | what each term means, once |
-| [Execution model](concepts/execution-model.md) | the four layers, the pipes and the stream processor |
-| *Host and commands* | layers 0 and 1: who owns what, and the command vocabularies |
-| [Host interface](host/interface.md) | the ownership split and the kernel interface |
-| [Stream command word](host/stream.md) | `SCMD32` and the payloads the pipes share |
-| [Graphics submission](host/graphics-submission.md) | the indirect buffer, batching, packets, fences, memory |
-| [GPIPE](host/pipes/gpipe.md), [BPIPE](host/pipes/bpipe.md), [XDMA](host/pipes/xdma.md), [CPIPE](host/pipes/cpipe.md) | one chapter per pipe vocabulary |
-| [Compute](host/compute.md) | the compute queue and the dispatch (still thin, see the page) |
-| *Graphics state* | layer 2's graphical payload |
-| [The state object](graphics/state-object.md) | the 512-dword payload, block by block |
-| [Draw and rasterization](graphics/draw-raster.md) | the draw description and the rasterization controls |
-| [Depth, stencil and blending](graphics/depth-blend.md) | the output-merger state |
-| *Shaders* | layer 3's contract with the driver |
-| [Shader ABI](shader/abi.md) | the stage record and its roots |
-| [Stage interfaces](shader/stages.md) | how to write each stage, end to end |
-| [Registers and allocation](shader/registers.md) | the register files, the reserved windows and the size rules |
-| [Descriptors](shader/descriptors.md) | buffer, image, sampler and attribute records, bit by bit |
-| [Geometry Stage](shader/geometry.md) | geometry record formulas, staging and validation boundaries |
-| [SIO](shader/sio.md) | the channel interface between stages and the pipeline |
-| *Instruction set* | layer 3's encoding |
-| [Instruction encoding](isa/encoding.md) | the instruction word, the formats and the mask discipline |
-| [Operands and registers](isa/operands.md) | selector space, conditional execution, addressing shapes |
-| [Instruction families](isa/family-vector.md) | what the rows of each family share: forms, operands and boundaries |
-| *Appendices* | reference material, consulted rather than read in sequence |
-| [Verification tooling](appendix/verification.md) | the oracle, the hardware runner and the benchmark |
-| [Measurements](appendix/measurements.md) | the microbenchmark tables |
-| [UNRESOLVED register](appendix/unresolved.md) | where every open item is, and which ones block work |
+- the kernel interface a user-mode driver uses: buffer objects, virtual
+  addresses, command submission, fences and user queues;
+- the command processors, their rings and their packet formats;
+- the fixed-function graphics pipeline, the state object and the resource
+  formats;
+- the shader ABI, the register model, descriptor tables and the stage
+  interfaces;
+- the complete instruction encoding, operand model and instruction families.
 
-## Reading order
+The display controllers, video decode and encode engines, and the internal
+implementation of the kernel driver are outside this manual. The kernel
+interface is described only to the extent that a user-mode driver depends on it.
 
-A reader with no prior knowledge should start with the
-[execution model](concepts/execution-model.md), then read
-[graphics submission](host/graphics-submission.md) and the
-[shader ABI](shader/abi.md) before the instruction pages, which are the
-reference for individual machine rows.
+## Structure
 
-## Instruction reference
+The manual is organised by layer, following the path of a command from the
+application to the shader:
 
-The instruction set is grouped into seven families.  A family is a grouping of
-the reference chapters, not an encoding property, and the two are orthogonal: a
-family may draw on several machine formats and a format may serve several
-families.  Each family has a chapter for what its rows share and an index of its
-machine rows; each row then has its own page with a synopsis, a description of
-that exact variant, the encoded operands, reference pseudocode, and measured
-cost where a measurement exists.
+| Part | Contents | Answers |
+|------|----------|---------|
+| I. Architecture | [Overview](architecture/overview.md), [execution model](architecture/execution-model.md), [memory system](architecture/memory-system.md), [LG200 profile](architecture/generation-lg200.md) | What the device is made of, how work executes, how memory is addressed |
+| II. Host interface | [UAPI](host/uapi.md), [buffer objects](host/buffer-objects.md), [MMIO](host/mmio.md), [rings](host/rings.md), [GPIPE](host/gpipe.md), [BPIPE](host/bpipe.md), [CPIPE](host/cpipe.md), [XDMA](host/xdma.md), [indirect buffers](host/indirect-buffers.md), [submissions](host/submissions.md), [compute submission](host/compute-submission.md) | How a driver allocates memory, builds commands and submits work |
+| III. Graphics pipeline | [Pipeline](graphics/pipeline.md), [draw](graphics/draw.md), [vertex input](graphics/vertex-input.md), [rasterization](graphics/rasterization.md), [depth and stencil](graphics/depth-stencil.md), [blending](graphics/blending.md), [texture](graphics/texture.md), [formats](graphics/formats.md), [multisampling](graphics/multisampling.md), [queries](graphics/queries.md), [streamout](graphics/streamout.md), [clear and blit](graphics/clear-blit.md), [state records](graphics/state-records.md), [state object](graphics/state-object.md) | How a draw is described and rasterized |
+| IV. Shaders | [Stages](shaders/stages.md), [shader ABI](shaders/shader-abi.md), [registers](shaders/registers.md), [descriptors](shaders/descriptors.md), [I/O](shaders/io.md), [geometry](shaders/geometry.md), [interpolation](shaders/interpolation.md), [compute](shaders/compute.md), [compiler contract](shaders/compiler-contract.md) | How a shader is launched, what it receives and what it must produce |
+| V. Instruction set | [Encoding](isa/encoding.md), [operands](isa/operands.md), [execution](isa/execution.md), [addressing](isa/addressing.md), [families](isa/families/vector.md), [reference](isa/reference.md) | How an instruction is encoded and what it does |
+| VI. Appendices | [Glossary](appendices/glossary.md), [UNRESOLVED register](appendices/unresolved.md), [walkthrough](appendices/walkthrough.md), [performance](appendices/performance.md) | Terms, open questions, one end-to-end example, relative cost |
 
-| Family | Rows | Chapter | Index | Machine formats |
-|--------|-----:|---------|-------|-----------------|
-| Vector ALU | 374 | [family](isa/family-vector.md) | [index](instructions/vector-alu.md) | `vop`, `vop-imm`, `shared-memory` |
-| Scalar ALU | 119 | [family](isa/family-scalar.md) | [index](instructions/scalar-alu.md) | `sop`, `sop-imm-control` |
-| Memory and image | 138 | [family](isa/family-memory.md) | [index](instructions/memory-image.md) | `smem`, `tex-buffer`, `flat`, `shared-memory` |
-| Atomic | 97 | [family](isa/family-atomic.md) | [index](instructions/atomic.md) | `tex-buffer`, `flat`, `shared-memory` |
-| Control prefix | 20 | [family](isa/family-control.md) | [index](instructions/control-prefix.md) | `sop-imm-control`, `jump-stack`, `shared-memory`, `prefix` |
-| SIO and export | 17 | [family](isa/family-sio.md) | [index](instructions/sio-export.md) | `sio-id`, `sio-imm` |
-| Interpolation | 3 | [family](isa/family-interpolation.md) | [index](instructions/interpolation.md) | `vop` |
+## Reading paths
 
-Four rows sit across the family boundary, and each is documented in the chapter
-that describes its mechanism rather than the one its name suggests:
-`v_bperm_sm_b32` and `v_perm_sm_b32` are permutes over the workgroup allocation,
-and `copy_sm_from_global` and `copy_sm_to_global` move blocks between the
-workgroup allocation and global memory.
+A driver engineer should read Part I, then Part II, then the state and pipeline
+chapters of Part III. A compiler engineer should read the execution model, then
+Part IV, then Part V. A reader who wants one concrete path through the system
+can start with the [walkthrough](appendices/walkthrough.md) and follow its
+links.
 
-## How the descriptions are written
-**A current figure is bold; a historical one is not.**  Where a page states a
-number that a tool computes - coverage, the bench counts, the UNRESOLVED tallies -
-the figure that is true now is written in bold, and a superseded figure is kept
-plain, usually with the date it was true.  `check_doc_numbers.py` enforces the
-bold side: it scans every page for bold figures near those measures and fails if
-one is not the live value.  So a stale number stays readable as history, and a new
-copy of a live number cannot appear without the suite noticing - which is the only
-reason it is safe to repeat a computed figure in prose at all.
+## Values and generations
 
+Mechanism chapters describe behaviour that is common to the LG200 generation.
+Numeric values, limits and feature support are collected in the
+[LG200 profile](architecture/generation-lg200.md). A future generation adds a
+profile page and a column; it does not duplicate the mechanism chapters.
 
-Each instruction page states what the row computes, the operands with their bit
-positions, the reference pseudocode and the boundary behaviour that matters.
-Behaviour that has not been established is written as `UNRESOLVED` in place
-rather than guessed, and behaviour that diverges from a comparable architecture
-is marked as a difference.
+## Conventions
 
-## Generations
+Bit ranges, numeric notation, normative terms and the marking of unresolved
+behaviour are defined in [Conventions](conventions.md). Every chapter uses that
+notation without restating it.
 
-Values in this documentation belong to the generation under "Generation
-profile".  Chapters describe mechanisms; a chip-specific value lives in that
-profile page or in a table column, so a new generation adds a profile and a
-column rather than a second copy of the manual.
+## Open questions
+
+Behaviour that the documentation does not establish is marked `UNRESOLVED` at
+the point where it matters. The [UNRESOLVED register](appendices/unresolved.md)
+lists every open item by area and gives its consequence for a driver or a
+compiler.

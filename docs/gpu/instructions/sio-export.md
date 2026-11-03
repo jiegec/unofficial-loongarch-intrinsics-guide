@@ -1,10 +1,6 @@
 # SIO and Export
 
-The rows' forms and operand roles are described in
-[SIO and Export Family](../isa/family-sio.md); the streams, the channel layout and
-the ordering rules are described in [SIO](../shader/sio.md).
-
-## Instruction index
+The family chapter is [SIO and Export](../isa/families/sio.md). The rows below are the machine rows of the family.
 
 {{ lg200('sioexport') }}
 
@@ -39,4 +35,3 @@ the ordering rules are described in [SIO](../shader/sio.md).
 {{ lg200('siowrrot_imm') }}
 
 {{ lg200('siowrrot_imm_c4') }}
-

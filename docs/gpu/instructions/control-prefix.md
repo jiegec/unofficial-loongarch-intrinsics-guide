@@ -1,8 +1,6 @@
-# Control Prefix
+# Control and Ordering
 
-Branch encoding, the ordering operation, termination and the jump stack are described in [Control Flow and Ordering Family](../isa/family-control.md).
-
-## Instruction index
+The family chapter is [Control and Ordering](../isa/families/control.md). The rows below are the machine rows of the family.
 
 {{ lg200('b') }}
 
@@ -43,4 +41,3 @@ Branch encoding, the ordering operation, termination and the jump stack are desc
 {{ lg200('rfe') }}
 
 {{ lg200('trap') }}
-

@@ -77,52 +77,73 @@ nav:
       - lsx/shuffling.md
       - lsx/undocumented.md
   - Loongson GPU (LG200):
-      - Overview: gpu/index.md
-      - Generation Profile: gpu/chips/lg200.md
-      - Glossary: gpu/concepts/glossary.md
-      - Execution Model: gpu/concepts/execution-model.md
-      - Host and Commands:
-          - Host Interface: gpu/host/interface.md
-          - Stream Command Word: gpu/host/stream.md
-          - Graphics Submission: gpu/host/graphics-submission.md
-          - GPIPE: gpu/host/pipes/gpipe.md
-          - BPIPE: gpu/host/pipes/bpipe.md
-          - XDMA: gpu/host/pipes/xdma.md
-          - CPIPE: gpu/host/pipes/cpipe.md
-          - Compute: gpu/host/compute.md
-      - Graphics State:
+      - Manual: gpu/index.md
+      - Conventions: gpu/conventions.md
+      - Architecture:
+          - Overview: gpu/architecture/overview.md
+          - Execution Model: gpu/architecture/execution-model.md
+          - Memory System: gpu/architecture/memory-system.md
+          - LG200 Profile: gpu/architecture/generation-lg200.md
+      - Host Interface:
+          - User-Space Interface: gpu/host/uapi.md
+          - Buffer Objects: gpu/host/buffer-objects.md
+          - MMIO and Command Words: gpu/host/mmio.md
+          - Rings: gpu/host/rings.md
+          - GPIPE: gpu/host/gpipe.md
+          - BPIPE: gpu/host/bpipe.md
+          - CPIPE: gpu/host/cpipe.md
+          - XDMA: gpu/host/xdma.md
+          - Indirect Buffers: gpu/host/indirect-buffers.md
+          - Submissions: gpu/host/submissions.md
+          - Compute Submission: gpu/host/compute-submission.md
+      - Graphics Pipeline:
+          - Pipeline: gpu/graphics/pipeline.md
+          - Draw: gpu/graphics/draw.md
+          - Vertex Input: gpu/graphics/vertex-input.md
+          - Rasterization: gpu/graphics/rasterization.md
+          - Depth and Stencil: gpu/graphics/depth-stencil.md
+          - Blending: gpu/graphics/blending.md
+          - Texture and Sampling: gpu/graphics/texture.md
+          - Formats and Layout: gpu/graphics/formats.md
+          - Multisampling: gpu/graphics/multisampling.md
+          - Queries: gpu/graphics/queries.md
+          - Streamout: gpu/graphics/streamout.md
+          - Clear and Blit: gpu/graphics/clear-blit.md
+          - State Records: gpu/graphics/state-records.md
           - State Object: gpu/graphics/state-object.md
-          - Draw and Rasterization: gpu/graphics/draw-raster.md
-          - Depth, Stencil and Blend: gpu/graphics/depth-blend.md
       - Shaders:
-          - Shader ABI: gpu/shader/abi.md
-          - Stage Interfaces: gpu/shader/stages.md
-          - Geometry Stage: gpu/shader/geometry.md
-          - Registers and Allocation: gpu/shader/registers.md
-          - Descriptors: gpu/shader/descriptors.md
-          - SIO: gpu/shader/sio.md
+          - Stages: gpu/shaders/stages.md
+          - Shader ABI: gpu/shaders/shader-abi.md
+          - Registers and Allocation: gpu/shaders/registers.md
+          - Descriptors: gpu/shaders/descriptors.md
+          - SIO: gpu/shaders/io.md
+          - Geometry Stage: gpu/shaders/geometry.md
+          - Interpolation: gpu/shaders/interpolation.md
+          - Compute: gpu/shaders/compute.md
+          - Compiler Contract: gpu/shaders/compiler-contract.md
       - Instruction Set:
           - Encoding: gpu/isa/encoding.md
-          - Operands and Registers: gpu/isa/operands.md
-          - Vector ALU (family): gpu/isa/family-vector.md
-          - Scalar ALU (family): gpu/isa/family-scalar.md
-          - Memory and Image (family): gpu/isa/family-memory.md
-          - Atomic (family): gpu/isa/family-atomic.md
-          - Control Flow (family): gpu/isa/family-control.md
-          - SIO and Export (family): gpu/isa/family-sio.md
-          - Interpolation (family): gpu/isa/family-interpolation.md
-          - Instruction Index:
+          - Operands: gpu/isa/operands.md
+          - Execution: gpu/isa/execution.md
+          - Addressing: gpu/isa/addressing.md
+          - Vector ALU: gpu/isa/families/vector.md
+          - Scalar ALU: gpu/isa/families/scalar.md
+          - Memory and Image: gpu/isa/families/memory.md
+          - Atomic: gpu/isa/families/atomic.md
+          - Control and Ordering: gpu/isa/families/control.md
+          - SIO and Export: gpu/isa/families/sio.md
+          - Interpolation: gpu/isa/families/interpolation.md
+          - Reference: gpu/isa/reference.md
+      - Appendices:
+          - Glossary: gpu/appendices/glossary.md
+          - UNRESOLVED Register: gpu/appendices/unresolved.md
+          - Walkthrough: gpu/appendices/walkthrough.md
+          - Performance: gpu/appendices/performance.md
+          - Machine Rows:
               - Vector ALU: gpu/instructions/vector-alu.md
               - Scalar ALU: gpu/instructions/scalar-alu.md
               - Memory and Image: gpu/instructions/memory-image.md
               - Atomic: gpu/instructions/atomic.md
-              - Control Prefix: gpu/instructions/control-prefix.md
+              - Control and Ordering: gpu/instructions/control-prefix.md
               - SIO and Export: gpu/instructions/sio-export.md
               - Interpolation: gpu/instructions/interpolation.md
-      - Appendices:
-          - Verification Tooling: gpu/appendix/verification.md
-          - Measurements: gpu/appendix/measurements.md
-          - UNRESOLVED Register: gpu/appendix/unresolved.md
-          - UNRESOLVED Status: gpu/appendix/unresolved-status.md
-          - Case Boundary Coverage: gpu/appendix/case-boundaries.md
-          - Carrier and Coverage Status: gpu/appendix/status.md

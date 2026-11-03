@@ -132,6 +132,56 @@ def _lg200_load_measure():
 lg200_measure = _lg200_load_measure()
 
 
+_LG200_PROVENANCE = re.compile(
+    r"20\d\d-\d\d-\d\d|\bcarrier\b|\bprobe\b|\bvendor\b|\bobserved\b|"
+    r"\bmeasured (on|with|using|by)\b|worktree|code/lg200|this tree|"
+    r"\bthe driver\b|\bclosed\s+(producer|driver|backend)\b|"
+    r"\bestablished producer\b|\bMesa\b|\bCTS\b",
+    re.I,
+)
+
+
+def _lg200_strip_comments(code):
+    """Strip comments from a reference pseudocode body."""
+    code = re.sub(r"/\*.*?\*/", "", code, flags=re.S)
+    code = re.sub(r"//.*$", "", code, flags=re.M)
+    code = re.sub(r"\n{3,}", "\n\n", code)
+    return code.strip()
+
+
+def _lg200_clean_description(text):
+    """Drop provenance sentences from a row description.
+
+    The instruction table is an engineering record. A rendered row page is a
+    manual page: it keeps the normative sentences and drops sentences that name
+    an experiment, a builder, a test harness or a date. An unresolved sentence
+    that is dropped is replaced by a generic marker so the page never claims a
+    property it does not establish.
+    """
+    out = []
+    for para in text.split("\n\n"):
+        keep = []
+        dropped_unresolved = False
+        kept_unresolved = False
+        for sentence in re.split(r"(?<=[.!?])\s+", para.strip()):
+            if not sentence.strip():
+                continue
+            if _LG200_PROVENANCE.search(sentence):
+                if "UNRESOLVED" in sentence:
+                    dropped_unresolved = True
+                continue
+            if "UNRESOLVED" in sentence:
+                kept_unresolved = True
+            keep.append(sentence.strip())
+        if keep:
+            out.append(" ".join(keep))
+            if dropped_unresolved and not kept_unresolved:
+                out.append("UNRESOLVED: this property is not established.")
+        elif dropped_unresolved:
+            out.append("UNRESOLVED: this property is not established.")
+    return "\n\n".join(out)
+
+
 def _lg200_latency_section(mnemonic):
     """Render the per-instruction Latency section (GPU data columns).
 
@@ -169,14 +219,13 @@ def _lg200_latency_section(mnemonic):
 |---------|------:|-------:|---------|
 | Dependency chain (lat) | {lat} | {m["lat_r2"]:.2f} | one {mnemonic} consuming the previous destination, same lane |
 | Independent streams (tp) | {tp} | {m["tp_r2"]:.2f} | 8 independent register streams, no cross-op dependency |
-| Carrier | 16 fragments | - | every op executes on all 16 fragment lanes |
+| Coverage | 16 fragment lanes | - | one op on each active lane |
 | Confidence | {rel} | - | both slopes > 0 with R2 > 0.5 |
 
-Measured by the PS-carrier differential wall-clock bench (slope of
-wall-clock vs op count, code/lg200/run_bench.py); the fixed
-submission/readback overhead subtracts out. Numbers are **relative
-wall-clock nanoseconds**, not architectural cycles (no shader-visible GPU
-clock; see [Measurements](../appendix/measurements.md)).{warn}
+Derived from the slope of wall-clock time against op count; the fixed
+submission and readback overhead cancels. Numbers are **relative wall-clock
+nanoseconds**, not architectural cycles (no shader-visible GPU clock; see
+[Performance](../appendices/performance.md)).{warn}
 """
 
 
@@ -490,11 +539,11 @@ def lg200_instruction(mnemonic):
     else:
         code = ""
 
+    description = _lg200_clean_description(info['description'])
+
     synopsis = "\n".join([
         f"Instruction: {info['assembly']}",
         f"Format: {info['format']}",
-        f"Class: {info['category']}",
-        f"Semantic model: {info['semantic_model']}",
         f"Encoding: 0x{info['encoding_lo']} (INST_LO), 0x{info['encoding_hi']} (INST_HI)",
     ])
 
@@ -507,6 +556,7 @@ def lg200_instruction(mnemonic):
 
     operation = ""
     if code:
+        code = _lg200_strip_comments(code)
         operation = ("\n### Operation\n\nReference pseudocode."
                      "\n\n```c++\n" + code + "\n```\n")
 
@@ -523,7 +573,7 @@ def lg200_instruction(mnemonic):
 
 ### Description
 
-{info['description']}
+{description}
 
 {encoding}
 {operation}

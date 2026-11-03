@@ -1,8 +1,6 @@
 # Vector ALU
 
-The semantics shared by these rows, their operand forms and their conditional-execution rules are described in [Vector ALU Family](../isa/family-vector.md).
-
-## Instruction index
+The family chapter is [Vector ALU](../isa/families/vector.md). The rows below are the machine rows of the family.
 
 {{ lg200('v_abs_f32') }}
 
@@ -751,4 +749,3 @@ The semantics shared by these rows, their operand forms and their conditional-ex
 {{ lg200('v_xor_b32') }}
 
 {{ lg200('v_xor_imm_b32') }}
-

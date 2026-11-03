@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 340" width="880" height="340" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12">
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#44506a"/></marker></defs>
+<style>.b{fill:#eef2f8;stroke:#44506a;stroke-width:1.2}.t{fill:#10141c}.m{fill:#5a6478}.a{stroke:#44506a;stroke-width:1.4;fill:none;marker-end:url(#a)}.d{fill:#fff;stroke:#44506a;stroke-width:1.1}</style>
+<text class="t" x="20" y="24" font-weight="700">Texture sampling path</text>
+<rect class="b" x="20" y="70" width="180" height="80" rx="4"/><text class="t" x="30" y="90" font-weight="600">Coordinate tuple</text><text class="m" x="30" y="106">offset · bias · u,v · lod</text>
+<rect class="b" x="220" y="70" width="180" height="80" rx="4"/><text class="t" x="230" y="90" font-weight="600">LOD select</text><text class="m" x="230" y="106">clamp(LOD + bias,</text><text class="m" x="230" y="122">base + min, base + max)</text>
+<rect class="b" x="420" y="70" width="180" height="80" rx="4"/><text class="t" x="430" y="90" font-weight="600">Mip and filter</text><text class="m" x="430" y="106">nearest / linear</text><text class="m" x="430" y="122">wrap and border</text>
+<rect class="b" x="620" y="70" width="180" height="80" rx="4"/><text class="t" x="630" y="90" font-weight="600">Format convert</text><text class="m" x="630" y="106">data and number format</text>
+<line class="a" x1="200" y1="110" x2="220" y2="110"/><line class="a" x1="400" y1="110" x2="420" y2="110"/><line class="a" x1="600" y1="110" x2="620" y2="110"/>
+<rect class="d" x="20" y="200" width="800" height="50" rx="4"/><text class="t" x="30" y="220" font-weight="600">Sampler descriptor</text><text class="m" x="30" y="236">clamp XYZ · min/max LOD · bias · filters · border pointer</text>
+<rect class="d" x="20" y="270" width="390" height="45" rx="4"/><text class="t" x="30" y="290" font-weight="600">Image descriptor</text><text class="m" x="30" y="306">base · format · type · levels · pitch · tiling</text>
+<rect class="d" x="430" y="270" width="390" height="45" rx="4"/><text class="t" x="440" y="290" font-weight="600">Result</text><text class="m" x="440" y="306">four channels after destination select and compare</text>
+<text class="m" x="20" y="330" font-size="11">The tuple prefix is variant-specific; a shader supplies only the slots its instruction consumes.</text>
+</svg>

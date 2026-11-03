@@ -1,8 +1,6 @@
 # Atomic
 
-The read-modify-write contract, the counter rules and the four memory spaces are described in [Atomic Family](../isa/family-atomic.md).
-
-## Instruction index
+The family chapter is [Atomic](../isa/families/atomic.md). The rows below are the machine rows of the family.
 
 {{ lg200('atomic_sm_add_u32') }}
 
@@ -197,4 +195,3 @@ The read-modify-write contract, the counter rules and the four memory spaces are
 {{ lg200('atomic_v_tex_swap_b32') }}
 
 {{ lg200('atomic_v_tex_xor_b32') }}
-

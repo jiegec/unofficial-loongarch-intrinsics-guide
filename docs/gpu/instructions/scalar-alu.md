@@ -1,8 +1,6 @@
 # Scalar ALU
 
-The operand forms, the condition register and the operation groups are described in [Scalar ALU Family](../isa/family-scalar.md).
-
-## Instruction index
+The family chapter is [Scalar ALU](../isa/families/scalar.md). The rows below are the machine rows of the family.
 
 {{ lg200('s_abs_i32') }}
 
@@ -241,4 +239,3 @@ The operand forms, the condition register and the operation groups are described
 {{ lg200('s_xor_b32') }}
 
 {{ lg200('s_xor_imm_b32') }}
-
