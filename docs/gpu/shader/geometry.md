@@ -403,6 +403,10 @@ still be refused when its LG200 record cannot be represented.
   Targeted readback and `render_different_content` regressions pass; arbitrary
   per-layer output counts and the full primitive-cut protocol remain unproven.
   Replaying layers is a driver policy, rather than a native layer ABI.
+  A 1D layered depth/stencil attachment is a height-one 2D surface. Its array
+  layout uses the depth surface's tile mode and per-layer offsets; treating it
+  as a linear 1D colour array permutes depth/stencil pixels. Format queries,
+  allocation, attachment validation and readback must agree on that layout.
 * Point-size distance records now declare initialized distance quads, and a
   single emitted vertex reserves the same miscellaneous quad as multiple
   vertices. Focused probes cover 1–8 distances and static/runtime point output;
@@ -443,7 +447,7 @@ conformance.
 | Runtime point emission boundaries | 0–3 loop iterations, all/mixed/no active emit conditions, two independent processes per shape; varying values and distinct output rows | 24 pass after removing the strip separator gate from point output |
 | Vulkan point clip-volume controls | `inside`, `outside`, `depth_clamp`, `depth_clip`, and `clipped.large_points`, three separate processes each | 15 pass after initializing the static separator and completing the meta depth predicate |
 | Piglit geometry corpus (historical aggregate) | 37 cases | 24 pass, 1 fail (`max-input-components`), 12 skip |
-| Vulkan CTS geometry matrix | 199 cases | 179 pass, 10 fail, 10 NotSupported, no GPU fault in this matrix |
+| Vulkan CTS geometry matrix (historical aggregate) | 199 cases | 179 pass, 10 fail, 10 NotSupported, no GPU fault in this matrix |
 | Vulkan CTS clip/cull matrix | 64 `vert_geom` cases, static/dynamic indexing, with/without fragment distance reads | 64 pass, no GPU fault |
 
 A later focused `max-input-components` check passes after input scheduling,
@@ -452,6 +456,14 @@ control changes every producer value by one and correctly renders the failure
 colour. Ten selected input-width cases, including 20, 24, 28, 32, 56, 64, 96,
 120, 124, and 128 components, pass with the corrected layout. These targeted
 results do not replace the historical aggregate with an inferred suite total.
+
+The two previously unsupported 1D-array readback cases, at 12×1 with six layers
+and 64×1 with four layers, pass after enabling height-one depth/stencil
+attachments with a matching tiled layout. Focused 1D mip rendering controls for
+D16, D24S8 and S8, a 1D-array D24S8 mip control, and a D16 1D-array sampling
+feedback-loop control also pass. The other eight historical geometry skips
+request 64 or 127 invocations, exceeding the implementation's advertised limit
+of 32; these results do not raise that limit.
 
 The aggregate geometry result above predates the null-position correction.
 Subsequent targeted checks pass nine previously failing layered cases in three
