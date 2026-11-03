@@ -3678,7 +3678,7 @@ std::optional<EnvelopeProgram> build_carrier_env(
       mnemonic == "getresinfo" || mnemonic.rfind("load_v_tex", 0) == 0 ||
       mnemonic.rfind("store_v_tex", 0) == 0 ||
       mnemonic == "v_sqrt_f64" || mnemonic == "v_rsq_f64" ||
-      mnemonic == "v_s2v_b32" || mnemonic == "v_cmpclass_f64" ||
+      mnemonic == "v_s2v_b32" ||
       // [HW 2026-11-03] v_add_imm_i32 and v_sub_imm_i32 belong here for a
       // reason of their own: every case of both rows returns the constant
       // 0x3f4fffff - the canary - on BOTH pipes, so the store never writes the
@@ -3689,7 +3689,14 @@ std::optional<EnvelopeProgram> build_carrier_env(
       // (FieldSem::ScalarCmp8 in build_generic), so the compare is a comparison
       // again.  The bucket reason named no mechanism for them, and while they
       // sat in this group the branch compared no word at all.
-      mnemonic == "v_perm_sm_b32" || mnemonic == "v_bperm_sm_b32";
+      mnemonic == "v_perm_sm_b32" || mnemonic == "v_bperm_sm_b32" ||
+      // [HW 2026-11-03] Both scalar compares write ZERO into the scalar register
+      // their RD8 field names: all 41 vectors of each row read 0 where the model says
+      // 0xffff, on both pipes.  Forcing SCC earlier graded a constant the carrier
+      // materialised with s_select; naming the register grades a word nothing writes.
+      // Neither is a value comparison, so the rows observe until the destination
+      // semantics are established.
+      mnemonic == "s_cmp_eq_u64" || mnemonic == "s_cmp_ne_u64";
   if (launch_state) {
     p->observe = true;
     // The group is broad; the reason is not.  Name the mechanism the comment
@@ -3697,6 +3704,8 @@ std::optional<EnvelopeProgram> build_carrier_env(
     const char* why = "launch-state group in build_carrier";
     if (flat_family)
       why = "flat input-plane values change with the 0x530 input_enable toggle";
+    else if (mnemonic == "s_cmp_eq_u64" || mnemonic == "s_cmp_ne_u64")
+      why = "the scalar-compare destination field writes no value";
     else if (mnemonic.rfind("load_sm_matrix_", 0) == 0)
       why = "persistent matrix file is cross-run state";
     else if (mnemonic.rfind("load_", 0) == 0 &&

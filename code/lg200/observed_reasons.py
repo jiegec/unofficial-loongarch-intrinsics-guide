@@ -57,6 +57,7 @@ PHRASES = {
     'coefficient window': ['coefficient window'],
     'launch-state group': ['launch-state group', 'launch state'],
     'accumulator and destination tuples': ['tuples are not staged'],
+    'scalar-compare destination': ['ordinary scalar register'],
 }
 
 
