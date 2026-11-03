@@ -1,4 +1,124 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 380" width="860" height="380" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12">
-<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#44506a"/></marker></defs>
-<style>.b{fill:#eef2f8;stroke:#44506a;stroke-width:1.2}.t{fill:#10141c}.m{fill:#5a6478}.a{stroke:#44506a;stroke-width:1.4;fill:none;marker-end:url(#a)}.d{fill:#fff;stroke:#44506a;stroke-width:1.1}</style>
-<text class="t" x="20" y="24" font-weight="700">Wave, lanes and register files</text><rect class="d" x="20" y="50" width="38" height="38" rx="4"/><text class="t" x="30" y="73" font-weight="600">0</text><rect class="d" x="64" y="50" width="38" height="38" rx="4"/><text class="t" x="74" y="73" font-weight="600">1</text><rect class="d" x="108" y="50" width="38" height="38" rx="4"/><text class="t" x="118" y="73" font-weight="600">2</text><rect class="d" x="152" y="50" width="38" height="38" rx="4"/><text class="t" x="162" y="73" font-weight="600">3</text><rect class="d" x="196" y="50" width="38" height="38" rx="4"/><text class="t" x="206" y="73" font-weight="600">4</text><rect class="d" x="240" y="50" width="38" height="38" rx="4"/><text class="t" x="250" y="73" font-weight="600">5</text><rect class="d" x="284" y="50" width="38" height="38" rx="4"/><text class="t" x="294" y="73" font-weight="600">6</text><rect class="d" x="328" y="50" width="38" height="38" rx="4"/><text class="t" x="338" y="73" font-weight="600">7</text><rect class="d" x="20" y="94" width="38" height="38" rx="4"/><text class="t" x="30" y="117" font-weight="600">8</text><rect class="d" x="64" y="94" width="38" height="38" rx="4"/><text class="t" x="74" y="117" font-weight="600">9</text><rect class="d" x="108" y="94" width="38" height="38" rx="4"/><text class="t" x="118" y="117" font-weight="600">10</text><rect class="d" x="152" y="94" width="38" height="38" rx="4"/><text class="t" x="162" y="117" font-weight="600">11</text><rect class="d" x="196" y="94" width="38" height="38" rx="4"/><text class="t" x="206" y="117" font-weight="600">12</text><rect class="d" x="240" y="94" width="38" height="38" rx="4"/><text class="t" x="250" y="117" font-weight="600">13</text><rect class="d" x="284" y="94" width="38" height="38" rx="4"/><text class="t" x="294" y="117" font-weight="600">14</text><rect class="d" x="328" y="94" width="38" height="38" rx="4"/><text class="t" x="338" y="117" font-weight="600">15</text><rect class="d" x="20" y="138" width="38" height="38" rx="4"/><text class="t" x="30" y="161" font-weight="600">16</text><rect class="d" x="64" y="138" width="38" height="38" rx="4"/><text class="t" x="74" y="161" font-weight="600">17</text><rect class="d" x="108" y="138" width="38" height="38" rx="4"/><text class="t" x="118" y="161" font-weight="600">18</text><rect class="d" x="152" y="138" width="38" height="38" rx="4"/><text class="t" x="162" y="161" font-weight="600">19</text><rect class="d" x="196" y="138" width="38" height="38" rx="4"/><text class="t" x="206" y="161" font-weight="600">20</text><rect class="d" x="240" y="138" width="38" height="38" rx="4"/><text class="t" x="250" y="161" font-weight="600">21</text><rect class="d" x="284" y="138" width="38" height="38" rx="4"/><text class="t" x="294" y="161" font-weight="600">22</text><rect class="d" x="328" y="138" width="38" height="38" rx="4"/><text class="t" x="338" y="161" font-weight="600">23</text><rect class="d" x="20" y="182" width="38" height="38" rx="4"/><text class="t" x="30" y="205" font-weight="600">24</text><rect class="d" x="64" y="182" width="38" height="38" rx="4"/><text class="t" x="74" y="205" font-weight="600">25</text><rect class="d" x="108" y="182" width="38" height="38" rx="4"/><text class="t" x="118" y="205" font-weight="600">26</text><rect class="d" x="152" y="182" width="38" height="38" rx="4"/><text class="t" x="162" y="205" font-weight="600">27</text><rect class="d" x="196" y="182" width="38" height="38" rx="4"/><text class="t" x="206" y="205" font-weight="600">28</text><rect class="d" x="240" y="182" width="38" height="38" rx="4"/><text class="t" x="250" y="205" font-weight="600">29</text><rect class="d" x="284" y="182" width="38" height="38" rx="4"/><text class="t" x="294" y="205" font-weight="600">30</text><rect class="d" x="328" y="182" width="38" height="38" rx="4"/><text class="t" x="338" y="205" font-weight="600">31</text><text class="m" x="20" y="238" font-size="11" text-anchor="start">32 lanes (8 × 4 shown)</text><rect class="b" x="400" y="50" width="200" height="160" rx="4"/><text class="t" x="410" y="70" font-weight="600">VGPR v0..v255</text><text class="m" x="410" y="86">one copy per lane</text><rect class="b" x="400" y="230" width="200" height="50" rx="4"/><text class="t" x="410" y="250" font-weight="600">SGPR s0..s101</text><text class="m" x="410" y="266">one copy per wave</text><rect class="b" x="630" y="50" width="200" height="60" rx="4"/><text class="t" x="640" y="70" font-weight="600">p0..p3</text><text class="m" x="640" y="86">32-bit lane mask</text><rect class="b" x="630" y="130" width="200" height="60" rx="4"/><text class="t" x="640" y="150" font-weight="600">SCC</text><text class="m" x="640" y="166">one bit per wave</text><rect class="b" x="630" y="210" width="200" height="70" rx="4"/><text class="t" x="640" y="230" font-weight="600">Masked write</text><text class="m" x="640" y="246">suppresses, does not clear</text><line class="a" x1="370" y1="110" x2="400" y2="110"/><line class="a" x1="370" y1="170" x2="400" y2="170"/><text class="m" x="20" y="320" font-size="11" text-anchor="start">A lane executes the same instruction stream; the scalar file is shared by all lanes.</text><text class="m" x="20" y="338" font-size="11" text-anchor="start">An instruction selects one of p0..p3; lanes outside it keep their previous destination value.</text></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 480" width="1000" height="480" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12">
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#44506a"/></marker><marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#2f5d8a"/></marker></defs>
+<text x="24" y="28" fill="#10141c" font-size="16" font-weight="700">Shared scalar file, per-lane vector file: a lane's mask bit gates its write</text>
+<text x="24" y="56" fill="#5a6478" font-size="11">one instruction word for all 32 lanes</text>
+<rect x="24" y="64" width="280" height="32" fill="#eef2f8" stroke="#44506a" stroke-width="1.25"/>
+<line x1="120" y1="64" x2="120" y2="96" stroke="#44506a" stroke-width="1"/>
+<line x1="240" y1="64" x2="240" y2="96" stroke="#44506a" stroke-width="1"/>
+<text x="72" y="85" fill="#10141c" font-size="12" text-anchor="middle">opcode</text>
+<text x="180" y="85" fill="#10141c" font-size="12" text-anchor="middle">PJ2 = 2</text>
+<text x="272" y="85" fill="#10141c" font-size="12" text-anchor="middle">vdst v12</text>
+<text x="320" y="96" fill="#5a6478" font-size="11">s0 … s101 · 102 words · one copy per wave</text>
+<rect x="320" y="104" width="376" height="24" fill="#fff" stroke="#44506a" stroke-width="1.25"/>
+<line x1="352" y1="104" x2="352" y2="128" stroke="#44506a" stroke-width="0.6"/>
+<line x1="384" y1="104" x2="384" y2="128" stroke="#44506a" stroke-width="0.6"/>
+<line x1="416" y1="104" x2="416" y2="128" stroke="#44506a" stroke-width="0.6"/>
+<line x1="448" y1="104" x2="448" y2="128" stroke="#44506a" stroke-width="0.6"/>
+<line x1="480" y1="104" x2="480" y2="128" stroke="#44506a" stroke-width="0.6"/>
+<line x1="512" y1="104" x2="512" y2="128" stroke="#44506a" stroke-width="0.6"/>
+<line x1="544" y1="104" x2="544" y2="128" stroke="#44506a" stroke-width="0.6"/>
+<line x1="576" y1="104" x2="576" y2="128" stroke="#44506a" stroke-width="0.6"/>
+<line x1="608" y1="104" x2="608" y2="128" stroke="#44506a" stroke-width="0.6"/>
+<line x1="640" y1="104" x2="640" y2="128" stroke="#44506a" stroke-width="0.6"/>
+<line x1="672" y1="104" x2="672" y2="128" stroke="#44506a" stroke-width="0.6"/>
+<text x="708" y="112" fill="#5a6478" font-size="11">no PJ2 slot:</text>
+<text x="708" y="128" fill="#5a6478" font-size="11">a scalar write is never gated</text>
+<line x1="180" y1="96" x2="180" y2="112" stroke="#2f5d8a" stroke-width="1.25" marker-end="url(#a2)"/>
+<rect x="109" y="116" width="22" height="24" fill="#eef2f8" stroke="#44506a" stroke-width="1.25"/>
+<text x="120" y="132" fill="#10141c" font-size="11" text-anchor="middle">p0</text>
+<rect x="139" y="116" width="22" height="24" fill="#eef2f8" stroke="#44506a" stroke-width="1.25"/>
+<text x="150" y="132" fill="#10141c" font-size="11" text-anchor="middle">p1</text>
+<rect x="169" y="116" width="22" height="24" fill="#eef2f8" stroke="#2f5d8a" stroke-width="1.5"/>
+<text x="180" y="132" fill="#2f5d8a" font-size="11" text-anchor="middle">p2</text>
+<rect x="199" y="116" width="22" height="24" fill="#eef2f8" stroke="#44506a" stroke-width="1.25"/>
+<text x="210" y="132" fill="#10141c" font-size="11" text-anchor="middle">p3</text>
+<text x="24" y="120" fill="#5a6478" font-size="11">mask slots</text>
+<text x="24" y="136" fill="#5a6478" font-size="11">in scalar file</text>
+<rect x="172" y="167" width="16" height="6" fill="#44506a" stroke="#44506a" stroke-width="0.6"/>
+<rect x="172" y="175" width="16" height="6" fill="#44506a" stroke="#44506a" stroke-width="0.6"/>
+<rect x="172" y="183" width="16" height="6" fill="#44506a" stroke="#44506a" stroke-width="0.6"/>
+<rect x="172" y="191" width="16" height="6" fill="#44506a" stroke="#44506a" stroke-width="0.6"/>
+<rect x="172" y="199" width="16" height="6" fill="#44506a" stroke="#44506a" stroke-width="0.6"/>
+<rect x="172" y="207" width="16" height="6" fill="#44506a" stroke="#44506a" stroke-width="0.6"/>
+<rect x="172" y="215" width="16" height="6" fill="#44506a" stroke="#44506a" stroke-width="0.6"/>
+<rect x="172" y="223" width="24" height="6" fill="#2f5d8a" stroke="#2f5d8a" stroke-width="0.6"/>
+<rect x="172" y="231" width="16" height="6" fill="#44506a" stroke="#44506a" stroke-width="0.6"/>
+<rect x="172" y="239" width="16" height="6" fill="#44506a" stroke="#44506a" stroke-width="0.6"/>
+<rect x="172" y="247" width="16" height="6" fill="#44506a" stroke="#44506a" stroke-width="0.6"/>
+<rect x="172" y="255" width="16" height="6" fill="#44506a" stroke="#44506a" stroke-width="0.6"/>
+<rect x="172" y="263" width="16" height="6" fill="#44506a" stroke="#44506a" stroke-width="0.6"/>
+<rect x="172" y="271" width="16" height="6" fill="#44506a" stroke="#44506a" stroke-width="0.6"/>
+<rect x="172" y="279" width="16" height="6" fill="#44506a" stroke="#44506a" stroke-width="0.6"/>
+<rect x="172" y="287" width="16" height="6" fill="#44506a" stroke="#44506a" stroke-width="0.6"/>
+<rect x="172" y="295" width="16" height="6" fill="#44506a" stroke="#44506a" stroke-width="0.6"/>
+<rect x="172" y="303" width="16" height="6" fill="#44506a" stroke="#44506a" stroke-width="0.6"/>
+<rect x="172" y="311" width="16" height="6" fill="#44506a" stroke="#44506a" stroke-width="0.6"/>
+<rect x="172" y="319" width="16" height="6" fill="#44506a" stroke="#44506a" stroke-width="0.6"/>
+<rect x="172" y="327" width="16" height="6" fill="#44506a" stroke="#44506a" stroke-width="0.6"/>
+<rect x="172" y="335" width="16" height="6" fill="#eef2f8" stroke="#44506a" stroke-width="1"/>
+<rect x="172" y="343" width="16" height="6" fill="#44506a" stroke="#44506a" stroke-width="0.6"/>
+<rect x="172" y="351" width="16" height="6" fill="#44506a" stroke="#44506a" stroke-width="0.6"/>
+<rect x="172" y="359" width="16" height="6" fill="#44506a" stroke="#44506a" stroke-width="0.6"/>
+<rect x="172" y="367" width="16" height="6" fill="#44506a" stroke="#44506a" stroke-width="0.6"/>
+<rect x="172" y="375" width="16" height="6" fill="#44506a" stroke="#44506a" stroke-width="0.6"/>
+<rect x="172" y="383" width="16" height="6" fill="#44506a" stroke="#44506a" stroke-width="0.6"/>
+<rect x="172" y="391" width="16" height="6" fill="#44506a" stroke="#44506a" stroke-width="0.6"/>
+<rect x="172" y="399" width="16" height="6" fill="#44506a" stroke="#44506a" stroke-width="0.6"/>
+<rect x="172" y="407" width="16" height="6" fill="#44506a" stroke="#44506a" stroke-width="0.6"/>
+<rect x="172" y="415" width="16" height="6" fill="#44506a" stroke="#44506a" stroke-width="0.6"/>
+<text x="166" y="172" fill="#5a6478" font-size="11" text-anchor="end">lane 0</text>
+<text x="166" y="420" fill="#5a6478" font-size="11" text-anchor="end">lane 31</text>
+<text x="172" y="156" fill="#5a6478" font-size="11">32 bits · bit i = lane i</text>
+<text x="320" y="158" fill="#10141c" font-size="11">v12</text>
+<text x="696" y="158" fill="#5a6478" font-size="11" text-anchor="end">256 words per lane</text>
+<rect x="320" y="166" width="376" height="256" fill="#fff" stroke="#44506a" stroke-width="1.25"/>
+<rect x="320" y="222" width="376" height="8" fill="#2f5d8a" stroke="#2f5d8a" stroke-width="0.5"/>
+<line x1="320" y1="174" x2="696" y2="174" stroke="#44506a" stroke-width="0.6"/>
+<line x1="320" y1="182" x2="696" y2="182" stroke="#44506a" stroke-width="0.6"/>
+<line x1="320" y1="190" x2="696" y2="190" stroke="#44506a" stroke-width="0.6"/>
+<line x1="320" y1="198" x2="696" y2="198" stroke="#44506a" stroke-width="0.6"/>
+<line x1="320" y1="206" x2="696" y2="206" stroke="#44506a" stroke-width="0.6"/>
+<line x1="320" y1="214" x2="696" y2="214" stroke="#44506a" stroke-width="0.6"/>
+<line x1="320" y1="222" x2="696" y2="222" stroke="#44506a" stroke-width="0.6"/>
+<line x1="320" y1="230" x2="696" y2="230" stroke="#44506a" stroke-width="0.6"/>
+<line x1="320" y1="238" x2="696" y2="238" stroke="#44506a" stroke-width="0.6"/>
+<line x1="320" y1="246" x2="696" y2="246" stroke="#44506a" stroke-width="0.6"/>
+<line x1="320" y1="254" x2="696" y2="254" stroke="#44506a" stroke-width="0.6"/>
+<line x1="320" y1="262" x2="696" y2="262" stroke="#44506a" stroke-width="0.6"/>
+<line x1="320" y1="270" x2="696" y2="270" stroke="#44506a" stroke-width="0.6"/>
+<line x1="320" y1="278" x2="696" y2="278" stroke="#44506a" stroke-width="0.6"/>
+<line x1="320" y1="286" x2="696" y2="286" stroke="#44506a" stroke-width="0.6"/>
+<line x1="320" y1="294" x2="696" y2="294" stroke="#44506a" stroke-width="0.6"/>
+<line x1="320" y1="302" x2="696" y2="302" stroke="#44506a" stroke-width="0.6"/>
+<line x1="320" y1="310" x2="696" y2="310" stroke="#44506a" stroke-width="0.6"/>
+<line x1="320" y1="318" x2="696" y2="318" stroke="#44506a" stroke-width="0.6"/>
+<line x1="320" y1="326" x2="696" y2="326" stroke="#44506a" stroke-width="0.6"/>
+<line x1="320" y1="334" x2="696" y2="334" stroke="#44506a" stroke-width="0.6"/>
+<line x1="320" y1="342" x2="696" y2="342" stroke="#44506a" stroke-width="0.6"/>
+<line x1="320" y1="350" x2="696" y2="350" stroke="#44506a" stroke-width="0.6"/>
+<line x1="320" y1="358" x2="696" y2="358" stroke="#44506a" stroke-width="0.6"/>
+<line x1="320" y1="366" x2="696" y2="366" stroke="#44506a" stroke-width="0.6"/>
+<line x1="320" y1="374" x2="696" y2="374" stroke="#44506a" stroke-width="0.6"/>
+<line x1="320" y1="382" x2="696" y2="382" stroke="#44506a" stroke-width="0.6"/>
+<line x1="320" y1="390" x2="696" y2="390" stroke="#44506a" stroke-width="0.6"/>
+<line x1="320" y1="398" x2="696" y2="398" stroke="#44506a" stroke-width="0.6"/>
+<line x1="320" y1="406" x2="696" y2="406" stroke="#44506a" stroke-width="0.6"/>
+<line x1="320" y1="414" x2="696" y2="414" stroke="#44506a" stroke-width="0.6"/>
+<line x1="424" y1="166" x2="424" y2="422" stroke="#44506a" stroke-width="0.9"/>
+<rect x="320" y="334" width="376" height="8" fill="none" stroke="#5a6478" stroke-width="1.25" stroke-dasharray="4 2"/>
+<rect x="320" y="166" width="376" height="256" fill="none" stroke="#44506a" stroke-width="1.25"/>
+<line x1="196" y1="226" x2="278" y2="226" stroke="#2f5d8a" stroke-width="1.25"/>
+<rect x="278" y="218" width="16" height="16" fill="#fff" stroke="#2f5d8a" stroke-width="1.5"/>
+<line x1="280" y1="226" x2="292" y2="226" stroke="#2f5d8a" stroke-width="1.25"/>
+<line x1="294" y1="226" x2="320" y2="226" stroke="#2f5d8a" stroke-width="1.25" marker-end="url(#a2)"/>
+<text x="198" y="218" fill="#5a6478" font-size="11">p2[7] = 1</text>
+<text x="198" y="240" fill="#5a6478" font-size="11">gate open</text>
+<line x1="188" y1="338" x2="278" y2="338" stroke="#44506a" stroke-width="1.25"/>
+<rect x="278" y="330" width="16" height="16" fill="#fff" stroke="#44506a" stroke-width="1.25"/>
+<line x1="280" y1="340" x2="292" y2="332" stroke="#44506a" stroke-width="1.25"/>
+<text x="198" y="330" fill="#5a6478" font-size="11">p2[21] = 0</text>
+<text x="198" y="352" fill="#5a6478" font-size="11">gate blocked</text>
+<text x="708" y="172" fill="#5a6478" font-size="11">one copy per lane</text>
+<text x="708" y="188" fill="#5a6478" font-size="11">row i = lane i</text>
+<text x="24" y="456" fill="#5a6478" font-size="11">a set bit lets the write land in that lane's row; a clear bit suppresses it, so the row keeps its value</text>
+</svg>

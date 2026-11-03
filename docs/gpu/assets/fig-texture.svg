@@ -1,14 +1,91 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 340" width="880" height="340" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12">
-<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#44506a"/></marker></defs>
-<style>.b{fill:#eef2f8;stroke:#44506a;stroke-width:1.2}.t{fill:#10141c}.m{fill:#5a6478}.a{stroke:#44506a;stroke-width:1.4;fill:none;marker-end:url(#a)}.d{fill:#fff;stroke:#44506a;stroke-width:1.1}</style>
-<text class="t" x="20" y="24" font-weight="700">Texture sampling path</text>
-<rect class="b" x="20" y="70" width="180" height="80" rx="4"/><text class="t" x="30" y="90" font-weight="600">Coordinate tuple</text><text class="m" x="30" y="106">offset · bias · u,v · lod</text>
-<rect class="b" x="220" y="70" width="180" height="80" rx="4"/><text class="t" x="230" y="90" font-weight="600">LOD select</text><text class="m" x="230" y="106">clamp(LOD + bias,</text><text class="m" x="230" y="122">base + min, base + max)</text>
-<rect class="b" x="420" y="70" width="180" height="80" rx="4"/><text class="t" x="430" y="90" font-weight="600">Mip and filter</text><text class="m" x="430" y="106">nearest / linear</text><text class="m" x="430" y="122">wrap and border</text>
-<rect class="b" x="620" y="70" width="180" height="80" rx="4"/><text class="t" x="630" y="90" font-weight="600">Format convert</text><text class="m" x="630" y="106">data and number format</text>
-<line class="a" x1="200" y1="110" x2="220" y2="110"/><line class="a" x1="400" y1="110" x2="420" y2="110"/><line class="a" x1="600" y1="110" x2="620" y2="110"/>
-<rect class="d" x="20" y="200" width="800" height="50" rx="4"/><text class="t" x="30" y="220" font-weight="600">Sampler descriptor</text><text class="m" x="30" y="236">clamp XYZ · min/max LOD · bias · filters · border pointer</text>
-<rect class="d" x="20" y="270" width="390" height="45" rx="4"/><text class="t" x="30" y="290" font-weight="600">Image descriptor</text><text class="m" x="30" y="306">base · format · type · levels · pitch · tiling</text>
-<rect class="d" x="430" y="270" width="390" height="45" rx="4"/><text class="t" x="440" y="290" font-weight="600">Result</text><text class="m" x="440" y="306">four channels after destination select and compare</text>
-<text class="m" x="20" y="330" font-size="11">The tuple prefix is variant-specific; a shader supplies only the slots its instruction consumes.</text>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 600" width="1000" height="600"
+     font-family="DejaVu Sans, Helvetica, Arial, sans-serif">
+  <title>Texture sampling: from the coordinate tuple and the two descriptors to the filtered result</title>
+  <defs>
+    <marker id="ar" viewBox="0 0 8 8" refX="6" refY="3" markerWidth="8" markerHeight="8"
+            markerUnits="userSpaceOnUse" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill="#44506a"/>
+    </marker>
+    <marker id="ara" viewBox="0 0 8 8" refX="6" refY="3" markerWidth="8" markerHeight="8"
+            markerUnits="userSpaceOnUse" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill="#2f5d8a"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="1000" height="600" fill="#ffffff"/>
+
+  <text x="24" y="28" font-size="16" font-weight="700" fill="#10141c">Texture sampling: coordinate tuple &#8594; filtered, format-converted result</text>
+  <text x="24" y="52" font-size="12" fill="#5a6478">samp reads a 3&#8211;10 VGPR coordinate window and two SGPR descriptor groups taken from one 0x40-byte slot:</text>
+  <text x="24" y="68" font-size="12" fill="#5a6478">an 8-dword image descriptor at +0x00 and a 4-dword sampler descriptor at +0x30.</text>
+
+  <rect x="400" y="88" width="424" height="152" rx="3" fill="#eef2f8" stroke="#44506a" stroke-width="1.25"/>
+  <text x="416" y="110" font-size="11" font-weight="600" fill="#10141c">image descriptor &#183; 32 B at +0x00</text>
+  <text x="416" y="132" font-size="11" fill="#5a6478">[39:0]</text>
+  <text x="552" y="132" font-size="11" fill="#10141c">base address (40-bit VA)</text>
+  <text x="416" y="155" font-size="11" fill="#5a6478">[77:64] [91:78]</text>
+  <text x="552" y="155" font-size="11" fill="#10141c">width &#183; height</text>
+  <text x="416" y="178" font-size="11" fill="#5a6478">[111:108] [115:112]</text>
+  <text x="552" y="178" font-size="11" fill="#10141c">base level &#183; last level</text>
+  <text x="416" y="201" font-size="11" fill="#5a6478">[57:52] [61:58]</text>
+  <text x="552" y="201" font-size="11" fill="#10141c">data format &#183; number format</text>
+  <text x="416" y="224" font-size="11" fill="#5a6478">[107:96]</text>
+  <text x="552" y="224" font-size="11" fill="#10141c">dest select X Y Z W &#183; 4 &#215; 3 bit</text>
+
+  <rect x="320" y="344" width="416" height="168" rx="3" fill="#eef2f8" stroke="#44506a" stroke-width="1.25"/>
+  <text x="336" y="366" font-size="11" font-weight="600" fill="#10141c">sampler descriptor &#183; 16 B at +0x30</text>
+  <text x="336" y="386" font-size="11" fill="#5a6478">[8:0]</text>
+  <text x="494" y="386" font-size="11" fill="#10141c">clamp X &#183; Y &#183; Z, 3 bit each</text>
+  <text x="336" y="408" font-size="11" fill="#5a6478">[43:32] [55:44]</text>
+  <text x="494" y="408" font-size="11" fill="#10141c">min LOD &#183; max LOD, 8.8 unsigned</text>
+  <text x="336" y="430" font-size="11" fill="#5a6478">[77:64]</text>
+  <text x="494" y="430" font-size="11" fill="#10141c">LOD bias, 8.8 signed, 14 bit</text>
+  <text x="336" y="452" font-size="11" fill="#5a6478">[85:84] [87:86] [91:90]</text>
+  <text x="494" y="452" font-size="11" fill="#10141c">mag &#183; min &#183; mip filter, 2 bit each</text>
+  <text x="336" y="474" font-size="11" fill="#5a6478">[107:96] [127:126]</text>
+  <text x="494" y="474" font-size="11" fill="#10141c">border colour pointer &#183; colour type</text>
+  <text x="336" y="496" font-size="11" fill="#5a6478">[28]</text>
+  <text x="494" y="496" font-size="11" fill="#10141c">disable cube wrap</text>
+
+  <rect x="24" y="276" width="276" height="48" rx="3" fill="#eef2f8" stroke="#44506a" stroke-width="1.25"/>
+  <line x1="70" y1="276" x2="70" y2="324" stroke="#44506a" stroke-width="1.25"/>
+  <line x1="116" y1="276" x2="116" y2="324" stroke="#44506a" stroke-width="1.25"/>
+  <line x1="162" y1="276" x2="162" y2="324" stroke="#44506a" stroke-width="1.25"/>
+  <line x1="208" y1="276" x2="208" y2="324" stroke="#44506a" stroke-width="1.25"/>
+  <line x1="254" y1="276" x2="254" y2="324" stroke="#44506a" stroke-width="1.25"/>
+  <text x="47"  y="305" font-size="11" fill="#10141c" text-anchor="middle">offset</text>
+  <text x="93"  y="305" font-size="11" fill="#10141c" text-anchor="middle">bias</text>
+  <text x="139" y="305" font-size="11" fill="#10141c" text-anchor="middle">x</text>
+  <text x="185" y="305" font-size="11" fill="#10141c" text-anchor="middle">y</text>
+  <text x="231" y="305" font-size="11" fill="#10141c" text-anchor="middle">layer</text>
+  <text x="277" y="305" font-size="11" fill="#10141c" text-anchor="middle">lod</text>
+  <text x="24" y="356" font-size="11" fill="#5a6478">one slot = one VGPR; the variant fixes the window</text>
+
+  <text x="512" y="262" font-size="11" fill="#10141c" text-anchor="end">level = clamp(lod + bias, base level + min lod, base level + max lod)</text>
+
+  <path d="M300,300 H912" fill="none" stroke="#2f5d8a" stroke-width="1.25" marker-end="url(#ara)"/>
+  <circle cx="528" cy="300" r="4" fill="#2f5d8a"/>
+  <circle cx="664" cy="300" r="4" fill="#2f5d8a"/>
+  <circle cx="800" cy="300" r="4" fill="#2f5d8a"/>
+  <text x="512" y="292" font-size="11" font-weight="600" fill="#10141c" text-anchor="end">level select</text>
+  <text x="648" y="292" font-size="11" font-weight="600" fill="#10141c" text-anchor="end">texel fetch</text>
+  <text x="784" y="292" font-size="11" font-weight="600" fill="#10141c" text-anchor="end">format decode</text>
+
+  <path d="M528,240 V296" fill="none" stroke="#44506a" stroke-width="1.25" marker-end="url(#ar)"/>
+  <path d="M664,240 V296" fill="none" stroke="#44506a" stroke-width="1.25" marker-end="url(#ar)"/>
+  <path d="M800,240 V296" fill="none" stroke="#44506a" stroke-width="1.25" marker-end="url(#ar)"/>
+  <text x="536" y="272" font-size="11" fill="#5a6478">base level</text>
+  <text x="672" y="272" font-size="11" fill="#5a6478">footprint</text>
+  <text x="808" y="272" font-size="11" fill="#5a6478">format &#183; channels</text>
+
+  <path d="M528,344 V304" fill="none" stroke="#44506a" stroke-width="1.25" marker-end="url(#ar)"/>
+  <path d="M664,344 V304" fill="none" stroke="#44506a" stroke-width="1.25" marker-end="url(#ar)"/>
+  <text x="536" y="330" font-size="11" fill="#5a6478">LOD window &#183; bias</text>
+  <text x="672" y="330" font-size="11" fill="#5a6478">clamp &#183; filter &#183; border</text>
+
+  <text x="976" y="330" font-size="11" fill="#10141c" text-anchor="end">vec4 in dst VGPRs</text>
+
+  <text x="24" y="536" font-size="11" fill="#5a6478">slot = 0x40 B: image at +0x00 (32 B) &#183; 16 B at +0x20 carries no descriptor &#183; sampler at +0x30 (16 B)</text>
+  <text x="24" y="554" font-size="11" fill="#5a6478">the shader addresses a slot as resource root s6:s7 + physical slot &#215; 0x40; the physical slot is the rank among the units the shader samples</text>
+  <text x="24" y="572" font-size="11" fill="#5a6478">UNRESOLVED: whether the border colour pointer is in 8-byte or 16-byte units</text>
 </svg>

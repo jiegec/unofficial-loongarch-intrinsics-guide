@@ -7,8 +7,8 @@ together. The values of one generation are in the [LG200 profile](generation-lg2
 
 ![Ownership and command path](../assets/fig-system.svg)
 
-The figure shows which layers own which objects and where the rings sit between the
-kernel and the command processors.
+The figure shows which rings the kernel owns, the CPIPE MCS queue the user owns,
+and where each ring publishes its write pointer.
 
 ## Blocks
 
@@ -16,7 +16,7 @@ kernel and the command processors.
 |-------|------|
 | Host interface | Kernel ioctls, buffer objects, virtual addresses, submissions and fences. |
 | GPIPE | Graphics command processor. Consumes the graphics ring and executes indirect buffers. |
-| BPIPE | Inner graphics and blit command processor. Consumes the commands inside a graphics indirect buffer and drives blits. |
+| BPIPE | Inner graphics and blit command processor. Has its own ring and write pointer and drives blits from that ring. |
 | CPIPE | Compute command processor. Drives compute queues and user queues. |
 | XDMA | Transfer engine for linear copy and fill. |
 | Stream processor (SP) | Executes shader waves: vector ALUs, scalar ALU, lane masks, texture and memory instructions. |
@@ -33,13 +33,16 @@ A graphics command and a compute command take different paths to the SP.
 A **graphics** submission is an indirect buffer (IB) submitted on the graphics
 ring. GPIPE consumes the ring, executes the IB, and applies the state record it
 contains. The state record selects the shader stages and the fixed-function
-state; BPIPE commands inside the IB carry draw and blit payloads. The shader
-stages then run over the primitives produced by the draw.
+state. The shader stages then run over the primitives produced by the draw.
+BPIPE is a separate ring and write pointer; it does not consume packets inside a
+graphics IB.
 
-A **compute** submission uses a compute queue. The kernel creates the queue, the
-user-mode driver writes the queue's user ring, and the kernel signals the queue
-through a doorbell packet on the management ring. CPIPE consumes the queue and
-launches the compute kernel described by the kernel descriptor.
+A **compute** submission uses a compute queue. The kernel creates the queue and
+installs its MQD, but the MCS ring is a user-owned GEM BO: the user-mode driver
+writes the packets and the queue's write pointer. The kernel rings the queue
+through the HIQ with `(pasid, queue_id)`; it does not read the packets. CPIPE
+consumes the queue and launches the compute kernel described by the kernel
+descriptor.
 
 An **XDMA** submission is a linear copy or fill on the transfer ring. It does
 not use the graphics IB format or the compute queue record.
@@ -50,19 +53,21 @@ not use the graphics IB format or the compute queue record.
 |-------|-------|-------------------------|
 | Application | Application | API objects and commands. |
 | User-mode driver | Application process | Buffer objects, virtual addresses, IBs, queue records, shader binaries and descriptor tables. |
-| Kernel driver | Kernel | Rings, VMIDs, page tables, queue provisioning, fences, reset and recovery. |
+| Kernel driver | Kernel | Kernel rings, VMIDs, page tables, queue provisioning, fences, reset and recovery. The CPIPE MCS ring is user-owned. |
 | Hardware | Device | Command processors, SP, fixed-function blocks, caches and memory. |
 
-A user-mode driver never programs a ring cursor or a page table directly. It
-builds memory objects and command buffers, submits them through the kernel, and
-waits on a fence.
+A user-mode driver does not program a kernel ring cursor or a page table directly.
+It builds memory objects and command buffers, submits them through the kernel,
+and waits on a fence. For a CPIPE MCS queue, the user writes that queue's write
+pointer; the kernel only installs the MQD and rings the HIQ.
 
 ## A draw in one paragraph
 
-A draw is a state record applied by GPIPE, followed by the draw's payload. The
-record carries the state object: draw information, rasterization state, depth,
-stencil and blend state, surface records, stage configuration and the shader-info
-records. The vertex stage reads attributes through descriptor tables and writes
+A draw is a state record applied by GPIPE. There is no separate draw packet: the
+record carries the state object, and the draw's own fields are the Draw Info
+record at state offset 0. The rest of the object holds rasterization state,
+depth, stencil and blend state, surface records, stage configuration and the
+shader-info records. The vertex stage reads attributes through descriptor tables and writes
 its output to stream SIO0. The rasterizer assembles primitives, clips and
 rasterizes them, and the fragment stage reads interpolated inputs and writes
 colour to stream SIO1. The output-merger blocks apply depth, stencil and blend
@@ -72,10 +77,10 @@ the detailed path.
 ## Execution in one paragraph
 
 A shader runs as a wave of up to 32 lanes. Each lane has its own vector
-registers; the scalar registers are shared by the wave. A lane-mask register
-holds one bit per lane, and an instruction can be gated by any of the four mask
-registers. Branches are wave-wide; per-lane control flow is expressed by
-narrowing and restoring masks. See
+registers; the scalar registers are shared by the wave. A lane mask is a 32-bit
+scalar value; the instruction's 2-bit PJ2 field selects one of the four predicate
+slots p0..p3, and the mask gates each lane's write. Branches are wave-wide;
+per-lane control flow is expressed by narrowing and restoring masks. See
 [Execution model](execution-model.md) and [Execution](../isa/execution.md).
 
 ## Memory in one paragraph

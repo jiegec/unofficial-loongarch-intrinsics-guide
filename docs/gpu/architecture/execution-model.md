@@ -23,23 +23,30 @@ and the per-instruction latency are not established:
 > UNRESOLVED: how many waves a vector unit can keep resident, and how many
 > instructions it can issue per cycle.
 
-The 32-lane width is an architectural maximum. A lane mask is one 32-bit word,
-so a 33rd lane has no representation; a launch that needs more than 32
+The compiler ABI and the current kernel support 32 lanes. That is the supported
+width, not a proven hardware maximum. A lane mask is one 32-bit word, so a 33rd
+lane has no representation in this ABI; a launch that needs more than 32
 invocations uses more than one wave.
 
 ## Register files
 
 | File | Size | Visibility | Purpose |
 |------|-----:|------------|---------|
-| Scalar (SGPR) | 102 registers, `s0..s101` | One copy per wave | Uniform values, descriptors, control flow. |
+| Scalar (SGPR) | 102 registers, `s0..s101` | One copy per wave | Uniform values, descriptors, control flow; the `p0..p3` predicate slots live in this file. |
 | Vector (VGPR) | 256 registers, `v0..v255` | One copy per lane | Per-invocation data. |
-| Lane mask | 4 registers, `p0..p3` | One bit per lane | Per-instruction lane set. |
 | Condition | `SCC` | One bit per wave | Scalar comparison result and carry. |
 
-The low scalar registers are reserved for the launch and for the lane-mask
-window; the exact windows are in [Registers and allocation](../shaders/registers.md).
-The vector registers are private to a lane: two lanes may hold different values
-in the same register number.
+The low scalar registers are reserved for the launch; the exact windows are in
+[Registers and allocation](../shaders/registers.md). The vector registers are
+private to a lane: two lanes may hold different values in the same register
+number.
+
+The four predicate slots `p0..p3` are addressed by the instruction's 2-bit
+`PJ2` field. They are part of the scalar file, not a fifth per-lane array. A
+compare writes a 32-bit lane mask to an ordinary scalar register; a shader moves
+that value into a `p` slot before using it as an instruction mask. The mask has
+one bit per lane and gates that lane's own write: a zero bit suppresses the
+write and leaves the previous destination value.
 
 ## Instruction execution
 
@@ -126,10 +133,10 @@ The blocks and their state are described in
 
 | Property | Value |
 |----------|-------|
-| Wave width | 32 lanes (architectural maximum) |
+| Wave width | 32 lanes (supported ABI width; not proven as a hardware maximum) |
 | Scalar registers | 102 |
 | Vector registers | 256 per lane |
-| Lane-mask registers | 4 |
+| Predicate slots | 4, `p0..p3`, in the scalar file |
 | Issue width, dual issue | UNRESOLVED |
 | Resident waves per unit | UNRESOLVED |
 | Per-instruction latency | UNRESOLVED |

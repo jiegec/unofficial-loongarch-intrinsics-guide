@@ -59,20 +59,12 @@ The state object contains:
 See [State records](../graphics/state-records.md) and
 [State object](../graphics/state-object.md).
 
-## 4. Build the command stream
+## 4. The draw is the record
 
-The record is followed by the BPIPE commands that draw:
-
-```text
-CTXR(0x0a)
-CFGW(0x01, payload_dwords)
-<payload>
-DRAW(0x03)
-SYNC(0x05, stage 0, selector 0xf)
-```
-
-The payload selects the primitive box and, for a blit, the source texture. For a
-plain draw, the state record is the draw and BPIPE carries the draw command.
+There is no separate draw packet. The state record is the draw: when the ring
+packet that names the indirect buffer is consumed, the record applies and the
+draw runs. A 2D blit is a different path; it uses BPIPE's own ring and context,
+not a packet appended to a graphics draw.
 
 See [BPIPE](../host/bpipe.md).
 

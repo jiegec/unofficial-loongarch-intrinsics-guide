@@ -6,28 +6,29 @@ that make writes visible.
 
 ![GPU virtual address space](../assets/fig-va.svg)
 
-The figure shows the client ranges, the hole and the two segment apertures that a
-client mapping must not intersect.
+The figure shows the 1 MiB head, the single 1 TiB client range, the hole above
+it and the two decode apertures outside the client walk.
 
 ## Address space
 
-A GPU virtual address is 48 bits wide. The kernel reserves the low 1 MiB and
-exposes the rest of the address space through two ranges separated by a hole:
+The client GPU virtual-address window on LG200 is **1 TiB (40 bits)**, not
+the full 48-bit linear form. The kernel excludes the low 1 MiB with a per-address floor and publishes one
+low client range; nothing is mapped in that head. On the current kernel the range ends at
+`0x00ff_fff0_0000`; the end is reported by the device-information query, so a
+driver MUST use the reported value rather than assume the maximum.
 
 | Range | Use |
 |-------|-----|
-| `0x0000_0000_0000_0000` – `0x0000_0000_000f_ffff` | Reserved by the kernel; not available to a client. |
-| Below `0x0000_8000_0000_0000` | Low client range. |
-| `0x0000_8000_0000_0000` – `0xffff_7fff_ffff_ffff` | Hole; not mapped. |
-| Above `0xffff_8000_0000_0000` | High client range. |
+| `0x0000_0000_0000_0000` – `0x0000_0000_000f_ffff` | Excluded by the kernel as a floor; not mapped and not available to a client. |
+| `0x0000_0000_0010_0000` – `0x0000_00ff_fff0_0000` | Client range; one root page directory per VMID. |
+| `0x0000_0100_0000_0000` – `0x0000_7fff_ffff_ffff` | Above the 40-bit client walk; not mapped by a client page table. |
+| `0x0000_8000_0000_0000` – `0xffff_7fff_ffff_ffff` | Hole; `GEM_VA` rejects it. |
+| Above `0xffff_8000_0000_0000` | High range of the 48-bit linear form; the LG200 client window is 1 TiB, so the kernel publishes no high range. |
 
 The MMU uses the low 48 bits of a 64-bit address; the upper 16 bits are ignored.
-The hole splits the 48-bit space into a low client range and a high client range,
-so a sign-extended address cannot alias a low address.
-
-The exact end of each client range is reported by the kernel through the device
-information query; a driver MUST use the reported values rather than assume the
-maximum.
+The client walk covers 40 bits. The hole is above the client window on this
+generation, so a client mapping cannot be placed in it and there is no second
+client range to alias.
 
 ## Page tables
 
@@ -76,18 +77,23 @@ previous owner cannot resolve against the new owner's directory.
 
 ## Segment apertures
 
-Two segment apertures sit above the client address space and must not overlap a
-client mapping:
+Two segment apertures are decode tags in bits 63:48 of a 64-bit flat address.
+They are outside the client walk, not blocks inside the client address space:
 
-| Aperture | Base | Size | Purpose |
-|----------|------|------|---------|
-| LDS | `0x0001_0000_0000_0000` | 4 GiB | Workgroup shared memory. |
-| Scratch | `0x0002_0000_0000_0000` | 4 GiB | Per-invocation private memory. |
+| Aperture | Tag and base | Size | Effect |
+|----------|--------------|------|--------|
+| LDS | tag `0x0001`, base `0x0001_0000_0000_0000` | 4 GiB | Redirects a flat request to on-chip workgroup shared memory. |
+| Scratch | tag `0x0002`, base `0x0002_0000_0000_0000` | 4 GiB | Redirects to per-invocation private memory, expanded per work-item. |
+
+A client mapping in the published 1 TiB window has tag 0, so a client page table
+never maps either aperture. A flat request is redirected by the tag; the
+aperture is a decode, not storage. The scratch bytes used by the graphics path
+are an ordinary client buffer object reached through a descriptor.
 
 The hardware takes the aperture base from bits 47:32 of the programmed value, so
-the driver writes `0x0001_0000` for LDS and `0x0002_0000` for scratch. The kernel
-places the client GPUVM aperture above these segments; the first node uses
-`0x0003_0000_0000`.
+the driver writes `0x0001_0000` for LDS and `0x0002_0000` for scratch. The KCD
+per-process aperture begins at `0x0003_0000_0000`; that is a KCD-specific decode
+base, not the DRM client VA base (1 MiB) or the user allocator's 4 GiB floor.
 
 A shared-memory address is a byte offset within the LDS aperture. The register
 form carries 32 bits and the immediate form 16 bits, so a workgroup allocation

@@ -12,7 +12,7 @@ each pipe is in its own chapter.
 |------|------|-------|------|---------|
 | Graphics | GPIPE | DRM | 1–3 | Graphics indirect buffers. |
 | Blit | BPIPE | DRM | — | Inner graphics commands and blits. |
-| Compute | CPIPE | KCD or DRM | 4–7 | Compute queues and user queues. |
+| Compute | CPIPE | KCD/DRM; MCS ring user-owned | 4–7 | Compute queues and user queues. |
 | Transfer | XDMA | DRM | — | Linear copy and fill. |
 | Display | DPIPE | — | — | Not used on LG200. |
 | Encode | EPIPE | — | — | Not used on LG200. |
@@ -44,7 +44,10 @@ writable by the command processor; an indirect buffer referenced by the ring
 MUST additionally be mapped executable.
 
 The ring's base address and size are programmed by the kernel through the
-provisioning commands. A user-mode driver never programs a ring register.
+provisioning commands. A user-mode driver programs no kernel ring register. For
+a CPIPE MCS queue, the user writes that queue's own write pointer in its index
+block; the kernel installs the MQD and rings the HIQ, but does not write the
+queue pointer.
 
 ## IB alignment
 
@@ -58,8 +61,10 @@ requirements:
 | CPIPE | 64 B | 64 B |
 | XDMA | 256 B | 8 B |
 
-A submission whose IB violates the alignment is rejected by the kernel before it
-reaches the ring.
+The kernel's admission check establishes only 4-byte alignment. The stricter
+starts in the table are host conventions; whether the command processors require
+them is UNRESOLVED. A submission whose IB violates the kernel check is rejected
+before it reaches the ring.
 
 ## Doorbell
 

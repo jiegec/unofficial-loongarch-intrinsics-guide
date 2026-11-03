@@ -49,12 +49,12 @@ UNRESOLVED; see [Execution model](execution-model.md).
 
 | Property | Value |
 |----------|-------|
-| Virtual address width | 48 bits |
+| Client virtual address width | 40 bits (1 TiB); the linear form is 48 bits |
 | Page-table entry | 8 bytes |
 | Page size | 4 KiB or 16 KiB, a kernel build property |
 | Walk | Three levels for VMIDs 1–7; one-level GART for VMID 0 |
 | VMIDs | 8: kernel 0, DRM 1–3, KCD 4–7 |
-| Reserved VA head | 1 MiB |
+| Excluded VA head (floor) | 1 MiB |
 | VA hole | `0x0000_8000_0000_0000` – `0xffff_7fff_ffff_ffff` |
 | LDS aperture | `0x0001_0000_0000_0000`, 4 GiB |
 | Scratch aperture | `0x0002_0000_0000_0000`, 4 GiB |

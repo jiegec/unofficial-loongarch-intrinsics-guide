@@ -1,18 +1,113 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 410" width="820" height="410" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12"><defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#44506a"/></marker></defs>
-<style>.b{fill:#eef2f8;stroke:#44506a;stroke-width:1.2}.t{fill:#10141c}.m{fill:#5a6478}.a{stroke:#44506a;stroke-width:1.4;fill:none;marker-end:url(#a)}.d{fill:#fff;stroke:#44506a;stroke-width:1.1}.x{stroke:#5a6478;stroke-width:1.2;fill:none;stroke-dasharray:5 4}</style>
-<text class="t" x="20" y="24" font-weight="700">Ownership and command path</text>
-<rect class="b" x="20" y="50" width="160" height="100" rx="4"/><text class="t" x="30" y="70" font-weight="600">User mode</text><text class="m" x="30" y="86">application + UMD</text>
-<rect class="b" x="20" y="220" width="160" height="100" rx="4"/><text class="t" x="30" y="240" font-weight="600">Kernel</text><text class="m" x="30" y="256">rings, MMU, fences</text>
-<rect class="b" x="230" y="50" width="150" height="300" rx="4"/><text class="t" x="240" y="70" font-weight="600">Rings</text>
-<rect class="b" x="242" y="82" width="126" height="44" rx="4"/><text class="t" x="252" y="108" font-weight="600">graphics</text><rect class="b" x="242" y="146" width="126" height="44" rx="4"/><text class="t" x="252" y="172" font-weight="600">blit</text><rect class="b" x="242" y="210" width="126" height="44" rx="4"/><text class="t" x="252" y="236" font-weight="600">compute</text><rect class="b" x="242" y="274" width="126" height="44" rx="4"/><text class="t" x="252" y="300" font-weight="600">transfer</text>
-<rect class="b" x="430" y="50" width="150" height="300" rx="4"/><text class="t" x="440" y="70" font-weight="600">Command processors</text>
-<rect class="b" x="442" y="82" width="126" height="44" rx="4"/><text class="t" x="452" y="108" font-weight="600">GPIPE</text><rect class="b" x="442" y="146" width="126" height="44" rx="4"/><text class="t" x="452" y="172" font-weight="600">BPIPE</text><rect class="b" x="442" y="210" width="126" height="44" rx="4"/><text class="t" x="452" y="236" font-weight="600">CPIPE</text><rect class="b" x="442" y="274" width="126" height="44" rx="4"/><text class="t" x="452" y="300" font-weight="600">XDMA</text>
-<rect class="b" x="630" y="50" width="170" height="100" rx="4"/><text class="t" x="640" y="70" font-weight="600">Stream processor</text><text class="m" x="640" y="86">waves, VGPR/SGPR, masks</text>
-<rect class="b" x="630" y="190" width="170" height="100" rx="4"/><text class="t" x="640" y="210" font-weight="600">Fixed-function graphics</text><text class="m" x="640" y="226">raster, depth, blend, texture</text>
-<rect class="b" x="630" y="330" width="170" height="50" rx="4"/><text class="t" x="640" y="350" font-weight="600">Memory</text><text class="m" x="640" y="366">GPU VA, LDS, scratch</text>
-<line class="a" x1="180" y1="100" x2="180" y2="220"/><line class="a" x1="180" y1="270" x2="230" y2="270"/>
-<line class="a" x1="380" y1="110" x2="430" y2="110"/><line class="a" x1="580" y1="110" x2="630" y2="110"/>
-<line class="a" x1="715" y1="150" x2="715" y2="190"/><line class="a" x1="715" y1="290" x2="715" y2="330"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="620" viewBox="0 0 1000 620" font-family="DejaVu Sans, sans-serif">
+  <defs>
+    <marker id="ah" viewBox="0 0 6 6" refX="6" refY="3" markerWidth="6" markerHeight="6" markerUnits="userSpaceOnUse" orient="auto">
+      <path d="M0,0 L6,3 L0,6 z" fill="#44506a"/>
+    </marker>
+    <marker id="aha" viewBox="0 0 6 6" refX="6" refY="3" markerWidth="6" markerHeight="6" markerUnits="userSpaceOnUse" orient="auto">
+      <path d="M0,0 L6,3 L0,6 z" fill="#2f5d8a"/>
+    </marker>
+  </defs>
 
-<text class="m" x="20" y="400" font-size="11">A user-mode driver builds memory objects and indirect buffers; the kernel owns rings, page tables and fences.</text>
+  <rect x="0" y="0" width="1000" height="620" fill="#ffffff"/>
+
+  <text x="24" y="28" font-size="16" font-weight="bold" fill="#10141c">LG200 command rings: ownership and hand-off</text>
+  <text x="24" y="48" font-size="11" fill="#5a6478">The kernel fills the GPIPE, BPIPE and XDMA rings; the CPIPE queue ring is user memory that the kernel only provisions.</text>
+
+  <!-- ownership bands -->
+  <rect x="24" y="60" width="952" height="116" fill="#f4f7fb"/>
+  <rect x="24" y="200" width="736" height="136" fill="#f4f7fb"/>
+  <rect x="24" y="368" width="952" height="104" fill="#f4f7fb"/>
+  <rect x="24" y="488" width="952" height="108" fill="#f4f7fb"/>
+
+  <text x="48" y="80" font-size="11" font-weight="bold" fill="#5a6478" letter-spacing="0.8">USER MODE</text>
+  <text x="48" y="220" font-size="11" font-weight="bold" fill="#5a6478" letter-spacing="0.8">KERNEL</text>
+  <text x="48" y="386" font-size="11" font-weight="bold" fill="#5a6478" letter-spacing="0.8">QUEUE BAND</text>
+  <text x="48" y="506" font-size="11" font-weight="bold" fill="#5a6478" letter-spacing="0.8">HARDWARE</text>
+
+  <!-- user objects -->
+  <rect x="48" y="92" width="560" height="76" fill="#eef2f8" stroke="#44506a" stroke-width="1.25"/>
+  <text x="64" y="118" font-size="12" fill="#10141c">IB command BO &#8212; command stream built by the user-mode driver</text>
+  <text x="64" y="138" font-size="11" fill="#5a6478">client VA; the CP reads these bytes through the client page tables</text>
+  <text x="64" y="154" font-size="11" fill="#5a6478">the kernel keeps only the address and length</text>
+
+  <rect x="760" y="92" width="192" height="76" fill="#eef2f8" stroke="#2f5d8a" stroke-width="1.5"/>
+  <text x="776" y="118" font-size="12" fill="#10141c">MCS command stream</text>
+  <text x="776" y="138" font-size="11" fill="#5a6478">user writes and publishes</text>
+  <text x="776" y="154" font-size="11" fill="#5a6478">kernel reads no packets</text>
+
+  <!-- kernel objects -->
+  <rect x="48" y="228" width="560" height="88" fill="#eef2f8" stroke="#44506a" stroke-width="1.25"/>
+  <text x="64" y="256" font-size="12" fill="#10141c">Kernel ring BO &#8212; GTT, kernel-only writer</text>
+  <text x="64" y="276" font-size="11" fill="#5a6478">device-visible bytes change only at commit</text>
+  <text x="64" y="294" font-size="11" fill="#5a6478">256-dw frames, 2 in flight (default)</text>
+
+  <rect x="624" y="228" width="124" height="88" fill="#eef2f8" stroke="#44506a" stroke-width="1.25"/>
+  <text x="636" y="250" font-size="12" fill="#10141c">CPIPE control</text>
+  <text x="636" y="268" font-size="11" fill="#5a6478">MQD install</text>
+  <text x="636" y="284" font-size="11" fill="#5a6478">doorbell:</text>
+  <text x="636" y="300" font-size="11" fill="#5a6478">pasid + queue id</text>
+
+  <!-- queue band -->
+  <rect x="48" y="396" width="200" height="64" fill="#eef2f8" stroke="#44506a" stroke-width="1.25"/>
+  <text x="64" y="414" font-size="12" fill="#10141c">GFX ring</text>
+  <text x="64" y="432" font-size="11" fill="#5a6478">kernel &#183; 2 KiB</text>
+  <text x="64" y="450" font-size="11" fill="#5a6478">wptr 0x18</text>
+
+  <rect x="264" y="396" width="200" height="64" fill="#eef2f8" stroke="#44506a" stroke-width="1.25"/>
+  <text x="280" y="414" font-size="12" fill="#10141c">BPIPE ring</text>
+  <text x="280" y="432" font-size="11" fill="#5a6478">kernel &#183; 2 KiB</text>
+  <text x="280" y="450" font-size="11" fill="#5a6478">wptr 0x30</text>
+
+  <rect x="480" y="396" width="200" height="64" fill="#eef2f8" stroke="#44506a" stroke-width="1.25"/>
+  <text x="496" y="414" font-size="12" fill="#10141c">XDMA ring</text>
+  <text x="496" y="432" font-size="11" fill="#5a6478">kernel &#183; 2 KiB</text>
+  <text x="496" y="450" font-size="11" fill="#5a6478">wptr 0x20</text>
+
+  <rect x="760" y="396" width="192" height="64" fill="#eef2f8" stroke="#2f5d8a" stroke-width="1.5"/>
+  <text x="776" y="414" font-size="12" fill="#10141c">CPIPE MCS queue</text>
+  <text x="776" y="432" font-size="11" fill="#5a6478">user-owned GTT BO</text>
+  <text x="776" y="450" font-size="11" fill="#5a6478">64 KiB + 64 B index</text>
+
+  <!-- processors -->
+  <rect x="48" y="520" width="200" height="64" fill="#eef2f8" stroke="#44506a" stroke-width="1.25"/>
+  <text x="148" y="540" font-size="12" font-weight="bold" fill="#10141c" text-anchor="middle">GPIPE</text>
+  <text x="148" y="558" font-size="11" fill="#5a6478" text-anchor="middle">consumes the GFX ring</text>
+  <text x="148" y="574" font-size="11" fill="#5a6478" text-anchor="middle">executes the IB</text>
+
+  <rect x="264" y="520" width="200" height="64" fill="#eef2f8" stroke="#44506a" stroke-width="1.25"/>
+  <text x="364" y="540" font-size="12" font-weight="bold" fill="#10141c" text-anchor="middle">BPIPE</text>
+  <text x="364" y="558" font-size="11" fill="#5a6478" text-anchor="middle">consumes the BPIPE ring</text>
+  <text x="364" y="574" font-size="11" fill="#5a6478" text-anchor="middle">blit and copy engine</text>
+
+  <rect x="480" y="520" width="200" height="64" fill="#eef2f8" stroke="#44506a" stroke-width="1.25"/>
+  <text x="580" y="540" font-size="12" font-weight="bold" fill="#10141c" text-anchor="middle">XDMA</text>
+  <text x="580" y="558" font-size="11" fill="#5a6478" text-anchor="middle">consumes the XDMA ring</text>
+  <text x="580" y="574" font-size="11" fill="#5a6478" text-anchor="middle">linear copy and fill</text>
+
+  <rect x="760" y="520" width="192" height="64" fill="#eef2f8" stroke="#44506a" stroke-width="1.25"/>
+  <text x="856" y="540" font-size="12" font-weight="bold" fill="#10141c" text-anchor="middle">CPIPE</text>
+  <text x="856" y="558" font-size="11" fill="#5a6478" text-anchor="middle">8 queues per PASID, shared</text>
+  <text x="856" y="574" font-size="11" fill="#5a6478" text-anchor="middle">KCD VMID 4&#8211;7, DRM 1&#8211;3</text>
+
+  <!-- A1: submission -->
+  <line x1="148" y1="168" x2="148" y2="228" stroke="#44506a" stroke-width="1.25" marker-end="url(#ah)"/>
+  <text x="160" y="192" font-size="11" fill="#5a6478">submit ioctl: IB address + length</text>
+
+  <!-- A2: wptr publish -->
+  <line x1="148" y1="316" x2="148" y2="396" stroke="#44506a" stroke-width="1.25" marker-end="url(#ah)"/>
+  <line x1="364" y1="316" x2="364" y2="396" stroke="#44506a" stroke-width="1.25" marker-end="url(#ah)"/>
+  <line x1="580" y1="316" x2="580" y2="396" stroke="#44506a" stroke-width="1.25" marker-end="url(#ah)"/>
+  <text x="160" y="357" font-size="11" fill="#5a6478">publish wptr</text>
+
+  <!-- A3: kernel control of the user queue -->
+  <path d="M748,272 L800,272 L800,396" fill="none" stroke="#44506a" stroke-width="1.25" stroke-dasharray="4 3" marker-end="url(#ah)"/>
+
+  <!-- A5: user publishes into its own queue (accent path) -->
+  <line x1="856" y1="168" x2="856" y2="396" stroke="#2f5d8a" stroke-width="1.5" marker-end="url(#aha)"/>
+
+  <!-- A4: consumers -->
+  <line x1="148" y1="460" x2="148" y2="520" stroke="#44506a" stroke-width="1.25" marker-end="url(#ah)"/>
+  <line x1="364" y1="460" x2="364" y2="520" stroke="#44506a" stroke-width="1.25" marker-end="url(#ah)"/>
+  <line x1="580" y1="460" x2="580" y2="520" stroke="#44506a" stroke-width="1.25" marker-end="url(#ah)"/>
+  <line x1="856" y1="460" x2="856" y2="520" stroke="#2f5d8a" stroke-width="1.5" marker-end="url(#aha)"/>
 </svg>

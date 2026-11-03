@@ -1,14 +1,16 @@
 # Descriptors
 
-A descriptor is a fixed-size record in GPU memory that describes a resource. The
-shader-info record's roots point at descriptor tables; the tables' entries point
-at payload. This chapter defines the record layouts, the binding slots and the
-address rules.
+A descriptor is a fixed-size record in GPU memory that describes a resource. A
+shader-info root is a 64-bit base address, not a resource pointer. On the Vulkan
+path the payload is three hops below it: a 16-byte set pointer, a 0x40-byte
+slot, and the record's own base field. This chapter defines the record layouts,
+the binding slots and the address rules.
 
 ![Descriptor indirection](../assets/fig-descriptors.svg)
 
-The figure shows the three levels of indirection: a root, a table entry and the
-descriptor that points at the payload.
+The figure separates the pointer chain (root, set pointer, slot, record base) from
+the fixed windows on the same page (push constants, implicit arguments, attribute
+table).
 
 ## Binding slots
 
@@ -80,21 +82,23 @@ There are 16 attribute records. Dual-slot elements are not supported.
 
 ## Roots and tables
 
-| Root | Register | Table |
-|------|----------|-------|
-| Constant | `s4:s5` | Per-stage uniform table: 12 entries of 16 bytes. |
-| Image and sampler | `s6:s7` | 0x40-byte slots. |
-| Attributes | `s8:s9` | 16 entries of 16 bytes. |
-| Read-write buffer | `s0:s1` | 16 entries of 16 bytes; streamout. |
+| Root | Register | Layout |
+|------|----------|--------|
+| Constant (graphics) | `s4:s5` | Base of a page: push constants at `+0x4000`, draw parameters at `+0x4100`, attribute table at `+0x4130`. |
+| Resource and sampler (Vulkan) | `s6:s7` | Base of a page: set-pointer table at `+0x00` (five 16-byte records, stride `0x10`), implicit arguments at `+0x50`, push constants at `+0x90`, descriptor slots at `+0x1c0` (0x40 bytes each). |
+| Attributes | `s8:s9` | 16 records of 16 bytes; the compiler indexes `s8:s9 + slot * 16`. The driver writes the same table at `+0x4130`, but no code establishes that `+0x40` of the shader-info record hydrates it: UNRESOLVED. |
+| Read-write buffer | — | No read-write root register is established. The streamout/read-write path is not modelled by these roots. |
 
-The constant root's entry 0 is the ordinary uniform block; entry `n` is at
-offset `(n - 1) * 16`. The image-and-sampler root's slot `n` is at
-`n * 0x40`. The attribute root's entry `i` is at `i * 16`.
+The set-pointer hop exists on the Vulkan path. The direct graphics path uses the
+slot at the root directly, which is the simpler three-level form in the figure's
+left column.
 
 ## Push constants
 
-Push constants occupy 256 bytes at offset `0x4000` in the constant root. The
-shader reads them with a scalar flat load.
+On the graphics path, push constants occupy 256 bytes at `+0x4000` in the
+constant root. The compute path has no constant root; its push constants are at
+`+0x90` in the kernarg page rooted at `s6:s7`. The shader reads them with a
+scalar flat load.
 
 ## Binding table packing
 

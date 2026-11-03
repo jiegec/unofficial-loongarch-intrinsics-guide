@@ -65,6 +65,7 @@ once here and linked from the chapters that use it.
 | Term | Meaning |
 |------|---------|
 | **Machine row** | One instruction variant: mnemonic plus the operand form it encodes. |
+| **MCS queue** | The user-owned ring of a CPIPE user queue; the user writes its packets and write pointer. |
 | **Format** | A machine encoding layout, such as `vop` or `flat`. |
 | **Family** | A documentation grouping of rows, independent of the format. |
 | **Selector** | The encoded operand class; 8-bit or 11-bit. |

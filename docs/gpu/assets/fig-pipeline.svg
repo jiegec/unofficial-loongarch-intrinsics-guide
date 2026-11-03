@@ -1,17 +1,62 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 350" width="880" height="350" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12"><defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#44506a"/></marker></defs>
-<style>.b{fill:#eef2f8;stroke:#44506a;stroke-width:1.2}.t{fill:#10141c}.m{fill:#5a6478}.a{stroke:#44506a;stroke-width:1.4;fill:none;marker-end:url(#a)}.d{fill:#fff;stroke:#44506a;stroke-width:1.1}.x{stroke:#5a6478;stroke-width:1.2;fill:none;stroke-dasharray:5 4}</style>
-<text class="t" x="20" y="24" font-weight="700">Graphics pipeline and SIO</text>
-<rect class="b" x="20" y="80" width="150" height="80" rx="4"/><text class="t" x="30" y="100" font-weight="600">Vertex</text><text class="m" x="30" y="116">SIO0 writer</text>
-<rect class="b" x="200" y="80" width="150" height="80" rx="4"/><text class="t" x="210" y="100" font-weight="600">Geometry</text><text class="m" x="210" y="116">SIO0 to SIO1</text>
-<rect class="b" x="380" y="80" width="150" height="80" rx="4"/><text class="t" x="390" y="100" font-weight="600">Rasterizer</text><text class="m" x="390" y="116">fixed</text>
-<rect class="b" x="560" y="80" width="150" height="80" rx="4"/><text class="t" x="570" y="100" font-weight="600">Fragment</text><text class="m" x="570" y="116">SIO1 writer</text>
-<rect class="b" x="740" y="80" width="120" height="80" rx="4"/><text class="t" x="750" y="100" font-weight="600">Output merger</text><text class="m" x="750" y="116">depth / blend</text>
-<line class="a" x1="170" y1="120" x2="200" y2="120"/><line class="a" x1="350" y1="120" x2="380" y2="120"/><line class="a" x1="530" y1="120" x2="560" y2="120"/><line class="a" x1="710" y1="120" x2="740" y2="120"/>
-<text class="m" x="174" y="68" font-size="10">SIO0</text><text class="m" x="354" y="68" font-size="10">SIO1</text><text class="m" x="714" y="68" font-size="10">SIO1</text>
-<path class="x" d="M95 160 C95 205 455 205 455 160"/>
-<text class="m" x="225" y="215" font-size="10">no geometry: vertex output reaches the rasterizer directly</text>
-<rect class="d" x="20" y="260" width="250" height="55" rx="4"/><text class="t" x="30" y="280" font-weight="600">Descriptor roots</text><text class="m" x="30" y="296">s4:s5 constant · s6:s7 image/sampler</text>
-<rect class="d" x="300" y="260" width="250" height="55" rx="4"/><text class="t" x="310" y="280" font-weight="600">Vertex input</text><text class="m" x="310" y="296">attribute table s8:s9</text>
-<rect class="d" x="580" y="260" width="280" height="55" rx="4"/><text class="t" x="590" y="280" font-weight="600">Fragment output</text><text class="m" x="590" y="296">colour and depth channels to SIO1</text>
-<text class="m" x="20" y="340" font-size="11">A geometry stage consumes SIO0 and writes SIO1; without one, the vertex stage feeds the rasterizer.</text>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="480" viewBox="0 0 1000 480">
+  <rect width="1000" height="480" fill="#ffffff"/>
+  <g font-family="DejaVu Sans, Verdana, sans-serif">
+    <text x="24" y="28" font-size="16" font-weight="700" fill="#10141c">LG200 graphics pipeline: stage order and the two SIO rings</text>
+
+    <text x="332" y="60" font-size="11" fill="#5a6478" text-anchor="middle">no geometry (GS off): the SIO0 vertex record goes to the rasterizer</text>
+    <path d="M104 96 V72 H560 V90" fill="none" stroke="#2f5d8a" stroke-width="1.25" stroke-dasharray="4 3"/>
+    <path d="M557 90 H563 L560 96 Z" fill="#2f5d8a"/>
+
+    <g fill="#eef2f8" stroke="#44506a">
+      <rect x="32" y="96" width="136" height="56" rx="3" stroke-width="1.25"/>
+      <rect x="192" y="96" width="136" height="56" rx="3" stroke-width="2.5"/>
+      <rect x="352" y="96" width="136" height="56" rx="3" stroke-width="2.5" stroke-dasharray="5 3"/>
+      <rect x="512" y="96" width="136" height="56" rx="3" stroke-width="1.25"/>
+      <rect x="672" y="96" width="136" height="56" rx="3" stroke-width="2.5"/>
+      <rect x="832" y="96" width="136" height="56" rx="3" stroke-width="1.25"/>
+    </g>
+    <g text-anchor="middle" fill="#10141c" font-size="12" font-weight="600">
+      <text x="100" y="118">Vertex fetch</text>
+      <text x="260" y="118">Vertex</text>
+      <text x="420" y="118">Geometry</text>
+      <text x="580" y="118">Rasterizer</text>
+      <text x="740" y="118">Fragment</text>
+      <text x="900" y="118">Output merger</text>
+    </g>
+    <g text-anchor="middle" fill="#5a6478" font-size="11">
+      <text x="100" y="138">fixed</text>
+      <text x="260" y="138">shader &#183; DS-as-VS</text>
+      <text x="420" y="138">shader &#183; optional</text>
+      <text x="580" y="138">fixed</text>
+      <text x="740" y="138">shader &#183; PS</text>
+      <text x="900" y="138">fixed</text>
+    </g>
+
+    <g stroke="#44506a" stroke-width="1.25" fill="#44506a">
+      <path d="M172 124 H184" fill="none"/><path d="M184 121 H190 L184 127 Z" stroke="none"/>
+      <path d="M332 124 H344" fill="none"/><path d="M344 121 H350 L344 127 Z" stroke="none"/>
+      <path d="M492 124 H504" fill="none"/><path d="M504 121 H510 L504 127 Z" stroke="none"/>
+      <path d="M652 124 H664" fill="none"/><path d="M664 121 H670 L664 127 Z" stroke="none"/>
+      <path d="M812 124 H824" fill="none"/><path d="M824 121 H830 L824 127 Z" stroke="none"/>
+    </g>
+
+    <path d="M256 152 V216 H400 V160" fill="none" stroke="#44506a" stroke-width="1.25"/>
+    <path d="M397 160 H403 L400 154 Z" fill="#44506a"/>
+    <text x="240" y="204" font-size="12" font-weight="600" fill="#10141c" text-anchor="end">SIO0 &#183; vertex window</text>
+    <text x="240" y="220" font-size="11" fill="#5a6478" text-anchor="end">GS on, &#8805; 12 ch</text>
+
+    <path d="M440 152 V280 H600 V160" fill="none" stroke="#44506a" stroke-width="1.25"/>
+    <path d="M597 160 H603 L600 154 Z" fill="#44506a"/>
+    <text x="424" y="268" font-size="12" font-weight="600" fill="#10141c" text-anchor="end">SIO1 &#183; geometry window</text>
+    <text x="424" y="284" font-size="11" fill="#5a6478" text-anchor="end">1 + 32&#183;stride</text>
+
+    <path d="M736 152 V344 H896 V160" fill="none" stroke="#44506a" stroke-width="1.25"/>
+    <path d="M893 160 H899 L896 154 Z" fill="#44506a"/>
+    <text x="720" y="332" font-size="12" font-weight="600" fill="#10141c" text-anchor="end">SIO1 &#183; fragment window</text>
+    <text x="720" y="348" font-size="11" fill="#5a6478" text-anchor="end">depth = 0, colour = channels</text>
+
+    <text x="24" y="406" font-size="11" fill="#5a6478">In a per-draw pipeline only the shader stages write SIO records; SIO1 carries two disjoint windows (geometry record, fragment export).</text>
+    <text x="24" y="426" font-size="11" fill="#5a6478">SIO0 and SIO1 are channel-addressed stage buses, not memory; the command ring is a separate host-written path.</text>
+  </g>
 </svg>

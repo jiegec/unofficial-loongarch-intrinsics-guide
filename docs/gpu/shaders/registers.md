@@ -25,13 +25,15 @@ window:
 | `s0..s11` | Vertex descriptor and vertex inputs, when used. |
 | `s0..s7` | Fragment and geometry descriptors, when used. |
 
-A compiler reserves the whole window rather than the part its stage reads.
+A compiler reserves the whole window rather than the part its stage reads. Some
+older descriptions place a read-write buffer root at `s0:s1`; the current
+compiler and Vulkan code have no such root, and `s0..s3` are the lane-mask
+results, so no read-write root is listed.
 
 ## Launch registers
 
 | Register | Contents | Stage |
 |----------|----------|-------|
-| `s0:s1` | Read-write buffer root. | Streamout |
 | `s2` | Fragment interpolation selector. | Fragment |
 | `s4:s5` | Constant root. | Vertex, geometry, fragment |
 | `s6:s7` | Image and sampler descriptor root. | Vertex, geometry, fragment |
@@ -68,7 +70,7 @@ reports.
 ## Size rules
 
 The record's size fields are the allocation a stage asks for, not the
-architectural maximum. The rules are in [Shader ABI](shader-abi.md#size-rules).
+supported ABI width, not a proven hardware maximum. The rules are in [Shader ABI](shader-abi.md#size-rules).
 The vector file is 256 registers; the field that carries its size encodes 256 as
 255.
 

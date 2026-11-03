@@ -44,8 +44,7 @@ A window descriptor is a 32-bit word:
 | `[31:20]` | Length | Number of state dwords in the window. |
 
 The length MUST be nonzero and the window MUST stay inside the 512-dword block.
-A record whose delta is no smaller than the full form is emitted as the full
-form.
+A delta that would exceed 516 dwords is emitted as the full form instead.
 
 ## Semantics
 
@@ -55,23 +54,27 @@ from the previous record. A full record replaces the whole block.
 
 A record is applied at the draw that carries it. The state object is not a
 separate command: a record that passes the command processor is the draw's
-state.
+state. The draw's own fields are the Draw Info record at state offset `0x000`;
+the rest of the block is the state the draw consumes.
 
 ## Terminator and end command
 
-Every record ends with the terminator `0x0000_0003`. A full-state envelope then
-carries the end command `0x0000_0f05`, followed by eleven zero dwords.
+Every record ends with the terminator `0x0000_0003`. A submitted buffer then
+carries one **buffer tail** after its last record: the end command
+`0x0000_0f05` followed by eleven zero dwords. The tail belongs to the buffer,
+not to the full form; a delta record used as the last record also needs it.
 
 In a batched buffer, the next record's header overwrites the previous record's
-end command; only the last record keeps its end command. The submitted length
-MUST include the last record's end command and its eleven pad dwords.
+end command; only the last record keeps the tail. The submitted length MUST
+include the last record's tail.
 
 ## Batching
 
-The full form occupies 528 dwords, of which 517 are used. The batch cursor
-advances by 516 dwords, so the next record starts where the previous record's
-end command was. A delta record is variable-length and starts at the cursor left
-by the previous record.
+The full record occupies 516 dwords. A submitted full-form buffer adds the
+12-dword tail, for 528 dwords, of which 517 are used. The batch cursor advances
+by 516 dwords, so the next record starts where the previous record's end command
+was. A delta record is variable-length and starts at the cursor left by the
+previous record.
 
 ## Why delta records exist
 

@@ -36,8 +36,8 @@ mask and restores it without cleaning up the values.
 - `p0..p3` are lane-mask registers and may gate any instruction.
 - `p0` holds the lanes still alive for the invocation by convention; the other
   three hold region masks.
-- The mask file is separate from the scalar file. A mask register is not a
-  window of `s0..s3`.
+- The mask registers live in the scalar file but use the distinguished selector
+  encodings `0x7c..0x7f`; they are not a window of `s0..s3`.
 - `p1..p3` are undefined at launch. A shader MUST write a mask before selecting
   it.
 

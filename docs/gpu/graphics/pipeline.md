@@ -53,8 +53,9 @@ set.
 
 The stages exchange data through two mechanisms:
 
-- **SIO rings.** The vertex stage writes its output to SIO0; the geometry stage
-  reads SIO0 and writes SIO1; the fragment stage writes SIO1. SIO is a
+- **SIO rings.** The vertex stage produces the SIO0 record; the geometry stage
+  consumes SIO0 and writes SIO1; the fragment stage writes SIO1. With no
+  geometry stage, the rasterizer consumes the vertex record directly. SIO is a
   channel-addressed interface, not memory. See [SIO](../shaders/io.md).
 - **Descriptor-bound memory.** Uniform buffers, storage buffers, images and
   samplers are reached through descriptor tables whose roots are in the
@@ -82,13 +83,15 @@ prefetch-safety copy of the vertex record.
 
 ## Fragment output
 
-The fragment stage writes colour channels to SIO1. The first colour target
-starts at channel `channels << 7`, where `channels` counts the channels of the
-preceding targets. A target contributes two channels for a 16-bit format, four
-for a 32-bit format and one for a packed integer format. A written depth value
-occupies channel slot 0. The export count is the total colour channels plus one
-when depth is written; a fragment stage that writes nothing still exports one
-channel.
+The fragment stage exports colour channels to SIO1. Depth and coverage occupy
+channel 0; the colour window's base is the export channel count `channels`. The
+export instruction's immediate is `channels << 7`, because the hardware counts
+that field in 0x80-channel units; the immediate is not the channel index.
+
+A colour target contributes its component count: `R32F` one channel, `RG32F`
+two, `RGBA32F` four, and a packed integer format one. A 32-bit format is not
+automatically four channels. A fragment stage that writes nothing still exports
+one channel.
 
 ## Diagram
 

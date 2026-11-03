@@ -20,8 +20,11 @@ An image and its sampler share a 0x40-byte slot:
 | `+0x20` | 16 | Not part of a descriptor. |
 | `+0x30` | 16 | Sampler descriptor. |
 
-The image-and-sampler root is `s6:s7`. A shader selects a slot by adding the
-slot index times 0x40 to the root.
+The image-and-sampler root is `s6:s7`. The slot number is a **physical** slot:
+only the image/sampler units the shader actually samples are packed, in first-use
+order, into physical slots 0 through n-1. An unsampled binding does not consume a
+slot. The shader's handle is the physical slot times 0x40, not the API binding
+number.
 
 ## Image descriptor
 
@@ -128,9 +131,12 @@ upper bound; the variant consumes a prefix. The tuple slots are ordered:
 1. texel offset, when the variant has one;
 2. LOD bias, when the variant has one;
 3. coordinates: `(u, v)` for 2D, `(u, v, layer)` for a 2D array,
-   `(u, v, w)` for a volume, `(u, v, ref)` for a depth comparison, and a
-   direction `(x, y, z)` for a cube;
+   `(u, v, w)` for a volume, and a direction `(x, y, z)` for a cube;
 4. gradients or the explicit LOD, when the variant has them.
+
+A depth-compare form puts the comparison reference before the coordinates:
+`(ref, u, v)`. The reference is not a texture coordinate and does not shift the
+other slots.
 
 | Variant family | Slots after the coordinates |
 |----------------|-----------------------------|
@@ -256,7 +262,9 @@ descriptor. The result is a scalar float broadcast to the destination channels.
 ## Open questions
 
 - The meaning of the performance-mode field.
-- The 12-bit colour swizzle subfields.
+- Whether destination-select values beyond the current channel mapping are
+  meaningful. The fields are four independent 3-bit selectors, not one 12-bit
+  subfield.
 - Whether anisotropic filtering has any effect at all.
 - The exact per-quad granularity of the bias and depth-reference slots.
 - The border-table addressing unit.

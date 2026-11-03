@@ -9,7 +9,7 @@ fields are in [State object](../graphics/state-object.md).
 ![Command nesting](../assets/fig-command.svg)
 
 The figure shows the containment of a submission, a ring packet, an indirect
-buffer, a state record and the draw payload.
+buffer and a state record; the draw is the record, not a separate packet.
 
 ## Full-state envelope
 
@@ -30,23 +30,31 @@ descriptor, not an opaque value. The state object starts at dword 3, so a state
 offset is relative to that dword, and the packet byte offset is the state offset
 plus 12.
 
+There is no separate draw packet. The draw's own fields are the **Draw Info**
+record at state offset `0x000`: 36 bytes, the first nine state dwords. The rest
+of the 512-dword state object describes the shaders, render targets, viewports
+and the other state the draw consumes. The record is the draw.
+
 ## Batching
 
-Consecutive draws may share one indirect buffer. Each block is laid out at the
-full 528-dword size, but the write cursor advances by 516 dwords, so the next
-block's header overwrites the previous block's end command:
+Consecutive draws may share one indirect buffer. Only the **first** record of the
+buffer is the full 516-dword form (528 dwords with its tail); later records are
+delta records of 4 through 516 dwords, and the cursor advances by the record's
+own length. The next header
+overwrites the previous record's end command:
 
 ```text
-block 0: header, state, 0x3, 0xf05, pads
-block 1: header, state, 0x3, 0xf05, pads
+record 0 (full):  header, 512 state dwords, 0x3, 0xf05, pads
+record 1 (delta): 0xf04, windows, 0x3, 0xf05, pads
+record 2 (delta): 0xf04, windows, 0x3, 0xf05, pads
 ```
 
-The submitted length MUST restore the last block's end command and its eleven
-pad dwords: twelve dwords beyond the last state block. A length without that
-tail leaves the graphics ring waiting for an end that never arrives.
+The submitted length MUST restore the last record's end command and its eleven
+pad dwords: twelve dwords beyond the last record. A length without that tail
+leaves the graphics ring waiting for an end that never arrives.
 
-A batch capacity of 16 blocks and a ring of four indirect buffers is a working
-configuration; both are host choices, not architectural limits.
+The current driver sizes a batch for 80 draws, 64 segments and 64 indirect
+buffers; these are host choices, not architectural limits.
 
 ## Border-table preamble
 
@@ -85,9 +93,11 @@ and an end command; otherwise the completion fence never signals.
 
 ## Alignment and limits
 
-An indirect buffer MUST be mapped executable. Its start MUST be 32-byte aligned
-for GPIPE, BPIPE and the display pipes, and 64-byte aligned for CPIPE. Its length
-MUST be a multiple of four bytes and no larger than `0x00ff_ffff` dwords.
+An indirect buffer MUST be mapped executable. Its length MUST be a multiple of
+four bytes and no larger than `0x00ff_ffff` dwords. The kernel's admission check
+establishes 4-byte alignment only; a 32-byte start for GPIPE/BPIPE or a 64-byte
+start for CPIPE is a host convention, and whether the command processors require
+it is UNRESOLVED.
 
 ## Open questions
 
