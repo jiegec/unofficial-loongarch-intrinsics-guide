@@ -714,6 +714,42 @@ std::uint32_t atomic_old_or_32(const std::string& op, std::uint64_t init,
   return acc;
 }
 
+// [HW 2026-11-03] v_mbcnt_u32's popcount window is the launch's own lane count
+// minus one bits - the field is not a fixed three-bit slice.
+//
+// The 2026-10-13 probe that fixed the window at a[2:0] ran on the compute pipe
+// with the default four-lane group, where it is right.  The same row on the
+// graphics pipe (sixteen lanes) disagreed on eleven vectors, and the values name
+// the rule: (a=0x7fffffff, b=0) returns 0x3 at 4 lanes, 0x7 at 8, 0xf at 16 and
+// 0x1f at 32 - the popcount of 3, 7, 15 and 31 set bits - so the field is a
+// [lanes-1:0] window.  Two lanes give a one-bit window and one lane a zero-bit
+// one (pc 0, M 0, dst = b), and both match: compute fails 13 of 41 at 2 lanes and
+// 24 of 41 at 1 lane UNDER THE OLD MODEL, and passes all 41 with this one.
+std::uint32_t mbcnt_window(std::uint32_t a, std::uint32_t b, unsigned lanes) {
+  const unsigned bits = lanes > 1u ? lanes - 1u : 0u;
+  const std::uint32_t field =
+      bits >= 32u ? 0xffffffffu : ((1u << bits) - 1u);
+  const std::uint32_t alo = a & field;
+  std::uint32_t M = 0;
+  const int pc = __builtin_popcount(alo) +
+                 (alo == 0u ? 0 : __builtin_popcount(b & field));
+  if (pc != 0) {
+    int n = 1;
+    while ((1u << n) < static_cast<std::uint32_t>(pc + 1)) ++n;
+    M = (1u << n) - 1u;
+  }
+  std::uint32_t Mp = M;
+  if (M != 0u) {
+    const unsigned h = 31u - static_cast<unsigned>(__builtin_clz(M));
+    if ((b >> h) & 1u) {
+      unsigned z = h + 1u;
+      while (z < 32u && ((b >> z) & 1u)) ++z;
+      if (z < 32u) Mp |= (1u << z);
+    }
+  }
+  return b | Mp;
+}
+
 // ---- launch environment ------------------------------------------------
 //
 // One program shape, two dispatch engines.  The instruction stream, the source
@@ -1025,6 +1061,9 @@ void append_implicit_scc_op(Builder& builder, const std::string& mnemonic,
 std::optional<EnvelopeProgram> build_generic(
     const std::string& mnemonic, const std::vector<EnvelopeCase>& rows,
     const CarrierEnv& env, std::string& error) {
+  // One row's expectation depends on the launch width, not just on its operands;
+  // see mbcnt_window and the site that re-evaluates it.
+  const bool mnemonic_mbcnt = mnemonic == "v_mbcnt_u32";
   const auto* spec = isa::semantic_spec(mnemonic);
   if (spec == nullptr || spec->rule_count == 0) {
     error = "no semantic specification";
@@ -1107,6 +1146,13 @@ std::optional<EnvelopeProgram> build_generic(
     // all-lanes rows passed.
     if (has_vcc_output && env.lanes > 0 && expect.size() > 1) {
       expect[1] &= active_mask;
+    }
+    // v_mbcnt_u32 is the one row whose whole result, not just its mask, is a
+    // function of the launch width: its popcount window is lanes-1 bits (see
+    // mbcnt_window).  The case vectors are the four-lane instance, which is what
+    // the offline oracle evaluates; re-evaluate them at the launch's width.
+    if (mnemonic_mbcnt && !expect.empty() && row.inputs.size() >= 2) {
+      expect[0] = mbcnt_window(row.inputs[0], row.inputs[1], env.lanes);
     }
     // Lane-mask outputs are a function of the launch's lane count.  Measured
     // pattern on the saved CS matrix: every v_cmp row whose oracle mask is
@@ -3786,12 +3832,25 @@ std::optional<EnvelopeProgram> build_carrier_env(
   const unsigned flat_wave =
       env.kind == LaunchEnvironment::Compute ? 8u : 16u;
   const bool flat_multiwave = flat_family && env.lanes > flat_wave;
+  // [HW 2026-11-03] v_mbcnt_u32's window is lanes-1 bits where that has been
+  // measured as a single rule - compute at 1, 2 and 4 lanes, graphics at 16 -
+  // and it is NOT one rule beyond them in compute: at 8 lanes the window model
+  // is right for 40 of 41 vectors and the exception is the extension step
+  // (a=0xff, b=8 reads 0x0f where the model extends to 0x1f, though the same
+  // pair reads 0x0b at 4 lanes); at 16 and 32 lanes 16 of 41 diverge, and the
+  // values are neither the 7-bit nor the 15-bit window's result.  The row still
+  // compares in both matrices - compute runs 4 lanes and graphics 16 - so the
+  // unproven widths observe instead of grading against a rule that does not
+  // hold there.
+  const bool mbcnt_wide = mnemonic == "v_mbcnt_u32" &&
+                          env.kind == LaunchEnvironment::Compute &&
+                          env.lanes > 4u;
   const bool flat_compare =
       !flat_multiwave &&
       (flat_roundtrip || (flat_family && !flat_subword_defect) ||
        (flat_family && std::getenv("LGPU_FLAT_COMPARE")));
   const bool launch_state =
-      (flat_family && !flat_compare) ||
+      mbcnt_wide || (flat_family && !flat_compare) ||
       mnemonic.rfind("load_sm_matrix_", 0) == 0 ||
       mnemonic.find("_fmtdesc_") != std::string::npos ||
       mnemonic.find("_fmtinst_") != std::string::npos ||
@@ -3835,7 +3894,9 @@ std::optional<EnvelopeProgram> build_carrier_env(
     // The group is broad; the reason is not.  Name the mechanism the comment
     // above records, and fall back to the group name when there is none.
     const char* why = "launch-state group in build_carrier";
-    if (flat_multiwave)
+    if (mbcnt_wide)
+      why = "the popcount window follows no single rule above four lanes";
+    else if (flat_multiwave)
       why = "the old-value read-back is a race between waves above one wave width";
     else if (flat_family)
       why = "flat input-plane values change with the 0x530 input_enable toggle";
