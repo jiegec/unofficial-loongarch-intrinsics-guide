@@ -16,10 +16,14 @@ struct AddU32Result {
 
 struct AddCU32Result {
   std::uint32_t sum;
-  bool carry;
+  std::uint32_t carry;  // per-lane bitmap, bit i = lane i's carry-out
 };struct SubU32Result {
   std::uint32_t diff;
   bool borrow;
+};
+struct SubCU32Result {
+  std::uint32_t diff;
+  std::uint32_t borrow;  // per-lane bitmap, bit i = lane i's borrow-out
 };
 
 AddU32Result oracle_v_add_u32(std::uint32_t a, std::uint32_t b);
@@ -405,8 +409,8 @@ std::uint32_t oracle_pack_unorm16_f32(std::uint32_t a);
 std::uint32_t oracle_s_sub_u32(std::uint32_t a, std::uint32_t b);
 std::uint32_t oracle_select_b32(std::uint32_t a, std::uint32_t b, std::uint32_t sel);
 std::uint32_t oracle_threadid_u32(std::uint32_t);
-std::uint32_t oracle_v_subb_u32(std::uint32_t a, std::uint32_t b, std::uint32_t borrow);
-std::uint32_t oracle_v_subbrev_u32(std::uint32_t a, std::uint32_t b, std::uint32_t borrow);
+SubCU32Result oracle_v_subb_u32(std::uint32_t a, std::uint32_t b, std::uint32_t borrow);
+SubCU32Result oracle_v_subbrev_u32(std::uint32_t a, std::uint32_t b, std::uint32_t borrow);
 std::uint32_t sf_cos32(std::uint32_t a, const FpPolicy&);
 std::uint32_t sf_exp2_32(std::uint32_t a, const FpPolicy&);
 std::uint32_t sf_fma32(std::uint32_t a, std::uint32_t b, std::uint32_t c,
@@ -595,8 +599,8 @@ std::uint32_t oracle_atomic_v_buff_min_u32(std::uint32_t old, std::uint32_t src)
 std::uint32_t oracle_atomic_v_buff_or_b32(std::uint32_t old, std::uint32_t src);
 std::uint32_t oracle_atomic_v_buff_swap_b32(std::uint32_t old, std::uint32_t src);
 std::uint32_t oracle_atomic_v_buff_xor_b32(std::uint32_t old, std::uint32_t src);
-std::uint32_t oracle_v_subb_u32(std::uint32_t a, std::uint32_t b, std::uint32_t borrow);
-std::uint32_t oracle_v_subbrev_u32(std::uint32_t a, std::uint32_t b, std::uint32_t borrow);
+SubCU32Result oracle_v_subb_u32(std::uint32_t a, std::uint32_t b, std::uint32_t borrow);
+SubCU32Result oracle_v_subbrev_u32(std::uint32_t a, std::uint32_t b, std::uint32_t borrow);
 std::uint32_t oracle_pack_f16rtz_f32(std::uint32_t a);
 std::uint32_t oracle_copysign_imm_f32(std::uint32_t src, std::uint32_t imm,
                              const FpPolicy&);

@@ -685,9 +685,18 @@ std::uint64_t sm_old_or(const std::string& op, bool sgn, std::uint64_t initial,
 // The 32-bit form of that OR, with the same 32-bit signed pre-extension
 // atomic_final_n applies to min/max (a 32-bit -1 must compare as -1, not as
 // 0xffffffff in a 64-bit register).
+// [HW 2026-11-03] The read-back is per WAVE, not per launch.  With one wave's
+// worth of lanes, the result dword is the OR of that wave (4 and 8 lanes in
+// compute, 16 in graphics).  A launch wider than one wave leaves only the LAST
+// wave's OR there, because the next wave's stores overwrite the dword instead of
+// merging with it: the wrap case of atomic_v_flat_add_i32 (cell 0xffffffff, src
+// 1) reads back 0xffffffff at 8 lanes, 0x0000000f at 16 and 0x0000001f at 32 -
+// exactly the OR of the chain values the last eight lanes see (7..14 and
+// 23..30).  So the model walks the chain of the last wave only.
 std::uint32_t atomic_old_or_32(const std::string& op, std::uint64_t init,
                                std::uint64_t src, bool sgn,
-                               std::uint64_t swap, unsigned lanes) {
+                               std::uint64_t swap, unsigned lanes,
+                               unsigned wave = 0u) {
   std::uint64_t v = init, a = src;
   if (sgn && (op == "min" || op == "max")) {
     v = static_cast<std::uint64_t>(
@@ -696,8 +705,10 @@ std::uint32_t atomic_old_or_32(const std::string& op, std::uint64_t init,
         static_cast<std::int64_t>(static_cast<std::int32_t>(a)));
   }
   std::uint32_t acc = 0;
+  const unsigned width = (wave != 0u && wave < lanes) ? wave : lanes;
+  const unsigned first = lanes - width;
   for (unsigned lane = 0; lane < lanes; ++lane) {
-    acc |= static_cast<std::uint32_t>(v);
+    if (lane >= first) acc |= static_cast<std::uint32_t>(v);
     v = atomic_apply(op, sgn, v, a, swap);
   }
   return acc;
@@ -1083,18 +1094,19 @@ std::optional<EnvelopeProgram> build_generic(
       continue;
     }
     std::vector<std::uint32_t> expect = row.expected;
-    // The alu-carry class (v_add/v_sub/v_addc/v_subb/v_subbrev) writes its
-    // carry/borrow-OUT into the VCC pair the RD8 operand names, and the manual
-    // calls that "a separate per-lane bit".  The oracle spells the same bit as
-    // one dword, 0 or 1.  This carrier used to DROP that word right here, which
-    // made a two-word result look like a one-word result: the case slot stayed
-    // reserved (case_offset steps by expected.size()) but nothing ever wrote or
-    // compared it, so 44/44 v_sub_u32 PASS compared the difference and never
-    // looked at the borrow.  Map the oracle's two spellings onto the launch's
-    // mask instead - the same model the v_cmp block below uses - and let
-    // build_valu store and compare it.
+    // The alu-carry class (v_add/v_sub/v_addc/v_subb/v_subrev) writes its
+    // carry/borrow-OUT into the VCC pair the RD8 operand names as a PER-LANE
+    // BITMAP - bit i is lane i's carry/borrow-out [HW 2026-11-03: a=0xffffffff
+    // with b=0 reads back 0x0001 / 0xfffe / 0xbeef for those third sources,
+    // and s7 is never written].  The oracle states that same word, so the
+    // expectation is already in the launch's spelling.  The one correction
+    // left is the lane count: a lane this launch does not execute leaves its
+    // bit clear, so mask the word to the active lanes.  This used to expand the
+    // oracle's old 0/1 boolean to the all-active mask, which is why the rows
+    // whose true bitmap is a proper subset (0x0001, 0xfffe) failed while the
+    // all-lanes rows passed.
     if (has_vcc_output && env.lanes > 0 && expect.size() > 1) {
-      expect[1] = expect[1] != 0u ? active_mask : 0u;
+      expect[1] &= active_mask;
     }
     // Lane-mask outputs are a function of the launch's lane count.  Measured
     // pattern on the saved CS matrix: every v_cmp row whose oracle mask is
@@ -2449,8 +2461,12 @@ std::optional<EnvelopeProgram> build_flat(const std::string& mnemonic,
       const std::uint32_t cell = def.inputs[0];
       const std::uint32_t src = def.inputs[1];
       const std::uint32_t swap = def.inputs.size() >= 3 ? def.inputs[2] : 0u;
+      // A compute wave is eight lanes wide and a graphics wave sixteen, both
+      // measured through this read-back (see atomic_old_or_32).
+      const unsigned wave =
+          env.kind == LaunchEnvironment::Compute ? 8u : 16u;
       bc.expected.push_back(
-          atomic_old_or_32(op, cell, src, sgn, swap, env.lanes));
+          atomic_old_or_32(op, cell, src, sgn, swap, env.lanes, wave));
       bc.expected.push_back(atomic_final_n(op, cell, src, sgn, swap, env.lanes));
       program.cases.push_back(std::move(bc));
       off += 8u;
@@ -3759,9 +3775,21 @@ std::optional<EnvelopeProgram> build_carrier_env(
       mnemonic == "store_v_flat_b96";
   // Experiment knob (README, "Environment knobs"), not a stable interface: it
   // re-enables the comparison for a subword row in one watched session.
+  // [HW 2026-11-03] A launch wider than one wave cannot grade an atomic's
+  // old-value dword, and the reason is the measurement: at 32 lanes the row
+  // passes 39/39 on one run and 37/39 on the next, with a DIFFERENT case
+  // failing each time (gen54303, then gen54306, then gen54317).  The dword is
+  // OR-merged within a wave and the waves race for it, so which wave's OR
+  // survives is not a function of the operands.  Within one wave it is: 1, 2,
+  // 4, 8 lanes in compute and 16 in graphics all compare exactly.  The wave
+  // widths are themselves measured through this read-back (atomic_old_or_32).
+  const unsigned flat_wave =
+      env.kind == LaunchEnvironment::Compute ? 8u : 16u;
+  const bool flat_multiwave = flat_family && env.lanes > flat_wave;
   const bool flat_compare =
-      flat_roundtrip || (flat_family && !flat_subword_defect) ||
-      (flat_family && std::getenv("LGPU_FLAT_COMPARE"));
+      !flat_multiwave &&
+      (flat_roundtrip || (flat_family && !flat_subword_defect) ||
+       (flat_family && std::getenv("LGPU_FLAT_COMPARE")));
   const bool launch_state =
       (flat_family && !flat_compare) ||
       mnemonic.rfind("load_sm_matrix_", 0) == 0 ||
@@ -3807,7 +3835,9 @@ std::optional<EnvelopeProgram> build_carrier_env(
     // The group is broad; the reason is not.  Name the mechanism the comment
     // above records, and fall back to the group name when there is none.
     const char* why = "launch-state group in build_carrier";
-    if (flat_family)
+    if (flat_multiwave)
+      why = "the old-value read-back is a race between waves above one wave width";
+    else if (flat_family)
       why = "flat input-plane values change with the 0x530 input_enable toggle";
     else if (mnemonic == "s_cmp_eq_u64" || mnemonic == "s_cmp_ne_u64")
       why = "the scalar-compare destination field writes no value";

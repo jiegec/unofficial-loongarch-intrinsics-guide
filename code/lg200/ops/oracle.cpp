@@ -15,26 +15,24 @@ AddU32Result oracle_v_add_u32(std::uint32_t a, std::uint32_t b) {
 }
 
 AddCU32Result oracle_v_addc_u32(std::uint32_t a, std::uint32_t b, std::uint32_t cin) {
-  // The carry lane is gated on the low 30 bits of VCC. The sum path is:
-  //   low30 = cin & 0x3fffffff
-  //   cin_eff = low30 != 0
-  //   carry_out = (a + b + cin_eff) > 0xffffffff
-  //   sum = low30 == 0          -> a + b
-  //         low30 == 0x3fffffff -> a + b + 1            (standard)
-  //         otherwise           -> (a+b) | (a+b+1)      (OR carry injection)
-  const std::uint32_t low30 = cin & 0x3fffffffu;
+  // [HW 2026-11-03] The third source is the VCC pair.  Bit i of its low sixteen
+  // bits is lane i's carry-in, and the instruction writes bit i = lane i's
+  // carry-out back into the pair's low word (s7 is never written).  The sum
+  // word here is the OR over the sixteen lanes, which is what the case carrier
+  // reads back (one cell per case, every lane stores to it); the carry word is
+  // the exact scalar value.  The old model gated on the low THIRTY bits and
+  // spelled the second word as one boolean, which cannot express a partial
+  // bitmap.
+  const std::uint32_t bits = cin & 0xffffu;
   const std::uint32_t s = a + b;
-  const bool cin_eff = low30 != 0;
-  std::uint32_t sum;
-  if (low30 == 0) {
-    sum = s;
-  } else if (low30 == 0x3fffffffu) {
-    sum = s + 1u;
-  } else {
-    sum = s | (s + 1u);
+  std::uint32_t sum = 0;
+  std::uint32_t carry = 0;
+  for (std::uint32_t lane = 0; lane < 16; ++lane) {
+    const std::uint32_t ci = (bits >> lane) & 1u;
+    sum |= s + ci;
+    if (static_cast<std::uint64_t>(a) + b + ci > 0xffffffffu)
+      carry |= 1u << lane;
   }
-  const bool carry =
-      (static_cast<std::uint64_t>(a) + b + (cin_eff ? 1u : 0u)) > 0xffffffffu;
   return {sum, carry};
 }
 
@@ -2319,27 +2317,40 @@ std::uint32_t oracle_atomic_v_buff_xor_b32(std::uint32_t old,
                                            std::uint32_t src) {
   return oracle_rmw_new(oracle_v_xor_b32, old, src);
 }
-std::uint32_t oracle_v_subb_u32(std::uint32_t a, std::uint32_t b, std::uint32_t borrow) {
-  // [HW 2026-08-25] three-branch borrow-in behavior (probed on ~45 points,
-  // stable across reruns): the VCC borrow operand gates on its LOW 30 BITS.
-  //   low30 == 0           -> plain r = a - b
-  //   low30 == 0x3fffffff  -> r - 1 (full borrow)
-  //   any other low30      -> r | (r - 1) (round up to the next Mersenne
-  //                            number; r == 0 wraps to 0xffffffff)
+SubCU32Result oracle_v_subb_u32(std::uint32_t a, std::uint32_t b,
+                                 std::uint32_t borrow) {
+  // [HW 2026-11-03] Same VCC spelling as v_addc: bit i of the third source's
+  // low sixteen bits is lane i's borrow-in, and bit i of the second word is
+  // lane i's borrow-out.  The diff word is the OR over the sixteen lanes (the
+  // case carrier's readback); the borrow word is the exact scalar value.
+  const std::uint32_t bits = borrow & 0xffffu;
   const std::uint32_t r = a - b;
-  const std::uint32_t g = borrow & 0x3fffffffu;
-  if (g == 0x3fffffffu) return r - 1u;
-  if (g == 0u) return r;
-  return r | (r - 1u);
+  std::uint32_t diff = 0;
+  std::uint32_t bout = 0;
+  for (std::uint32_t lane = 0; lane < 16; ++lane) {
+    const std::uint32_t bi = (bits >> lane) & 1u;
+    diff |= r - bi;
+    if (static_cast<std::uint64_t>(a) < static_cast<std::uint64_t>(b) + bi)
+      bout |= 1u << lane;
+  }
+  return {diff, bout};
 }
-std::uint32_t oracle_v_subbrev_u32(std::uint32_t a, std::uint32_t b, std::uint32_t borrow) {
-  // [HW 2026-08-25] exact mirror of v_subb with the operand roles swapped:
-  // r = b - a, then the same low30 borrow trichotomy.
+SubCU32Result oracle_v_subbrev_u32(std::uint32_t a, std::uint32_t b,
+                                    std::uint32_t borrow) {
+  // [HW 2026-11-03] exact mirror of v_subb with the operand roles swapped:
+  // r = b - a, the same per-lane borrow-in from the low sixteen bits, and
+  // bit i = lane i's borrow-out.
+  const std::uint32_t bits = borrow & 0xffffu;
   const std::uint32_t r = b - a;
-  const std::uint32_t g = borrow & 0x3fffffffu;
-  if (g == 0x3fffffffu) return r - 1u;
-  if (g == 0u) return r;
-  return r | (r - 1u);
+  std::uint32_t diff = 0;
+  std::uint32_t bout = 0;
+  for (std::uint32_t lane = 0; lane < 16; ++lane) {
+    const std::uint32_t bi = (bits >> lane) & 1u;
+    diff |= r - bi;
+    if (static_cast<std::uint64_t>(b) < static_cast<std::uint64_t>(a) + bi)
+      bout |= 1u << lane;
+  }
+  return {diff, bout};
 }
 
 std::uint32_t oracle_pack_f16rtz_f32(std::uint32_t a) {
