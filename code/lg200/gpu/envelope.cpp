@@ -929,8 +929,9 @@ void emit_env_prelude(Builder& builder, const CarrierEnv& env) {
 // graphics side assembles its result-store descriptor.  Same four words, same
 // meaning; only the producer differs.
 void emit_load_desc(Builder& builder, const CarrierEnv& env,
-                    const isa::Reg& quad, std::uint64_t base) {
-  if (!env.flat_store) {
+                    const isa::Reg& quad, std::uint64_t base,
+                    bool force = false) {
+  if (!env.flat_store && !force) {
     return;
   }
   builder.s_mov_imm_b32(isa::sgpr(quad.index + 0),
@@ -1741,8 +1742,24 @@ std::optional<EnvelopeProgram> build_buff(const std::string& mnemonic,
   // Graphics: s4-s7 are hydrated from the PS control packet's user data and
   // must never be clobbered.  Compute: nothing hydrates them, so the
   // descriptor is assembled here against the carrier's own load window.
+  //
+  // [HW 2026-11-03] The formatted rows are the exception, and the reason is the
+  // one the compute pipe already proved: these ten read a descriptor whose
+  // format fields they are testing, and the packet's hydration is not that
+  // descriptor - every one of them returns a fixed plane value (0x3f800000 for
+  // fmtdesc, constants for fmtinst) regardless of the staged data, while the
+  // same row on compute, where this function assembles the four words, matches
+  // its model 5 of 5.  So graphics assembles them here too for those rows.
+  // LOADS only: the formatted STORES use this quad for their read-back, where
+  // the hydrated descriptor is the one that works - forcing it there turned four
+  // passing rows into 1/3 failures.
+  const bool own_desc =
+      mnemonic.rfind("load_", 0) == 0 &&
+      (mnemonic.find("_fmtdesc_") != std::string::npos ||
+       mnemonic.find("_fmtinst_") != std::string::npos ||
+       mnemonic == "load_v_buff_i8" || mnemonic == "load_v_buff_u8");
   emit_load_desc(builder, env, load_desc,
-                 env.arg_va + carrier::kLoadWindow);
+                 env.arg_va + carrier::kLoadWindow, own_desc);
   const isa::Reg zero_address = isa::vgpr(0);
   builder.v_mov_b32(zero_address, isa::zero_reg(), isa::predicate(0));
   const isa::Reg imm_temp = isa::sgpr(16);
@@ -3852,8 +3869,24 @@ std::optional<EnvelopeProgram> build_carrier_env(
   const bool launch_state =
       mbcnt_wide || (flat_family && !flat_compare) ||
       mnemonic.rfind("load_sm_matrix_", 0) == 0 ||
-      mnemonic.find("_fmtdesc_") != std::string::npos ||
+      // [HW 2026-11-03] the four fmtdesc loads left this bucket and now compare
+      // on both pipes, 5/5 each: they were observed because the graphics launch
+      // hydrates s4-s7 from the packet and that is not the descriptor these rows
+      // test.  build_buff assembles the four words on both pipes for them now
+      // (see own_desc).  The fmtinst rows stay: they read their own constant for
+      // every staged datum, and the descriptor assembly did not change that.
+      //
+      // load_v_buff_i8 / load_v_buff_u8 are a different failure and stay too:
+      // compared under the same descriptor they read back 0x3f4fffff - the
+      // result cell's canary - on every vector, so nothing was stored at all and
+      // the width question is not yet reachable.
       mnemonic.find("_fmtinst_") != std::string::npos ||
+      // The formatted STORES stay observed: they were never compared, and the
+      // descriptor work above did not touch their path.
+      mnemonic.rfind("store_v_buff_fmtdesc_", 0) == 0 ||
+      mnemonic == "load_v_buff_fmtdesc_c2" ||
+      mnemonic == "load_v_buff_fmtdesc_c3" ||
+      mnemonic == "load_v_buff_fmtdesc_c4" ||
       mnemonic == "load_v_buff_i8" || mnemonic == "load_v_buff_u8" ||
       mnemonic == "store_v_buff_b8" || mnemonic == "getlod" ||
       mnemonic == "getresinfo" ||
