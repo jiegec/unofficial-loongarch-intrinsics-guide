@@ -15,8 +15,15 @@ struct FpPolicy {
 
 // Host-independent IEEE-754 binary32 operations, bit-exact. NaN payloads are
 // canonicalized (quiet bit set, low payload preserved). add/sub/mul are
-// correctly rounded for all four rounding modes. min/max follow IEEE 754-2008
-// minNum/maxNum with the NaN behavior defined by the instruction cases.
+// correctly rounded for all four rounding modes.
+//
+// [HW 2026-11-03] min/max are NOT IEEE 754-2019 minimum/maximum, and this comment
+// used to say they were "minNum/maxNum".  They propagate a NaN candidate from
+// either position, keeping its sign and payload (quieted only if signalling), so
+// the selection is not a total order: min(2.0, qNaN) is the NaN, where minimum()
+// would return 2.0.  The instruction cases are the authority and the v_min_f32 page
+// says so explicitly - the earlier wording here is what made a reader expect
+// minNum, and a 136-case boundary sweep is what rejected it.
 std::uint32_t sf_add32(std::uint32_t a, std::uint32_t b, FpPolicy policy);
 std::uint32_t sf_sub32(std::uint32_t a, std::uint32_t b, FpPolicy policy);
 std::uint32_t sf_revsub32(std::uint32_t a, std::uint32_t b, FpPolicy policy);
