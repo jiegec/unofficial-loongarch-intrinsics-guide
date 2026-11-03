@@ -885,6 +885,10 @@ TexStage emit_tex_prelude(Builder& builder, EnvelopeProgram& program,
 // what the compute path declares in the kernel descriptor, so it is taken from
 // the emitted operands rather than from a fixed window that the program may
 // outgrow.
+bool uses_shared_memory(const EnvelopeProgram& program) {
+  return program.listing.find("_sm_") != std::string::npos;
+}
+
 bool finalize_program(Builder& builder, EnvelopeProgram& program,
                       std::string& error) {
   if (!link_program(builder.lines, program, error)) {
@@ -901,8 +905,8 @@ bool finalize_program(Builder& builder, EnvelopeProgram& program,
   // 4096 is above the largest footprint a case can stage: one cell per lane at
   // 0x20 + 4*width*chunk, with chunk 64 and width at most 4, is under 1.1 KiB.
   if (program.shared_bytes == 0 &&
-      program.listing.find("_sm_") != std::string::npos) {
-    program.shared_bytes = 4096;
+      uses_shared_memory(program)) {
+    program.shared_bytes = kLdsWindowBytes;
   }
   program.sgpr_high_water = builder.sgpr_high;
   program.vgpr_high_water = builder.vgpr_high;
@@ -3772,7 +3776,7 @@ std::optional<EnvelopeProgram> build_cs_mask_probe(unsigned variant,
   EnvelopeProgram program;
   // The shared-memory variants stage one cell per lane at 0x20 + 4*lane.
   if ((variant >= 42 && variant <= 44) || variant == 56)
-    program.shared_bytes = 512;
+    program.shared_bytes = kLdsWindowBytes;
   BuiltCase bc;
   bc.id = "mask-probe";
   for (unsigned i = 0; i < 4; ++i) bc.offsets.push_back(4 * i);
@@ -4024,7 +4028,7 @@ std::optional<EnvelopeProgram> build_cs_matrix_probe(unsigned variant,
   EnvelopeProgram program;
   program.probe = true;
   // 64 dwords of shared memory are staged and read through the matrix forms.
-  program.shared_bytes = 512;
+  program.shared_bytes = kLdsWindowBytes;
   if (!finalize_program(builder, program, error)) return std::nullopt;
   return program;
 }
@@ -4113,7 +4117,7 @@ std::optional<EnvelopeProgram> build_cs_mask_lifetime_probe(unsigned variant,
   EnvelopeProgram program;
   program.probe = true;
   // Class 3 and the mixed chain stage one cell in shared memory.
-  if (klass == 3 || klass == 7) program.shared_bytes = 512;
+  if (klass == 3 || klass == 7) program.shared_bytes = kLdsWindowBytes;
   if (!finalize_program(builder, program, error)) return std::nullopt;
   return program;
 }

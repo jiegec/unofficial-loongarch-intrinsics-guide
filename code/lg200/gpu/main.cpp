@@ -404,7 +404,7 @@ constexpr std::uint32_t kComputeLaunchSgprs = 14;
 // with no window declared at all.
 bool cs_lds_preflight(const lgpu::envelope::EnvelopeProgram& program,
                       std::uint32_t declared, std::string& why) {
-  const bool uses_lds = program.listing.find("_sm_") != std::string::npos;
+  const bool uses_lds = lgpu::envelope::uses_shared_memory(program);
   if (uses_lds && declared == 0) {
     why = "the program executes a shared-memory instruction but the launch "
           "declares a zero-byte LDS window; set program.shared_bytes in the "
@@ -702,6 +702,27 @@ int csrun_batch(bool dry_run) {
       std::printf("BATCH %s SKIP-ENVELOPE pass=0 fail=0 rows=%zu -- %s\n",
                   block.mnemonic.c_str(), block.rows.size(), error.c_str());
       continue;
+    }
+    {
+      // The single-mnemonic preflight, in the path the lane sweep and a bulk
+      // run actually use.  It was in csrun and csbench only, and this entry
+      // point submits every block it builds: run_gpu.py --lane-sweep reaches
+      // all 32 atomic_sm_* rows through here, so the one path that submits
+      // windowless LDS launches in bulk was the one path without the guard.
+      // A refusal is per block and not fatal: nothing was submitted, so the
+      // pipe is untouched and the rest of the batch still runs.
+      std::string lds_why;
+      if (!dry_run &&
+          !cs_lds_preflight(*program, program->shared_bytes, lds_why)) {
+        std::printf("BATCH-BLOCK %s\n", block.mnemonic.c_str());
+        std::printf("csrun-batch: %s: %s\n", block.mnemonic.c_str(),
+                    lds_why.c_str());
+        std::printf("BATCH-BLOCK-END %s\n", block.mnemonic.c_str());
+        std::printf(
+            "BATCH %s PREFLIGHT-FAIL pass=0 fail=0 rows=%zu -- %s\n",
+            block.mnemonic.c_str(), block.rows.size(), lds_why.c_str());
+        continue;
+      }
     }
     if (dry_run) {
       // Same status AND the same listing the single-mnemonic dry path emits, so
@@ -1338,7 +1359,7 @@ int csbench_run(const std::string& mnemonic, const std::string& kind,
       std::fprintf(stderr, "csbench: %s: %s\n", mnemonic.c_str(), why.c_str());
       return 4;
     }
-    if (program->listing.find("_sm_") != std::string::npos)
+    if (lgpu::envelope::uses_shared_memory(*program))
       std::fprintf(stderr,
                    "csbench: %s: LDS window %u bytes, program executes "
                    "shared-memory instructions\n",

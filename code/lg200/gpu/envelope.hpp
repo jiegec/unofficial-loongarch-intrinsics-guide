@@ -68,6 +68,23 @@ struct EnvelopeProgram {
   std::uint32_t shared_bytes = 0;
 };
 
+// Declared workgroup shared memory for a launch that executes an LDS
+// instruction.  The size belongs to the launch, not to the row: it only has to
+// cover the cells the carrier stages, and 4 KiB covers every case shape (one
+// cell per row at 0x20 + 4*width*chunk, chunk 64 and width at most 4: under 1.1
+// KiB).  It is also a whole number of resource-word granules - shape_rsrc0
+// folds the size in as ((bytes*8 + 0x3f8) & 0x1ffc00), one unit per 1024 bytes
+// - so a sub-1024 declaration leaves granulated_shm_size at zero while .kd +28
+// names the window, and the two fields disagree about whether the launch has
+// shared memory at all.
+inline constexpr std::uint32_t kLdsWindowBytes = 4096;
+
+// True when the program's listing carries a shared-memory instruction.  The
+// builder (which must declare a window) and the runner (which refuses a
+// windowless launch) ask that one question through this predicate, so they
+// cannot disagree about which programs need a window.
+bool uses_shared_memory(const EnvelopeProgram& program);
+
 // True when the mnemonic has a materializable generic PS suite.
 bool generic_available(const std::string& mnemonic);
 
