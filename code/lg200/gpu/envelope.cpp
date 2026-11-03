@@ -1411,9 +1411,17 @@ std::optional<EnvelopeProgram> build_generic(
     // reaches, which is a different defect from the unwritten-destination class
     // the v_fcvt_* holes turned out to be.  The knob stays because the next
     // question - which address the fetch does use - needs it.
-    if (std::getenv("LGPU_FMT_SENTINEL") != nullptr &&
+    const bool fmt_sentinel =
+        std::getenv("LGPU_FMT_SENTINEL") != nullptr &&
         (mnemonic.find("_fmtinst_") != std::string::npos ||
-         mnemonic.find("_fmtdesc_") != std::string::npos)) {
+         mnemonic.find("_fmtdesc_") != std::string::npos);
+    // Experiment knob, not a stable interface: the two interp phases read VD8
+    // as an in-place source, and "the instruction wrote a value" and "VD8 kept
+    // a stale value" are the same reading until VD8 is pre-loaded.
+    const bool interp_sentinel =
+        std::getenv("LGPU_INTERP_SENTINEL") != nullptr &&
+        (mnemonic == "v_interp_2_f32" || mnemonic == "v_interp_mov_b32");
+    if (fmt_sentinel || interp_sentinel) {
       builder.s_mov_imm_b32(imm_temp, 0xdeadbeefu);
       builder.v_mov_b32(dst_vgpr, imm_temp, isa::predicate(0));
     }
@@ -2289,10 +2297,17 @@ std::optional<EnvelopeProgram> build_lds(const std::string& mnemonic,
       off += 4 * width;
       continue;
     }
-    // stage the input data dwords into v9..
+    // Stage the input data dwords into v9..  load_sm_interp is the exception:
+    // its RJ8 operand is the SCALAR coefficient base s9, so the staged VGPR was
+    // dead.  Graphics leaves s9 launch-owned (the fragment input window base);
+    // compute has nothing to supply it, so stage the case dword there instead.
     for (unsigned p = 0; p < width; ++p) {
       builder.s_mov_imm_b32(imm_temp, def.inputs[p]);
-      builder.v_mov_b32(isa::vgpr(9 + p), imm_temp, isa::predicate(0));
+      if (mnemonic == "load_sm_interp" && env.flat_store) {
+        builder.s_mov_imm_b32(isa::sgpr(9 + p), def.inputs[p]);
+      } else {
+        builder.v_mov_b32(isa::vgpr(9 + p), imm_temp, isa::predicate(0));
+      }
     }
     if (mnemonic == "load_sm_interp") {
       // Interpolator load: (pred, VD8 dst, RJ8 s9 coefficient base, UO8
@@ -3489,8 +3504,11 @@ std::optional<EnvelopeProgram> build_gs(const std::string& mnemonic,
   program.probe = true;
   // SIO reads/rotates return channel-file content not oracle-able
   // (launch-state dependent); observe mode records without failing.
-  // v_emit2/3 clobber the emit-index VGPR with the descriptor side effect
-  // before the payload copy (contract doc 38), so they observe too.
+  // v_emit2/3 have no register destination.  kSioEmitRules consumes
+  // PJ2, VJ8, GK11, GA11 in that order, so the operand the carrier stores (v8)
+  // is VJ8 - the separator selector - not GK11 (the emit index, s0).  The
+  // instruction's descriptor side effect overwrites that separator VGPR; the
+  // emitted stream itself is not observable here, so the rows observe.
   //
   // [N2 2026-11-03] siowrite/siowrite_imm were the family's only two
   // exceptions, and the exception was the defect: a write's destination is the
@@ -3502,7 +3520,8 @@ std::optional<EnvelopeProgram> build_gs(const std::string& mnemonic,
     program.observe = true;
     program.observe_reason =
         sio ? "SIO channel-file content is not oracle-able"
-            : "emit-index VGPR clobbered by the descriptor side effect";
+            : "the emit's descriptor side effect overwrites the separator "
+              "VGPR (VJ8); the emit index is GK11 and no register result exists";
   }
   std::uint32_t off = carrier::kResultBase;
   for (std::size_t ci = 0; ci < rows.size(); ++ci) {
@@ -3641,6 +3660,13 @@ std::optional<EnvelopeProgram> build_gs(const std::string& mnemonic,
   // SIO encodings collide with VOP1/SOP2 forms in the open decoder
   // (siordrot == s_add_u32 slot), so skip the round-trip check here.
   if (!link_program_no_rr(builder.lines, program, error)) return std::nullopt;
+  // link_program_no_rr is the only builder path that skips finalize_program(),
+  // and finalize_program() is the only place that publishes the register
+  // high-water mark.  Without this the compute kernel descriptor declares
+  // max(0, kComputeLaunchSgprs)=14 SGPR and max(0, 1)=1 VGPR while this
+  // program stages through s24 and stores through v26:v27.
+  program.sgpr_high_water = builder.sgpr_high;
+  program.vgpr_high_water = builder.vgpr_high;
 
   Builder fsb;
   const std::uint32_t kColor[4] = {0x3e4ccccdu, 0x3ecccccdu,

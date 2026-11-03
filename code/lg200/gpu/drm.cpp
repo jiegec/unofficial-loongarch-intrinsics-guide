@@ -891,7 +891,8 @@ PsSubmitReport submit_gs(const PsSubmitRequest& request) {
       carrier::PsControlPacket::ShaderStage::Gs, 4, gs_bytes, 8,
       carrier::PsControlPacket::stage_program_address(
           carrier::PsControlPacket::ShaderStage::Gs),
-      0x100000100ull, 0x100000456ull, 0x100000a00ull);
+      0x100000100ull, 0x100000456ull, 0x100000a00ull,
+      0, 0, 0x00004020ull);  // SGPR size 32 (the GS program uses s24), VGPR size 64
   // probe-proven GS stage config: kShaderConfigGsEnable = 1<<3 only;
   // the template baseline (0x24 DS-as-VS) is preserved as-is.
   p.set_stage_config(1u << 3);
