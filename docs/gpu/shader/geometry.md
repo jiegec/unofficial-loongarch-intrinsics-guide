@@ -203,7 +203,7 @@ array sizes:
 ```text
 G = max(number of declared distance output groups,
         ceil((clip_distance_array_size + cull_distance_array_size) / 4))
-point_size_group = 1 for a multi-vertex stage that writes PointSize; else 0
+point_size_group = 1 if the stage writes PointSize; else 0
 distance_offset = 8 channels, when G > 1 or point_size_group = 1
                   4 channels, otherwise
 P = next_power_of_two(distance_offset / 4 + G), when G > 0
@@ -213,6 +213,9 @@ point_size_offset = 4 channels
 
 Point size uses the miscellaneous quad immediately after position. A second
 distance group also requires this quad even when point size is absent.
+The reservation also applies to `max_vertices = 1`: omitting it lets the
+point-size write at offset 4 overwrite the first distance group. A negative
+distance can then become a positive point size and incorrectly survive clipping.
 Position-size and varying-row layout then depend on the record class. This is
 the implemented decision table, not a claim that every input is admitted by
 hardware:
@@ -242,6 +245,19 @@ writes clip-distance values to the SIO1 varying plane when fragment
 interpolation consumes them. The channel and descriptor quantities are separate:
 window width is measured in channels, while descriptor values name staged
 records.
+
+When point size and distances are both present, the shared host ABI declares
+`Output Clip Distance Count = 4*ceil(C/4)`, where `C` is the logical merged
+clip/cull payload count. Otherwise it declares `C`. This is a physical record
+count: the emitter writes all four components of each distance group and uses
+zero for components without a shader value. Clip-plane enables, cull counts,
+and fragment input array sizes retain their logical values. Padding therefore
+adds neither an enabled plane nor a fragment input. With the current point-size
+record plan, advertising 1, 2, or 3 instead of the initialized quad loses point
+vertices even when clipping is disabled; advertising 4 repairs the same binary
+and record dimensions. This observation establishes the required producer/
+consumer contract for this plan; it does not establish a different, more densely
+packed record format.
 
 ## Staging registers and static site capacity
 
@@ -325,9 +341,10 @@ still be refused when its LG200 record cannot be represented.
   Targeted readback and `render_different_content` regressions pass; arbitrary
   per-layer output counts and the full primitive-cut protocol remain unproven.
   Replaying layers is a driver policy, rather than a native layer ABI.
-* Point size combined with a single clip distance still fails the static and
-  runtime point probes. Four- and eight-distance combinations pass, so those
-  results must not be generalized to a smaller distance payload.
+* Point-size distance records now declare initialized distance quads, and a
+  single emitted vertex reserves the same miscellaneous quad as multiple
+  vertices. Focused probes cover 1–8 distances and static/runtime point output;
+  arbitrary record capacities and divergent emission remain unproven.
 * Divergent loop-carried clip/cull outputs, transform feedback, and the complete
   SIO1 record-capacity boundary need
   additional direct probes and full CTS coverage.
@@ -356,7 +373,9 @@ conformance.
 |-------|-------|--------|
 | Point-record pixel probes | 110 cases: 3-32 emits, 0/1/2/3/5 varying planes, point size off/on | 110 pass |
 | Multi-site and width probes | 30 deterministic site/attribute cases | 30 pass |
-| Distance output probes | 12 cases: 1/4/8 distances, static/runtime point and triangle output | 10 pass, 2 fail; both failures are single-distance point output with point size enabled, using static/runtime emission |
+| Distance output probes | 12 cases: 1/4/8 distances, static/runtime point and triangle output | 12 pass after matching the physical distance count to the point-size record |
+| Distance record boundary probes | 16 cases: 1–4 distances, clip enable off/on, fragment distance read off/on; 24 cases: 1–8 distances, point size off/on and static/runtime point output | 40 pass; the first matrix previously had 12 failures |
+| Single-vertex point records | 7 cases: no distances or 1/4/8 distances, positive/negative distance, with point-size footprint checks | 7 pass; reserving the miscellaneous quad repairs the negative 1/4-distance cases |
 | Piglit geometry corpus | 37 cases | 24 pass, 1 fail (`max-input-components`), 12 skip |
 | Vulkan CTS geometry matrix | 199 cases | 179 pass, 10 fail, 10 NotSupported, no GPU fault in this matrix |
 | Vulkan CTS clip/cull matrix | 64 `vert_geom` cases, static/dynamic indexing, with/without fragment distance reads | 64 pass, no GPU fault |
