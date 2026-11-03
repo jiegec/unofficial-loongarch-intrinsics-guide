@@ -67,15 +67,15 @@ ticks; `bench_ns.py` derives `lat_ns`/`tp_ns`.
 
 ## 5. Coverage
 
-**497 OK / 271 SKIP of 768.**  The SKIPs are not one thing:
+**531 OK / 237 SKIP of 768.**  The SKIPs are not one thing:
 
 | split | rows | meaning |
 |---|---|---|
-| SKIP and correctness **SKIP** | 84 | the carrier itself refuses them (descriptor / sampler / texture) |
-| SKIP for any other reason | 187 | the bench lacks a template |
+| SKIP and correctness **SKIP** | 185 | the carrier itself refuses them (descriptor / sampler / texture) |
+| SKIP for any other reason | 52 | the bench lacks a template |
 
-The 84 are the **stable** side of that split: they are the carrier own
-refusal (SKIP-ENVELOPE), which holds whatever else the matrix says.  The 187 are
+The 185 are the **stable** side of that split: they are the carrier own
+refusal (SKIP-ENVELOPE), which holds whatever else the matrix says.  The 52 are
 everything else the bench skips.
 
 **Cross-checked against the correctness path on 2026-10-13**, joining the carrier's
@@ -378,11 +378,11 @@ A family template therefore has to do one of two things: derive the classes from
 the rows layout instead of from a decoded variant, or give the family variant
 entries.  Either way the template is what is missing; the reason string names the
 first symptom.
-610 is 497 (the last hardware run's OK) plus the eight flat load rows, the 24 flat atomic rows and the 26 shared-memory
-atomic rows, the 24 buffer atomic rows the 7 shared-memory load rows the 11 store rows the 4 plain buffer store rows the two 32-bit cmpswap rows, the six shared-memory cmpswap rows and the five
-scalar flat load rows this work added - i.e. the offline number and the device number agree, which is
-what makes it usable as a target before a session.  The reasons are the same
-per-family gaps the sections above describe.
+610 is the offline buildable count and 531 the last hardware run's OK; the difference is the
+per-family templates added after that run, listed in the sections above.  The offline number
+is what a session should reach, and the two are not expected to agree between runs - which is
+why the bench page quotes both.  The reasons are the same per-family gaps the sections above
+describe.
 
 ## 6. Reference values and cross-check
 

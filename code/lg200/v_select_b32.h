@@ -1,4 +1,4 @@
-// v_select_b32 -- Selects one of two 32-bit lane values under a per-lane condition: `d = c ? A : b`.
+// v_select_b32 -- Selects one of two 32-bit lane values under a per-lane condition: `d = c ? A : b`. The vector destination is `VD8`, the two values are `GJ11` and `GK11`, and the condition is `GA11` - a general source selector, so it names an ordinary scalar register (the canonical form stages it in `s0`) or a lane-mask register.
 //
 // A is src[0], b is src[1], and c is src[2] - the GA11 operand, a general
 // source selector, so it names either an ordinary scalar register (the

@@ -86,7 +86,7 @@ def main():
                 int(c['parameter_mask_lo'], 16) == int(e['parameter-mask-inst-lo'], 16) and
                 int(c['parameter_mask_hi'], 16) == int(e['parameter-mask-inst-hi'], 16) and
                 int(c['ignored_mask_hi'], 16) == int(e['print-ignored-mask-inst-hi'], 16) and
-                int(c['reserved_mask_hi'], 16) == int(e['unresolved-mask-inst-hi'], 16) and
+                int(c['reserved_mask_hi'], 16) == int(e.get('undefined-mask-inst-hi') or e.get('unresolved-mask-inst-hi'), 16) and
                 c['operand_layout'] == layout and c['operand_signature'] == sig)
         print(f"   {'OK ' if same else 'DIFF'} {m:6s} value={c['inst_hi']} layout={layout[:46]}")
         bad += 0 if same else 1

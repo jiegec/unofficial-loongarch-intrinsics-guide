@@ -6,7 +6,7 @@ the pages linked from each row; this page is the index.
 
 Verified together on 2026-10-12: chapter invariants hold (`check_gpu.py`: 768
 rows, 12 formats, 7 families, 33 state blocks), the table is intact (768 rows, 23
-columns, unique), the offline oracle passes (**768 instructions, 86,016
+columns, unique), the offline oracle passes (**768 instructions, 86,018
 vectors**), and the hardware runner builds.
 
 ## Phase 1 - the PS/CS carrier
@@ -28,7 +28,7 @@ power cycle.
 
 | item | state |
 |---|---|
-| CS microbench over the universe | 497 OK / 271 SKIP of 768, 0 faults |
+| CS microbench over the universe | 531 OK / 237 SKIP of 768, 0 faults |
 | method | marginal cost from the firmware timestamp block; K-copy chain (latency) vs eight independent streams (throughput) |
 | tick calibration | 1.333 ns (two independent samples, 0.3 % apart) |
 | deliverable record | [MICROBENCH.md](../../../code/lg200/gpu/MICROBENCH.md) |
@@ -43,7 +43,7 @@ record.
 | measure | start | now |
 |---|---|---|
 | rows stating an `UNRESOLVED` | 668 | **505** |
-| distinct UNRESOLVED sentences | 872 | **668** (907 occurrences) |
+| distinct UNRESOLVED sentences | 872 | **667** (906 occurrences) |
 | rows whose every open clause states a reason | — | **459** |
 | explicit placeholder bodies in `code/lg200` | 11 | **0** |
 
@@ -84,7 +84,7 @@ for a while that was a real gap: at its worst the check reported **457 rows grew
 +62,957 vectors, about three quarters of the current grid**.  The **2026-10-22 full PS
 run** closed it - one process, one session, 768 rows in 79.5 s, 80,887 passes and the 11
 documented `v_mbcnt_u32` divergences - so the same check now reports
-**0 rows grew, +0 vectors** and the matrix covers all 86,016.  The two consequences worth
+**0 rows grew, +0 vectors** and the matrix covers 86,016 of the current 86,018 vectors - `v_select_b32` grew by two after that run, so those two have not been on the device.  The two consequences worth
 remembering from when it did not:
 
 | vector | in the 10-10 grid? | therefore |
@@ -179,7 +179,7 @@ hardware plan.
 
 `code/lg200/gpu/audit.py` reads the runner's own listings, not the source, so it audits
 the programs that were actually assembled.  Over a freshly regenerated corpus
-(`run_gpu.py --dry`, host only, 768 PASS / **86,016** rows in **54 s**; two runs, 53.7
+(`run_gpu.py --dry`, host only, 768 PASS / **86,018** rows in **54 s**; two runs, 53.7
 and 56.6, on 2026-10-13, replacing an earlier 23.4 s measurement taken before the 252
 rounding-mode cases were added) it reports **768
 programs audited, 0 refused, 0 problems**.

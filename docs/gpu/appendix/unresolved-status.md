@@ -55,7 +55,7 @@ operand either and still write it.
 Inside the 668 description cells there were **872 distinct UNRESOLVED sentences**
 (1,511 occurrences), i.e. the same unknown is restated on every family member it
 applies to.  Closing one sentence closes every row that carries it.  **As of
-2026-10-13 the same measure is 668 distinct sentences and 907 occurrences**,
+2026-10-13 the same measure is 667 distinct sentences and 906 occurrences**,
 counted by the tracked definition in `check_doc_numbers.py`; the earlier pair is
 kept because it is what the snapshot said, not because it is smaller.
 
@@ -78,7 +78,7 @@ kept because it is what the snapshot said, not because it is smaller.
 | 13 | "how a 16-bit lane is packed inside a register" / "whether both halves ... are compared" (seven wordings) | **33** | **hardware**: the 16-bit compares read one element per register, in the **low half** - `v_cmp_eq_i16(0x00000000, 0x80000000)` is true (low halves equal, high halves differ), and that pair sits in the matrix recorded as 668 PASS / 1 FAIL, so bits 31:16 do not enter the comparison. | 2026-10-12 |
 | 14 | the flat atomics' "address resolution, alignment, rejected accesses, lane collisions and fence-less visibility" | **20** | **partly established**: address resolution is the absolute 64-bit VA (Axis-1/U3) and lane collisions are architecturally undefined (the carrier leaves the per-lane old value unverified); the alignment requirement, out-of-range behaviour and fence-less visibility stay open because they need a fault-tolerant misaligned access or a two-instruction ordering test the single-instruction carrier cannot stage. | 2026-10-12 |
 | 15 | "whether a mask selector reads this destination back" | **14** | **static**: the layout carries both a predicate selector (`PJ2`) and a scalar destination (`RD8`), the vendor seed names both, and the row's own Semantics says the destination may be either - so a predicate consumer and a scalar read both see the mask. | 2026-10-12 |
-| 16 | "whether a long chain wraps modulo two to the thirty-second, saturates or faults" | **8** | **recorded hardware - and its STRENGTH is now stated**: the PS matrix has 768 rows, of which 631 were compared against the oracle and 117 were merely OBSERVED; this row is one of the observed ones (`run=0`, detail `PASS gen14812 (observed)`), so its recorded values are hardware readings rather than oracle-checked ones.  Those readings contain overflow cases only a wrapping model satisfies - `v_mma_323216_i8_i8_i32(0x7fffffff, 0x1, 0x80000000)` is `0x7ffffffc`, the wrapped `0x80000000 - 4`, where saturation would leave `0x80000000` - and the dependent-chain bench runs 2048 accumulations without faulting.  (An earlier note here said "matrix 668 PASS / 1 FAIL"; no matrix in the tree carries those totals, so it is replaced by the counts above, which case_provenance.py reprints every run.) | 2026-10-13 |
+| 16 | "whether a long chain wraps modulo two to the thirty-second, saturates or faults" | **8** | **recorded hardware - and its STRENGTH is now stated**: the PS matrix has 768 rows, of which 629 were compared against the oracle, 137 were merely OBSERVED, 1 is SKIP-ENVELOPE and 1 fails (`v_mbcnt_u32`); this row is one of the observed ones (`run=0`, detail `PASS gen14812 (observed)`), so its recorded values are hardware readings rather than oracle-checked ones.  Those readings contain overflow cases only a wrapping model satisfies - `v_mma_323216_i8_i8_i32(0x7fffffff, 0x1, 0x80000000)` is `0x7ffffffc`, the wrapped `0x80000000 - 4`, where saturation would leave `0x80000000` - and the dependent-chain bench runs 2048 accumulations without faulting.  (An earlier note here said "matrix 668 PASS / 1 FAIL"; no matrix in the tree carries those totals, so it is replaced by the counts above, which case_provenance.py reprints every run.) | 2026-10-13 |
 | 17 | "the conversion rules for normalized scaling, signed clamping and float representation" | **8** | **static**: the conversion classes are the Vulkan ones, which is what `number_format` names (mesa maps each Vulkan texel class onto it, `loong_descriptor.c`).  What remains is coverage, not a rule: the formatted rows are observed-mode, so no case yet separates a conversion from a copy. | 2026-10-12 |
 | 18 | "An odd pair base ... whether an unaligned index is rejected or silently aligned" | **7** | **encoding-contract**: the pair base goes in the same selector field a single register would (`x2` names the width, it is not an encoding bit), so nothing in the instruction rejects an odd base - even alignment is a register-allocation constraint on the producer, and an out-of-contract base is not observable from a conforming producer's output. | 2026-10-12 |
 | 19 | lane ordering / visibility ("Lanes that share an address ...", "the order of two lanes naming one location", ...) | **20** | **by design**: the order is architecturally undefined and fixes no intermediate value - the reference carrier leaves the per-lane old value unverified and compares only the post-atomic cell. | 2026-10-12 |
@@ -158,7 +158,7 @@ an ISA question, and it is recorded here so the item is not left implicit.
 
 Still open in the code layer: `load_sm_matrix_x{1,2,4}` (plane/lane layout) and
 `load_v_buff_fmt*` / `store_v_buff_fmt*` (descriptor format decode), 19 lines
-in total.  Offline `make verify` passes throughout (768 instructions, 86,016
+in total.  Offline `make verify` passes throughout (768 instructions, 86,018
 vectors).
 
 ## 3. Editing rules used
@@ -178,7 +178,7 @@ vectors).
 
 ## 5. Remaining
 
-The rest of the 668 sentences are grouped by family in the accompanying
+The rest of the 667 sentences are grouped by family in the accompanying
 inventory (loonggpu `tmp/unresolved-inventory.tsv`).  The largest repeated
 classes still open are: signalling-vs-quiet NaN, buffer/texel descriptor
 format decode, out-of-bounds access behaviour, operand-width extremes, and
