@@ -12,7 +12,6 @@ plugins:
       include_dir: code
   - glightbox
   - llmstxt:
-      link: /unofficial-loongarch-intrinsics-guide/llms.txt
       sections:
         Unofficial LoongArch Intrinsics Guide:
         - "*.md"
