@@ -6,9 +6,11 @@
 // namespace is launch-owned state - the group id (s11-s13), the local id
 // (v0-v2) and the sizes, offsets and dimensions the kernarg block carries.
 //
-// The body is a deliberate passthrough, not a placeholder: the hardware result
-// is launch-owned state the offline oracle cannot synthesise, so the runner
-// stages the value under test as the case input and this reference copies it -
-// the same observed-mode contract the memory carriers use.
+// The body names no value, and unlike the memory carriers it cannot: getreg has
+// NO data source, so there is nowhere to stage a value under test and no case
+// input can reach the result.  The earlier passthrough said the runner stages the
+// value as the case input; that was never true of this row - the control carrier
+// stages nothing for it and reads nothing back.  Its evidence is the control
+// sentinel only.
 
-dst[0] = src[0];
+dst[0] = 0u;

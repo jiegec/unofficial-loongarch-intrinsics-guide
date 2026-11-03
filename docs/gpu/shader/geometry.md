@@ -105,6 +105,16 @@ to both the interval allocator and the fallback instruction walk. LCO regression
 tests cover appended emit preheaders, loop-carried values, and backward layout
 edges in acyclic control flow.
 
+A destructive two-address instruction, such as `v_mac_f32`, requires its
+addend and destination to occupy the same register at execution. This does not
+permit the allocator to discard the original addend if it remains live. The
+source and destination may share storage only when the source's final read is
+that instruction; otherwise the compiler copies the addend into the destination
+before the instruction. A single textual read inside a loop can execute many
+times, so a loop-invariant source must survive the back edge. Violating this
+contract displaced and stretched the geometry in three instancing CTS cases;
+it was independent of the SIO strip-cut protocol.
+
 ## Ordering and execution masks
 
 `check` waits for work already issued in the domains selected by
@@ -354,10 +364,19 @@ conformance.
 The aggregate geometry result above predates the null-position correction.
 Subsequent targeted checks pass nine previously failing layered cases in three
 separate processes each, and twelve prefix-sensitive secondary-command-buffer
-cases in three processes each. Three cases with varying per-invocation emit
-counts still fail. These focused results do not replace the aggregate matrix
-with an inferred total. Previously isolated secondary-command-buffer cases
-continue to be included in validation.
+cases in three processes each. A subsequent two-address lifetime correction
+passes `output_vary_by_attribute_instancing`, `output_vary_by_uniform_instancing`,
+and `output_vary_by_texture_instancing` five times each in separate processes.
+These focused results do not replace the aggregate matrix with an inferred
+total, or establish arbitrary divergent invocation emission.
+
+Layered rendering still has an intermittent VM fault. A later focused sequence
+recorded 29 passes before
+`layered.cube_array.64_64_12.secondary_cmd_buffer_inherit_framebuffer` faulted
+at unmapped address `0x200004100`. Device recovery and its health control failed,
+so remaining cases were not executed. Producer and driver causality remain
+`UNRESOLVED`. Previously isolated secondary-command-buffer cases remain in the
+validation backlog; successful pixel comparisons do not establish fault freedom.
 
 The earlier timeout in
 `dEQP-VK.clipping.user_defined.clip_cull_distance_dynamic_index.vert_geom.1_7`

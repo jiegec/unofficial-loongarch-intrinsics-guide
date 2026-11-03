@@ -1214,6 +1214,9 @@ std::optional<EnvelopeProgram> build_generic(
     // class: that field is an output as well as the carry-in a case stages, so
     // the pair it names holds the second result word after the target runs.
     bool has_vcc_dst = false;
+    // Set when a scalar compare's own destination register is what the readback
+    // stores; the s_select materialisation must then be skipped.
+    bool has_scalar_cmp_dst = false;
     std::uint32_t scc_borrow = 0;
     bool scc_staged = false;
     if (is_mma) {
@@ -1297,7 +1300,23 @@ std::optional<EnvelopeProgram> build_generic(
         }
         case isa::FieldSem::ScalarCmp8:
           if (rule.is_output) {
-            operands.push_back(isa::op_reg(isa::scc_reg()));
+            // [N2 2026-11-03] The field encodes the condition register (0x80)
+            // or an ordinary scalar register, and the row's own model states a
+            // VALUE in the destination.  Forcing SCC made the carrier
+            // materialise that value with s_select(0xffff, 0) - the oracle's own
+            // constant - so the word the readback graded was the carrier's,
+            // selected by the hardware predicate.  The two 64-bit rows take a
+            // real scalar destination (the driver's own template .002,
+            // "s_cmp_eq_u64 s2, s[4:5], s[6:7]", is that shape), so the graded
+            // word is the one the instruction wrote.
+            if (is_u64cmp) {
+              dst_sgpr = isa::sgpr(8, width);
+              operands.push_back(isa::op_reg(dst_sgpr));
+              has_sgpr_dst = true;
+              has_scalar_cmp_dst = true;
+            } else {
+              operands.push_back(isa::op_reg(isa::scc_reg()));
+            }
           } else {
             error = "unreachable scalar-cmp source";
             return std::nullopt;
@@ -1372,7 +1391,7 @@ std::optional<EnvelopeProgram> build_generic(
           return std::nullopt;
       }
     }
-    if (is_implicit_scc_family(spec->mnemonic)) {
+    if (is_implicit_scc_family(spec->mnemonic) && !has_scalar_cmp_dst) {
       append_implicit_scc_op(builder, spec->mnemonic, std::move(operands));
       has_sgpr_dst = true;
       dst_sgpr = isa::sgpr(8);
@@ -3152,12 +3171,18 @@ std::optional<EnvelopeProgram> build_gs(const std::string& mnemonic,
   // (launch-state dependent); observe mode records without failing.
   // v_emit2/3 clobber the emit-index VGPR with the descriptor side effect
   // before the payload copy (contract doc 38), so they observe too.
-  if ((sio && mnemonic != "siowrite" && mnemonic != "siowrite_imm") ||
-      emit) {
+  //
+  // [N2 2026-11-03] siowrite/siowrite_imm were the family's only two
+  // exceptions, and the exception was the defect: a write's destination is the
+  // STREAM, not a register (VJ8 and VK8 are both sources and the machine row has
+  // no destination field), so the word stored after the instruction is the very
+  // word staged into v8 before it - the 3/3 PASS compared the case input with
+  // itself.  They observe with the rest of the family.
+  if (sio || emit) {
     program.observe = true;
-    program.observe_reason = sio && mnemonic != "siowrite" && mnemonic != "siowrite_imm"
-                                ? "SIO channel-file content is not oracle-able"
-                                : "emit-index VGPR clobbered by the descriptor side effect";
+    program.observe_reason =
+        sio ? "SIO channel-file content is not oracle-able"
+            : "emit-index VGPR clobbered by the descriptor side effect";
   }
   std::uint32_t off = carrier::kResultBase;
   for (std::size_t ci = 0; ci < rows.size(); ++ci) {
@@ -3598,8 +3623,12 @@ std::optional<EnvelopeProgram> build_carrier_env(
       // 0x3f4fffff - the canary - on BOTH pipes, so the store never writes the
       // result and the row cannot be compared until that staging is fixed.
       mnemonic == "v_add_imm_i32" || mnemonic == "v_sub_imm_i32" ||
-      mnemonic == "v_perm_sm_b32" || mnemonic == "v_bperm_sm_b32" ||
-      mnemonic == "s_cmp_eq_u64" || mnemonic == "s_cmp_ne_u64";
+      // [N2 2026-11-03] s_cmp_eq_u64/s_cmp_ne_u64 are no longer here: their
+      // destination is a scalar register the carrier now names and stores
+      // (FieldSem::ScalarCmp8 in build_generic), so the compare is a comparison
+      // again.  The bucket reason named no mechanism for them, and while they
+      // sat in this group the branch compared no word at all.
+      mnemonic == "v_perm_sm_b32" || mnemonic == "v_bperm_sm_b32";
   if (launch_state) {
     p->observe = true;
     // The group is broad; the reason is not.  Name the mechanism the comment

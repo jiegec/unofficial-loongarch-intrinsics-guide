@@ -1,8 +1,9 @@
 // jpop -- Pops a control-flow record from the jump stack and resumes the path it describes.
 //
-// The semantics is the line above.  The body below is the register-level
-// reduction the per-lane reference can express: the jump stack is control flow,
-// which a per-lane value oracle does not model, so this row is run in observed
-// mode rather than compared.
+// The row has NO destination field: RA8 carries the record, X2_23 the encoded
+// position, X0_1 and X1_8 complete it and PJ2 is the mask selector, so no case
+// word can be a result and this reference returns none.  The GPU row's evidence
+// is the control carrier's sentinel: the launch reaches the instruction and the
+// balanced pair returns control to the post store.
 
-dst[0] = src[0];
+return true;

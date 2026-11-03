@@ -6711,6 +6711,13 @@ inline constexpr SemanticsTuple kSemanticsTuples[] = {
   {"v_cmp_tru_i64", "GK11", 2u},
   {"v_cmp_tru_u64", "GK11", 2u},
   {"v_cmp_u_f64", "GK11", 2u},
+  // [N2 2026-11-03] v_cmpclass_f64's value operand is an f64 pair, like every
+  // other f64 predicate row (v_cmp_eq_f64 and its twelve siblings all carry
+  // GJ11=2u here).  Its class set is one word - the vendor's own template prints
+  // that operand as "v0", not "v[0:1]" - so GK11 stays 1.  Without this entry
+  // the emitter staged the case's second input word into the CLASS-SET register
+  // and never staged the class set at all.
+  {"v_cmpclass_f64", "GJ11", 2u},
   {"v_fcvt_f32_f64", "GJ11", 2u},
   {"v_fcvt_f64_f32", "VD8", 2u},
   {"v_fcvt_f64_i32", "VD8", 2u},

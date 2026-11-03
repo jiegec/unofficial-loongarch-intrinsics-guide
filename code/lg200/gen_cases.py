@@ -358,6 +358,16 @@ def main() -> int:
         # A 64-bit operand is a word pair in every family, including the b64
         # atomics whose names carry no type token.
         pfmt = fmt if fmt in ("f64", "i64", "u64", "b64") else ""
+        # [N2 2026-11-03] v_cmpclass_f64 is a pair AND a word: the value is an
+        # f64 pair (GJ11x2) and the class set a 32-bit bitmask (GK11).  The pair
+        # grid is kept whole so the row loses no coverage; only the class set's
+        # second word - which this row never had - is dropped.
+        if mnemonic == "v_cmpclass_f64" and nin == 3:
+            for row in grids(pair_list(mnemonic), 2):
+                words = flat(row)
+                out.append(mnemonic + "\t" + FP_POLICY + "\t" +
+                           " ".join(hex(v) for v in words[:3]))
+            continue
         if pfmt and nin % 2 == 0 and nin > 0:
             plist = pair_list(mnemonic) if pfmt == "f64" else INT_PAIRS
             for row in grids(plist, nin // 2):
