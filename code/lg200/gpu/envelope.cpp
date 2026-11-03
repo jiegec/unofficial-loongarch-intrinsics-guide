@@ -3930,35 +3930,44 @@ std::optional<EnvelopeProgram> build_carrier_env(
   const bool launch_state =
       mbcnt_wide || (flat_family && !flat_compare) ||
       mnemonic.rfind("load_sm_matrix_", 0) == 0 ||
-      // [HW 2026-11-03] the four fmtdesc loads left this bucket and now compare
-      // on both pipes, 5/5 each: they were observed because the graphics launch
-      // hydrates s4-s7 from the packet and that is not the descriptor these rows
-      // test.  build_buff assembles the four words on both pipes for them now
-      // (see own_desc).  The fmtinst rows stay: they read their own constant for
-      // every staged datum, and the descriptor assembly did not change that.
-      //
-      // load_v_buff_i8 / load_v_buff_u8 are a different failure and stay too:
-      // compared under the same descriptor they read back 0x3f4fffff - the
-      // result cell's canary - on every vector, so nothing was stored at all and
-      // the width question is not yet reachable.
+      // [HW 2026-11-03] The whole buff bucket left here, because the mechanism it
+      // recorded was an encoding defect: eighteen buffer rows had bit 27 clear
+      // in their instruction word (0x21xxxxxx where the family is 0x29xxxxxx),
+      // so the hardware did not decode them at all and the destination kept
+      // whatever the previous program left there.  That is why they "read a fixed
+      // plane pattern" and why the readback changed between runs.  The catalog
+      // and the codec table now set the bit, and the rows compare.
+      // What is LEFT of the formatted buff bucket after the bit-27 repair, and
+      // the split is measured: the single-dword forms now compare and pass
+      // (load_v_buff_fmtdesc_c1 5/5, store_v_buff_fmtdesc_c1 3/3, the byte loads
+      // 14/14), while every multi-dword or format-instruction form still fails
+      // exactly 2 of its 3 vectors on both pipes - a different defect, in the
+      // format fields, and it is not what the encoding fix was about.
       mnemonic.find("_fmtinst_") != std::string::npos ||
-      // The formatted STORES stay observed: they were never compared, and the
-      // descriptor work above did not touch their path.
-      mnemonic.rfind("store_v_buff_fmtdesc_", 0) == 0 ||
       mnemonic == "load_v_buff_fmtdesc_c2" ||
       mnemonic == "load_v_buff_fmtdesc_c3" ||
       mnemonic == "load_v_buff_fmtdesc_c4" ||
-      mnemonic == "load_v_buff_i8" || mnemonic == "load_v_buff_u8" ||
+      mnemonic == "store_v_buff_fmtdesc_c2" ||
+      mnemonic == "store_v_buff_fmtdesc_c3" ||
+      mnemonic == "store_v_buff_fmtdesc_c4" ||
       mnemonic == "store_v_buff_b8" || mnemonic == "getlod" ||
-      mnemonic == "getresinfo" ||
-      // [HW 2026-11-03] load_v_tex_mip is NOT in this group: its case vectors
-      // are "the value of texel i", and it reads them - 8 of 8 compare equal
-      // on both pipes.  The rows that stay here are the ones whose fetch is
-      // driven by an S# the carrier never stages (build_tex passes sdesc=null)
-      // or by a derivative window: load_v_tex, load_v_tex_pck(_sgn) and the
-      // mip_pck forms read a constant 0x3fe00000 for every texel.
-      (mnemonic.rfind("load_v_tex", 0) == 0 && mnemonic != "load_v_tex_mip") ||
-      mnemonic.rfind("store_v_tex", 0) == 0 ||
+      mnemonic == "getresidinfo" || mnemonic == "getresinfo" ||
+      // [HW 2026-11-03] The texture bucket emptied with the same bit-27 repair
+      // the buff rows got: these rows' instruction words were 0x21xxxxxx, which
+      // the hardware does not decode, so the destination kept the previous
+      // program's value - and the "S# is never staged" sentence in the earlier
+      // note was an inference that four measurements contradict (the six fetch
+      // forms have no sampler operand at all, u-l-i-g says no sampler record is
+      // read, the atomic tex rows share this prelude and pass, and getlod does
+      // stage an S# and still reads a constant).  load_v_tex_mip was the only
+      // row of the family with an anchor, which is why only it worked.
+      //
+      // What stays observed is what is not an encoding question: load_v_tex
+      // (it still reads a window value rather than the staged texel after the
+      // repair), getlod (placeholder model, and the gradient it needs is not in
+      // the case data) and getresinfo (placeholder model, channel mapping
+      // UNRESOLVED).
+      mnemonic == "load_v_tex" ||
       mnemonic == "v_sqrt_f64" || mnemonic == "v_rsq_f64" ||
       mnemonic == "v_s2v_b32" ||
       // [HW 2026-11-03] v_add_imm_i32 and v_sub_imm_i32 belong here for a
