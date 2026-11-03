@@ -1967,6 +1967,10 @@ std::optional<EnvelopeProgram> build_lds(const std::string& mnemonic,
   builder.exit();
 
   if (!finalize_program(builder, program, error)) return std::nullopt;
+  if (program.shared_bytes == 0 &&
+      program.listing.find("_sm_") != std::string::npos) {
+    program.shared_bytes = 4096;
+  }
   return program;
 }
 // load/store/atomic_v_flat through a 64-bit flat address.  The address VGPR
@@ -2243,6 +2247,10 @@ std::optional<EnvelopeProgram> build_flat(const std::string& mnemonic,
   builder.exit();
 
   if (!finalize_program(builder, program, error)) return std::nullopt;
+  if (program.shared_bytes == 0 &&
+      program.listing.find("_sm_") != std::string::npos) {
+    program.shared_bytes = 4096;
+  }
   return program;
 }
 
@@ -2946,6 +2954,10 @@ std::optional<EnvelopeProgram> build_smem(const std::string& mnemonic,
   builder.nop();
   builder.exit();
   if (!finalize_program(builder, program, error)) return std::nullopt;
+  if (program.shared_bytes == 0 &&
+      program.listing.find("_sm_") != std::string::npos) {
+    program.shared_bytes = 4096;
+  }
   return program;
 }
 
@@ -3719,6 +3731,10 @@ std::optional<EnvelopeProgram> build_cs_mask_probe(unsigned variant,
   bc.expected = {kMagic};
   program.cases.push_back(std::move(bc));
   if (!finalize_program(builder, program, error)) return std::nullopt;
+  if (program.shared_bytes == 0 &&
+      program.listing.find("_sm_") != std::string::npos) {
+    program.shared_bytes = 4096;
+  }
   return program;
 }
 
@@ -3871,6 +3887,10 @@ std::optional<EnvelopeProgram> build_cs_divergent_check_probe(unsigned variant,
   builder.nop();
   builder.exit();
   if (!finalize_program(builder, program, error)) return std::nullopt;
+  if (program.shared_bytes == 0 &&
+      program.listing.find("_sm_") != std::string::npos) {
+    program.shared_bytes = 4096;
+  }
   return program;
 }
 
@@ -3964,6 +3984,10 @@ std::optional<EnvelopeProgram> build_cs_matrix_probe(unsigned variant,
   // 64 dwords of shared memory are staged and read through the matrix forms.
   program.shared_bytes = 512;
   if (!finalize_program(builder, program, error)) return std::nullopt;
+  if (program.shared_bytes == 0 &&
+      program.listing.find("_sm_") != std::string::npos) {
+    program.shared_bytes = 4096;
+  }
   return program;
 }
 
@@ -4053,6 +4077,10 @@ std::optional<EnvelopeProgram> build_cs_mask_lifetime_probe(unsigned variant,
   // Class 3 and the mixed chain stage one cell in shared memory.
   if (klass == 3 || klass == 7) program.shared_bytes = 512;
   if (!finalize_program(builder, program, error)) return std::nullopt;
+  if (program.shared_bytes == 0 &&
+      program.listing.find("_sm_") != std::string::npos) {
+    program.shared_bytes = 4096;
+  }
   return program;
 }
 
@@ -4631,6 +4659,10 @@ std::optional<EnvelopeProgram> build_cs_pj2_probe(unsigned variant,
   EnvelopeProgram program;
   program.probe = true;
   if (!finalize_program(builder, program, error)) return std::nullopt;
+  if (program.shared_bytes == 0 &&
+      program.listing.find("_sm_") != std::string::npos) {
+    program.shared_bytes = 4096;
+  }
   return program;
 }
 
@@ -4667,6 +4699,10 @@ std::optional<EnvelopeProgram> build_cs_probe(std::string& error,
   for (unsigned i = 0; i < 8; ++i) bc.offsets.push_back(4 * i);
   program.cases.push_back(std::move(bc));
   if (!finalize_program(builder, program, error)) return std::nullopt;
+  if (program.shared_bytes == 0 &&
+      program.listing.find("_sm_") != std::string::npos) {
+    program.shared_bytes = 4096;
+  }
   return program;
 }
 
