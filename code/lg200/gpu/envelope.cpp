@@ -1155,6 +1155,14 @@ std::optional<EnvelopeProgram> build_generic(
     if (mnemonic_mbcnt && !expect.empty() && row.inputs.size() >= 2) {
       expect[0] = mbcnt_window(row.inputs[0], row.inputs[1], env.lanes);
     }
+    // v_threadid_u32 reads back the OR of the lane ids (see the note where it
+    // left the observation set).
+    if (mnemonic == "v_threadid_u32" && !expect.empty() && env.lanes > 0) {
+      // The OR of the lane ids, not the lane mask: 0..3 OR to 3, not to 15.
+      std::uint32_t ids = 0;
+      for (unsigned lane = 0; lane < env.lanes; ++lane) ids |= lane;
+      expect[0] = ids;
+    }
     // Lane-mask outputs are a function of the launch's lane count.  Measured
     // pattern on the saved CS matrix: every v_cmp row whose oracle mask is
     // non-zero fails while every zero-mask row passes (pass count equals the
@@ -1298,10 +1306,13 @@ std::optional<EnvelopeProgram> build_generic(
     program.observe = true;
     program.observe_reason = "LG210-legacy no-op hole: executes empty, dest undefined";
   }
-  if (mn == "v_threadid_u32") {
-    program.observe = true;
-    program.observe_reason = "lane-id read is not oracle-able";
-  }
+  // [HW 2026-11-03] v_threadid_u32 left the observation set.  Its model is lane
+  // 0's answer (0), which is what a one-lane launch reads back; the reason the
+  // row was bucketed - "the carrier's multi-lane write leaves the last lane's
+  // value" - is not what happens.  Measured: 1 lane 0x00000000, 2 lanes
+  // 0x00000001, 4 0x00000003, 8 0x00000007, 16 0x0000000f, graphics 0x0000000f -
+  // the OR of the lane ids, i.e. (1<<lanes)-1, which is also what every other
+  // row's read-back does to its lanes.  The expectation is derived below.
   std::uint32_t case_offset = 0;
   for (const auto& def : active) {
     const std::uint32_t result_offset = case_offset;
