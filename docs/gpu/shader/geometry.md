@@ -141,13 +141,38 @@ reviewing wait placement and descriptor reuse.
 
 Full-domain checks do not by themselves establish layered-rendering correctness.
 The composed program also depends on record layout, primitive cuts, layer replay,
-attachment visibility, and host resource lifetime. Intermittent layered readback
-failures remain open; full-domain waits and additional waits immediately after
-runtime emits have both been tested without eliminating them. A fixed sequence
-of separate CTS processes exposes failures after particular preceding geometry
-workloads. Removing the synthetic eight-vertex prefix can make that short
-sequence pass while regressing the broader geometry suite, so neither a passing
-isolated readback nor prefix removal establishes a correct record protocol.
+attachment visibility, and host resource lifetime. Additional waits immediately
+following runtime emits and submissions split between replay layers have not
+eliminated the observed failures.
+
+### Positions retained during layer replay
+
+The implementation replays a dynamic-layer draw against individual attachments.
+It skips some nonmatching emits but retains records needed to prime or advance
+the stream. Such a record must not introduce visible geometry. The runtime
+recipe uses the null homogeneous position `(0, 0, 0, 0)` for all four position
+components when the layer does not match. `(0, 0, 0, 1)` is an ordinary point at
+the Cartesian origin: together with two live strip vertices it can form a
+nonzero-area triangle. A triangle containing a null homogeneous vertex has zero
+projected area. This distinction matters even when all the placeholder vertices,
+considered as a separate primitive, would coincide.
+
+For statically enumerated layer-writing streams, the current compiler also
+prepends eight emits in two four-vertex primitives. Each prefix emit explicitly
+stores the complete null homogeneous position using lowered `store_output` IO.
+An unwritten application output is undefined; a compiler-generated prefix must
+initialize its own position rather than depend on a selector fallback. The
+prefix raises the declared output count by eight, is excluded from transform
+feedback, and is not inserted while emit sites remain inside loops. Removing
+it has regressed other rotating-window shapes. Its presence is an implementation
+workaround, not a requirement imposed on application shaders or a complete
+explanation of the hardware's stream-window protocol.
+
+Targeted LG200 runs with null positions pass the previously failing layered
+readback and differing-content cases, including sequences of separate CTS
+processes. The primitive-cut behavior and arbitrary record-capacity boundaries
+still require independent validation; those results do not establish general GS
+conformance.
 
 ## Geometry output record
 
@@ -286,9 +311,10 @@ still be refused when its LG200 record cannot be represented.
   not proven. The selector's current runtime descriptor path broadcasts an
   ordinal from the first active lane; this does not define a correct shared
   record for divergent invocation counts.
-* Layered readback and some `render_different_content` cases remain failing or
-  intermittent. Replaying layers is a driver policy; it is not part of the
-  hardware geometry ABI established here.
+* Layer replay now initializes retained and synthetic positions explicitly.
+  Targeted readback and `render_different_content` regressions pass; arbitrary
+  per-layer output counts and the full primitive-cut protocol remain unproven.
+  Replaying layers is a driver policy, rather than a native layer ABI.
 * Point size combined with a single clip distance still fails the static and
   runtime point probes. Four- and eight-distance combinations pass, so those
   results must not be generalized to a smaller distance payload.
@@ -325,10 +351,13 @@ conformance.
 | Vulkan CTS geometry matrix | 199 cases | 179 pass, 10 fail, 10 NotSupported, no GPU fault in this matrix |
 | Vulkan CTS clip/cull matrix | 64 `vert_geom` cases, static/dynamic indexing, with/without fragment distance reads | 64 pass, no GPU fault |
 
-The remaining geometry failures include per-invocation dynamic emission,
-some basic varying output cases, and layered rendering. Layered readback remains
-intermittent; a passing retry does not establish a repair. Previously isolated
-secondary command buffer cases are included in the full geometry matrix.
+The aggregate geometry result above predates the null-position correction.
+Subsequent targeted checks pass nine previously failing layered cases in three
+separate processes each, and twelve prefix-sensitive secondary-command-buffer
+cases in three processes each. Three cases with varying per-invocation emit
+counts still fail. These focused results do not replace the aggregate matrix
+with an inferred total. Previously isolated secondary-command-buffer cases
+continue to be included in validation.
 
 The earlier timeout in
 `dEQP-VK.clipping.user_defined.clip_cull_distance_dynamic_index.vert_geom.1_7`
