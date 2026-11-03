@@ -1399,6 +1399,24 @@ std::optional<EnvelopeProgram> build_generic(
     if (is_bitset) stage_bitset_base(builder, def.inputs.at(0));
     std::vector<isa::Operand> operands;
     isa::Reg dst_vgpr = isa::vgpr(10);
+    // [HW 2026-11-03] Experiment knob, not a stable interface: the formatted
+    // rows read a constant for every staged datum, and "the format produces 0"
+    // and "the destination is never written" are the same reading until the
+    // destination is pre-loaded.
+    //
+    // Measured with LGPU_FMT_SENTINEL=1: the sentinel does NOT survive anywhere -
+    // load_v_buff_fmtinst_c1, store_v_buff_fmtinst_c1 and the wide fmtdesc rows
+    // all still read 0x00000000.  So the destination IS written, and what it gets
+    // is a fixed zero: these rows fetch from an address the case offset never
+    // reaches, which is a different defect from the unwritten-destination class
+    // the v_fcvt_* holes turned out to be.  The knob stays because the next
+    // question - which address the fetch does use - needs it.
+    if (std::getenv("LGPU_FMT_SENTINEL") != nullptr &&
+        (mnemonic.find("_fmtinst_") != std::string::npos ||
+         mnemonic.find("_fmtdesc_") != std::string::npos)) {
+      builder.s_mov_imm_b32(imm_temp, 0xdeadbeefu);
+      builder.v_mov_b32(dst_vgpr, imm_temp, isa::predicate(0));
+    }
     if (legacy_noop) {
       builder.s_mov_imm_b32(imm_temp, 0xa5a5a5a5u);
       builder.v_mov_b32(dst_vgpr, imm_temp, isa::predicate(0));
