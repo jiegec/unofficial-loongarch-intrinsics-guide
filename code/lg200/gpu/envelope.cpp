@@ -1301,11 +1301,16 @@ std::optional<EnvelopeProgram> build_generic(
   // LG200, dest left undefined) and the lane-id read (the carrier's
   // multi-lane write leaves the last lane's value; which lane is read
   // back is not oracle-able): record observations without failing.
-  if (mn == "v_fcvt_f16_i16" || mn == "v_fcvt_f16_u16" ||
-      mn == "v_fcvt_i16_f16" || mn == "v_fcvt_u16_f16") {
-    program.observe = true;
-    program.observe_reason = "LG210-legacy no-op hole: executes empty, dest undefined";
-  }
+  // [HW 2026-11-03] The four LG210-legacy holes no longer merely observe: "it
+  // executes empty and leaves the destination undefined" and "the destination
+  // happens to read zero because nothing staged it" are the same observation
+  // until the destination is pre-loaded.  It is now pre-loaded with 0xa5a5a5a5
+  // and the expected word IS that sentinel, so the claim "this silicon does not
+  // write the destination" is compared rather than recorded.  The same shape the
+  // atomic_sm_rsub rows use for their measured no-write invariant.
+  const bool legacy_noop =
+      mn == "v_fcvt_f16_i16" || mn == "v_fcvt_f16_u16" ||
+      mn == "v_fcvt_i16_f16" || mn == "v_fcvt_u16_f16";
   // [HW 2026-11-03] v_threadid_u32 left the observation set.  Its model is lane
   // 0's answer (0), which is what a one-lane launch reads back; the reason the
   // row was bucketed - "the carrier's multi-lane write leaves the last lane's
@@ -1328,6 +1333,10 @@ std::optional<EnvelopeProgram> build_generic(
     if (is_bitset) stage_bitset_base(builder, def.inputs.at(0));
     std::vector<isa::Operand> operands;
     isa::Reg dst_vgpr = isa::vgpr(10);
+    if (legacy_noop) {
+      builder.s_mov_imm_b32(imm_temp, 0xa5a5a5a5u);
+      builder.v_mov_b32(dst_vgpr, imm_temp, isa::predicate(0));
+    }
     isa::Reg dst_sgpr = isa::sgpr(8);
     bool has_vgpr_dst = false;
     bool has_sgpr_dst = false;
