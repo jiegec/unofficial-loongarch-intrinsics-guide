@@ -4059,22 +4059,27 @@ std::optional<EnvelopeProgram> build_carrier_env(
       // is not what the hardware expects.  Deciding that needs a controlled
       // opcode experiment, not a guess.
       mnemonic == "v_add_imm_i32" || mnemonic == "v_sub_imm_i32" ||
-      // [N2 2026-11-03] s_cmp_eq_u64/s_cmp_ne_u64 are no longer here: their
-      // destination is a scalar register the carrier now names and stores
-      // (FieldSem::ScalarCmp8 in build_generic), so the compare is a comparison
-      // again.  The bucket reason named no mechanism for them, and while they
-      // sat in this group the branch compared no word at all.
       mnemonic == "v_perm_sm_b32" || mnemonic == "v_bperm_sm_b32" ||
-      // [N1 2026-11-03] s_cmp_eq_u64/s_cmp_ne_u64, THIRD spelling tried and
-      // rejected.  Naming RD8 grades zero (the register is never written);
-      // grading SCC through s_select(0xffff, 0, scc), which is what the 32-bit
-      // siblings use and pass with, also grades zero - and there the failure
-      // set is exactly the vectors whose operands are EQUAL (eq 33/41, ne
-      // 8/41): every graded word is 0, including the eight equal pairs of
-      // s_cmp_eq_u64 where the model says 0xffff, so SCC is not being written
-      // either.  Both spellings are therefore blind to the result.  The rows
-      // stay observed, and the sentence now records that SCC was tried rather
-      // than leaving the next reader to try it again.
+      // [HW 2026-11-03, corrected] s_cmp_eq_u64 / s_cmp_ne_u64.  Two spellings
+      // have been graded and both read zero on all 41 vectors: naming the RD8
+      // scalar, and materialising SCC through s_select(0xffff, 0, scc) - the
+      // shape the 32-bit siblings pass 39 of 39 with.
+      //
+      // The pass/fail split is the informative part, and it is easy to state
+      // backwards, so precisely: of the 41 vectors, 8 have equal operands and 33
+      // do not.  s_cmp_eq_u64 therefore passes 33 and fails 8 (the eight where
+      // the model says 0xffff), and s_cmp_ne_u64 passes 8 and fails 33.  Every
+      // graded word is 0.
+      //
+      // What that does NOT establish is that SCC is left unwritten - the earlier
+      // note here said so and went too far.  Zero is also what a compare that
+      // writes 0 produces, what a write that lands after the read produces, and
+      // what a compare produces whose second source never reached it: this row is
+      // the only compare in the corpus whose second pair is staged at s6:s7, and
+      // s6:s7 IS the VCC pair.  So the rows observe, the sentence says what was
+      // measured, and the four-way discriminator is a probe
+      // (LGPU_SCMP_PROBE=rd8|scc with an s8 sentinel, a VCC sentinel and a nop
+      // distance; the patch is preserved under build/pending-w3).
       mnemonic == "s_cmp_eq_u64" || mnemonic == "s_cmp_ne_u64";
   if (launch_state) {
     p->observe = true;
