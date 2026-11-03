@@ -26,7 +26,8 @@ The current implementation has passing deterministic boundary probes for static
 point records without clip distances, runtime line-strip emission, multi-varying
 strip channels, and static and uniform-loop triangle-strip clip distances. Four-
 and eight-distance point-size combinations also pass static and uniform-loop
-probes; the one-distance combination remains failing. It does not establish
+probes; subsequent boundaries cover one through eight distances, including
+single-vertex point-size records. This does not establish
 arbitrary non-uniform invocation emission, every dynamic distance-output shape,
 transform-feedback parity, or complete layered rendering. The Vulkan geometry
 CTS and Piglit geometry suites remain the correctness oracles for composed
@@ -416,6 +417,30 @@ at unmapped address `0x200004100`. Device recovery and its health control failed
 so remaining cases were not executed. Producer and driver causality remain
 `UNRESOLVED`. Previously isolated secondary-command-buffer cases remain in the
 validation backlog; successful pixel comparisons do not establish fault freedom.
+
+Complete submission captures are available through `LOONGVK_DUMP_SUBMIT`, an
+absolute output prefix. Each submission produces `.meta` and `.ib` files, plus
+the used `.root` and `.resource` prefixes when present. Unlike
+`LOONGVK_DUMP_IB`, which captures draw construction, this records the final IB
+length and submission residency. `LOONG_DUMP_VAMAP_FILE` adds the exact pinned
+BO mappings, submission token and returned kernel fence sequence. Match the
+captures by process, IB address/length and timestamp/token, rather than assuming
+file sequence numbers identify the same submission across processes.
+
+With this instrumentation, one planned hardware replay of the isolated
+inherited-framebuffer case passes without a new fault or reset. Its three
+submissions contain 12 initialization records and 24 GS records. Direct shader,
+root/resource and render-target addresses match resident VA mappings; this
+check does not validate shader-computed addresses, nested descriptors or lifetime
+races. The original fault therefore remains unresolved. Ten historical geometry
+failures also pass in two separate processes each with the default configuration
+and diagnostics disabled; these focused checks do not replace the earlier
+aggregate results.
+
+`LOONG_NO_SUBMIT=1` supports offline construction and capture by completing
+the caller's binary and timeline syncobjs on the CPU. It executes no GPU
+instructions. Any CTS result reported in this mode is host-flow evidence only
+and must never be counted as hardware validation.
 
 The earlier timeout in
 `dEQP-VK.clipping.user_defined.clip_cull_distance_dynamic_index.vert_geom.1_7`
