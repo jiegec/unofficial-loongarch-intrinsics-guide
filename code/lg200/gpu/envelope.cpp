@@ -1455,20 +1455,31 @@ std::optional<EnvelopeProgram> build_generic(
               std::to_string(built.offsets.size());
       return std::nullopt;
     }
-    // [2026-11-03] What the destination cell actually holds when the lanes
-    // disagree.  This carrier stages one cell per case and every lane stores to
-    // it, so the word the host reads is not one lane's value - it is the OR over
-    // the lanes.  That matters for the alu-carry family, whose two result words
-    // are the sum (which differs per lane when the carry-in differs) and the
-    // carry-out mask.  Reproduced host-side: the oracle sum spelling s|(s+1)
-    // reproduces 122 of v_addc_u32's 127 rows ONLY under the OR readback
-    // (106/127 if the cell were lane 0's value, 103/127 for lane 15), and it
-    // reproduces those 122 with exactly the same five second-word failures.  So
-    // s|(s+1) is a readback artifact rather than per-lane arithmetic, and any
-    // row whose lanes can differ is compared against that OR.  The carry probe
-    // (lgpu-gpu carry) settles it per lane in one dispatch: each destination
-    // word reads base or base+1, and a single OR value means the cell is shared.
-
+    // [HW 2026-11-03] What the destination cell holds when the lanes disagree, and
+    // how the third source is consumed.  lgpu-gpu carry measured both in one
+    // dispatch (16 arms, one compute launch, lanes=16):
+    //
+    //   X=0x00000001 -> s6=0x0001 dst=0x0001     X=0x0000fffe -> s6=0xfffe dst=0xfffe
+    //   X=0x00010000 -> s6=0x0000 dst=0x0000     X=0xdeadbeef -> s6=0xbeef dst=0xbeef
+    //   X=0x80000000 -> s6=0x0000 dst=0x0000     X=0x3fffffff -> s6=0xffff dst=0xffff
+    //   control (b=1, so the add carries in every lane) -> s6=0xffff dst=0xbeef
+    //   four, sixteen and sixty-four nops between the instruction and the read
+    //   all still read 0xbeef.
+    //
+    // So the carry-in is consumed PER LANE from the third source low sixteen bits
+    // (0x10000 and 0x80000000 reach no lane), the carry-out is the sixteen-lane
+    // bitmap in the low word of the named pair, s7 is never written, and distance
+    // changes nothing.  That rules out both a stale pair and a mask in the other
+    // half.  It also means the oracle cannot express this row: its dst[1] is one
+    // flag, while the hardware writes a per-lane bitmap derived from the third
+    // source.  v_addc_u32 keeps its five failing vectors for that reason, and the
+    // alu-carry rows whose carry-in is uniform keep passing.
+    //
+    // The one-cell convention below is separate: a case stages one cell and every
+    // lane stores to it, so the word the host reads is the OR over the lanes.  That
+    // is why the oracle spells the sum s|(s+1): under the OR readback that spelling
+    // reproduces 122 of the 127 v_addc_u32 rows, and no single-lane convention does
+    // (106 for lane 0, 103 for lane 15).
     built.expected = def.expected;
     program.cases.push_back(std::move(built));
     case_offset += 4 * static_cast<std::uint32_t>(def.expected.size());
