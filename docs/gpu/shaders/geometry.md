@@ -84,7 +84,7 @@ read.
 
 Every emitted vertex contributes a position block of `P` quads and a varying
 row holding `N` quads padded to `next_pow2(max(N, 1))`. `N` is the number of
-linked output varying planes, `M` the declared output vertex count, `S` a
+live raster output varying planes, `M` the declared output vertex count, `S` a
 layer or viewport chunk, and `G` the number of distance groups:
 
 ```text
@@ -188,7 +188,7 @@ The emit recipe uses `v_emit3` for a triangle-strip output and `v_emit2` for
 every other topology, including points, line strips and triangle fans. The pair
 does not split into a triangle opcode and a line opcode.
 
-`GK` carries the emitted-vertex ordinal within the run. `GA` carries the
+`GK` carries the emitted-vertex ordinal within the invocation. `GA` carries the
 descriptor of that vertex's final live varying component:
 
 ```text
@@ -199,13 +199,45 @@ compact: varying_descriptor_base + 4 * e + 3
 `VJ` names the separator register; the plan keeps the separator state in vector
 register 35. The first emit of a run seeds that register to zero and later emits
 of the same run MUST NOT reseed it. A run left open when the invocation exits is
-closed implicitly, so a stage need not emit a final cut after its last vertex,
-but the ordinal restarts at zero for the next run.
+closed implicitly, so a stage need not emit a final cut after its last vertex.
+A cut resets separator state but does not restart the vertex ordinal: two
+three-vertex strips in one invocation use ordinals 0 through 5. Position and
+varying descriptors therefore continue advancing across cuts. The ordinal
+starts at zero for each new invocation.
 
 The strip and point recipes take the record from the same decision, so two
 stages with equal `N`, `M`, `P` and `S` write the same record. The runtime
 emitter scales the position block and the varying row by the live ordinal
 separately, because their strides differ.
+
+## Transform feedback and raster outputs
+
+Transform feedback captures shader outputs independently of fragment input
+consumption. An output used only for capture does not need a generic varying
+plane in the raster record. Consequently, the record formulas use the number
+of live raster outputs for `N`, not the number of captured attributes or the
+transform-feedback buffer stride. Position, point size, and clip/cull payloads
+retain their fixed-function roles even when the fragment shader reads none of
+them.
+
+The shared LCO frontend accepts a consumer slot mask and a separate validity
+flag. Gallium and Vulkan supply fragment input slots through this same
+interface. A valid zero mask denotes a linked fragment program with no varying
+inputs; the default, invalid mask denotes an unknown consumer and does not
+discard outputs on that basis. NIR's `is_xfb_only` variable flag and
+`no_varying` output-store flag also exclude capture-only generic outputs from
+raster layout discovery. Clip and cull distance slots are retained because
+they also describe clipping payloads.
+
+Filtering the raster layout preserves the linked bases and interpolation
+modes of surviving slots. Geometry raster attributes use dense ordinals in
+the surviving output set; fragment attribute descriptors map their linked
+input bases to those ordinals. Transform-feedback stores use the capture
+declarations and emitted values independently of this filtering. In
+particular, capturing fifteen vec4 outputs with no fragment varying inputs
+must not request fifteen raster varying planes or lose captured components.
+This separation is a compiler/driver ABI contract, not an increase in the
+hardware raster record limits below.
 
 ## Limits
 
