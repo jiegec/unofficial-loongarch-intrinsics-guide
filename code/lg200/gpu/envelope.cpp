@@ -3745,9 +3745,16 @@ std::optional<EnvelopeProgram> build_carrier_env(
   //  - the SUBWORD forms are still defects, and they stay observed: i8/u8/
   //    i16/u16 loads fail 6-7 of 13 and b8/b16/b96 stores fail 6/4/2, the same
   //    numbers at one lane and at sixteen, so no lane race explains them.
+  // [HW 2026-11-03] The four subword LOADS left this set.  They failed because
+  // their model was the b32 identity dst[0] = src[0] while the hardware
+  // narrows to the low byte/halfword and extends - 0x00000080 reads back
+  // 0xffffff80, 0x7fffffff reads back 0x000000ff - which is what the row
+  // title says and what load_sm_i8/u8/i16/u16 already model.  With the model
+  // corrected they pass 14/14 on both pipes, and identically at one lane.
+  // The STORES stay: b8 and b16 are the same identity defect in the other
+  // direction (the hardware writes only the low byte/halfword, so the readback
+  // keeps the rest of the word) and b96 writes nothing at all.
   const bool flat_subword_defect =
-      mnemonic == "load_v_flat_i8" || mnemonic == "load_v_flat_u8" ||
-      mnemonic == "load_v_flat_i16" || mnemonic == "load_v_flat_u16" ||
       mnemonic == "store_v_flat_b8" || mnemonic == "store_v_flat_b16" ||
       mnemonic == "store_v_flat_b96";
   // Experiment knob (README, "Environment knobs"), not a stable interface: it
@@ -3762,7 +3769,14 @@ std::optional<EnvelopeProgram> build_carrier_env(
       mnemonic.find("_fmtinst_") != std::string::npos ||
       mnemonic == "load_v_buff_i8" || mnemonic == "load_v_buff_u8" ||
       mnemonic == "store_v_buff_b8" || mnemonic == "getlod" ||
-      mnemonic == "getresinfo" || mnemonic.rfind("load_v_tex", 0) == 0 ||
+      mnemonic == "getresinfo" ||
+      // [HW 2026-11-03] load_v_tex_mip is NOT in this group: its case vectors
+      // are "the value of texel i", and it reads them - 8 of 8 compare equal
+      // on both pipes.  The rows that stay here are the ones whose fetch is
+      // driven by an S# the carrier never stages (build_tex passes sdesc=null)
+      // or by a derivative window: load_v_tex, load_v_tex_pck(_sgn) and the
+      // mip_pck forms read a constant 0x3fe00000 for every texel.
+      (mnemonic.rfind("load_v_tex", 0) == 0 && mnemonic != "load_v_tex_mip") ||
       mnemonic.rfind("store_v_tex", 0) == 0 ||
       mnemonic == "v_sqrt_f64" || mnemonic == "v_rsq_f64" ||
       mnemonic == "v_s2v_b32" ||
@@ -3777,12 +3791,16 @@ std::optional<EnvelopeProgram> build_carrier_env(
       // again.  The bucket reason named no mechanism for them, and while they
       // sat in this group the branch compared no word at all.
       mnemonic == "v_perm_sm_b32" || mnemonic == "v_bperm_sm_b32" ||
-      // [HW 2026-11-03] Both scalar compares write ZERO into the scalar register
-      // their RD8 field names: all 41 vectors of each row read 0 where the model says
-      // 0xffff, on both pipes.  Forcing SCC earlier graded a constant the carrier
-      // materialised with s_select; naming the register grades a word nothing writes.
-      // Neither is a value comparison, so the rows observe until the destination
-      // semantics are established.
+      // [N1 2026-11-03] s_cmp_eq_u64/s_cmp_ne_u64, THIRD spelling tried and
+      // rejected.  Naming RD8 grades zero (the register is never written);
+      // grading SCC through s_select(0xffff, 0, scc), which is what the 32-bit
+      // siblings use and pass with, also grades zero - and there the failure
+      // set is exactly the vectors whose operands are EQUAL (eq 33/41, ne
+      // 8/41): every graded word is 0, including the eight equal pairs of
+      // s_cmp_eq_u64 where the model says 0xffff, so SCC is not being written
+      // either.  Both spellings are therefore blind to the result.  The rows
+      // stay observed, and the sentence now records that SCC was tried rather
+      // than leaving the next reader to try it again.
       mnemonic == "s_cmp_eq_u64" || mnemonic == "s_cmp_ne_u64";
   if (launch_state) {
     p->observe = true;

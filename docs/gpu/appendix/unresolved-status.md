@@ -158,7 +158,7 @@ an ISA question, and it is recorded here so the item is not left implicit.
 
 Still open in the code layer: `load_sm_matrix_x{1,2,4}` (plane/lane layout) and
 `load_v_buff_fmt*` / `store_v_buff_fmt*` (descriptor format decode), 19 lines
-in total.  Offline `make verify` passes throughout (768 instructions, 86,093
+in total.  Offline `make verify` passes throughout (768 instructions, 86,097
 vectors).
 
 ## 3. Editing rules used
