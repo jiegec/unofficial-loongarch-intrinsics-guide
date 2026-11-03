@@ -157,13 +157,13 @@ Boundary coverage of the required classes, as measured by `case_coverage.py`:
 | type-token selection, texture atomics, 64-bit integer compares | 710 |
 | the six-dword three-pair shape, the type union, pair low words | 753 |
 | the sub-word loads | 765 |
-| the plain-width (`bNN`) rows, and separating launch-shape rows | **615 of 738 value-expressible** (123 rows are asked for no class at all) |
+| the plain-width (`bNN`) rows, and separating launch-shape rows | **633 of 738 value-expressible** (90 still have gaps, 15 have no result) |
 
 The vector count went 20,732 -> 83,547.  The auditor now separates the rows whose
 result is **launch state rather than an operand** - the environment and SIO reads,
 the stream emits, the interpolators and the index read, 30 in all - and reports
 them as launch-shape: they need a launch state, not a case.  Every row whose
-boundaries *are* expressible as an input value is covered, with 0 gaps.  The full
+boundaries *are* expressible as an input value is covered.  The full
 record is in [Case Boundary Coverage](case-boundaries.md).
 
 ## What the boundaries changed

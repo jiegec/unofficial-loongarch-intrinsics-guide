@@ -92,6 +92,76 @@ def classes_for(mnemonic: str):
     return req
 
 
+# --- payload rules: the 123 rows whose NAME carries no [uibf]NN tag ----------
+# classes_for() reads the type tag out of the name, so a row called
+# load_s_buff_w8 or samp_c_d is asked for nothing and its "0 gaps" says nothing.
+# Those rows still move a value; what their classes are is read from the row's
+# own .h (which columns the model reads) and from the width the model copies -
+# a whole 32-bit word in every one of them.  The rule is applied ONLY when
+# classes_for() came back empty, so no verdict on a tagged row can change.
+PAYLOAD_RULES = (
+    # Scalar wide loads: the size is a WORD COUNT (w1..w16), so no tag is in the
+    # name.  The model copies the dwords (load_s_buff_w8.h:4-6), and the row
+    # states that 0x80000000 keeps its set bit rather than being extended.
+    (r"^load_s_(buff|flat)_w(1|2|4|8|16)$", "b32"),
+    # Descriptor/flat block loads and stores: the size is a BIT BLOCK (b96/b128),
+    # i.e. 3 or 4 raw dwords (load_v_flat_b96.h:4-7).
+    (r"^(load|store)_v_(buff|flat)_b(96|128)$", "b32"),
+    # Formatted loads/stores: the element format lives in the descriptor or in
+    # the instruction field, and the carrier builds the descriptor, so the case
+    # word is a whole dword the model copies (load_v_buff_fmtinst_c4.h:4-5).
+    (r"^(load|store)_v_(buff|flat)_fmt(desc|inst)_c[1-4]$", "b32"),
+    # Shared-memory reads: one word per lane per plane (family-memory.md:111).
+    (r"^load_sm_(interp|matrix_x[124])$", "b32"),
+    # Image fetches, gathers and samples: the texel word.
+    (r"^(load|store)_v_tex(_mip)?(_pck)?(_sgn)?$", "b32"),
+    (r"^(gather|samp)(_[a-z0-9]+)*$", "b32"),
+    # The descriptor queries.
+    (r"^(getlod|getresinfo)$", "b32"),
+    # The scalar compares: s_cmp.h compares with cmp_eq_u32 and the row says
+    # "two 32-bit scalar values", so both columns are 32-bit operands.
+    (r"^s_cmp(_imm)?$", "b32"),
+)
+
+
+def payload_cols(mnemonic: str):
+    """The input columns the row's own model reads - the payload, not the
+    carrier's address/selector columns, which must stay inside the window."""
+    body = (ROOT / (mnemonic + ".h")).read_text(encoding="utf-8")
+    code = "\n".join(l for l in body.splitlines()
+                     if l.strip() and not l.strip().startswith("//"))
+    cols = {int(i) for i in re.findall(r"src\[(\d+)\]", code)}
+    # src[0+1] is src[1]: the word-pair form the wide loads and the matrix x2
+    # read.  A bare src[\d+] pattern does not see it (gen_cases.py:409 loses the
+    # column for exactly this reason).
+    for base, off in re.findall(r"src\[(\d+)\+(\d+)\]", code):
+        cols |= {int(base), int(base) + int(off)}
+    return sorted(c for c in cols if c >= 0)
+
+
+def payload_for(mnemonic: str):
+    """(name, value, bits, column) for the boundaries a tagless row admits."""
+    tag = next((t for pat, t in PAYLOAD_RULES if re.match(pat, mnemonic)), None)
+    if tag is None:
+        return []
+    cols = payload_cols(mnemonic)
+    if not cols:
+        return []          # the model reads no input: nothing to ask for
+    tbl, bits = {"b32": (I32, 32), "b16": (I16, 16)}[tag]
+    return [(tag + ":" + n, v, bits, c) for c in cols for n, v in tbl.items()]
+
+
+def col_covered(cases, value, bits, col):
+    """Covered in THIS column when one is named, in any word when col < 0.
+
+    `cases` is the row's case list, one word list per case, so a column test
+    asks whether SOME case puts the value in that column.
+    """
+    if col < 0:
+        return any(covered(w, value, bits) for w in cases)
+    return any(col < len(w) and covered([w[col]], value, bits) for w in cases)
+
+
 def words_of(s: str):
     return [int(w, 16) for w in re.findall(r"0[xX][0-9a-fA-F]+", s or "")]
 
@@ -192,28 +262,46 @@ def main():
         if sem.get(m) in LAUNCH_SEM and m not in launch_skip:
             launch.append(m)
             continue
-        req = classes_for(m)
         ws = by.get(m, [])
-        missing = [name for name, v, bits in req
-                   if not any(covered(w, v, bits) for w in ws)]
-        rows.append((m, len(req), len(missing), ",".join(missing)))
-        for x in missing:
-            gaps[x.split(":", 1)[1] if ":" in x else x] += 1
+        req = [(n, v, b, -1) for n, v, b in classes_for(m)]
+        kind = "tagged"
+        if not req:
+            req = payload_for(m)
+            kind = "payload" if req else "no-result"
+        missing = [(name, col) for name, v, bits, col in req
+                   if not col_covered(ws, v, bits, col)]
+        shown = [n if c < 0 else "%s@c%d" % (n, c) for n, c in missing]
+        rows.append((m, len(req), len(missing), ",".join(shown), kind))
+        # one instruction counts once per class, however many of its columns
+        # miss it
+        for x in {n.split(":", 1)[1] if ":" in n else n for n, _c in missing}:
+            gaps[x] += 1
 
     total = len(rows)
     # A row whose name carries no type tag is asked for NO class by
     # classes_for(), so "missing == 0" says nothing about it.  Counting those as
     # complete is how this gate reported "with gaps: 0" while load_s_buff_w8 and
     # 122 other payload/control rows had never been asked for anything.
+    # The bucket is now named instead of counted as a hole.
     unasked = sum(1 for r in rows if r[1] == 0)
     full = sum(1 for r in rows if r[2] == 0 and r[1] > 0)
+    payload = [r for r in rows if r[4] == "payload"]
+    noresult = [r for r in rows if r[4] == "no-result"]
     print("instructions: %d value-expressible (%d launch-shape)"
           % (total, len(launch)))
     print("  with all required boundary classes: %d   with gaps: %d"
           % (full, total - full - unasked))
-    print("  asked for NO class (no type tag in the name): %d" % unasked)
+    print("  asked for NO class: %d  (%d payload-rule, %d no-result)"
+          % (unasked, len(payload), len(noresult)))
     print("  launch-shape rows (need a launch state, not a case): %s"
           % " ".join(launch))
+    print("  payload rows (name carries no [uibf]NN tag, model reads a dword):"
+          " %d, all classes: %d, with gaps: %d"
+          % (len(payload),
+             sum(1 for r in payload if r[2] == 0),
+             sum(1 for r in payload if r[2] > 0)))
+    print("  no-result rows (oracle carries 0 inputs and 0 outputs): %d: %s"
+          % (len(noresult), " ".join(r[0] for r in noresult)))
 
     # A floating-point case with no declared policy is silently evaluated as
     # "round to nearest, no flush" - which is NOT the measured hardware mode, so
@@ -230,16 +318,16 @@ def main():
         print("  %-26s %d" % (k, n))
     print()
     print("worst rows:")
-    for m, nreq, nmiss, miss in sorted(rows, key=lambda r: -r[2])[:12]:
+    for m, nreq, nmiss, miss, _kind in sorted(rows, key=lambda r: -r[2])[:12]:
         # The whole missing-class list, not the first 70 columns of it: WHICH classes
         # are missing is the actionable part.
         print("  %-26s %2d/%2d missing: %s" % (m, nmiss, nreq, miss))
 
     if args.tsv:
         with open(args.tsv, "w") as f:
-            f.write("mnemonic\trequired\tmissing\tmissing_classes\n")
+            f.write("mnemonic\trequired\tmissing\tmissing_classes\tkind\n")
             for r in rows:
-                f.write("%s\t%d\t%d\t%s\n" % r)
+                f.write("%s\t%d\t%d\t%s\t%s\n" % r)
         print("\n-> %s" % args.tsv)
 
 

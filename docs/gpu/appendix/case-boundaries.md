@@ -31,7 +31,7 @@ The count read (19) until 2026-10-13 while the list beside it named 17 - the row
 counted from memory rather than from its own contents, which is the defect this page
 records elsewhere.  And `case_coverage.py` required only 12 of the 17 for f64 rows, so those
 rows were judged against a weaker requirement than f32 and f16: no negative max/min, no
-`max_denorm`, no negative NaN.  Both are fixed, and the full set still passes 615 of 738 -
+`max_denorm`, no negative NaN.  Both are fixed, and every row that is asked for classes still passes that set -
 which means the generated vectors had carried the five all along.
 
 ## 2. Measurement
@@ -130,8 +130,8 @@ stores it first, the flat and buffer paths preload it), so a boundary grid
 exercises exactly the classes the element width admits.  Their second input is the
 address offset, which must stay inside the carrier's window and is therefore held
 at zero.  Coverage read **765 of 768** at the time; **as of 2026-10-13 it is 768 of
-768 rows accounted for - 615 value-expressible with every required class, 123 asked for no
-class at all, and 30
+768 rows accounted for - 633 value-expressible with every required class, 90 with gaps, 15
+that have no result to ask about, and 30
 launch-shape** - and the earlier figure is kept rather than overwritten.  Both
 current measures are anchored in `check_doc_numbers.py`, so this sentence cannot
 drift again without the suite saying so.
@@ -140,7 +140,7 @@ The plain-width (@@bNN@@) rows were the last omission of the same kind: their
 content is staged like the sub-word loads', and once the audit also asks for the
 raw bit patterns a @@bNN@@ operand admits, they need the same treatment.  With that
 **every row whose boundaries are expressible as an input value is covered**:
-@@case_coverage.py@@ now reports **615 of 738 value-expressible rows** with 0 gaps, and - since 2026-11-03 - the 123 rows its type-tag rules never ask anything of, so a reader cannot mistake "no gaps" for "everything is required".
+@@case_coverage.py@@ reports **633 of 738 value-expressible rows** with every required class and - since 2026-11-03 - **90 with real gaps**, 15 rows that have no result at all, and 108 payload rows that its type-tag rules used to ask nothing of.  That last number is the point: the earlier "0 gaps" was measured only over the rows whose names carry a type tag, so the 108 rows named by size (`load_s_buff_w8`) or by bit block (`load_v_buff_b96`) were never asked a question.  They are asked now, and 90 of them answer with a gap - 507 missing (row, class, column) entries, about 431 vectors.  Most of the gaps are in the texture rows (samp 32, gather 24, tex 10, descriptor queries 2) and the formatted rows (16), whose models pass a dword through, so their class space is the raw 32-bit pattern rather than a float type.
 
 The **30** that remain are **launch-shape** rows, and the auditor names them
 explicitly rather than counting them as gaps: the execution-environment and SIO
@@ -216,8 +216,8 @@ compute path - is an open question and needs a device; it is the same question a
 
 | measure | value |
 |---|---|
-| rows exercising every required class | **615 / 738 value-expressible** (2026-11-03; the other 123 have no type tag) |
-| rows still with gaps | **0** |
+| rows exercising every required class | **633 / 738 value-expressible** (2026-11-03; 90 still have gaps, 15 have no result) |
+| rows still with gaps | **90** (507 missing row/class/column entries) |
 | launch-shape rows with no case by construction | 30 (they need a launch state; listed by case_coverage.py) |
 | hardware rows failing under the expanded set | 78 (measured earlier, before the boundary fill; the device is parked, so this number is stale and is the next hardware task) |
 
