@@ -306,6 +306,13 @@ is ordered after each staged emit before the next payload overwrites its
 registers. Before final export, the stream header is updated with the emitted
 vertex count, then the SIO1 export commits the record's published export count.
 
+Static point streams initialize their separator payload VGPR, `v35`, to zero in
+the prologue before an emit can read it. Runtime recipes also initialize it once
+and preserve it across iterations. Leaving the static value uninitialized caused
+intermittent missing points when several invocations shared a launch; reducing
+the thread count concealed the failure. Initialization repairs the focused
+point-depth controls without reducing their thread count.
+
 The selector uses the measured `GK`, `GA`, and `VJ` operand roles described in
 [SIO](sio.md#emitting). The instruction pages define the encoded fields; the
 exact relationship between those fields and every possible stream record remains
@@ -320,6 +327,14 @@ configuration. Dynamic layer handling uses driver replay/filter paths where
 selected; this does not imply that arbitrary layered GS output is complete.
 Point records use `v_emit2`. Geometry input `PointSize` without a producer
 carrier reads as the implementation's default 1.0.
+
+For Vulkan point draws routed through the driver's passthrough GS, depth clipping
+uses the homogeneous predicate `w > 0 && z >= 0 && z <= w`. Rejected points receive
+position `(2, 2, 0, 1)`, outside the x/y clip volume, and the meta shader emits one
+record per input. This avoids depending on conditional-emission behavior in this
+internal shader. Depth-clamp and explicit depth-clip-disable select the variant
+without that depth predicate. This is a driver emulation policy, separate from
+the shared GS record ABI and from the API's user geometry shader.
 
 The selector rejects more than five output varying planes, unsupported input
 vertex selectors above 5, clip/cull payloads above eight components, and SIO1
@@ -345,6 +360,10 @@ still be refused when its LG200 record cannot be represented.
   single emitted vertex reserves the same miscellaneous quad as multiple
   vertices. Focused probes cover 1–8 distances and static/runtime point output;
   arbitrary record capacities and divergent emission remain unproven.
+* A focused point shader that stores its outputs before a runtime emit loop
+  still renders black when the loop should emit once. Straight-line conditional
+  emission controls pass. Position values are still present in the generated
+  SIO writes; the cause of this runtime-loop failure remains unresolved.
 * Divergent loop-carried clip/cull outputs, transform feedback, and the complete
   SIO1 record-capacity boundary need
   additional direct probes and full CTS coverage.
@@ -376,6 +395,7 @@ conformance.
 | Distance output probes | 12 cases: 1/4/8 distances, static/runtime point and triangle output | 12 pass after matching the physical distance count to the point-size record |
 | Distance record boundary probes | 16 cases: 1–4 distances, clip enable off/on, fragment distance read off/on; 24 cases: 1–8 distances, point size off/on and static/runtime point output | 40 pass; the first matrix previously had 12 failures |
 | Single-vertex point records | 7 cases: no distances or 1/4/8 distances, positive/negative distance, with point-size footprint checks | 7 pass; reserving the miscellaneous quad repairs the negative 1/4-distance cases |
+| Vulkan point clip-volume controls | `inside`, `outside`, `depth_clamp`, `depth_clip`, and `clipped.large_points`, three separate processes each | 15 pass after initializing the static separator and completing the meta depth predicate |
 | Piglit geometry corpus | 37 cases | 24 pass, 1 fail (`max-input-components`), 12 skip |
 | Vulkan CTS geometry matrix | 199 cases | 179 pass, 10 fail, 10 NotSupported, no GPU fault in this matrix |
 | Vulkan CTS clip/cull matrix | 64 `vert_geom` cases, static/dynamic indexing, with/without fragment distance reads | 64 pass, no GPU fault |
