@@ -404,7 +404,27 @@ def main() -> int:
                            " ".join(hex(v) for v in flat(row)))
             continue
         pol = FP_POLICY if sem == "floating-point-value" else ""
-        if IMM_SLOT.search(meta[mnemonic].get("operand_signature", "")) and nin > 1:
+        if mnemonic in ("load_s_buff_w16", "load_s_flat_w16"):
+            # Sixteen-dword payloads: a cross product of the value set is 36 cases
+            # and the runner's one-page BO refuses it before submission ("payload
+            # exceeds one GPU page").  A class only has to appear in each column
+            # once, so vary one column at a time.  This sits before the immediate
+            # branch because these rows carry an immediate slot in their operand
+            # signature, and that branch would shadow it.
+            body = (ROOT / f"{mnemonic}.h").read_text(encoding="utf-8")
+            used = set()
+            for a, b in re.findall(r"src\[(\d+)(?:\s*\+\s*(\d+))?\]", body):
+                lo = int(a)
+                used.update(range(lo, lo + (int(b) if b else 0) + 1))
+            gen = []
+            for j in range(nin):
+                if j not in used:
+                    continue
+                for v in base:
+                    row = [0] * nin
+                    row[j] = v
+                    gen.append(row)
+        elif IMM_SLOT.search(meta[mnemonic].get("operand_signature", "")) and nin > 1:
             # The immediate is the last input (the ISA prints it last and the
             # seed reads v_cmp_imm_eq_f16 p0, s0, v0, 0x00000000).
             cols = [base] * (nin - 1) + [base]

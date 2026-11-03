@@ -4186,6 +4186,24 @@ std::optional<EnvelopeProgram> build_cs(const std::string& mnemonic,
             "the device (2026-10-12); it is excluded from every compute run";
     return std::nullopt;
   }
+  // [HW 2026-11-04] load_s_buff_w16 and load_s_flat_w16 hung the compute ring on
+  // the first run that gave them a boundary grid - fifteen cases of sixteen-dword
+  // payloads.  The failure is a queue timeout ("submitted ring=0x100020000
+  // queue_...") and every row after it fails to open the device, so it parks the
+  // machine rather than failing one case.
+  //
+  // The graphics pipe passes the SAME program 15 of 15, so this is not the row
+  // being illegal; it is the compute staging of a sixteen-dword block, which is
+  // not understood yet.  Refused here rather than retried: a case that parks the
+  // device is worth more as a recorded hazard than as a second data point.
+  if (mnemonic == "load_s_buff_w16" || mnemonic == "load_s_flat_w16") {
+    error = "compute carrier refuses the sixteen-dword payload rows: on "
+            "2026-11-04 the fifteen-case grid timed out the ring and the device "
+            "stopped admitting submissions for every row after it; the graphics "
+            "pipe passes the same program, so the compute staging of the block is "
+            "the open question";
+    return std::nullopt;
+  }
   return build_carrier(mnemonic, rows, LaunchEnvironment::Compute, error,
                        lanes);
 }
