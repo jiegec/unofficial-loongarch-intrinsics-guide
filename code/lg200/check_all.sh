@@ -104,6 +104,13 @@ echo "== coverage_claims"
 cd "$REPO" && python3 code/lg200/coverage_claims.py | tail -1
 echo "== observed_reasons"
 cd "$REPO" && python3 code/lg200/observed_reasons.py | tail -1
+# The observe-mode readback (build/gpu_obs/) is a device-produced artifact, so
+# this is a note until a non-dry run has written one and a gate afterwards: a
+# record that is present but older than the matrix, or not what the matrix says,
+# is a claim about hardware that the tree no longer supports.  Both checks run
+# under the one step name above, so the suite's own accounting keeps one entry
+# per gate.
+cd "$REPO" && python3 code/lg200/observed_reasons.py --samples | tail -4
 echo "== check_gpu"
 # check_gpu.py lives at the checkout root, not beside these scripts.
 cd "$REPO"

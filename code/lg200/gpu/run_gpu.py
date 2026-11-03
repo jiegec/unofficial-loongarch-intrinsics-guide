@@ -23,6 +23,13 @@ transports consume the same case rows:
 Results: build/gpu_ps_generic_results.tsv and
 build/gpu_cs_generic_results.tsv (full runs; mnemonic runs land in
 build/gpu_last_run.tsv) plus a per-instruction log in build/gpu-run-logs/.
+
+The log cannot double as the record of the observe-mode rows: every run
+rewrites it, a --dry one included, so a reading printed only there survives
+until the next dry sweep.  Those readings are also written to
+build/gpu_obs/<pipe>/, a record only a run that actually submitted touches, and
+observed_reasons.py --samples checks it against the matrix and against its own
+age.
 """
 from __future__ import annotations
 
@@ -43,6 +50,26 @@ OUT = {
 }
 OUT_LAST = ROOT / "build" / "gpu_last_run.tsv"            # every invocation
 LOGDIR = ROOT / "build" / "gpu-run-logs"
+
+# The observe-mode readback, kept apart from the per-mnemonic log on purpose: a
+# log is rewritten by every run that touches the mnemonic, a --dry one
+# included, so a reading printed there survives only until the next dry sweep.
+# These files are written by non-dry runs only, so each one is a statement of
+# the run that made it rather than a leftover of that run.
+OBSDIR = ROOT / "build" / "gpu_obs"
+OBS_COLS = ("case", "offset", "value", "model", "reason")
+# The matrix's own column names first, so a reader that already parses the matrix
+# parses this, and then what only a record of samples can say: how many dwords
+# the row produced, why the row is observed, and when it was read.
+OBS_INDEX_COLS = ("mnemonic", "pipe", "status", "pass", "fail", "rows",
+                  "samples", "reason", "stamp")
+# One read-back dword as main.cpp's compare_cases prints it, and the verdict line
+# that follows the case's dwords and carries the carrier's reason.  The model
+# field came with this record; a binary built before it printed the line without
+# one, and such a sample is stored as "-" rather than dropped.
+OBS_LINE = re.compile(r"^OBS (\S+): offset 0x([0-9a-f]+) = 0x([0-9a-f]+)"
+                      r"(?: model (0x[0-9a-f]+|-))?$")
+OBS_VERDICT = re.compile(r"^PASS (\S+) \(observed(?:: (.*))?\)$")
 
 sys.path.insert(0, str(PAIRS))
 from cases import parse_case_files  # noqa: E402
@@ -292,6 +319,106 @@ def run_batch(mnemonics, by, dry, timeout_s, env=None):
     return res
 
 
+def obs_samples(out):
+    """The read-back dwords in one mnemonic's output, as sample rows.
+
+    compare_cases prints one "OBS <case>: offset 0x.. = 0x.. model 0x.." line per
+    staged dword of an observe-mode case and then that case's verdict,
+    "PASS <case> (observed: <why>)".  The reason belongs to the case, not to the
+    dword, so the dwords are held until the verdict arrives and a block whose
+    verdict never came contributed no reading rather than being attributed to
+    the next case.
+    """
+    rows, pending = [], []
+    for line in out.splitlines():
+        m = OBS_LINE.match(line.strip())
+        if m:
+            pending.append(m.groups())
+            continue
+        v = OBS_VERDICT.match(line.strip())
+        if v is None:
+            continue
+        why = (v.group(2) or "").strip()
+        for case, off, val, model in pending:
+            rows.append((case, "0x" + off, "0x" + val, model or "-", why))
+        pending = []
+    return rows
+
+
+def read_index(path):
+    """Rows of an existing index.tsv as dicts; empty when the file is foreign."""
+    try:
+        lines = path.read_text(encoding="utf-8").splitlines()
+    except OSError:
+        return []
+    if not lines or lines[0].split("\t") != list(OBS_INDEX_COLS):
+        return []
+    out = []
+    for line in lines[1:]:
+        cells = line.split("\t")
+        if len(cells) == len(OBS_INDEX_COLS):
+            out.append(dict(zip(OBS_INDEX_COLS, cells)))
+    return out
+
+
+def write_obs(pipe, results, full):
+    """Persist this run's observe-mode readings under build/gpu_obs/<pipe>/.
+
+    Two tab-separated artifacts, both rewritten whole:
+
+        <mnemonic>.tsv  case  offset  value  model  reason   - one row per
+                        read-back dword, in the order the runner printed it
+        index.tsv       mnemonic pipe status pass fail rows samples reason
+                        stamp    - one row per observed mnemonic, carrying the
+                        same status/pass/fail/rows as the results matrix
+
+    The index repeats the matrix's column names so a reader that parses the
+    matrix parses this, and so observed_reasons.py --samples can check the two
+    records against each other without knowing how either was made.  The model
+    column is the case's expected dword: it is recorded, not compared - the row
+    is observation-only, which is the whole reason its reading needs a record of
+    its own.
+
+    Only a run that submitted writes here.  A --dry run assembles and compares
+    nothing, so it has no reading to record and must not touch the last one.
+
+    full says the run covered the whole universe: then the index is this run's
+    complete set and a mnemonic it does not list is a leftover from an older
+    carrier, dropped so the record cannot describe two models at once.  A
+    --mnemonic run leaves the rest of the session's record alone.
+    """
+    d = OBSDIR / pipe
+    d.mkdir(parents=True, exist_ok=True)
+    stamp = time.strftime("%Y%m%dT%H%M%SZ", time.gmtime())
+    fresh = [r for r in results if r.get("obs")]
+    for r in fresh:
+        lines = ["\t".join(OBS_COLS)]
+        for case, off, val, model, why in r["obs"]:
+            lines.append("\t".join((case, off, val, model, why)))
+        (d / (r["mnemonic"] + ".tsv")).write_text(
+            "\n".join(lines) + "\n", encoding="utf-8")
+    # The previous index is read even for a full run: the file is rebuilt from
+    # this run alone, but what it used to hold is what has to be cleaned up.
+    previous = read_index(d / "index.tsv")
+    idx = {} if full else {row["mnemonic"]: row for row in previous}
+    for r in fresh:
+        idx[r["mnemonic"]] = {
+            "mnemonic": r["mnemonic"], "pipe": pipe, "status": r["status"],
+            "pass": r["pass"], "fail": r["fail"], "rows": r["rows"],
+            "samples": len(r["obs"]), "reason": r["obs"][-1][4],
+            "stamp": stamp}
+    if full:
+        for row in previous:
+            m = row["mnemonic"]
+            if m not in idx:
+                (d / (m + ".tsv")).unlink(missing_ok=True)
+    lines = ["\t".join(OBS_INDEX_COLS)]
+    for m in sorted(idx):
+        lines.append("\t".join(str(idx[m][c]) for c in OBS_INDEX_COLS))
+    (d / "index.tsv").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    return d
+
+
 # A representative subset of the v_cmp family, whose mask output is a function
 # of the active lane count (envelope.cpp is_lane_mask_family).  One all-true row
 # pins the width for the whole family; sweeping all ~163 v_cmp rows would
@@ -456,10 +583,14 @@ def main() -> int:
                     break
                 if res["status"] == "NOT-RUN":
                     break          # never attempted; leave it for the next batch
+                # Parsed before the log write, and from the same text: the log
+                # is the next run's to overwrite, the sample record is this
+                # run's to keep.
+                out = res.pop("out", "") or ""
+                res["obs"] = obs_samples(out)
                 results.append(res)
                 done += 1
-                (LOGDIR / f"{m}.log").write_text(res.pop("out", "") or "",
-                                                 encoding="utf-8")
+                (LOGDIR / f"{m}.log").write_text(out, encoding="utf-8")
                 print(f"[{len(results):3d}/{len(targets)}] {m:36s} "
                       f"{res['status']:14s} pass={res['pass']:3d} "
                       f"fail={res['fail']:3d} rows={res['rows']:3d} "
@@ -474,6 +605,7 @@ def main() -> int:
             retry["mnemonic"] = stalled
             retry["detail"] = "retry after batch stall: " + retry["detail"]
             retry_out = retry.pop("out", "") or ""
+            retry["obs"] = obs_samples(retry_out)
             (LOGDIR / f"{stalled}.retry.log").write_text(retry_out,
                                                          encoding="utf-8")
             (LOGDIR / f"{stalled}.log").write_text(retry_out, encoding="utf-8")
@@ -505,6 +637,10 @@ def main() -> int:
                             f"{r['fail']}\t{r['rows']}\t"
                             f"{r['pass'] + r['fail']}\t{r['detail']}\n")
             print("results:", OUT[pipe])
+            # After the matrix, so the record can be checked against it by age
+            # as well as by content: a record older than the matrix it belongs
+            # to is the stale case, and this order makes that visible.
+            print("obs:", write_obs(pipe, results, full=True))
         return 0
     for i, m in enumerate(sorted(targets), 1):
         rows = by.get(m, [])
@@ -514,8 +650,9 @@ def main() -> int:
         else:
             res = run_one(m, rows, dry, timeout_s, pipe)
             res["mnemonic"] = m
-            (LOGDIR / f"{m}.log").write_text(res.pop("out", "") or "",
-                                             encoding="utf-8")
+            out = res.pop("out", "") or ""
+            res["obs"] = obs_samples(out)
+            (LOGDIR / f"{m}.log").write_text(out, encoding="utf-8")
         results.append(res)
         print(f"[{i:3d}/{len(targets)}] {m:36s} {res['status']:14s} "
               f"pass={res['pass']:3d} fail={res['fail']:3d} "
@@ -555,6 +692,7 @@ def main() -> int:
                         f"{r['fail']}\t{r['rows']}\t"
                         f"{r['pass'] + r['fail']}\t{r['detail']}\n")
         print("results:", target)
+        print("obs:", write_obs(pipe, results, full=full))
     return 0
 
 

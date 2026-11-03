@@ -265,8 +265,17 @@ int compare_cases(const lgpu::envelope::EnvelopeProgram& program,
         if (off + 4 > result.size()) continue;
         std::uint32_t actual = 0;
         std::memcpy(&actual, result.data() + off, 4);
-        std::printf("OBS %s: offset 0x%x = 0x%08x\n", c.id.c_str(), off,
-                    actual);
+        // The model word rides on the reading because the offsets a case lands
+        // on exist only here: without it the persisted record (build/gpu_obs/)
+        // could not say which expected dword this reading belongs to without
+        // re-deriving the carrier's placement.  It is recorded, not compared -
+        // an observe row asserts nothing, which is why the reading needs a
+        // record of its own at all.
+        char model[11] = "-";
+        if (k < c.expected.size())
+          std::snprintf(model, sizeof model, "0x%08x", c.expected[k]);
+        std::printf("OBS %s: offset 0x%x = 0x%08x model %s\n", c.id.c_str(),
+                    off, actual, model);
       }
       if (program.observe_reason[0])
         std::printf("PASS %s (observed: %s)\n", c.id.c_str(),

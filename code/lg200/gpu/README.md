@@ -133,6 +133,16 @@ universe. Single-instruction runs (`--mnemonic`) land in
   buffer loads, matrix, texture fetch/sample) run in observed mode: the
   carrier executes them and the row records observation (`(observed)` in
   the detail column) instead of an independent comparison.
+- Those readings are also written to `build/gpu_obs/<pipe>/`: one file per
+  mnemonic holding the dwords the runner read back (case, offset, value,
+  model, reason) and an `index.tsv` repeating those rows' status and
+  counts, which a full run rewrites whole and a `--mnemonic` run updates in
+  place. The log in `build/gpu-run-logs/` cannot serve as that record: every
+  run rewrites it, a `--dry` one included, so a reading printed there
+  survives only until the next dry sweep. `observed_reasons.py --samples`
+  checks the record against the matrix and against the age of the runner
+  binary, and reports a checkout that has never written one rather than
+  failing it.
 - SKIP-ENVELOPE was the previous escape hatch when no carrier could stage an
   I/O model (e.g. MMA operands, non-b32 flat forms); the observe path closed
   it and the envelope now materializes every mnemonic.
@@ -180,8 +190,9 @@ execution/observation instead of an oracle comparison.
 `lgpu-gpu --matrix` dumps the materializable subset per carrier with its
 operand form. Every mnemonic is routed through `build_carrier`
 (generic/control/buff/flat/lds/tex/samp, plus the observe path for
-launch-state-dependent families); the envelope materializes the full
-768-instruction universe, so the matrix has no SKIP rows left.
+launch-state-dependent families); the envelope materializes every mnemonic it can
+stage, and the ones it cannot are reported per row as `SKIP-ENVELOPE` with the
+reason - 86 of the 768 on compute and 1 on graphics.
 fp_policy cases that carry `ftz`/`daz` are matched against the CPU-oracle
 expectations; the hardware truth (denormal flush, NaN payload shape,
 rounding policy) is recorded with the affected instruction families.
@@ -306,8 +317,8 @@ unmapped and the pipe is quarantined.  `csverify` still passes, because the
 stream is correct; rebooting does not clear it (measured 2026-10-29 across two
 boots).  Fix the PD programming at VMID handover, then rerun the ladder above.
 
-`--pipe cs` executes **685 of the 768 mnemonics**; the other 83 are reported as
-`SKIP-ENVELOPE` with the reason rather than assembled into a stream, in two
+`--pipe cs` executes **682 of the 768 mnemonics**; the other 86 are reported as
+`SKIP-ENVELOPE` with the reason rather than assembled into a stream, in three
 groups:
 
 * **81 T#/S# rows** - `load_v_tex*`, `store_v_tex*`, `atomic_v_tex*`, `samp*`,
@@ -328,7 +339,16 @@ groups:
   `shared_segment_size` plus the resource word's granulated-shared field) and the
   launch-bound global region the copy names.
 
-The graphics transport executes all 768.
+* **3 rows the carrier refuses by name** - `trap`, `v_movindex_b32` and
+  `v_pack_snorm16_f32`.  `trap` wedged the pipe and parked the device on 2026-10-12,
+  so it is left out of every compute run.  `v_movindex_b32` has no dedicated
+  carrier, and measured on compute it hangs rather than faults, which costs the pipe
+  a platform power cycle.  `v_pack_snorm16_f32` has no case rows that qualify for the
+  generic carrier.  Each prints its own reason into the matrix `detail` column.
+
+The graphics transport envelopes 767 of the 768 - every row but
+`v_pack_snorm16_f32` - and the 2026-11-03 matrix passes 765 of them; the two
+failures are `v_addc_u32` and `v_mbcnt_u32`.
 
 ### Launch and memory path vs loongvk (Axis 1)
 
@@ -347,11 +367,12 @@ path (`src/mesa/src/loonggpu/vulkan/loongvk_kd.h`, `loongvk_mcs.c`, and
 | workgroup shared memory | the kernel descriptor names the window: `SHARED_SIZE` at
 offset 28 and `PRIVATE_SIZE` at 24 (`LOONGVK_KD_OFF_SHARED_SIZE`), so a kernel that
 declares an LDS window sets it | the carrier carries the same field
-(`drm.cpp` copies `shared_bytes` into `shared_segment_size`) and leaves it at 0, the
-initialiser it starts from | **not resolved**: whether a zero window is correct for the
-`load_sm_*` / `store_sm_*` / `atomic_sm_*` rows has never been measured - there is no
-LDS row in the last hardware matrix - so this is a deviation recorded rather than
-settled, and it needs a device |
+(`drm.cpp` copies `shared_bytes` into `shared_segment_size`) and now sets it: any program whose listing carries an `_sm_` instruction
+declares `kLdsWindowBytes` (4096, above the largest footprint a case can stage) and
+`cs_lds_preflight` refuses a shared-memory launch that declares zero | **settled
+2026-11-03**: all 48 rows it covers - 8 `load_sm_*`, 3 `load_sm_matrix_*`,
+5 `store_sm_*` and 32 `atomic_sm_*` - pass on both pipes; the window is a fixed
+upper bound rather than a computed footprint |
 | output pointer | the host writes the output BO VA as the first user argument at `kernarg+0`; the kernel loads it from `s[6:7]` | the host writes the same word (`drm.cpp`), and `build_generic` reads it once as launch-state evidence, then ignores it | **half-aligned**: produced, not consumed |
 
 The two deviations are safe **only because** the carrier and the host share
