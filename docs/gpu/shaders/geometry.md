@@ -239,6 +239,32 @@ must not request fifteen raster varying planes or lose captured components.
 This separation is a compiler/driver ABI contract, not an increase in the
 hardware raster record limits below.
 
+### Captured point size
+
+`PointSize` keeps its fixed-function payload quad even when transform feedback
+captures it. It does not consume a generic varying plane. A capture declaration
+must not disable this carrier: rasterization still needs the value while capture
+is active, paused, or inactive. The vertex stage writes position channel 4;
+the geometry stage uses the point-size slot in its position record, so `P` must
+include that quad in both cases.
+
+Capture observes the shader's original value. Rasterization may require a
+separate clamped copy because LG200 does not enforce the API's point-size range
+on the streamed value. Gallium currently uses `[0.125, 2048]`: for example, a
+shader output of `2064` must be captured as `2064` while the raster point spans
+at most `2048` pixels. This is a frontend policy, not an ISA constant. LCO's
+shared target options default to a zero maximum, which disables this extra
+clamp; a frontend that already lowered the size, or uses another API policy,
+can retain that default.
+
+For captured sizes, the compiler preserves the original value for buffer
+stores and applies `v_max_f32` followed by `v_min_f32` only to the raster copy.
+Bounds that are not inline VOP constants must first be materialized in an
+encodable source. The point-size carrier and its position-record width remain
+present when capture stores are disabled. VS and GS share this rule; it does
+not add Vulkan transform-feedback support or change Vulkan's advertised point
+size features.
+
 ## Limits
 
 | Limit | Value |
