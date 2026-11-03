@@ -393,6 +393,21 @@ execution count. Shader storage side effects can provide a separate progress
 observation, but their exact-lane mask and memory visibility remain part of
 that observation's contract.
 
+To isolate a consumer, verify that the producer's encoded binary and launch
+state stay identical when changing the fragment program. A linker can move
+arithmetic between stages or remove outputs, so source similarity alone does
+not establish that control. Separate shader programs can help retain the
+producer, but the resulting binaries and state still need comparison. A
+constant fragment program also does not bypass coefficient generation when
+the host requests coefficient groups. Record that request independently of
+the shader's coefficient loads.
+
+Inspect wait domains in the encoded instructions. An unassigned compiler IR
+domain can select a default during packing; it is not necessarily an encoded
+zero. A full-domain wait covers the documented ordering domains, but does not
+by itself prove the lifetime of a fixed-function record or completion of an
+attachment write.
+
 These checks validate the compiled program and its launch state. They do not
 extend an instruction's documented semantics to other operand forms or stages,
 and a finite successful run does not resolve an intermittent failure.
