@@ -1,5 +1,4 @@
-// v_fcvt_i32_f32 -- Converts each lane's single-precision source to a signed 32-bit integer,
-// truncating toward zero: `d = i32_trunc(a)`.
+// v_fcvt_i32_f32 -- Converts each lane single-precision source to a signed 32-bit integer, truncating toward zero.
 //
 // [HW 2026-11-03] The title used to say "to the nearest" while the helper it calls
 // (ops/softfloat.cpp:454) rounds TowardZero whatever the policy says: 3.5 gives 3 and -42.8

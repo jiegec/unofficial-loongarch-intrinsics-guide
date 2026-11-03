@@ -1,5 +1,4 @@
-// v_abs_f32 -- Takes the magnitude of an f32 value: a denormal input flushes to zero, anything
-// else loses its sign bit: `d = flush(a) & 0x7fffffff`.
+// v_abs_f32 -- Takes the magnitude of an f32 value: a denormal input flushes to zero, anything else loses its sign bit.
 //
 // [HW 2026-11-03] The first line used to promise a pure bit clear ("d = a & 0x7fffffff") and
 // the body below contradicts it for exactly those inputs: 0x807fffff is a denormal, so a bit
