@@ -373,6 +373,30 @@ for the storage table. A host that sizes the argument block from the vertex and
 fragment layouts truncates the geometry tables, so the range MUST cover the
 geometry layout whenever a geometry stage can be bound.
 
+## Validating a compiled pipeline
+
+Transform feedback and raster output observe different consumers of the emitted
+vertices. Correct captured positions and attributes do not establish that the
+SIO record reached the rasterizer or that the fragment stage wrote an
+attachment. Validate both against independent references: emitted order,
+assembled primitive count and buffer guards for capture; coverage and
+interpolated values across the attachment for raster output. Comparing two
+images alone can miss a draw that leaves both images at the clear value.
+
+When diagnosing missing output, retain the clear and draw contents of the
+attachment allocation as well as API readbacks. CPU access to an exported
+DMA-BUF requires completed rendering and the DMA-BUF CPU-access synchronization
+protocol. An unchanged allocation narrows that observation to a missing write
+or an earlier pipeline failure; it does not identify an SIO instruction or a
+particular stage. Likewise, an occlusion-query result is not a fragment-shader
+execution count. Shader storage side effects can provide a separate progress
+observation, but their exact-lane mask and memory visibility remain part of
+that observation's contract.
+
+These checks validate the compiled program and its launch state. They do not
+extend an instruction's documented semantics to other operand forms or stages,
+and a finite successful run does not resolve an intermittent failure.
+
 ## Open questions
 
 - **Primitive id and invocation id share `v1`.** Both lanes read vector
