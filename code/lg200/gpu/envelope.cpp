@@ -4022,7 +4022,7 @@ std::optional<EnvelopeProgram> build_carrier_env(
       mnemonic == "store_v_buff_fmtdesc_c2" ||
       mnemonic == "store_v_buff_fmtdesc_c3" ||
       mnemonic == "store_v_buff_fmtdesc_c4" ||
-      mnemonic == "store_v_buff_b8" || mnemonic == "getlod" ||
+      mnemonic == "getlod" ||
       mnemonic == "getresidinfo" || mnemonic == "getresinfo" ||
       // [HW 2026-11-03] The texture bucket emptied with the same bit-27 repair
       // the buff rows got: these rows' instruction words were 0x21xxxxxx, which
@@ -4042,10 +4042,22 @@ std::optional<EnvelopeProgram> build_carrier_env(
       mnemonic == "load_v_tex" ||
       mnemonic == "v_sqrt_f64" || mnemonic == "v_rsq_f64" ||
       mnemonic == "v_s2v_b32" ||
-      // [HW 2026-11-03] v_add_imm_i32 and v_sub_imm_i32 belong here for a
-      // reason of their own: every case of both rows returns the constant
-      // 0x3f4fffff - the canary - on BOTH pipes, so the store never writes the
-      // result and the row cannot be compared until that staging is fixed.
+      // [HW 2026-11-03, corrected] v_add_imm_i32 and v_sub_imm_i32: the STORE
+      // works and the INSTRUCTION does not write its VD8 destination.  The old
+      // note here said the opposite ("the store never writes the result") and
+      // quoted a constant that is not even produced by this repository.  What is
+      // measured: every cell of the row holds the value the LAST dispatch that
+      // wrote v10 left there.  Running v_add_imm_f32 first (its last vector is
+      // 0xffc00001) makes all 40 cells read 0xffc00001; running this row again
+      // changes nothing, because this row never overwrites it.  The same holds
+      // for v_sub_imm_i32 behind v_sub_imm_f32 (0xff800000).
+      //
+      // Why the word does not write VD8 is UNRESOLVED, and it is not recorded as
+      // a property of the instruction: its u32 sibling (same format, one opcode
+      // nibble apart) passes 40 of 40, so either this variant decodes to
+      // something that does not write the field, or the catalog's opcode for it
+      // is not what the hardware expects.  Deciding that needs a controlled
+      // opcode experiment, not a guess.
       mnemonic == "v_add_imm_i32" || mnemonic == "v_sub_imm_i32" ||
       // [N2 2026-11-03] s_cmp_eq_u64/s_cmp_ne_u64 are no longer here: their
       // destination is a scalar register the carrier now names and stores
@@ -4069,7 +4081,9 @@ std::optional<EnvelopeProgram> build_carrier_env(
     // The group is broad; the reason is not.  Name the mechanism the comment
     // above records, and fall back to the group name when there is none.
     const char* why = "launch-state group in build_carrier";
-    if (mbcnt_wide)
+    if (mnemonic == "v_add_imm_i32" || mnemonic == "v_sub_imm_i32")
+      why = "the instruction leaves its VD8 destination unwritten";
+    else if (mbcnt_wide)
       why = "the popcount window follows no single rule above four lanes";
     else if (flat_multiwave)
       why = "the old-value read-back is a race between waves above one wave width";

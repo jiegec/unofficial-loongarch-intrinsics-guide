@@ -58,6 +58,10 @@ PHRASES = {
     'launch-state group': ['launch-state group', 'launch state'],
     'accumulator and destination tuples': ['tuples are not staged'],
     'scalar-compare destination': ['ordinary scalar register'],
+    # [HW 2026-11-03] v_add_imm_i32 / v_sub_imm_i32: the instruction does not
+    # write its VD8 destination on this silicon, so the graded cell holds the
+    # previous dispatch's value.
+    'leaves its VD8 destination unwritten': ['leaves its VD8 destination'],
 }
 
 
