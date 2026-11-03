@@ -135,7 +135,22 @@ A conditional branch additionally carries its condition register in
   the selected mask is an absolute lane set (not intersected with `p0`), it survives the
   instruction, a compare can write a mask register and a branch can read one.  See
   [Operands](operands.md#conditional-execution) for the measurement table.
-* The meaning of reserved bits: they are emitted at the row's base value, but
-  whether the hardware requires that value is not established.
+* The meaning of reserved bits: they are emitted at the row's base value.  For
+  two of them the requirement is now measured rather than assumed, and the answer
+  is that the bit is part of the opcode.
+  [HW 2026-11-03] `INST_HI[27]` is required by the buffer and texture loads and
+  stores.  With the bit clear the row emits `0x21xxxxxx` where its family is
+  `0x29xxxxxx`, and the hardware does not decode the word at all: the destination
+  register keeps whatever the previous program left in it, which is why those
+  rows read a fixed value that changed between runs and differed between the two
+  pipes.  Setting the bit makes the catalog's base word equal the vendor seed
+  bit for bit (`load_v_tex` 0x291c0000, `store_v_tex` 0x29340000, `getlod`
+  0x28e40000) and thirty rows start comparing.  The split has no counterexample:
+  of the 137 rows in those two families, all 108 whose template carries the bit
+  compare and pass, and all 29 without it were failing to decode.
+  [HW 2026-11-03] `INST_HI[29]` is required by `store_v_flat_b96`: with it clear
+  the instruction writes nothing at all (nine result dwords read zero), and with
+  it set the store lands 3 of 3 on both pipes.  Both rows mark the bit fixed
+  instead of reserved, so a decoder that recomputes masks sees them as identity.
 * Whether the opcode fields of formats 9 and 10 (the 4-bit `INST_HI[26:23]`
   selector) carry any structure beyond the mnemonic.
