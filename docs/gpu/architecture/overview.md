@@ -1,101 +1,144 @@
 # Architecture Overview
 
-The LG200 is a GPU with four command-processing pipes, a stream processor that
-executes shader waves, a set of fixed-function graphics blocks, and a memory
-system shared with the CPU. This chapter describes how those parts fit
-together. The values of one generation are in the [LG200 profile](generation-lg200.md).
+The LG200 is a graphics and compute device: four command processors, a shader
+core, fixed-function graphics blocks and a shared memory system. This chapter
+names those blocks, follows a graphics and a compute submission to the engine
+that executes each, and states which layer owns each ring and queue. Display,
+video and kernel-internal scheduling are out of scope. The generation's values
+are in the [LG200 profile](generation-lg200.md); the wave and address model are
+in [Execution model](execution-model.md) and
+[Memory system](memory-system.md).
 
-![Ownership and command path](../assets/fig-system.svg)
+![Ring ownership and hand-off](../assets/fig-system.svg)
 
-The figure shows which rings the kernel owns, the CPIPE MCS queue the user owns,
-and where each ring publishes its write pointer.
+*The kernel fills the graphics, blit and transfer rings; the compute ring is
+client memory, which the client writes and publishes.*
 
 ## Blocks
 
-| Block | Role |
-|-------|------|
-| Host interface | Kernel ioctls, buffer objects, virtual addresses, submissions and fences. |
-| GPIPE | Graphics command processor. Consumes the graphics ring and executes indirect buffers. |
-| BPIPE | Inner graphics and blit command processor. Has its own ring and write pointer and drives blits from that ring. |
-| CPIPE | Compute command processor. Drives compute queues and user queues. |
-| XDMA | Transfer engine for linear copy and fill. |
-| Stream processor (SP) | Executes shader waves: vector ALUs, scalar ALU, lane masks, texture and memory instructions. |
-| Fixed-function graphics | Primitive assembly, rasterizer, interpolator, depth and stencil test, blending, texture filtering, streamout and queries. |
-| Memory system | GPU virtual memory, page tables, VMIDs, caches and the memory interface. |
+| Block | Fed by | Executes |
+|-------|--------|----------|
+| GPIPE | The graphics ring | State records in indirect buffers; drives a draw's stages and fixed-function state. |
+| BPIPE | Its own ring | 2D copy, fill and blit; no shader. |
+| CPIPE | Compute queues | Dispatches from an MCS command stream. |
+| XDMA | Its own ring | Copy and fill over linear memory. |
+| HIQ | Kernel-written firmware packets | Queue install and removal, doorbells, status. |
+| Command port | A register mailbox and direct register writes | Engine enable, ring provisioning, MMU, VMIDs, power. |
+| Shader core | Waves from GPIPE and CPIPE | Vector and scalar instructions, masks, texture and memory. |
+| Fixed-function graphics | GPIPE | Primitive assembly, rasterization, depth and stencil, blend, texture filtering, streamout, queries. |
+| Memory system | Every engine | Page tables, VMIDs, caches, memory interface. |
 
-The display controllers, video decode and encode engines are separate blocks and
-are not described here.
+The ring numbering also defines DPIPE and EPIPE. LG200 has neither block; a
+submission that names one is refused.
 
 ## Two command paths
 
-A graphics command and a compute command take different paths to the SP.
+A submission is a chunk array. One chunk kind carries an indirect buffer: a GPU
+address, a length in bytes and an engine selector. The kernel resolves the
+selector, admits the buffer against the submission's residency set, and appends
+the packets that point at it; the engine reads everything else from the buffer.
+All buffers of one submission must resolve to the same ring.
 
-A **graphics** submission is an indirect buffer (IB) submitted on the graphics
-ring. GPIPE consumes the ring, executes the IB, and applies the state record it
-contains. The state record selects the shader stages and the fixed-function
-state. The shader stages then run over the primitives produced by the draw.
-BPIPE is a separate ring and write pointer; it does not consume packets inside a
-graphics IB.
+### Graphics: a ring of pointers
 
-A **compute** submission uses a compute queue. The kernel creates the queue and
-installs its MQD, but the MCS ring is a user-owned GEM BO: the user-mode driver
-writes the packets and the queue's write pointer. The kernel rings the queue
-through the HIQ with `(pasid, queue_id)`; it does not read the packets. CPIPE
-consumes the queue and launches the compute kernel described by the kernel
-descriptor.
+On the graphics ring a chunk becomes a VMID update followed by the
+indirect-buffer command (`0x80`), which carries the buffer's address, its length
+and the VMID. The processor fetches the buffer through the page directory the
+submission installed for that VMID and executes the state records inside it.
+Chunks on one ring run in packet order. The kernel never copies the buffer: the
+records live in client memory and the ring carries only their address. Ring
+packets and buffer contents are different packet sets; the buffer's records are
+defined in [State records](../graphics/state-records.md).
 
-An **XDMA** submission is a linear copy or fill on the transfer ring. It does
-not use the graphics IB format or the compute queue record.
+### Compute: a queue the client writes
+
+Compute has no indirect-buffer route: the submission path refuses the engine
+selector for compute, so no kernel packet leads into CPIPE. The client creates a
+queue instead — a power-of-two ring of 4 KiB to 1 MiB, 64-byte aligned, with a
+64-byte index block immediately before it. The kernel validates the geometry,
+builds the queue descriptor (ring base, length in dwords, PASID, queue id, and
+the addresses of the write and read indices) and hands it to the firmware.
+
+The ring carries MCS (micro-code stream) commands, not HSA AQL packets: each
+command word holds an opcode in its low byte and a config field above it. A
+dispatch is a fixed sequence: the state-configuration command `0x89` writes the
+launch parameters into device state, the group command `0x87` carries the three
+workgroup counts, and a submit command (`0x8a`) names the 64-bit completion
+signal.
+
+The client publishes in two steps: it writes the new write index into the index
+block, then asks for a doorbell. The doorbell names only the PASID and the queue
+id; the kernel checks the index it is handed against the ring size and 64-byte
+alignment, and never parses the stream. The firmware consumes from the write index
+and writes the consumed position back to the read index.
+
+### Control is not a data path
+
+Bringing an engine up is not a ring operation. The kernel gives a pipe its ring
+base and size as arguments to an immediate command: it writes a command word and
+two arguments into a mailbox, raises the command-port interrupt, and polls a
+status word until the device reports completion. MMU enable, TLB maintenance and
+power-level changes travel the same way, serialised by the one mailbox. A value
+that needs no argument, such as a pipe's write pointer, is written straight to a
+register.
+
+Configuration that must be ordered against submitted work does appear on the
+ring: a register write (`0x81`), a VMID-to-PASID binding (`0x84`), or the
+page-directory writes and TLB invalidation a submission emits before its first
+buffer. Completion is also a memory write: the last packets store the
+submission's sequence number and raise an interrupt. Firmware control is a
+separate vocabulary of packets — process mapping, queue installation and removal,
+doorbells — written into the HIQ; a client never emits them.
 
 ## Ownership
 
-| Layer | Owner | What the layer controls |
-|-------|-------|-------------------------|
-| Application | Application | API objects and commands. |
-| User-mode driver | Application process | Buffer objects, virtual addresses, IBs, queue records, shader binaries and descriptor tables. |
-| Kernel driver | Kernel | Kernel rings, VMIDs, page tables, queue provisioning, fences, reset and recovery. The CPIPE MCS ring is user-owned. |
-| Hardware | Device | Command processors, SP, fixed-function blocks, caches and memory. |
+| Object | Written by | Publish point | Pointer location |
+|--------|-----------|---------------|------------------|
+| Graphics, blit, transfer rings | Kernel | Ring commit | MMIO write-pointer register |
+| Ring read pointer | Device | As it consumes | Kernel writeback memory, or a register |
+| Compute queue (MCS ring) | Client | The client, then a doorbell | 64-byte index block |
+| Indirect buffer | Client | The ring packet naming it | GPU virtual address |
+| Queue descriptor | Kernel | A queue-installation packet | HIQ packet payload |
 
-A user-mode driver does not program a kernel ring cursor or a page table directly.
-It builds memory objects and command buffers, submits them through the kernel,
-and waits on a fence. For a CPIPE MCS queue, the user writes that queue's write
-pointer; the kernel only installs the MQD and rings the HIQ.
+A client never writes a kernel ring cursor: it writes command bytes and submits,
+and the kernel stages the complete frame, copies it into the ring, and only then
+writes the write-pointer register. On the compute path the split differs: the
+client owns the bytes and the index, the kernel owns the queue's existence and
+the doorbell, so the correctness of a dispatch is entirely its client's
+responsibility.
 
-## A draw in one paragraph
+## A draw is a state record
 
-A draw is a state record applied by GPIPE. There is no separate draw packet: the
-record carries the state object, and the draw's own fields are the Draw Info
-record at state offset 0. The rest of the object holds rasterization state,
-depth, stencil and blend state, surface records, stage configuration and the
-shader-info records. The vertex stage reads attributes through descriptor tables and writes
-its output to stream SIO0. The rasterizer assembles primitives, clips and
-rasterizes them, and the fragment stage reads interpolated inputs and writes
-colour to stream SIO1. The output-merger blocks apply depth, stencil and blend
-state and write the surface. See [Graphics pipeline](../graphics/pipeline.md) for
-the detailed path.
+There is no draw packet. A draw is the 512-dword state block the records have
+accumulated, made current by the `0x03` that ends the record. Its own parameters
+are a 9-dword structure, Draw Info, at state offset `0x000`;
+[Draw](../graphics/draw.md) defines the rest of the block.
 
-## Execution in one paragraph
+A record takes one of two forms:
 
-A shader runs as a wave of up to 32 lanes. Each lane has its own vector
-registers; the scalar registers are shared by the wave. A lane mask is a 32-bit
-scalar value; the instruction's 2-bit PJ2 field selects one of the four predicate
-slots p0..p3, and the mask gates each lane's write. Branches are wave-wide;
-per-lane control flow is expressed by narrowing and restoring masks. See
-[Execution model](execution-model.md) and [Execution](../isa/execution.md).
+| Form | Length | Layout |
+|------|--------|--------|
+| Full | 516 dwords | `0xf04`, `10`, `0x20000001`, 512 state dwords, `0x03` |
+| Delta | 4–516 dwords | `0xf04`, one window descriptor per changed run, then `0x03` |
 
-## Memory in one paragraph
+Both are built from window descriptors: bits 7:0 hold the opcode (value `1`, a
+state-window write), bits 19:8 the first state dword of the run, bits 31:20 the
+run length, whose dwords follow. The full form's `0x20000001` is such a
+descriptor with start `0` and length 512. The mode word `10` distinguishes the
+full form from a delta; other values do not appear in any stream described here,
+and their meaning is UNRESOLVED.
 
-Every address in a command, a descriptor or a shader is a GPU virtual address in
-the VMID selected for the submission. The MMU walks a page table; buffers are
-mapped explicitly and must remain resident until the submission's fence signals.
-There is no cache-management packet: ordering is established by the submission
-fence and by the shader's ordering instructions. See
-[Memory system](memory-system.md).
+A standalone buffer that carries one full record is 528 dwords: the 516-dword
+record, then `0xf05` (command end) and eleven zero dwords. Records inside one
+buffer are packed back to back instead: a full record is 516 dwords there, the
+cursor advances by the record's own length, and only the last record of the
+buffer is followed by `0xf05` and the eleven zero dwords.
 
-## What this manual does not cover
+Because the state block persists across records, a delta names only what changed.
+A driver MUST include every dword whose value changed: a dword the record omits
+keeps the value the processor already holds, and a draw that then uses it reads
+or writes an address nobody programmed.
 
-- Display, video decode, video encode and the display controller registers.
-- The kernel's internal scheduler, recovery state machine and debug interfaces,
-  except where a user-mode driver observes their result.
-- Performance in architectural cycles. The performance appendix gives relative
-  wall-clock measurements and states their precision.
+Indirect buffers are admitted with 4-byte alignment of address and length, and
+nothing stronger. A 32-byte or 64-byte start is a builder convention; whether the
+command processor requires more than 4 bytes is UNRESOLVED.

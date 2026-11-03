@@ -1,68 +1,110 @@
 # Multisampling
 
-LG200 supports multisampled rendering. The state encodes 2x and 4x surfaces, and
-the current driver exposes 4x. This chapter defines the state, the resource
-layout and the resolve paths.
+LG200 supports at most four samples per pixel. A multisampled target is one surface whose
+samples are interleaved inside its tiles: not four planes, not a compressed form, and with no
+companion allocation. A resolve produces the single-sample image, and alpha-to-coverage is
+computed by the fragment shader.
 
 ## Sample count
 
-The sample count is not stored in the 512-dword state object, in the indirect
-buffer or in the buffer size. It is encoded in the resource:
+The framebuffer, depth/stencil and sampled-image sample counts are 1 and 4.
 
-- the image or surface type is a multisample type;
-- the image descriptor's last level is `log2(samples)`: 1 for 2x, 2 for 4x;
-- the surface type is 8 for a 2D multisample surface, or 12 for a 2D
-  multisample array.
+| Count | Surface storage | Surface Type |
+|------:|-----------------|--------------|
+| 1x | one storage word per texel | 0 (`2D`), 4 (`Layered`) |
+| 4x | four storage words per texel, interleaved | 8 (`2D Multisample`), 12 for a colour layer range |
+| 2x | no layout | — |
 
-A Pipe Enables bit enables multisampling for the draw. The bit does not carry
-the sample count. A draw MUST use a surface whose type and last level agree with
-the requested count.
+A storage word is the format's stored width, which can be wider than the exposed one: a depth
+surface uses four bytes per texel even when it presents 16 bits. A 4x target is single-level,
+keeps the level fields at 0, sets Tiling Mode 2, and sets Alignment to `log2(256 / storage
+bytes)`: 6 for a four-byte colour texel, 5 for eight, 4 for sixteen. A depth or stencil target
+always carries 6, which is the same rule because its storage word is four bytes. Alignment is
+not a multisample flag: a single-sample surface of the same format carries the same value.
 
-## Supported counts
+Nothing in the command stream distinguishes 2x from 4x. `Surface Type` 8 covers every
+multisampled attachment and both counts serialize byte-identical surface words; no field in the
+512-dword state object or in the indirect buffer carries the count. Only two per-draw fields
+describe multisampling:
 
-| Count | State encoding | Current driver |
-|------:|----------------|----------------|
-| 2x | Encodable | Not exposed |
-| 4x | Encodable | Exposed |
+| Bits | Field | Meaning |
+|------|-------|---------|
+| Pipe Enables 48 | MSAA Enable | Set for a multisampled draw, clear for a single-sample one. Does not carry the count. |
+| Pipe Enables 56:57 | Sample Rate | Per-pixel shading passes minus one, honoured only while MSAA Enable is set. A shading rate, not the sample count. |
 
-> UNRESOLVED: whether the hardware supports 2x rendering with the same resolve
-> paths as 4x, and whether a mixed 2x/4x attachment is legal.
+Which field, if any, tells the rasteriser how many samples a target has is **UNRESOLVED**, and no
+path describes a 2x attachment; a host MUST NOT issue a 2x draw. The one descriptor that names the
+4x geometry is the image descriptor of a *sampled* multisample image: Image Type 14
+(`2D Multisample`) or 15 (`2D Multisample Array`) with Last Level 2, the level count of the
+multisample layout rather than a mip range; 0 there makes every per-sample fetch read the wrong
+level.
 
 ## Colour layout
 
-A 4x colour surface uses the tile2 layout with a sample dimension. The surface
-record's alignment code is 6. A multisample colour attachment is cleared through
-a CPU mapping; a 4x colour resolve runs as a GPU pass that reads the sample
-plane.
+A 4x colour surface keeps the tile2 layout with the sample dimension folded into each tile: a
+texel owns four consecutive storage words, one per sample. A layer spans
+`ceil(height / 4) * (pitch / 4) * 64 * storage_bytes` bytes, where `pitch` is the surface word's
+row pitch in texels of the storage word; the depth map below uses the same span, and the map is
+the whole surface, so no second buffer holds coverage. Because four samples share each word
+group, a full clear can write the allocation as one flat run of storage words, but a partial one
+has to walk the sample map.
+
+The placement of a region inside that span is **UNRESOLVED**: one reading puts the region of
+texel `(x, y)` at `(y / 4) * (pitch / 4) * 0x100 + (x / 4) * 0x100`, the depth map without the
+row inversion; the other gives a colour tile a plane-and-slot address inside eight 0x2000-byte
+segments, leaves two tiles of the 8x8 tile grid unused, and rotates the channels with two tile
+exceptions. A host MUST NOT read a drawn 4x colour surface as a linear image and MUST resolve it
+on the GPU.
 
 ## Depth and stencil layout
 
-A 4x depth surface uses the interleaved sample map in
-[Formats and layout](formats.md#multisample-layout). The rows are inverted, and
-the layer span is a function of the pitch and the block size. Depth and stencil
-resolve run through CPU transfers that read the sample plane and write a single
-plane.
+The depth map is the one 4x layout whose address arithmetic is established: a grid of 256-byte
+regions, each holding a 4x4 group of texels with their four samples. The rows are inverted:
+window row `y` is surface row `h = height - 1 - y`, and the map is indexed by `h`. Within a
+region the word of sample `s` of texel `(x, h)` is
+
+```text
+w = ((h % 4) >= 2 ? 32 : 0) + ((x % 4) >= 2 ? 16 : 0)
+  + (h & 1 ? 8 : 0) + (x & 1 ? 4 : 0) + s
+```
+
+and the region starts at `(h / 4) * group + (x / 4) * 0x100` with `group = (pitch / 4) * 0x100`;
+both byte terms scale by the storage width. The same formula with four-byte constants is in
+[Formats and layout](formats.md#multisample-layout).
 
 ## Resolve
 
-| Resource | Resolve path |
-|----------|--------------|
-| Colour | GPU pass that reads the sample plane. |
-| Depth | CPU transfer. |
-| Stencil | CPU transfer. |
+| Source | Path | Restriction |
+|--------|------|-------------|
+| Colour | fragment pass: fetch each of the four samples, write one texel per pixel | integer colour formats are single-sample only |
+| Depth | CPU mapping of the sample map, read sample 0 | minimum, maximum and average need their own support |
+| Stencil | CPU mapping, aspect merged word by word | |
 
-A resolve is not a blend. A colour resolve copies the sample plane to a
-single-sample surface; it does not use the blend equation. A host MUST NOT fold
-a depth resolve into the colour pass.
+A resolve is not a blend: it builds the destination texel from the source samples and does not run
+the attachment's blend equation. Nor is it a copy, because the samples share a tile. A 4x-to-4x
+copy MUST move all four sample words; a path that stages sample 0 and writes one value into all
+four words implements the resolve contract and destroys samples 1 to 3.
 
 ## Alpha-to-coverage
 
-Alpha-to-coverage requires 4x multisampling. A draw that requests it with any
-other sample count MUST be rejected.
+Alpha-to-coverage requires a 4x target. A draw that requests it on a single-sample target MUST be
+rejected, and an integer colour attachment MUST be rejected with it.
+
+There is no fixed-function alpha-to-coverage state: the fragment shader computes the mask. Per
+covered fragment it clamps the exported alpha to 0..1, scales by 4, rounds to nearest, forms
+`(1 << n) - 1`, and ANDs the result with the sample mask, so alpha 0 keeps no sample and alpha 1
+keeps all four. The mask reaches the rasteriser through the coverage channel; the fragment input
+config declares it with its `Sample Mask Output` bit (bit 44).
+
+A shader that needs no explicit mask MUST NOT write one: the full 0xf mask selects a coverage path
+that drops part of a 4x colour surface, while an implicit mask uses the rasteriser's own coverage.
+A sample mask other than 0xf still has to be exported without alpha-to-coverage, and alpha-to-one
+applies after alpha-to-coverage.
 
 ## Open questions
 
-- The sample positions used by the rasterizer.
-- Whether a 2x surface can be resolved through the same GPU path.
-- The exact sample order for a 2x depth surface.
-- Whether a multisample surface can be sampled by a shader.
+- The field that names the sample count, and therefore whether 2x is reachable at all.
+- The 2x sample layout and its layer span.
+- The four sample positions, and which order a per-sample read addresses them in.
+- Whether the depth map's four-row group stride is fixed at 0x2000 bytes or follows the row pitch;
+  the two readings differ for a pitch other than 128 texels.

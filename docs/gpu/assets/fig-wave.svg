@@ -120,5 +120,5 @@
 <text x="198" y="352" fill="#5a6478" font-size="11">gate blocked</text>
 <text x="708" y="172" fill="#5a6478" font-size="11">one copy per lane</text>
 <text x="708" y="188" fill="#5a6478" font-size="11">row i = lane i</text>
-<text x="24" y="456" fill="#5a6478" font-size="11">a set bit lets the write land in that lane's row; a clear bit suppresses it, so the row keeps its value</text>
+<text x="24" y="456" fill="#5a6478" font-size="11">a set bit lets the write land in that lane's row; a clear bit blocks the write, and whether the old value survives is UNRESOLVED</text>
 </svg>

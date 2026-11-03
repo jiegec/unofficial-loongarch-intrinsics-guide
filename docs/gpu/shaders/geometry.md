@@ -1,218 +1,323 @@
 # Geometry Stage
 
-The geometry stage reads the vertex stage's SIO0 record, emits primitives and
-writes an SIO1 record. This chapter defines the input layout, the output record
-classes and the emit/cut rules. The stage's registers are in
-[Registers](registers.md); the SIO instructions are in [SIO](io.md).
+The geometry stage runs one invocation per input primitive. It reads the vertex
+stage's SIO0 record, emits vertices into an SIO1 record, and cuts that record
+into output primitives. This chapter defines the input record, both output
+record classes, the emit and cut rules, the limits, and the host state that runs
+the stage. Registers are in [Registers](registers.md); SIO transfers are in
+[SIO](io.md).
 
-## Input
+## Where the stage runs
 
-The geometry stage runs in slot 3 with shader type 4. It receives six 5-bit
-input-vertex selectors in `v0`: selector `i` is at bit offset `5 * i`. It also
-receives the primitive identifier in `v1`.
+The geometry program is shader slot 3 of the six shader-info slots, numbered VS
+0, HS 1, DS 2, GS 3, SS 4, PS 5. Slot records start at state offset `0x540`
+and are `0x60` bytes apart, so the geometry record is at `0x660`, with `Shader
+Type` (bits 32 to 39) set to 4. The vertex program runs in the domain-stage
+slot and its compiled form depends on whether a geometry stage is present; see
+[Stages](stages.md).
 
-Input positions use channels 0 through 3. Clip and cull data occupies the
-position-adjacent payload. Generic varying quads follow the position block in
-the linked layout order.
+The stage is optional. A draw without a bound geometry program MUST still write
+the geometry slot and the geometry configuration, because the command processor
+keeps the last state block it was given and would otherwise run the previous
+draw's program. The disabled form is an all-zero shader-info record and an
+all-zero `GEOMETRY_STAGE_CONFIG`.
 
-Let `D` be the producer's clip and cull payload component count and `E` indicate
-a miscellaneous position value such as an edge flag:
+With a geometry program bound, the shader config word at `0x4c0` sets DS Enable
+(bit 2), GS Enable (bit 3) and DS As VS (bit 5), and `GS Primitive Type`
+(bits 12 to 15) takes 1 for points, 2 for lines and 3 for triangles. That field
+is a category, not an assembly mode: a triangle strip and a triangle fan both
+program 3.
+
+## Input record
+
+Per input primitive the stage receives one SIO0 record and two vector registers.
+
+| Register | Content |
+|----------|---------|
+| `v0` | Six 5-bit vertex selectors. Selector `i` occupies bits `5i+4 : 5i` and names the entry-register index, 0 to 5, of input vertex `i`. |
+| `v1` | The primitive id when `Input Primitive ID` (bit 12) is set; the invocation id when `Input Invocation ID` (bit 13) is set. |
+
+A constant vertex index above 5 is rejected; a dynamic index is clamped to 5
+before the selector is extracted. The two `v1` enable bits are independent, and
+both meanings read `v1`, so a stage that reads both `gl_PrimitiveIDIn` and
+`gl_InvocationID` has no established lane assignment; see
+[Open questions](#open-questions).
+
+Position occupies channels 0 to 3 of the ring. The block after position carries
+clip and cull distances, and the generic varyings follow it in linked-layout
+order. Let `D` be the producer's distance component count and `E` indicate
+that the producer writes an edge flag:
 
 ```text
-clip_base(D, E) = 8, if D > 4 or E; otherwise 4
+clip_base(D, E)         = 8, if D > 4 or E; otherwise 4
 position_channels(D, E) = 4, if D = 0 and not E
                           clip_base(D, E) + 4 * ceil(D / 4), otherwise
 ```
 
-The generic varying at linked ordinal `b` starts at
-`position_channels + 4 * b`. Distance payload slots are not counted a second
-time as generic varying quads.
-
-For `V` linked generic varying quads, the current implementation chooses the SIO0
-window as:
+A generic varying whose ordinal in the linked layout is `b` starts at
+`position_channels + 4 * b`. Distance slots are skipped when the ordinals are
+counted, so they are not also paid for as generic quads; a cull slot the
+producer never wrote answers zero. For `V` linked generic varying quads the
+SIO0 window is:
 
 ```text
-minimum_window = max(position_channels + 4 * V, 4 * (V + 2), 12)
-window = minimum_window, if minimum_window <= 32
-         32 * ceil(minimum_window / 32), otherwise
+minimum = max(position_channels + 4 * V, 4 * (V + 2), 12)
+window  = minimum,                 if minimum <= 32
+          32 * ceil(minimum / 32), otherwise
 ```
 
-Wide records reserve complete 32-channel rows. The complete hardware condition
-for a partial row is UNRESOLVED.
+Producer and consumer MUST program the same window: the vertex stage's export
+width and the geometry stage's read width are one number. Wide records round up
+to complete 32-channel rows so that the input quads of adjacent vertices do not
+overlap; whether a partial row would overlap is UNRESOLVED, so the rounding is
+required.
 
-## Descriptor roots
-
-In the current LG200 graphics ABI, the geometry Shader Info record uses the
-following 64-bit roots. Offsets are bytes from the beginning of that record.
-
-| Offset | Root | Geometry-stage value |
-|--------|------|----------------------|
-| `0x20` | Read/write buffers | Zero in the current GS ABI. |
-| `0x28` | Constant buffers | Zero; buffer descriptors are reached through the constant root. |
-| `0x30` | Constants | Address of the GS constant descriptor and its relative descriptor tables. |
-| `0x38` | Resources and samplers | GS descriptor-table address with bit 62 set. |
-| `0x40` | Attributes | Zero; vertex-stage output is read through SIO0. |
-
-The resource-root flag is separate from the GPU virtual address. An address
-range check MUST exclude the flag; relocating the root MUST preserve it.
-Geometry resources have their own descriptor table and cannot alias the
-fragment-stage table merely because the sampler indices match.
-
-A host that caches Shader Info records must rebase both live GS roots when
-moving to a new argument block. Its range must cover the complete GS argument
-layout, including tables beyond the shorter VS/FS-only layout. Comparing the
-flagged resource root directly with an unflagged address range, or bounding it
-by the VS/FS reservation, leaves the old table address in an otherwise updated
-record. These are requirements of the current descriptor ABI, independent of
-the SIO output-record formulas below.
+An input read takes a channel number and returns an aligned quad; a scalar
+declaration issues one read per component and keeps one lane. Reads SHOULD be
+issued in non-decreasing channel order, because a read that moves backwards in
+the ring stalls every later export of the stage and raises no fault. The read's
+own register field does not select its destination; the window is fixed by the
+read's position in the sequence, so the lanes MUST be copied out before the next
+read.
 
 ## Output record
 
-The output record is an SIO1 window. The record is described by three classes.
-The formulas below are the current host and compiler agreement; they are not a
-claim that every combination is accepted by the hardware.
-
-Let `N` be the number of linked output varying planes, `M` the API maximum
-vertex count, `P` the number of position quads reserved by the output, `S` a
-special layer or viewport chunk, and `G` the number of distance groups.
+Every emitted vertex contributes a position block of `P` quads and a varying
+row holding `N` quads padded to `next_pow2(max(N, 1))`. `N` is the number of
+linked output varying planes, `M` the declared output vertex count, `S` a
+layer or viewport chunk, and `G` the number of distance groups:
 
 ```text
-G = max(declared distance groups,
-        ceil((clip_distance_array_size + cull_distance_array_size) / 4))
-point_size_group = 1 if the stage writes PointSize; otherwise 0
-distance_offset = 8 channels, when G > 1 or point_size_group = 1
-                  4 channels, otherwise
-P = next_power_of_two(distance_offset / 4 + G), when G > 0
-    1 + point_size_group, otherwise
+G              = max(declared distance groups, ceil((clip + cull) / 4))
+has_point_size = the stage writes PointSize
+P              = next_pow2(max(distance_offset_quads, 1 + has_point_size) + G),
+                   when G > 0; otherwise 1 + has_point_size
+distance_offset_quads = 2, when G > 1; otherwise 1
 ```
 
-Point size uses the miscellaneous quad immediately after position. A second
-distance group also requires that quad even when point size is absent.
+`P` is the position block's quad count, position included. A stage with
+distances therefore has `P >= 2`, and point size with one distance group gives
+`P = 4`: point size occupies the payload quad at channel offset 4 and the
+distances start after it. A second distance group needs that quad even when
+point size is absent.
 
-| Class | Condition | Layout |
-|-------|-----------|--------|
-| Compact | Default when the dense gates below do not apply. | Stride `2 + S + P - 1 + max(N, 1)`; window `32 * stride`; export count `window + 1`; position size `1 + S + P - 1`. |
-| Dense | No special chunk, and either `P = 1` with `N = 2` or `N = 3`, more than eight declared vertices with a varying, more than 32 position-only vertices, or a position payload that would overflow compact storage. | Complete position and varying planes, with the formulas below. |
+`S` is 1 when the stage writes `gl_Layer` or `gl_ViewportIndex` and the
+matching output is enabled. Such a record is always compact, and its declared
+vertex count is capped at 32 because a layer that is not a draw constant is
+replayed one layer per launch.
 
-The small two- and three-varying cases use the dense layout too. A
-single-varying stride cannot describe two full varying quads. Attribute count
-counts the live varying quads, with a minimum of one for a position-only record;
-it does not add a position/control quad to a two-varying output.
+### Classes
 
-For a dense record:
+| Class | Chosen when |
+|-------|-------------|
+| Wide | `S = 0` and any of: `M > 8` with `(N >= 1 or M > 32)`; `P > 1` with `(M > 8 or 1 + P + max(N, 1) >= 8)`; or `P = 1` with `N = 2` or `N = 3`. |
+| Compact | Everything else, including every record with `S = 1`. |
+
+The two- and three-varying cases take the wide layout because a single-varying
+compact stride cannot describe two full varying quads.
+
+For a wide record:
 
 ```text
-cut = 32 * ceil(M / 32)
-slots = 8 * ceil(M / 8)
-varying_row = 4 * next_power_of_two(max(N, 1))
-varying_channels = varying_row * slots, if N > 0; otherwise 0
-window = cut + 4 * P * slots + varying_channels
-stride = window / 32
-position_size = P * slots / 8
+cut                      = 32 * ceil(M / 32)
+slots                    = 8 * ceil(M / 8)
+varying_row              = 4 * next_pow2(max(N, 1))
+window                   = cut + (4 * P + (N > 0 ? varying_row : 0)) * slots
+stride                   = window / 32
+export_count             = floor(4096 / window) * stride + 1
+position_size            = P * slots / 8
+attribute_count          = max(N, 1)
+maximum_threads          = floor(4096 / window) - 1
 position_descriptor_base = cut
-varying_descriptor_base = cut + 4 * P * slots
-attribute_count = max(N, 1)
-export_count = floor(4096 / window) * stride + 1
-maximum_threads = floor(4096 / window) - 1
+varying_descriptor_base  = cut + 4 * P * slots
 ```
 
-Allocate the padding in `varying_row` for every vertex. Three varying quads
-have a four-quad row, and five have an eight-quad row. Using the live quad count
-in the allocation while advancing descriptors by the padded row overruns the
-window at later vertices. The window and export count have different units;
-export count is not generally `window + 1`.
+The padding in `varying_row` is allocated for every vertex: three varying quads
+occupy a four-quad row and five an eight-quad row. Advancing descriptors by the
+padded row while sizing the ring from the live count overruns the window at
+later vertices.
 
-For `M <= 8`, `P = 1`, and no special chunk:
+For `M = 8`, `P = 1` and no special chunk:
 
-| Live varying quads | Row channels | Window | Stride | Export count | Maximum threads |
-|--------------------|--------------|--------|--------|--------------|-----------------|
+| Live varying planes | Row channels | Window | Stride | Export count | Maximum threads |
+|---------------------|--------------|--------|--------|--------------|-----------------|
 | 2 | 8 | 128 | 4 | 129 | 31 |
 | 3 | 16 | 192 | 6 | 127 | 20 |
 
-Compact records retain a row of four channels for `N <= 1` and
-`align_up(4 * N, 16)` otherwise. A compact position payload uses
-`4 * next_power_of_two(max(N, 1))` instead. Compact records rotate through their
-window; the dense record's per-vertex containment rule must not be applied to
-them without accounting for that rotation.
-
-A window above 4096 channels is rejected. The current plan supports at most five
-geometry output varying planes, including distance planes.
-
-The varying descriptor for attribute `a`, component `c` and emitted vertex `e`
-is:
+For a compact record:
 
 ```text
-varying_descriptor_base + varying_row * e + 4 * a + c
+stride                   = 2 + S + (P - 1) + max(N, 1)
+window                   = 32 * stride
+export_count             = window + 1
+position_size            = 1 + S + (P - 1)
+attribute_count          = max(N, 1)
+maximum_threads          = 31
+position_descriptor_base = 32
+varying_descriptor_base  = 64 + (S + P - 1) * 32
 ```
 
-A position component uses:
+The compact varying row is four channels for one plane and
+`align_up(4 * N, 16)` above that, except that a position payload replaces it
+with `4 * next_pow2(max(N, 1))`. Compact descriptors rotate through the window
+instead of staying inside one pass over it, so the wide record's per-vertex
+containment rule does not apply to them. `window`, `stride` and
+`export_count` are three different units — channels, 32-channel rows and
+committed records — so export count is not generally `window + 1`.
 
-```text
-position_descriptor_base + 4 * P * emit + component
-```
+### Descriptors
 
-The fixed-function distance payload starts at channel offset 4 for one group
-without point size, or at offset 8 when point size or two distance groups are
-present. The compiler also writes clip-distance values to the SIO1 varying plane
-when fragment interpolation consumes them.
+A varying component at attribute `a`, component `c` and emitted vertex `e` is
+named by `varying_descriptor_base + varying_row * e + 4 * a + c`; a position
+component uses `position_descriptor_base + 4 * P * e + component`. The
+fixed-function distance payload starts `distance_offset` channels into the
+position block, where `distance_offset` is 8 when `G > 1` or `P >= 4`, and 4
+otherwise. Clip distances that fragment interpolation consumes are also written
+to an ordinary varying plane, so they appear twice in one record: in the
+fixed-function payload and as an interpolated attribute.
 
 ## Emit and cut
 
-`v_emit2` is used for points and lines, `v_emit3` for triangles. The emit index
-is in `GK11`, the record argument in `GA11` and the separator register in `VJ8`.
-For a dense record, the argument names the final live varying component:
+`v_emit2` and `v_emit3` share one layout: `GK11` in bits 7:0 of the low word
+plus bits 2:0 of the high word, `GA11` in bits 15:8 plus bits 5:3, and `VJ8` in
+bits 31:24. `GK` selects a vector register, `GA` names a scalar register, and
+`VJ` is an eight-bit field holding either a physical vector register number or a
+raw chunk constant. The `M.mod2` and `M.clmp1` modifier bits MUST be zero.
+
+The emit recipe uses `v_emit3` for a triangle-strip output and `v_emit2` for
+every other topology, including points, line strips and triangle fans. The pair
+does not split into a triangle opcode and a line opcode.
+
+`GK` carries the emitted-vertex ordinal within the run. `GA` carries the
+descriptor of that vertex's final live varying component:
 
 ```text
-GA = varying_descriptor_base + varying_row * emit + 4 * max(N, 1) - 1
+wide:    varying_descriptor_base + varying_row * e + 4 * max(N, 1) - 1
+compact: varying_descriptor_base + 4 * e + 3
 ```
 
-The static and runtime emitters use the same record decision. The runtime
-emitter scales the emitted-vertex ordinal separately for the position block
-and the varying row; these strides need not be equal.
+`VJ` names the separator register; the plan keeps the separator state in vector
+register 35. The first emit of a run seeds that register to zero and later emits
+of the same run MUST NOT reseed it. A run left open when the invocation exits is
+closed implicitly, so a stage need not emit a final cut after its last vertex,
+but the ordinal restarts at zero for the next run.
 
-A cut is not an emit. It resets the primitive separator, updates the header slot
-with the emitted-vertex count, restores the active lane mask and orders before
-the next emit. A runtime emitter MUST preserve the separator state between
-vertices of the same strip.
-
-## Interpolation preservation
-
-Uniformity across geometry invocations does not imply equality between emitted
-vertices. A uniform loop counter changes on each iteration of one invocation;
-a varying derived from it can require smooth interpolation. A compiler MUST
-preserve the interpolation qualifier unless it proves that all vertices of a
-primitive receive the same value. Reusing the same SSA definition at one store
-inside an emit loop is insufficient evidence: the definition can have a new
-value on each execution of the store. Values computed before the loop can
-still be propagated or treated as constant across its emitted vertices.
+The strip and point recipes take the record from the same decision, so two
+stages with equal `N`, `M`, `P` and `S` write the same record. The runtime
+emitter scales the position block and the varying row by the live ordinal
+separately, because their strides differ.
 
 ## Limits
 
 | Limit | Value |
 |-------|-------|
-| Input vertex selectors | Six 5-bit fields, values 0–5. |
-| Output varying planes | Five, including distance planes. |
-| Clip and cull payload | Eight components. |
-| SIO ring | 4096 channels. |
-| Output vertices | 8-bit field. |
-| Static emit sites | 16 in the emitter's bookkeeping. |
+| Input vertex selectors | Six, 5 bits each, values 0 to 5 |
+| SIO0 window | 12 to 4096 channels, rounded up to 32 above 32 |
+| Output varying planes | 5 |
+| Declared output vertices | 256 |
+| Static emit sites | 16 |
+| Record window | at most 4096 channels, refused above |
+| Compact stride | at most 7 rows |
 
-## Host policy
+The compact stride is seven rows at most because `Total Size` is an 8-bit field,
+which also confines five varying planes to records without a special chunk and
+without a position payload. A stage that needs more than 16 emit sites, or more
+than 16 declared vertices, takes the runtime route instead. The 8-bit
+output-vertex field cannot encode 256, so a host MUST truncate it to 0 and MUST
+NOT reject the record on that basis. A record window above 4096 channels is
+refused at pipeline creation: `maximum_threads` is `floor(4096 / window) - 1`,
+which underflows and wedges the rasterizer.
 
-The current compiler reserves dense records in complete 32-channel rows,
-streams constant entry-block input reads in channel order, and uses an allocated
-temporary for the saved mask. Runtime emitters use one active geometry thread;
-layered hardware invocations also use that limit. This overrides the record's
-computed maximum-thread default. For a GS-to-fragment handoff, the current
-host programs at least five fragment coefficient groups, even when fewer are
-live; reducing that initialized window can expose stale endpoint terms across
-draws or contexts. These are implementation choices, not a claim that larger
-thread counts are architecturally forbidden or that every coefficient-count
-setting is interchangeable.
+## Host configuration
+
+`GEOMETRY_STAGE_CONFIG` is eight bytes at state offset `0x4e0`.
+
+| Bits | Field | Meaning |
+|------|-------|---------|
+| 4:0 | Invocations | Hardware invocations per input primitive, encoded as `n - 1`. |
+| 6:5 | Stream Count | Number of output streams. |
+| 11:7 | Maximum Threads | Geometry invocations per wave. |
+| 12 | Input Primitive ID | Fills the primitive-id lane. |
+| 13 | Input Invocation ID | Fills the invocation-id lane. |
+| 19:16 | Output Clip Distance Count | Distance components the consumer reads. |
+| 20 | Output Point Size | The per-vertex record's payload quad carries a point size. |
+| 21 | Output Layer | The stream carries a layer record. |
+| 22 | Output Viewport Index | The stream carries a viewport-index record. |
+| 23 | Output Primitive ID | The stream carries a primitive-id record. |
+| 31:24 | Output Vertices | Declared vertices per invocation. |
+| 39:32 | Position Size | 32-channel rows per emitted vertex's position block. |
+| 47:40 | Output Stride | 32-channel rows per emitted vertex. |
+| 55:48 | Total Size | Committed records in the SIO1 window. |
+| 61:56 | Attribute Count | Varying planes the consumer reads, minimum one. |
+
+`Position Size`, `Output Stride`, `Total Size` and `Attribute Count` are one
+record's four numbers and MUST come from the same computation; deriving any of
+them a second time lets the two halves disagree.
+
+`Maximum Threads` takes the record's computed value except in two cases that
+MUST be pinned to 1: a stage whose emit ordinal is a runtime counter, and a
+layered stage with more than one hardware invocation. Both derive ring addresses
+from a value that is uniform across the wave, so two invocations sharing a wave
+write the same SIO1 slots and corrupt each other's stream. The field is a launch
+parameter, not an architectural maximum.
+
+`Output Layer` is a stream-shape gate, not "the shader wrote `gl_Layer`". With
+the bit set and no matching layer record in the stream, the rasterizer drops the
+trailing vertices of the strip. No geometry layer record shape is established,
+so a host SHOULD leave the bit clear, which routes layer writes into layer 0.
+
+`Output Clip Distance Count` is zero when the stage writes no distance slot. A
+record that carries a point size declares the count rounded up to four
+components, because the emitter zeroes the unused components and the consumer
+must use the same vertex addressing as the emit plan.
+
+A fragment stage behind a geometry stage initialises at least five coefficient
+groups, even when fewer varyings are live; programming only the active prefix
+leaves stale coefficient state across draws and contexts.
+
+## Descriptor roots
+
+The geometry Shader Info record carries five 64-bit roots. Offsets are bytes
+from the start of the record; the kernel entry is at `0x10`.
+
+| Offset | Root | Value |
+|--------|------|-------|
+| `0x20` | Read/write buffers | Zero. |
+| `0x28` | Constant buffers | Zero. No value in this field reaches a launch register; the constant descriptor is taken from `Constant`. |
+| `0x30` | Constants | Argument base plus `0x1ce4`. |
+| `0x38` | Resources and samplers | Argument base plus `0x3d20`, with bit 62 set. |
+| `0x40` | Attributes | Zero; vertex output is read through SIO0, not through an attribute root. |
+
+The resource root's flag is bit 62 of the field, bit 30 of its upper half. It is
+not part of the address: a range check MUST clear it before comparing, and a
+rebase MUST preserve it, because the flag alone puts the raw value above every
+valid range and hides a sub-base address. Only the constant and resource roots
+are live, so a host that rebases records into a new argument block MUST move
+both and MAY leave the other three alone.
+
+The geometry resource table is its own: 17 slots of `0x40` bytes at argument
+offset `0x3d20`, so a geometry stage pointed at the fragment table reads that
+stage's binding for the same descriptor index. The geometry argument layout is
+also longer than the vertex and fragment layouts alone: a vertex-stage constant
+window sits at `0x1d00`, while the geometry constant descriptor at `0x1ce4`
+plus the compiler's offsets reaches `0x247c` for the uniform table and `0x3c20`
+for the storage table. A host that sizes the argument block from the vertex and
+fragment layouts truncates the geometry tables, so the range MUST cover the
+geometry layout whenever a geometry stage can be bound.
 
 ## Open questions
 
-- Geometry invocations with different per-invocation emit counts.
-- Arbitrary per-layer output counts and the full primitive-cut protocol.
-- The complete hardware condition for a partial SIO row.
-- Whether the streamout stage can consume a geometry record directly.
+- **Primitive id and invocation id share `v1`.** Both lanes read vector
+  register 1 and the two enable bits are independent, so a stage that uses both
+  has no established lane assignment.
+- **Partial SIO rows.** Whether a window below 32 channels, or a tail that is a
+  partial 32-channel row, aliases a neighbouring vertex is not established.
+- **Layer records.** The shape of the layer record that `Output Layer` expects
+  is not established, which is why the bit is left clear and layer writes land
+  in layer 0. Arbitrary per-layer output counts and the complete cut protocol
+  are open with it.
+- **Invocations with different emit counts.** Invocations that emit different
+  vertex counts work only through the runtime route with one thread per wave.
+- **Streamout from a geometry record.** A geometry stage that captures
+  transform feedback stores its emitted records itself. Whether a streamout
+  stage can instead walk a geometry record directly is not established.

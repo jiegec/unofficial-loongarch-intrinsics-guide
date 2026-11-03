@@ -109,5 +109,5 @@
   <text x="656" y="484" font-size="11" fill="#10141c">attribute table · 16 × 16 B †</text>
   <text x="552" y="544" font-size="11" fill="#5a6478">No set table on this root: both windows are fixed offsets.</text>
 
-  <text x="24" y="584" font-size="11" fill="#5a6478">† The attribute table sits at +0x4130 with 16-byte records; which register pair carries it is UNRESOLVED.</text>
+  <text x="24" y="584" font-size="11" fill="#5a6478">† The attribute table sits at +0x4130 with 16-byte records, read at s8:s9 + n*16.</text>
 </svg>

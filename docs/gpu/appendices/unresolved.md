@@ -1,98 +1,106 @@
 # UNRESOLVED Register
 
-This register lists the properties that the manual does not establish. Each item
-states the question and its consequence. An item is removed when the property is
-established; the manual does not keep a history of closed items.
+A chapter marks a property it cannot establish as `UNRESOLVED` where that property appears. This appendix collects those properties by area and states the decision each one blocks. It is a work list for a driver, compiler or shader author, not a second description of the device: the mechanism stays in the chapter that owns it.
 
-## Execution and registers
+An entry is a question, never a guess. A host that must act picks one of the possible behaviours and records it as **Host policy**, naming the outcome it assumes; it does not present that choice as a device property. The second column says whether the entry is open because no source states the behaviour (*not stated*) or because two sources give different behaviours (*conflicting*). An entry is deleted when the behaviour is established, and the register keeps no history of closed items. A property that one host has merely not implemented is a gap in that host, not in the manual, and is not listed here.
 
-| Item | Consequence |
-|------|-------------|
-| Resident waves per vector unit. | Occupancy cannot be budgeted. |
-| Issue width and per-instruction latency. | Scheduling cannot be tuned to a documented model. |
-| Number of vector units and their lane counts. | Throughput cannot be derived from the ISA. |
-| Whether an odd-base vector tuple is legal. | A compiler conservatively aligns pairs. |
-| Whether the lane-mask window aliases the descriptor scratch in `s0..s3`. | A compiler reserves the whole window. |
-| Whether a compare that writes the mask it selects reads the old mask in every format. | The result is documented for the exercised forms only. |
-| Whether an SIO transfer is gated by the mask selector. | Masked SIO writes are untested. |
+## Execution and scheduling
 
-## Memory
+Wave composition, the mask registers and the issue order are in [Execution and Scheduling](../architecture/execution-model.md); the instruction forms that read a mask are in [Execution](../isa/execution.md).
 
-| Item | Consequence |
-|------|-------------|
-| Huge-page entry behaviour for a client mapping. | A huge-page mapping cannot be used with confidence. |
-| The `ZINF` field's effect. | Compression and zero-infill cannot be configured. |
-| Per-workgroup LDS capacity. | A workgroup allocation cannot be sized against a documented limit. |
-| The shared-memory offset unit and lane mapping of the swizzle forms. | Swizzled shared accesses cannot be generated. |
-| The matrix partial-fill rule. | Only the documented wide-enough launches are safe. |
-| Out-of-range buffer or image access behaviour. | A host must keep accesses inside the descriptor. |
-| Fault recovery per pipe. | A fault's effect on an unrelated context is unknown. |
+| Property | Why open | Consequence |
+|----------|----------|-------------|
+| Maximum lanes per wave. | not stated | 32 is the width the ABI and the supported kernels use, not a proven ceiling. A compiler MUST size a mask register at 32 bits and a host MUST report a subgroup size of 32. |
+| How many waves a workgroup that contains a barrier may hold. | not stated | The device reports four SIMDs per compute unit at ten waves each, so forty waves fit one unit; whether a barrier-bearing workgroup may occupy all of them is not established. A workgroup ceiling is host policy, and a host MUST NOT launch above the ceiling it advertises. |
+| Issue width and per-instruction latency. | not stated | No latency is encoded in an instruction and none is published, so a scheduler cannot be tuned to a documented model. Ordering MUST come from the explicit ordering instructions, never from an assumed latency. |
+| Whether an odd-base vector tuple is legal. | not stated | An operand pair is named by its base register. A compiler MUST align a tuple to its width, and a decoder MUST report an odd base in a tuple field rather than accept it. |
+| What an unselected lane holds after a gated write. | conflicting | Both "the lane keeps its previous value" and "the write clears the lane" are stated, while a gated load suppresses its update instead of clearing. A compiler MUST NOT build a merge from complementary gated writes; it MUST use a per-lane select with the mask as an operand. |
+| Which instruction classes clobber the mask registers without naming one. | conflicting | A buffer access redefines all four. One rule counts image and flat accesses with it, another keeps the masks live across them. A shader that needs a mask across any memory access MUST re-establish it. |
+| The value `p1` holds at wave entry. | not stated | `p0` holds the launch mask and `p2`/`p3` are undefined. A shader MUST capture `p0` before it writes `p0`, and MUST NOT read `p1`..`p3` before writing them. |
+| The value a writer leaves in `SCC`. | conflicting | One family leaves `0xffff` for true and the immediate family leaves 1. A consumer MUST test zero against non-zero and MUST NOT compare `SCC` with a particular non-zero value. |
+| Whether a compare that writes the mask it selects reads the old mask first. | not stated | A compare may name a mask register as its destination while its own selector names that same register. A compiler MUST write a compare result to a register other than the one the same instruction selects. |
 
-## Host and commands
+## Memory and addressing
 
-| Item | Consequence |
-|------|-------------|
-| Exact accepted creation flags for every BO domain. | A caller must treat a rejected flag as an error. |
-| `GEM_USERPTR` behaviour when the user mapping is unmapped in flight. | User-pointer memory is not a stable substitute for an import. |
-| Ordering between a timeline signal and a fence writeback. | A submission's last signal order is not fully documented. |
-| Whether a submission may contain more than one fence chunk. | A driver emits one. |
-| Doorbell acknowledgement and queue read-index update. | A queue's flow control is conservative. |
-| CWSR contract on LG200. | Context save is not exposed. |
-| The meaning of the `ZIP`, `EXC`, `CWSR` and `VRAM` immediate operations. | The kernel's use is opaque to a user driver. |
-| The exact state preserved by a per-pipe reset. | Recovery is handled at context granularity. |
-| The time counter's unit and wrap behaviour. | Calibration against a host clock is required. |
+Address formation, the decode tags and the fault model are in [Memory System](../architecture/memory-system.md); buffer objects are in [Buffer Objects](../host/buffer-objects.md).
+
+| Property | Why open | Consequence |
+|----------|----------|-------------|
+| Whether the MMU honours a huge-page entry for a client mapping. | not stated | Page tables are built from single-page entries and no source describes a larger one. A driver MUST map a client range in single pages. |
+| The hardware's per-workgroup shared-memory ceiling. | not stated | The launch descriptor names the window in 128-byte granules with a bias, and the device reports 128 KiB per compute unit; how that is split per workgroup is not established. The advertised window is host policy, and a shader MUST size its shared allocation to it. |
+| Out-of-range buffer and image access. | not stated | Whether the access is dropped, clamped to the last element or faults is not established. A host MUST keep every access inside its descriptor, and robust access MUST NOT be promised. |
+| The order of two lanes of one instruction that write one address. | not stated | A read-modify-write from two lanes of the same instruction has no documented order. A shader MUST reduce across lanes before the write, or use one atomic operation per result. |
+| Which faults are recoverable per pipe. | not stated | Recovery is at context granularity. Whether an unrelated context survives a fault raised on another pipe is not established. |
+
+## Host interface and submission
+
+Ring framing, cursor writeback and doorbells are in [Rings](../host/rings.md) and [MMIO](../host/mmio.md); submission lifetime is in [Submissions](../host/submissions.md).
+
+| Property | Why open | Consequence |
+|----------|----------|-------------|
+| Whether a command processor requires the start alignments a host reports. | not stated | Admission guarantees 4-byte alignment only. A producer SHOULD align a buffer packet to the larger boundary it reports, and MUST NOT depend on a rejection when it does not. |
+| Whether a packet may straddle the end of a ring. | not stated | A producer MUST keep every packet contiguous and pad the tail. |
+| Whether a fence writeback retires when the pipe issues it or when the write drains. | not stated | A waiter MUST treat the fence as ordering only once the word is written, and MUST NOT infer completion from the packet's position in the ring. |
+| The read-cursor update granularity of each pipe. | not stated | A producer MUST NOT reuse ring space before the cursor has passed it, whatever the reported granularity. |
+| Whether a user queue can require the context-save fields to be acted on. | not stated | Context save is not exposed to a user queue, and a queue MUST NOT assume its registers survive a preemption or a reset. |
+| The meaning of the `ZIP`, `EXC`, `CWSR` and `VRAM` immediate operations. | not stated | A user command stream MUST NOT issue them. Their effect on the pipe that issues them is not empty, and it is not described here. |
+| Which state a per-pipe reset preserves. | not stated | Recovery is at context granularity. A driver MUST rebuild the state it needs after a reset rather than rely on preservation. |
+| The unit and wrap behaviour of the time counter. | not stated | A calibration against a host clock is required, and the difference between two readings that straddle a wrap is not defined. |
 
 ## Graphics pipeline
 
-| Item | Consequence |
-|------|-------------|
-| Per-attribute instance divisor. | Instanced attributes must be replicated or handled in the shader. |
-| Out-of-range vertex fetch behaviour. | A fetch must stay inside the descriptor. |
-| Scissor edge inclusion. | A one-pixel difference at the rectangle edge is possible. |
-| Subpixel precision and the shared-edge fill rule. | Exact rasterization of shared edges is not specified. |
-| Sample positions for multisampling. | The sample pattern cannot be reproduced exactly. |
-| Early-depth and hi-Z acceptance rules. | Early depth cannot be relied on for correctness. |
-| Guardband interaction with clip and cull planes. | Clip behaviour near the guardband is conservative. |
-| Adjacency primitive behaviour. | Adjacency topologies are not a reliable path. |
-| Depth or stencil with only one surface bound. | The legal attachment combinations are not closed. |
-| Near/far clamp on floating-point depth. | Floating-point depth clamp is not specified. |
-| Stencil wrap and clamp boundaries. | The exact increment and decrement limits are not specified. |
-| Legal dual-source blend factors. | Dual-source blending is conservative. |
-| Logic operation with several render targets. | Multi-target logic operations are not specified. |
-| Alpha-to-coverage sample counts other than 4x. | Alpha-to-coverage requires 4x. |
-| 2x multisample support and layout. | Only 4x is exposed. |
-| Streamout stage hardware contract. | The stage record is not used by the current path. |
-| Whether a blit can read and write the same surface. | A host must not alias source and destination. |
-| Tiling conversion rules for a blit. | A blit between different tilings is not specified. |
+Primitive assembly and the stage order are in [Pipeline](../graphics/pipeline.md); raster state is in [Rasterization](../graphics/rasterization.md) and [Depth and Stencil](../graphics/depth-stencil.md).
+
+| Property | Why open | Consequence |
+|----------|----------|-------------|
+| Per-attribute instance divisor. | not stated | The vertex-input record carries no divisor field, so no attribute advances by a per-instance step. A host MUST replicate the attribute per instance or compute the step in the shader. |
+| Whether a scissor rectangle includes its maximum edge. | not stated | A one-pixel difference at the edge is possible. A test MUST NOT assert the boundary, and a producer SHOULD keep the rectangle half-open. |
+| Subpixel precision and the shared-edge fill rule. | not stated | Two triangles that share an edge are not guaranteed to cover each pixel exactly once. A shader that writes coverage MUST NOT rely on the rule. |
+| Sample positions under multisampling. | not stated | The pattern cannot be reproduced exactly, so a shader MUST NOT depend on a specific sample location. |
+| The rule that an early depth test applies. | not stated | The Early Z bit exists, but which comparison runs and against which written value is not stated. A shader whose fragment writes a side effect MUST disable early depth. |
+| Depth or stencil with only one surface bound. | not stated | The legal attachment combinations are not closed. A producer MUST bind both surfaces or neither. |
+| Whether a floating-point depth is clamped, and at which point. | not stated | The clamp-near and clamp-far bits exist, but their effect on a floating-point depth is not stated. A shader MUST NOT rely on the clamp. |
+| Stencil increment and decrement wrap boundaries. | not stated | Where a saturated increment stops, and whether a wrap applies per face, is not stated. A producer SHOULD keep the reference inside the range it can observe. |
+| Whether a blit may read and write one surface, and how it converts tilings. | not stated | A host MUST NOT alias a blit's source and destination, and a blit between two different tilings is not specified, so a host MUST convert through a linear surface or refuse. |
 
 ## Textures and formats
 
-| Item | Consequence |
-|------|-------------|
-| The performance-mode field. | The value 4 is written without a meaning. |
-| The 12-bit colour swizzle subfields. | Only per-format constants are known. |
-| The alignment code beyond cube and the constant 6. | Mip and layered setup is conservative. |
-| Whether anisotropic filtering has any effect. | The capability is not advertised. |
-| The per-quad granularity of the bias and depth-reference slots. | Only the offset slot is documented as per-quad. |
-| The border-table addressing unit. | The table pointer is written in 8-byte units. |
-| Surface types 2 and 6. | Mip-mapped attachment selection is conservative. |
-| Tiling values other than 0 and 2. | Only linear and tile2 are used. |
-| The 2x depth sample layout. | Only 4x depth is documented. |
+Image and sampler records are in [Textures](../graphics/texture.md); surface layout and pixel formats are in [Formats](../graphics/formats.md).
 
-## Shader ABI and ISA
+| Property | Why open | Consequence |
+|----------|----------|-------------|
+| The meaning of the performance-mode, performance-MIP and performance-Z fields. | not stated | No value is established to have an effect. A host MUST NOT tune them and MUST write the value the described path writes. |
+| The alignment code beyond the values used for a cube surface and the constant 6. | not stated | Mip and layered setup is conservative. A host MUST use a value whose behaviour is described. |
+| Whether anisotropic filtering has any effect. | not stated | The capability is not advertised, so a sampler MUST NOT request a maximum anisotropy above 1. |
+| The per-quad granularity of the bias and depth-reference slots. | not stated | Only the offset slot is documented as per-quad. A shader MUST NOT rely on a per-quad bias or depth reference. |
+| The sample layout of a 2x depth surface. | not stated | Only the 4x layout is described, so a 2x depth surface MUST NOT be sampled or resolved. |
 
-| Item | Consequence |
-|------|-------------|
-| The VGPR initial count's meaning. | The field is programmed by convention. |
-| Hydration of `s10:s11`. | The register is not used as a documented input. |
-| Whether the graphics LDS size field is honoured. | The graphics path writes zero. |
-| Whether the instruction cache needs an invalidate after a code replacement. | A replacement at the same address is not documented. |
-| The encodings and effects of `M.mod2` and `M.clmp1`. | The modifiers are emitted at zero. |
-| The meaning of `bl1` and `bl2`. | The bits are emitted by convention. |
-| The exact effect of the mask rows. | They are used only where their names suffice. |
-| The second interpolation phase's arithmetic. | A varying must come from the stage interface. |
-| The opcode fields of formats 9 and 10 beyond the mnemonic. | The fields are treated as opcode bits. |
-| The jump-stack predicate's meaning. | The instruction is not used for a return address. |
-| The prefix operations' effects. | Prefixes are used only fused to their operation. |
-| The shared-memory copy granularity and address form. | The rows are described but not used. |
-| The `getreg` hardware-register numbering. | Compute identifiers come from the kernarg block. |
+## Shader ABI
+
+The shader-info record and its roots are in [Shader ABI](../shaders/shader-abi.md); the register namespaces are in [Registers](../shaders/registers.md); interpolation is in [Interpolation](../shaders/interpolation.md).
+
+| Property | Why open | Consequence |
+|----------|----------|-------------|
+| Whether the VGPR initial count is a count of preloaded registers or an index. | not stated | The field is host policy today. A shader MUST NOT read a vector register it did not write, except for the identifiers the ABI names. |
+| The contents of `s10:s11` at a vertex launch. | not stated | The allocation window withholds them and no documented root writes them. A shader MUST NOT read `s10:s11` as an input. |
+| Whether a compute launch's reported scalar count must cover `s11..s13`. | not stated | The hardware writes the group ids there whatever the count says, so a launch applies a floor. A producer MUST report at least that floor. |
+| Whether the graphics `LDS Size` field is honoured. | not stated | A graphics record carries zero in the field. A graphics shader MUST NOT declare shared memory. |
+| Whether replacing code at one address requires an instruction-cache invalidate. | not stated | A replacement at the same address is not documented. A host SHOULD place new code at a fresh address and flush the range it replaces. |
+| The encoding and effect of the `mod2`, `clmp1`, `bl1` and `bl2` fields. | not stated | The fields are host policy. A producer MUST write only the combination the described path writes. |
+| The arithmetic of the second interpolation phase. | not stated | A varying MUST be taken from the stage interface; a shader MUST NOT reconstruct the phase itself. |
+| The hardware-register numbering that `getreg` reads. | not stated | Compute identifiers come from the kernarg block, so a shader MUST NOT read a hardware register through `getreg`. |
+
+## Instruction encoding and semantics
+
+The mask of a row and the format rules are in [Encoding](../isa/encoding.md); operand fields are in [Operands](../isa/operands.md).
+
+| Property | Why open | Consequence |
+|----------|----------|-------------|
+| How the machine selects a format when a word matches rows in more than one format. | not stated | A disassembler that is not told the format MUST report the ambiguity, and a producer MUST NOT rely on one resolution. |
+| What the machine reads from an ignored bit, and whether a reserved bit must be zero. | not stated | A decoder MUST NOT match on either, and an encoder SHOULD write the base value in both. |
+| The unit of the `jirl` and `trap` displacement, and the scaling of the `jpush` and `jpop` position. | not stated | A producer MUST NOT reuse the branch rule, and MUST compute the target in the unit the row states. |
+| Whether an opcode field encodes anything below the row level. | not stated | The 4-bit `sio-id` and `sio-imm` fields and the 2-bit `prefix` field are used as opcode bits only, so a decoder MUST treat them as part of the mnemonic. |
+| Whether a prefix reaches one instruction, persists, or composes with the next. | not stated | A producer MUST NOT emit a prefix that is not consumed by the instruction that follows it. |
+| Whether a source with both the negate and absolute modifiers negates the absolute value or takes the absolute of the negation. | conflicting | A producer SHOULD build the result in two instructions instead of relying on the combination. |
+| Whether an SIO transfer is gated by its `PJ2` field. | not stated | The SIO formats carry the field, while the gating rule names only the vector, flat, buffer, image and shared-memory families. A shader MUST NOT rely on an SIO write being masked. |
+| Whether `PJ2` gates `jpush` and `jpop`. | not stated | Both carry the field. A producer MUST NOT rely on a gated jump-stack operation. |

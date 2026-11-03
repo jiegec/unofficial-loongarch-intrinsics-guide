@@ -1,66 +1,75 @@
 # Loongson LG200 Graphics and Compute
 
-This manual describes the Loongson LG200 GPU: its command interface, its
-graphics pipeline, its shader programming model and its instruction set. It is
-written for driver and compiler engineers who know graphics and instruction-set
-architecture but have no prior knowledge of this device.
+This manual describes the Loongson LG200 GPU and the interface through which
+software drives it. It reaches from the commands a client issues through the
+kernel to the bit fields of a shader instruction. It is written for driver and
+compiler engineers who know graphics and instruction-set architecture but have no
+prior knowledge of this device.
 
 ## Scope
 
-The manual covers the LG200 graphics and compute engines from the user-space
-interface down to the shader instruction. It includes:
+The manual covers the graphics and compute interface: the commands that allocate
+memory, map addresses, submit work on a ring or a user queue, and wait for
+completion; the command processors that consume the resulting packets; the
+graphics pipeline and the state object that configures it; the shader ABI,
+register files, descriptors and stage interfaces; and the instruction set, from
+its encoding and operands down to the machine rows, one row per encoded
+instruction variant.
 
-- the kernel interface a user-mode driver uses: buffer objects, virtual
-  addresses, command submission, fences and user queues;
-- the command processors, their rings and their packet formats;
-- the fixed-function graphics pipeline, the state object and the resource
-  formats;
-- the shader ABI, the register model, descriptor tables and the stage
-  interfaces;
-- the complete instruction encoding, operand model and instruction families.
+Two areas are explicitly outside it.
 
-The display controllers, video decode and encode engines, and the internal
-implementation of the kernel driver are outside this manual. The kernel
-interface is described only to the extent that a user-mode driver depends on it.
+- **The display interface.** The layer commands
+  (`DRM_IOCTL_LOONGGPU_LAYER_*`), gamma (`DRM_IOCTL_LOONGGPU_VIDEO_GAMMA`) and
+  metadata (`DRM_IOCTL_LOONGGPU_GET_META`, `DRM_IOCTL_LOONGGPU_SET_META`)
+  belong to the display controller and are not part of the graphics or compute
+  interface this manual describes.
+- **The kernel driver.** Its scheduling, memory management, reset and recovery are
+  described only where a client sees their result.
 
 ## Structure
 
-The manual is organised by layer, following the path of a command from the
-application to the shader:
+The parts are ordered by layer, from the client command to the shader
+instruction; the appendices hold material that belongs to no single layer.
 
-| Part | Contents | Answers |
-|------|----------|---------|
-| I. Architecture | [Overview](architecture/overview.md), [execution model](architecture/execution-model.md), [memory system](architecture/memory-system.md), [LG200 profile](architecture/generation-lg200.md) | What the device is made of, how work executes, how memory is addressed |
-| II. Host interface | [UAPI](host/uapi.md), [buffer objects](host/buffer-objects.md), [MMIO](host/mmio.md), [rings](host/rings.md), [GPIPE](host/gpipe.md), [BPIPE](host/bpipe.md), [CPIPE](host/cpipe.md), [XDMA](host/xdma.md), [indirect buffers](host/indirect-buffers.md), [submissions](host/submissions.md), [compute submission](host/compute-submission.md) | How a driver allocates memory, builds commands and submits work |
-| III. Graphics pipeline | [Pipeline](graphics/pipeline.md), [draw](graphics/draw.md), [vertex input](graphics/vertex-input.md), [rasterization](graphics/rasterization.md), [depth and stencil](graphics/depth-stencil.md), [blending](graphics/blending.md), [texture](graphics/texture.md), [formats](graphics/formats.md), [multisampling](graphics/multisampling.md), [queries](graphics/queries.md), [streamout](graphics/streamout.md), [clear and blit](graphics/clear-blit.md), [state records](graphics/state-records.md), [state object](graphics/state-object.md) | How a draw is described and rasterized |
-| IV. Shaders | [Stages](shaders/stages.md), [shader ABI](shaders/shader-abi.md), [registers](shaders/registers.md), [descriptors](shaders/descriptors.md), [I/O](shaders/io.md), [geometry](shaders/geometry.md), [interpolation](shaders/interpolation.md), [compute](shaders/compute.md), [compiler contract](shaders/compiler-contract.md) | How a shader is launched, what it receives and what it must produce |
-| V. Instruction set | [Encoding](isa/encoding.md), [operands](isa/operands.md), [execution](isa/execution.md), [addressing](isa/addressing.md), [families](isa/families/vector.md), [instruction reference](isa/reference.md) | How an instruction is encoded and what it does, and where its machine row lives |
-| VI. Appendices | [Glossary](appendices/glossary.md), [UNRESOLVED register](appendices/unresolved.md), [walkthrough](appendices/walkthrough.md), [performance](appendices/performance.md) | Terms, open questions, one end-to-end example, relative cost |
+| Part | Question it answers | Chapters |
+|------|---------------------|----------|
+| Architecture | What the device is made of, how a wave executes, how an address is translated, and what values the part has | [Overview](architecture/overview.md), [Execution model](architecture/execution-model.md), [Memory system](architecture/memory-system.md), [LG200 profile](architecture/generation-lg200.md) |
+| Host interface | How memory is allocated, how a command stream is built, how a pipe is driven, and how work is submitted and completed | [User-space interface](host/uapi.md), [Buffer objects](host/buffer-objects.md), [MMIO and command words](host/mmio.md), [Rings](host/rings.md), [GPIPE](host/gpipe.md), [BPIPE](host/bpipe.md), [CPIPE](host/cpipe.md), [XDMA](host/xdma.md), [Indirect buffers](host/indirect-buffers.md), [Submissions](host/submissions.md), [Compute submission](host/compute-submission.md) |
+| Graphics pipeline | How a draw is described, rasterized and written to a surface; how clears, blits and queries run; what a resource format means | [Pipeline](graphics/pipeline.md), [Draw](graphics/draw.md), [Vertex input](graphics/vertex-input.md), [Rasterization](graphics/rasterization.md), [Depth and stencil](graphics/depth-stencil.md), [Blending](graphics/blending.md), [Texture and sampling](graphics/texture.md), [Formats and layout](graphics/formats.md), [Multisampling](graphics/multisampling.md), [Queries](graphics/queries.md), [Streamout](graphics/streamout.md), [Clear and blit](graphics/clear-blit.md), [State records](graphics/state-records.md), [State object](graphics/state-object.md) |
+| Shaders | How a stage is launched, what it receives, what it must produce, and what a compiler must respect | [Stages](shaders/stages.md), [Shader ABI](shaders/shader-abi.md), [Registers and allocation](shaders/registers.md), [Descriptors](shaders/descriptors.md), [SIO](shaders/io.md), [Geometry stage](shaders/geometry.md), [Interpolation](shaders/interpolation.md), [Compute](shaders/compute.md), [Compiler contract](shaders/compiler-contract.md) |
+| Instruction set | How an instruction is encoded, what its operands select and how it executes | [Encoding](isa/encoding.md), [Operands](isa/operands.md), [Execution](isa/execution.md), [Addressing](isa/addressing.md); families: [vector](isa/families/vector.md), [scalar](isa/families/scalar.md), [memory and image](isa/families/memory.md), [atomic](isa/families/atomic.md), [control and ordering](isa/families/control.md), [SIO and export](isa/families/sio.md), [interpolation](isa/families/interpolation.md) |
+| Instruction reference | How to read a row, and the entry that defines each instruction's own fields | [Reference](isa/reference.md), [Vector ALU](instructions/vector-alu.md), [Scalar ALU](instructions/scalar-alu.md), [Memory and image](instructions/memory-image.md), [Atomic](instructions/atomic.md), [Control and ordering](instructions/control-prefix.md), [SIO and export](instructions/sio-export.md), [Interpolation](instructions/interpolation.md) |
+| Appendices | Terms, open questions, one worked example, relative cost | [Glossary](appendices/glossary.md), [UNRESOLVED register](appendices/unresolved.md), [Walkthrough](appendices/walkthrough.md), [Performance](appendices/performance.md) |
 
 ## Reading paths
 
-A driver engineer should read Part I, then Part II, then the state and pipeline
-chapters of Part III. A compiler engineer should read the execution model, then
-Part IV, then Part V. A reader who wants one concrete path through the system
-can start with the [walkthrough](appendices/walkthrough.md) and follow its
-links.
+| Reader | Order |
+|--------|-------|
+| Graphics driver | [Overview](architecture/overview.md) → [User-space interface](host/uapi.md) → [Buffer objects](host/buffer-objects.md) → [Indirect buffers](host/indirect-buffers.md) → [Submissions](host/submissions.md) → [State records](graphics/state-records.md) → [State object](graphics/state-object.md) → [Draw](graphics/draw.md) |
+| Compute driver | [Rings](host/rings.md) → [CPIPE](host/cpipe.md) → [Compute submission](host/compute-submission.md) → [Compute](shaders/compute.md) |
+| Shader compiler | [Execution model](architecture/execution-model.md) → [Shader ABI](shaders/shader-abi.md) → [Registers and allocation](shaders/registers.md) → [Compiler contract](shaders/compiler-contract.md) → [Encoding](isa/encoding.md) → [Operands](isa/operands.md) → [Execution](isa/execution.md) → [Reference](isa/reference.md) |
 
-## Values and generations
+The [walkthrough](appendices/walkthrough.md) is one complete path: it follows a
+draw from context creation to fence wait and links the chapter that defines each
+step.
 
-Mechanism chapters describe behaviour that is common to the LG200 generation.
-Numeric values, limits and feature support are collected in the
-[LG200 profile](architecture/generation-lg200.md). A future generation adds a
-profile page and a column; it does not duplicate the mechanism chapters.
+## Values
+
+The manual describes the LG200 generation. The values, limits and feature support
+of the part are collected in the [LG200 profile](architecture/generation-lg200.md).
 
 ## Conventions
 
-Bit ranges, numeric notation, normative terms and the marking of unresolved
-behaviour are defined in [Conventions](conventions.md). Every chapter uses that
-notation without restating it.
+Normative terms carry fixed meanings. The key words are **MUST**, **MUST NOT**,
+**SHOULD**, **SHOULD NOT** and **MAY**: **MUST** marks a requirement of the
+hardware or of the interface, **SHOULD** a recommended practice that may be
+departed from only with a stated reason, and **MAY** an option. **Host policy**
+marks a choice of one driver rather than a property of the device. Those terms,
+the notation for numbers and bit ranges, the register names and the columns of a
+field table are defined in [Conventions](conventions.md).
 
 ## Open questions
 
-Behaviour that the documentation does not establish is marked `UNRESOLVED` at
-the point where it matters. The [UNRESOLVED register](appendices/unresolved.md)
-lists every open item by area and gives its consequence for a driver or a
-compiler.
+A property that the manual does not establish is marked `UNRESOLVED` where it
+matters, with its consequence for a driver or a compiler. The
+[UNRESOLVED register](appendices/unresolved.md) collects those items by area.
