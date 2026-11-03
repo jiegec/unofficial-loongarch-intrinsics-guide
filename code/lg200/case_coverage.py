@@ -201,11 +201,17 @@ def main():
             gaps[x.split(":", 1)[1] if ":" in x else x] += 1
 
     total = len(rows)
-    full = sum(1 for r in rows if r[2] == 0)
+    # A row whose name carries no type tag is asked for NO class by
+    # classes_for(), so "missing == 0" says nothing about it.  Counting those as
+    # complete is how this gate reported "with gaps: 0" while load_s_buff_w8 and
+    # 122 other payload/control rows had never been asked for anything.
+    unasked = sum(1 for r in rows if r[1] == 0)
+    full = sum(1 for r in rows if r[2] == 0 and r[1] > 0)
     print("instructions: %d value-expressible (%d launch-shape)"
           % (total, len(launch)))
     print("  with all required boundary classes: %d   with gaps: %d"
-          % (full, total - full))
+          % (full, total - full - unasked))
+    print("  asked for NO class (no type tag in the name): %d" % unasked)
     print("  launch-shape rows (need a launch state, not a case): %s"
           % " ".join(launch))
 

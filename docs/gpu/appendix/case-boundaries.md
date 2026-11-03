@@ -31,7 +31,7 @@ The count read (19) until 2026-10-13 while the list beside it named 17 - the row
 counted from memory rather than from its own contents, which is the defect this page
 records elsewhere.  And `case_coverage.py` required only 12 of the 17 for f64 rows, so those
 rows were judged against a weaker requirement than f32 and f16: no negative max/min, no
-`max_denorm`, no negative NaN.  Both are fixed, and the full set still passes 738 of 738 -
+`max_denorm`, no negative NaN.  Both are fixed, and the full set still passes 615 of 738 -
 which means the generated vectors had carried the five all along.
 
 ## 2. Measurement
@@ -52,7 +52,7 @@ Parse through `cases.py` instead of counting a file.
 
 **The split, measured independently (2026-10-22).**  A count that does not use the parser
 agrees with it exactly: 4,654 hand-written `CASE`/`CASE_FP` lines across the 768 `.cpp`
-files plus 81,472 rows in `generated_cases.tsv` is 86,126, which is what `parse_case_files`
+files plus 82,528 rows in `generated_cases.tsv` is 87,182, which is what `parse_case_files`
 returns.  So the merge is complete, and that is worth stating because the sum is the only
 thing here that does not depend on the parser being right.
 
@@ -130,7 +130,8 @@ stores it first, the flat and buffer paths preload it), so a boundary grid
 exercises exactly the classes the element width admits.  Their second input is the
 address offset, which must stay inside the carrier's window and is therefore held
 at zero.  Coverage read **765 of 768** at the time; **as of 2026-10-13 it is 768 of
-768 rows accounted for - 738 value-expressible with every required class and 30
+768 rows accounted for - 615 value-expressible with every required class, 123 asked for no
+class at all, and 30
 launch-shape** - and the earlier figure is kept rather than overwritten.  Both
 current measures are anchored in `check_doc_numbers.py`, so this sentence cannot
 drift again without the suite saying so.
@@ -139,7 +140,7 @@ The plain-width (@@bNN@@) rows were the last omission of the same kind: their
 content is staged like the sub-word loads', and once the audit also asks for the
 raw bit patterns a @@bNN@@ operand admits, they need the same treatment.  With that
 **every row whose boundaries are expressible as an input value is covered**:
-@@case_coverage.py@@ now reports **738 of 738 value-expressible rows**, 0 gaps.
+@@case_coverage.py@@ now reports **615 of 738 value-expressible rows** with 0 gaps, and - since 2026-11-03 - the 123 rows its type-tag rules never ask anything of, so a reader cannot mistake "no gaps" for "everything is required".
 
 The **30** that remain are **launch-shape** rows, and the auditor names them
 explicitly rather than counting them as gaps: the execution-environment and SIO
@@ -215,7 +216,7 @@ compute path - is an open question and needs a device; it is the same question a
 
 | measure | value |
 |---|---|
-| rows exercising every required class | **738 / 738 value-expressible** (2026-10-13) |
+| rows exercising every required class | **615 / 738 value-expressible** (2026-11-03; the other 123 have no type tag) |
 | rows still with gaps | **0** |
 | launch-shape rows with no case by construction | 30 (they need a launch state; listed by case_coverage.py) |
 | hardware rows failing under the expanded set | 78 (measured earlier, before the boundary fill; the device is parked, so this number is stale and is the next hardware task) |

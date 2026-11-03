@@ -247,6 +247,17 @@ LOAD_OK = re.compile(r"^load_(sm|v_buff|v_flat)_[iu](8|16)$")
 # must stay inside the carrier's window and is held at zero.
 SUBWORD_OK = re.compile(r"^(load|store)_(sm|v_buff|v_flat)_"
                          r"(b8|b16|b32|b64|swizzle_b64)$")
+# The scalar wide forms state their size as a WORD COUNT (w1..w16) or as a
+# bit-block (b96/b128), so no [uibf]NN type tag ever appears in their names and
+# the boundary tables above were never applied to them: ten load_s_*_w* rows and
+# eight *_v_*_b96|b128 rows carried three hand vectors and nothing else, which is
+# exactly the set the boundary audit finds missing 0, 1 and INT_MAX.
+# w16 is deliberately absent: the graphics submit carries one page, and a
+# 39-vector grid of sixteen-dword cases overflows it ("submit payload exceeds one
+# GPU page" - refused before submission, so it costs a row, not a fault).  Those
+# two rows keep their three hand vectors until the carrier can chunk a submit.
+WIDE_OK = re.compile(r"^(load|store)_s_(buff|flat)_w(1|2|4|8)$|"
+                     r"^(load|store)_v_(buff|flat)_b(96|128)$")
 
 
 def case_targets() -> list:
@@ -269,6 +280,11 @@ def case_targets() -> list:
         if LOAD_OK.match(mnemonic) or SUBWORD_OK.match(mnemonic):
             if nin_of(mnemonic) in (1, 2):
                 out.append(mnemonic)
+            continue
+        # Wide payload rows stage the whole block from the case inputs, so a
+        # boundary grid is stageable even though the name carries no type tag.
+        if WIDE_OK.match(mnemonic) and nin_of(mnemonic) in (2, 3, 4):
+            out.append(mnemonic)
             continue
         # Rows whose last input is an immediate: the register columns keep the
         # value grid and the immediate column gets its own, which is what the
@@ -384,6 +400,14 @@ def main() -> int:
               (SUBWORD_OK.match(mnemonic) and "b64" not in mnemonic)) and nin == 2:
             # content | address offset (held in-window)
             gen = grid_cols([base, [0]])
+        elif WIDE_OK.match(mnemonic):
+            # The wide payload rows reduce the block to the dwords the model
+            # returns (code/lg200/load_s_buff_w8.h:3-5), so the 32-bit INT set is
+            # this row's class space.  An input the model never reads is the
+            # address offset, held inside the carrier's window like SUBWORD_OK's.
+            body = (ROOT / f"{mnemonic}.h").read_text(encoding="utf-8")
+            used = {int(i) for i in re.findall(r"src\[(\d+)\]", body)}
+            gen = grid_cols([base if i in used else [0] for i in range(nin)])
         else:
             gen = grids(base, nin)
         for row in gen:
