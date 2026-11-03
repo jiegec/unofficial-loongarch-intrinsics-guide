@@ -40,6 +40,32 @@ window = minimum_window, if minimum_window <= 32
 Wide records reserve complete 32-channel rows. The complete hardware condition
 for a partial row is UNRESOLVED.
 
+## Descriptor roots
+
+In the current LG200 graphics ABI, the geometry Shader Info record uses the
+following 64-bit roots. Offsets are bytes from the beginning of that record.
+
+| Offset | Root | Geometry-stage value |
+|--------|------|----------------------|
+| `0x20` | Read/write buffers | Zero in the current GS ABI. |
+| `0x28` | Constant buffers | Zero; buffer descriptors are reached through the constant root. |
+| `0x30` | Constants | Address of the GS constant descriptor and its relative descriptor tables. |
+| `0x38` | Resources and samplers | GS descriptor-table address with bit 62 set. |
+| `0x40` | Attributes | Zero; vertex-stage output is read through SIO0. |
+
+The resource-root flag is separate from the GPU virtual address. An address
+range check MUST exclude the flag; relocating the root MUST preserve it.
+Geometry resources have their own descriptor table and cannot alias the
+fragment-stage table merely because the sampler indices match.
+
+A host that caches Shader Info records must rebase both live GS roots when
+moving to a new argument block. Its range must cover the complete GS argument
+layout, including tables beyond the shorter VS/FS-only layout. Comparing the
+flagged resource root directly with an unflagged address range, or bounding it
+by the VS/FS reservation, leaves the old table address in an otherwise updated
+record. These are requirements of the current descriptor ABI, independent of
+the SIO output-record formulas below.
+
 ## Output record
 
 The output record is an SIO1 window. The record is described by three classes.
@@ -177,8 +203,12 @@ The current compiler reserves dense records in complete 32-channel rows,
 streams constant entry-block input reads in channel order, and uses an allocated
 temporary for the saved mask. Runtime emitters use one active geometry thread;
 layered hardware invocations also use that limit. This overrides the record's
-computed maximum-thread default. These are implementation choices, not a claim
-that larger thread counts are architecturally forbidden.
+computed maximum-thread default. For a GS-to-fragment handoff, the current
+host programs at least five fragment coefficient groups, even when fewer are
+live; reducing that initialized window can expose stale endpoint terms across
+draws or contexts. These are implementation choices, not a claim that larger
+thread counts are architecturally forbidden or that every coefficient-count
+setting is interchangeable.
 
 ## Open questions
 
