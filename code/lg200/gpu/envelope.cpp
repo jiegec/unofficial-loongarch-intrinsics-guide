@@ -3530,8 +3530,60 @@ std::optional<EnvelopeProgram> build_carrier_env(
   // data; load_sm_matrix reads a persistent matrix file (cross-run state);
   // tex/getlod/getresinfo fetch window state (0.5 / exponent-plane values)
   // regardless of the staged texels.
+  //
+  // The flat family is not one claim, and this list was treating it as one.
+  // Split it, because its three parts are uncomparable for three reasons that
+  // have nothing to do with each other:
+  //
+  //  - a STORE's expectation is the data the same program just wrote through
+  //    the same address pair, so the comparison asks whether the pair is
+  //    coherent, not whether the host-staged window is reachable at that VA.
+  //    build_flat emits store -> check -> load -> check, so the ordering the
+  //    csp masklife probe established is present, and every lane stages the
+  //    same datum, so the readback is lane-uniform at any launch width.  A
+  //    systematic tuple word order cancels between the two instructions, which
+  //    is why b96/b128 belong here even though their word order is UNRESOLVED:
+  //    this comparison does not decide that question.
+  //    store_v_flat_b8 is NOT here - its oracle asserts the wide-move
+  //    hypothesis ('dst[0] = src[0]' for a 0x12345678 datum) while the row's
+  //    own title says the low byte is stored, so a mismatch would be a
+  //    statement about the model.  b16 is: 0xbeef is its own truncation.
+  //  - a LOAD's expectation is the host-staged window, so comparing it IS the
+  //    measurement that the observation above only asserts.  It needs no lane
+  //    condition: build_flat broadcasts one VA to every lane.
+  //  - a 32-bit ATOMIC commits the old value its lanes returned to the result
+  //    dword at 'off', and N lanes on one cell return N different old values,
+  //    so only a one-lane launch is deterministic.  (The 64-bit path already
+  //    refuses that dword - "racy across 16 lanes; kept unverified" - so it is
+  //    deterministic at any lane count.)
+  const bool flat_family = route.family == CarrierRoute::Family::Flat;
+  auto ends_with = [](const std::string& s, const char* suf) {
+    const std::size_t n = std::strlen(suf);
+    return s.size() >= n && s.compare(s.size() - n, n, suf) == 0;
+  };
+  const bool flat_roundtrip =
+      flat_family &&
+      (mnemonic == "store_v_flat_b32" || mnemonic == "store_v_flat_b64" ||
+       mnemonic == "store_v_flat_b128");
+  // [HW 2026-11-03] b16 and b96 are NOT in that set, and the comparison is why.
+  // Compared, b16 fails 4 of 12: a 0x7fffffff datum reads back 0x0000ffff, so the
+  // store writes the low half and the oracle returns the whole dword.  b96 fails 2
+  // of 3 with every word reading back 0x00000000 - nothing reached the address at all.
+  // Both are defects to fix in the model and the carrier, not spellings to widen.
+  // b32, b64 and b128 pass 9/9, 9/9 and 3/3 with the same round-trip.
+  const bool flat_atomic32 =
+      mnemonic.rfind("atomic_v_flat", 0) == 0 &&
+      (ends_with(mnemonic, "_b32") || ends_with(mnemonic, "_i32") ||
+       ends_with(mnemonic, "_u32"));
+  const bool flat_lanes_ok = !flat_atomic32 || env.lanes == 1;
+  // Experiment knob (README, "Environment knobs"), not a stable interface: it
+  // compares the rest of the family in one watched session instead of recording
+  // it.  The measurement wants LGPU_CS_GROUP=1,1,1 alongside it.
+  const bool flat_compare =
+      flat_roundtrip ||
+      (flat_family && flat_lanes_ok && std::getenv("LGPU_FLAT_COMPARE"));
   const bool launch_state =
-      route.family == CarrierRoute::Family::Flat ||
+      (flat_family && !flat_compare) ||
       mnemonic.rfind("load_sm_matrix_", 0) == 0 ||
       mnemonic.find("_fmtdesc_") != std::string::npos ||
       mnemonic.find("_fmtinst_") != std::string::npos ||
@@ -3553,7 +3605,7 @@ std::optional<EnvelopeProgram> build_carrier_env(
     // The group is broad; the reason is not.  Name the mechanism the comment
     // above records, and fall back to the group name when there is none.
     const char* why = "launch-state group in build_carrier";
-    if (route.family == CarrierRoute::Family::Flat)
+    if (flat_family)
       why = "flat input-plane values change with the 0x530 input_enable toggle";
     else if (mnemonic.rfind("load_sm_matrix_", 0) == 0)
       why = "persistent matrix file is cross-run state";
