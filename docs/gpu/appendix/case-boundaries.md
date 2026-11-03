@@ -142,6 +142,39 @@ raw bit patterns a @@bNN@@ operand admits, they need the same treatment.  With t
 **every row whose boundaries are expressible as an input value is covered**:
 @@case_coverage.py@@ reports **633 of 738 value-expressible rows** with every required class and - since 2026-11-03 - **90 with real gaps**, 15 rows that have no result at all, and 108 payload rows that its type-tag rules used to ask nothing of.  That last number is the point: the earlier "0 gaps" was measured only over the rows whose names carry a type tag, so the 108 rows named by size (`load_s_buff_w8`) or by bit block (`load_v_buff_b96`) were never asked a question.  They are asked now, and 90 of them answer with a gap - 507 missing (row, class, column) entries, about 431 vectors.  Most of the gaps are in the texture rows (samp 32, gather 24, tex 10, descriptor queries 2) and the formatted rows (16), whose models pass a dword through, so their class space is the raw 32-bit pattern rather than a float type.
 
+### What this gate still does not ask
+
+The recount above made the gate admit which rows it never questions.  It is worth
+stating the other three blind spots in the same place, because "0 gaps" is a
+property of the question, not of the corpus.
+
+**The class space has no rounding and no flush.**  All seventeen classes are input
+literals.  Neither "a tie at the rounding boundary" nor "a result a flush would
+take to zero" is among them, so a row can never be reported missing either.  An
+independent audit of the corpus scores them by hand: RND 18 rows covered, 15
+missing, 144 not applicable; FTZ 23 covered, 5 missing, 149 not applicable.  The
+additive rows are where it shows - @@v_add_f32@@'s @@0x1 + 0x1@@ expects @@0x0@@
+because the hardware flushes, and no class ever asked for it.
+
+**The judgement is per row, not per operand position.**  For a row with a type
+tag the audit unions the inputs of the whole row (@@col = -1@@), so @@v_min_f32@@
+counts both signed zeros as covered from the single ordered pair @@(+0, -0)@@ and
+the reverse order, which decides the answer, has never been staged.  The same
+union asks @@v_cmpclass_f32@@'s mask operand for seventeen float classes.
+
+**The direction is not known.**  @@classes_for()@@ reads the name, not the body,
+so eleven rows whose float sits on the RESULT side (@@v_fcvt_f32_u80@@ and its
+siblings) are asked for float input classes.  They satisfy the NaN class today
+through a case whose input is @@0x7fc00000@@ - a value a real @@u8@@ operand
+cannot take.
+
+None of this is a hardware claim.  It says which questions the corpus has never
+answered, and the audit that produced the numbers carries the derived vectors that
+would answer them (15 minimum additions, each with an independently computed
+expectation).  Closing them is the remaining half of "boundary classes per row";
+closing them for the 21 rows that observe rather than compare needs launch state
+first, not data.
+
 The **30** that remain are **launch-shape** rows, and the auditor names them
 explicitly rather than counting them as gaps: the execution-environment and SIO
 reads, the geometry-stream emits, the interpolators (a launch-owned coefficient
