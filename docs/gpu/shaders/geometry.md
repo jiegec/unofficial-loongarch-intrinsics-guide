@@ -65,9 +65,49 @@ distance group also requires that quad even when point size is absent.
 
 | Class | Condition | Layout |
 |-------|-----------|--------|
-| Compact | Default when the Multi and Wide gates do not apply. | Stride `2 + S + P - 1 + max(N, 1)`; total `1 + 32 * stride`; varying row 4 for `N <= 1`, otherwise `align_up(4 * N, 16)`. |
-| Multi | `N` is 2 or 3, `P = 1` and no special chunk. | For `N = 2`: window 96, export 97, stride 3, attributes 3, threads 31. For `N = 3`: window 128, export 125, stride 4, attributes 3, threads 30. |
-| Wide | `S = 0` and the compact shape would exceed eight vertices or the encoded attribute and export fields. | `cut = 32 * ceil(M / 32)`; `slots = 8 * ceil(M / 8)`; `window = cut + 4 * (P + N) * slots`; stride `floor(window / 32)`; position size `P * slots / 8`. |
+| Compact | Default when the dense gates below do not apply. | Stride `2 + S + P - 1 + max(N, 1)`; window `32 * stride`; export count `window + 1`; position size `1 + S + P - 1`. |
+| Dense | No special chunk, and either `P = 1` with `N = 2` or `N = 3`, more than eight declared vertices with a varying, more than 32 position-only vertices, or a position payload that would overflow compact storage. | Complete position and varying planes, with the formulas below. |
+
+The small two- and three-varying cases use the dense layout too. A
+single-varying stride cannot describe two full varying quads. Attribute count
+counts the live varying quads, with a minimum of one for a position-only record;
+it does not add a position/control quad to a two-varying output.
+
+For a dense record:
+
+```text
+cut = 32 * ceil(M / 32)
+slots = 8 * ceil(M / 8)
+varying_row = 4 * next_power_of_two(max(N, 1))
+varying_channels = varying_row * slots, if N > 0; otherwise 0
+window = cut + 4 * P * slots + varying_channels
+stride = window / 32
+position_size = P * slots / 8
+position_descriptor_base = cut
+varying_descriptor_base = cut + 4 * P * slots
+attribute_count = max(N, 1)
+export_count = floor(4096 / window) * stride + 1
+maximum_threads = floor(4096 / window) - 1
+```
+
+Allocate the padding in `varying_row` for every vertex. Three varying quads
+have a four-quad row, and five have an eight-quad row. Using the live quad count
+in the allocation while advancing descriptors by the padded row overruns the
+window at later vertices. The window and export count have different units;
+export count is not generally `window + 1`.
+
+For `M <= 8`, `P = 1`, and no special chunk:
+
+| Live varying quads | Row channels | Window | Stride | Export count | Maximum threads |
+|--------------------|--------------|--------|--------|--------------|-----------------|
+| 2 | 8 | 128 | 4 | 129 | 31 |
+| 3 | 16 | 192 | 6 | 127 | 20 |
+
+Compact records retain a row of four channels for `N <= 1` and
+`align_up(4 * N, 16)` otherwise. A compact position payload uses
+`4 * next_power_of_two(max(N, 1))` instead. Compact records rotate through their
+window; the dense record's per-vertex containment rule must not be applied to
+them without accounting for that rotation.
 
 A window above 4096 channels is rejected. The current plan supports at most five
 geometry output varying planes, including distance planes.
@@ -94,11 +134,31 @@ when fragment interpolation consumes them.
 
 `v_emit2` is used for points and lines, `v_emit3` for triangles. The emit index
 is in `GK11`, the record argument in `GA11` and the separator register in `VJ8`.
+For a dense record, the argument names the final live varying component:
+
+```text
+GA = varying_descriptor_base + varying_row * emit + 4 * max(N, 1) - 1
+```
+
+The static and runtime emitters use the same record decision. The runtime
+emitter scales the emitted-vertex ordinal separately for the position block
+and the varying row; these strides need not be equal.
 
 A cut is not an emit. It resets the primitive separator, updates the header slot
 with the emitted-vertex count, restores the active lane mask and orders before
 the next emit. A runtime emitter MUST preserve the separator state between
 vertices of the same strip.
+
+## Interpolation preservation
+
+Uniformity across geometry invocations does not imply equality between emitted
+vertices. A uniform loop counter changes on each iteration of one invocation;
+a varying derived from it can require smooth interpolation. A compiler MUST
+preserve the interpolation qualifier unless it proves that all vertices of a
+primitive receive the same value. Reusing the same SSA definition at one store
+inside an emit loop is insufficient evidence: the definition can have a new
+value on each execution of the store. Values computed before the loop can
+still be propagated or treated as constant across its emitted vertices.
 
 ## Limits
 
@@ -113,10 +173,12 @@ vertices of the same strip.
 
 ## Host policy
 
-The current compiler rounds a wide record's window to a multiple of 32 channels,
+The current compiler reserves dense records in complete 32-channel rows,
 streams constant entry-block input reads in channel order, and uses an allocated
-temporary for the saved mask. These are implementation choices, not hardware
-requirements.
+temporary for the saved mask. Runtime emitters use one active geometry thread;
+layered hardware invocations also use that limit. This overrides the record's
+computed maximum-thread default. These are implementation choices, not a claim
+that larger thread counts are architecturally forbidden.
 
 ## Open questions
 
