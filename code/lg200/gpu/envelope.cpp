@@ -99,10 +99,17 @@ struct Builder {
   void buff_subword_load(const std::string& mne, const isa::Reg& pred,
                          const isa::Reg& dst, const isa::Reg& descriptor_base,
                          const isa::Reg& index, std::uint32_t immediate,
-                         bool bl1) {
+                         bool offen, bool bl1) {
     std::vector<isa::Operand> operands = {
         isa::op_reg(pred), isa::op_reg(dst), isa::op_reg(descriptor_base),
         isa::op_reg(index), isa::op_imm(immediate)};
+    // UO12 enters the address only when the offset is enabled, and this form
+    // has no index operand to fall back on: with the bit clear every case of a
+    // row read the descriptor base itself, so the whole row set landed on one
+    // cell.  Measured on the compute pipe (build/gpu-run-logs): all 13
+    // load_v_buff_i8 rows read back 0xffffffff and all 13 store_v_buff_b8 rows
+    // 0x00000000, for 13 different staged dwords.
+    if (offen) operands.push_back(isa::op_modifier("offen", 1));
     if (bl1) operands.push_back(isa::op_modifier("bl1", 1));
     append(isa::McInst{mne, "", std::move(operands)});
   }
@@ -122,10 +129,11 @@ struct Builder {
                           const isa::Reg& data,
                           const isa::Reg& descriptor_base,
                           const isa::Reg& index, std::uint32_t immediate,
-                          bool bl1) {
+                          bool offen, bool bl1) {
     std::vector<isa::Operand> operands = {
         isa::op_reg(pred), isa::op_reg(data), isa::op_reg(descriptor_base),
         isa::op_reg(index), isa::op_imm(immediate)};
+    if (offen) operands.push_back(isa::op_modifier("offen", 1));
     if (bl1) operands.push_back(isa::op_modifier("bl1", 1));
     append(isa::McInst{mne, "", std::move(operands)});
   }
@@ -1461,6 +1469,19 @@ std::optional<EnvelopeProgram> build_generic(
   return program;
 }
 
+// The buff load form that reads back as many dwords as the case wrote.  The
+// c2/c3/c4 rows carry a wider data tuple, and the store readback used to load
+// one dword while the result loop stored the whole tuple - so the second and
+// later compared dwords were registers no instruction had written.
+static const char* buff_load_form(unsigned width) {
+  switch (width) {
+    case 2: return "load_v_buff_b64";
+    case 3: return "load_v_buff_b96";
+    case 4: return "load_v_buff_b128";
+    default: return "load_v_buff_b32";
+  }
+}
+
 // ---- buff (buffer-descriptor memory) carrier --------------------------------
 //
 // Loads/stores through the PS-record-hydrated buffer descriptor.  Result
@@ -1753,22 +1774,26 @@ std::optional<EnvelopeProgram> build_buff(const std::string& mnemonic,
                            zero_address, store_desc, isa::zero_reg(), cell,
                            true, false, true, false);
         } else {
+          // offen: the case's byte offset is the UO12 immediate, so it only
+          // reaches the address when the offset is enabled.
           builder.buff_subword_store(mnemonic, isa::predicate(0),
                                      isa::vgpr(8, width), store_desc,
-                                     isa::zero_reg(), cell, true);
+                                     isa::zero_reg(), cell, true, true);
         }
         builder.check_k_vm_vs_sm();
-        builder.buff_mem("load_v_buff_b32", isa::predicate(0), isa::vgpr(10),
-                         zero_address, load_desc, isa::zero_reg(), off, true,
-                         false, false, false);
+        builder.buff_mem(buff_load_form(width), isa::predicate(0),
+                         isa::vgpr(10, width), zero_address, load_desc,
+                         isa::zero_reg(), off, true, false, false, false);
         builder.check_k_vm_vs_sm();
       } else {
         for (unsigned p = 0; p < width; ++p)
           program.arg_preloads.emplace_back(cell + 4 * p, def.inputs[p]);
-        // [HW 2026-08-25] same window-relative offset as the b32 form.
+        // [HW 2026-08-25] same window-relative offset as the b32 form - but
+        // the b32 form enables the offset and this one did not, so the case's
+        // offset never entered the address.
         builder.buff_subword_load(mnemonic, isa::predicate(0),
                                   isa::vgpr(10, width), load_desc,
-                                  isa::zero_reg(), off, true);
+                                  isa::zero_reg(), off, true, true);
         builder.check_k_vm_vs_sm();
       }
     } else if (is_store) {
@@ -2462,9 +2487,20 @@ std::optional<EnvelopeProgram> build_tex(const std::string& mnemonic,
             4 * static_cast<std::uint32_t>(ci), texel);
     // Texel-fetch coords for 2D: {x=ci, y=row, lod=0} (LCO packs
     // {x,y,lod}).  Experiment knobs shift each slot.
-    builder.s_mov_imm_b32(st.imm_temp,
-                          static_cast<std::uint32_t>(ci) +
-                              env_u32("LGPU_TEX_XOFF", 0u));
+    // The coordinate tuple holds reals: under M.un1 the x slot is a texel-unit
+    // float, so texel ci is selected by ci+0.5 and the integer ci is the bit
+    // pattern of a denormal.  Row 0 is the one case where the two readings
+    // agree, which is what makes an integer-built row set worth comparing: the
+    // x>=1 rows are exactly the ones that separate them.  The float staging is a
+    // knob so one run of each decides which the form consumes.
+    float xf = static_cast<float>(ci) + 0.5f;
+    std::uint32_t xbits = 0;
+    std::memcpy(&xbits, &xf, 4);
+    const std::uint32_t ximm =
+        env_has("LGPU_TEX_XFLOAT")
+            ? xbits
+            : static_cast<std::uint32_t>(ci) + env_u32("LGPU_TEX_XOFF", 0u);
+    builder.s_mov_imm_b32(st.imm_temp, ximm);
     builder.v_mov_b32(isa::vgpr(16), st.imm_temp, isa::predicate(0));
     builder.s_mov_imm_b32(
         st.imm_temp,
@@ -5748,10 +5784,11 @@ std::optional<EnvelopeProgram> build_cs_bench_buff_subword_store(
   builder.v_mov_b32(data_v, imm_temp, isa::predicate(0));
   for (unsigned copy = 0; copy < copies; ++copy) {
     builder.buff_subword_store(mnemonic, isa::predicate(0), data_v, store_desc,
-                               isa::vgpr(0), carrier::kLoadWindow + off, false);
+                               isa::vgpr(0), carrier::kLoadWindow + off, false,
+                               false);
     if (chained) {
       builder.buff_subword_load("load_v_buff_u8", isa::predicate(0), data_v,
-                                load_desc, isa::vgpr(0), off, false);
+                                load_desc, isa::vgpr(0), off, false, false);
     }
   }
   builder.check_k_vm_vs_sm();
