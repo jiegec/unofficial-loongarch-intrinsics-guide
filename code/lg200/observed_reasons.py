@@ -29,6 +29,7 @@ PHRASES = {
     'lane-id read': ['last lane'],
     'coefficient window': ['coefficient window'],
     'launch-state group': ['launch-state group', 'launch state'],
+    'accumulator and destination tuples': ['tuples are not staged'],
 }
 
 def main() -> int:

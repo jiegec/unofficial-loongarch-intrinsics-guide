@@ -1131,6 +1131,12 @@ std::optional<EnvelopeProgram> build_generic(
   // stays open rather than guessed at.
   const bool is_dp4a = std::strncmp(spec->mnemonic, "v_dp4a_", 7) == 0;
   const bool is_mma = std::strncmp(spec->mnemonic, "v_mma_", 6) == 0;
+  // [2026-11-03] mma window bases.  They used to be v0/v4/v8, which broke the
+  // x4 model's own premise twice: v9 is the result store's zero address and
+  // is written after the staging, so C became (input2, 0, input2, input2)
+  // rather than four identical dwords, and v10 is VD8, so the destination
+  // tuple's first dword sat inside the C window.  The alu3 class carries
+  // exactly three general sources (GJ11, GK11, GA11), in that order.
   const bool is_u64cmp = std::string(spec->mnemonic) == "s_cmp_eq_u64" ||
                          std::string(spec->mnemonic) == "s_cmp_ne_u64";
   const bool is_bitset =
@@ -1157,6 +1163,18 @@ std::optional<EnvelopeProgram> build_generic(
   // [HW 2026-08-25] the interpolation phases read the coefficient window
   // (launch-dependent barycentric state), not the staged sources; the
   // generic carrier cannot oracle them (same class as load_sm_interp).
+  //
+  // [2026-11-03] v_interp_mov_b32 is the exception among the three interp
+  // rows: it performs no arithmetic (family-interpolation.md, "Coverage" -
+  // it is the family's control), its model is dst[0] = src[0], and the one
+  // staged row (0x12345678 with a zero second source) already returned the
+  // source in observed mode.  Carrying it in this branch made the control
+  // row an observation while its arithmetic sibling v_interp_1_f32 compares
+  // 6/6, so it moves out and becomes a one-row comparison.
+  // [HW 2026-11-03] v_interp_mov_b32 stays here: taken out of this branch and
+  // compared, its single case returns 0x00000000 for a staged 0x12345678 on BOTH
+  // pipes, so it reads the payload window rather than the register source and the
+  // pass-through model is wrong.  Measured, not assumed.
   if (mn == "v_interp_2_f32" || mn == "v_interp_mov_b32") {
     program.observe = true;
     program.observe_reason = "coefficient window is launch state";
@@ -1199,12 +1217,17 @@ std::optional<EnvelopeProgram> build_generic(
     std::uint32_t scc_borrow = 0;
     bool scc_staged = false;
     if (is_mma) {
-      // [HW 2026-08-25] the 8816/323216 mma reads 16-BYTE register
-      // windows starting at each source register (4 identical dwords per
-      // window, matching oracle_v_mma's x4 model).  Stage the input
-      // replicated into v0..v3 / v4..v7 / v8..v11 and read single
-      // dwords of the window bases; the raw one-dword staging left every
-      // window full of garbage, producing the old 0x118-class results.
+      // [HW 2026-08-25] the 8816/323216 mma reads 16-BYTE register windows
+      // starting at each source register (4 identical dwords per window,
+      // matching oracle_v_mma's x4 model).  Stage the input replicated into
+      // the three window bases (see kMmaWindow) and read single dwords of
+      // those bases; the raw one-dword staging left every window full of
+      // garbage, producing the old 0x118-class results.
+      //
+      // This does NOT make the row comparable: only four dwords of a
+      // thirty-two-register accumulator tuple are staged and one destination
+      // word is read back.  It makes the staged window the shape the model
+      // describes, which is what a later comparison would have to rest on.
       for (unsigned w = 0; w < 3; ++w) {
         const std::uint32_t value = def.inputs.at(w);
         for (unsigned p = 0; p < 4; ++p) {
@@ -1213,8 +1236,9 @@ std::optional<EnvelopeProgram> build_generic(
                             isa::predicate(0));
         }
       }
-      // v9 doubles as the result-store zero address; restore it after
-      // the C window staging so the store keeps targeting arg+off.
+      // v9 is the result store's zero address and is no longer inside any
+      // window, but it is still staged here so the store keeps targeting
+      // arg+off whatever the prelude left there.
       builder.s_mov_imm_b32(imm_temp, 0u);
       builder.v_mov_b32(isa::vgpr(9), imm_temp, isa::predicate(0));
     }
@@ -1235,7 +1259,8 @@ std::optional<EnvelopeProgram> build_generic(
         case isa::FieldSem::GeneralSource11:
         case isa::FieldSem::GeneralSource8: {
           if (is_mma) {
-            // mma windows are pre-staged (v0/v4/v8 bases); emit the
+            // mma windows are pre-staged at kMmaWindow[input_index] (the
+            // alu3 sources are GJ11, GK11, GA11 in that order); emit the
             // base register without re-staging.
             operands.push_back(isa::op_reg(isa::vgpr(4 * input_index)));
             ++input_index;
@@ -3514,7 +3539,6 @@ std::optional<EnvelopeProgram> build_carrier_env(
       mnemonic == "store_v_buff_b8" || mnemonic == "getlod" ||
       mnemonic == "getresinfo" || mnemonic.rfind("load_v_tex", 0) == 0 ||
       mnemonic.rfind("store_v_tex", 0) == 0 ||
-      mnemonic.rfind("v_mma_", 0) == 0 ||
       mnemonic == "v_sqrt_f64" || mnemonic == "v_rsq_f64" ||
       mnemonic == "v_s2v_b32" || mnemonic == "v_cmpclass_f64" ||
       // [HW 2026-11-03] v_add_imm_i32 and v_sub_imm_i32 belong here for a
@@ -3543,6 +3567,17 @@ std::optional<EnvelopeProgram> build_carrier_env(
              mnemonic == "getlod" || mnemonic == "getresinfo")
       why = "window state rather than the staged texels";
     p->observe_reason = why;
+  }
+  // v_mma_* is not a launch-state row: it reads only the windows this
+  // carrier stages for it, and nothing the packet or the kernel descriptor
+  // sets.  It observes because the 323216 shape's accumulator and
+  // destination are thirty-two-register tuples (see the catalog row) while
+  // the carrier stages four dwords of each and reads one back, so a
+  // comparison would be a statement about the staging rather than about the
+  // instruction.
+  if (mnemonic.rfind("v_mma_", 0) == 0) {
+    p->observe = true;
+    p->observe_reason = "accumulator and destination tuples are not staged";
   }
   return p;
 }
