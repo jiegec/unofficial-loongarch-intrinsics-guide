@@ -1217,6 +1217,139 @@ int csp(const char* probe, unsigned variant, std::uint32_t timeout_ms,
 #endif
 }
 
+// P1: how is the alu-carry class's second word spelled?  One submission, one
+// tsv row per arm - arm, x, s6, s7, dst, p0, p1 - where `dst` is the set of
+// lanes whose destination word is base+1 (base = a+b), i.e. the lanes the
+// carry-in reached.  `--expect` prints the same table for the four candidate
+// models without opening the device, so a measured row can be compared with its
+// prediction; the arm list lives in envelope.cpp (carry_arm_*), next to the
+// builder that emits it.
+int carry(int only_arm, std::uint32_t timeout_ms, bool dry_run, bool expect) {
+  std::uint32_t group[3];
+  cs_group(group);
+  const unsigned lanes = group[0] * group[1] * group[2];
+  const unsigned arms = lgpu::envelope::carry_arm_count();
+  if (only_arm >= 0 && static_cast<unsigned>(only_arm) >= arms) {
+    std::fprintf(stderr, "carry: arm %d out of range (0..%u)\n", only_arm,
+                 arms - 1);
+    return 2;
+  }
+  if (expect) {
+    // Pure host: no device, no assembly.  The column layout matches the
+    // measured tsv, with a leading hypothesis column so the four tables can
+    // stay in one stream.
+    static const char* const kHyp[4] = {"H1", "H2", "H3", "H4"};
+    std::printf("# lanes=%u  dst = lanes whose destination word is base+1; "
+                "base = 0xffffffff + b\n", lanes);
+    std::printf("hyp\tarm\tx\ts6\ts7\tdst\tp0\tp1\n");
+    for (unsigned h = 0; h < 4; ++h) {
+      for (unsigned a = 0; a < arms; ++a) {
+        if (only_arm >= 0 && static_cast<unsigned>(only_arm) != a) continue;
+        const auto e = lgpu::envelope::carry_expect(a, h, lanes);
+        std::printf("%s\t%s\t0x%08x\t0x%08x\t0x%08x\t0x%04x\t0x%08x\t?\n",
+                    kHyp[h], lgpu::envelope::carry_arm_label(a),
+                    lgpu::envelope::carry_arm_x(a), e.s6, e.s7, e.dst_mask,
+                    e.p0);
+      }
+    }
+    // p1 is the launch's own: an observation, never a prediction.
+    return 0;
+  }
+  std::string error;
+  const unsigned first = only_arm < 0 ? 0u : static_cast<unsigned>(only_arm);
+  const unsigned count = only_arm < 0 ? arms : 1u;
+  auto program =
+      lgpu::envelope::build_cs_carry_probe(first, count, error, lanes);
+  if (!program) {
+    std::fprintf(stderr, "carry: %s\n", error.c_str());
+    return 2;
+  }
+  if (dry_run) {
+    std::printf("-- carry probe arms %u..%u (%zu bytes, %zu instructions; "
+                "sgpr<=%u vgpr<=%u; lanes=%u) --\n%s",
+                first, first + count - 1, program->bytes.size(),
+                program->words.size(), program->sgpr_high_water,
+                program->vgpr_high_water, lanes, program->listing.c_str());
+    if (std::getenv("LGPU_DUMP_WORDS"))
+      for (std::size_t i = 0; i < program->words.size(); ++i)
+        std::printf("word %3zu: lo=0x%08x hi=0x%08x\n", i,
+                    program->words[i].lo, program->words[i].hi);
+    return 0;
+  }
+#if !defined(LGPU_HAVE_DRM)
+  std::fprintf(stderr, "carry: drm submit layer not built (LGPU_HAVE_DRM)\n");
+  return 3;
+#else
+  if (!cs_preflight("carry")) return 5;
+  lgpu::drm::ComputeSubmitRequest request;
+  cs_fill_request(request, *program, 0x1000);
+  // The per-lane destination cells carry a sentinel, so "did not execute" is
+  // distinguishable from "carried to zero" (base+1 is 0 for the b = 0 arms).
+  request.output_preload = program->arg_preloads;
+  request.timeout_ms = timeout_ms;
+  const auto report = lgpu::drm::submit_compute(request);
+  if (report.status != lgpu::drm::ComputeSubmitReport::Status::Clean) {
+    cs_print_wedge(report, "carry");
+    return 3;
+  }
+  auto dword = [&](std::uint32_t off) -> std::uint32_t {
+    std::uint32_t v = 0;
+    if (static_cast<std::size_t>(off) + 4 <= report.output.size())
+      std::memcpy(&v, report.output.data() + off, 4);
+    return v;
+  };
+  // The cell map once, so a reader never has to reconstruct it from the
+  // builder.
+  for (unsigned k = 0; k < count; ++k) {
+    const unsigned a = first + k;
+    const std::uint32_t cell = lgpu::envelope::carry_arm_cell(a);
+    std::printf("# arm %s x=0x%08x b=0x%08x nops=%u base=0x%08x "
+                "s6@0x%x s7@0x%x p0@0x%x p1@0x%x dst@0x%x..0x%x\n",
+                lgpu::envelope::carry_arm_label(a),
+                lgpu::envelope::carry_arm_x(a),
+                lgpu::envelope::carry_arm_b(a),
+                lgpu::envelope::carry_arm_nops(a),
+                lgpu::envelope::carry_dst_base(a), cell, cell + 4u,
+                cell + 8u, cell + 12u, cell + 0x10u,
+                cell + 0x10u + 4u * (lanes - 1));
+  }
+  std::printf("arm\tx\ts6\ts7\tdst\tp0\tp1\n");
+  for (unsigned k = 0; k < count; ++k) {
+    const unsigned a = first + k;
+    const std::uint32_t cell = lgpu::envelope::carry_arm_cell(a);
+    const std::uint32_t base = lgpu::envelope::carry_dst_base(a);
+    const std::uint32_t want = base + 1u;
+    std::uint32_t mask = 0;
+    unsigned outliers = 0;
+    for (unsigned l = 0; l < lanes; ++l) {
+      const std::uint32_t v = dword(cell + 0x10u + 4u * l);
+      if (v == want) {
+        mask |= 1u << l;
+      } else if (v != base) {
+        if (outliers++ == 0)
+          std::fprintf(stderr,
+                       "carry: arm %s lane %u dst=0x%08x (neither 0x%08x nor "
+                       "0x%08x)\n",
+                       lgpu::envelope::carry_arm_label(a), l, v, base, want);
+      }
+    }
+    std::printf("%s\t0x%08x\t0x%08x\t0x%08x\t",
+                lgpu::envelope::carry_arm_label(a),
+                lgpu::envelope::carry_arm_x(a), dword(cell), dword(cell + 4u));
+    // A lane that read something other than base/base+1 is reported by the
+    // marker and named on stderr; the mask still counts only base+1 lanes.
+    if (outliers != 0)
+      std::printf("?0x%04x", mask);
+    else
+      std::printf("0x%04x", mask);
+    std::printf("\t0x%08x\t0x%08x\n", dword(cell + 8u), dword(cell + 12u));
+  }
+  std::printf("# signal=0x%016llx\n",
+              static_cast<unsigned long long>(report.signal_value));
+  return 0;
+#endif
+}
+
 // E-1: PJ2 is the per-instruction mask selector.  Each variant stages known
 // p0/p1 contents and reports, per lane, whether the instruction under test
 // wrote.  Output: p0..p3 at 0..12, the post-test p1 at 0x10, the branch
@@ -2075,6 +2208,22 @@ int main(int argc, char** argv) {
             : 8000u;
     return csp(argv[2], variant, tmo, dry_run);
   }
+  if (argc >= 2 && std::strcmp(argv[1], "carry") == 0) {
+    const bool dry_run = std::strcmp(argv[argc - 1], "--dry-run") == 0;
+    const bool expect = std::strcmp(argv[argc - 1], "--expect") == 0;
+    // carry [arm] [timeout] [--expect|--dry-run]: the first bare word is the
+    // arm (omitted = every arm), the second the timeout.
+    int only_arm = -1;
+    std::uint32_t tmo = 8000u;
+    for (int i = 2; i < argc; ++i) {
+      if (argv[i][0] == '-') continue;
+      if (only_arm < 0)
+        only_arm = static_cast<int>(std::strtol(argv[i], nullptr, 0));
+      else
+        tmo = static_cast<std::uint32_t>(std::strtoul(argv[i], nullptr, 0));
+    }
+    return carry(only_arm, tmo, dry_run, expect);
+  }
   if (argc >= 3 && std::strcmp(argv[1], "pj2") == 0) {
     const unsigned variant =
         static_cast<unsigned>(std::strtoul(argv[2], nullptr, 0));
@@ -2128,5 +2277,8 @@ int main(int argc, char** argv) {
                "lgpu-gpu csbench <m> lat|tp [copies] [reps] [--dry-run] | "
                "lgpu-gpu csp <divchk|matrix|masklife> <variant> [timeout] "
                "[--dry-run]\n");
+  std::fprintf(stderr,
+               "       lgpu-gpu carry [arm] [timeout] [--expect|--dry-run] "
+               "(P1: the alu-carry second word)\n");
   return 2;
 }

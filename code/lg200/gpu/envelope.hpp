@@ -273,6 +273,54 @@ std::optional<EnvelopeProgram> build_cs_mask_lifetime_probe(unsigned variant,
                                                             std::string& error,
                                                             unsigned lanes);
 
+// P1: how is the alu-carry class's second word spelled?  `v_addc_u32`'s RD8
+// field is the VCC pair - the per-lane carry-in the instruction reads and the
+// per-lane carry-out it writes - and on the compute pipe that pair is s[6:7],
+// which the launch also hands the kernel as the kernarg pointer.  The family's
+// second result word has been measured as the full active mask, as 0x1 and as
+// 0xfffe for rows whose oracle calls the same thing one boolean, so this probe
+// reads every place the word could live while varying exactly one value.
+//
+// One program holds all sixteen arms; the arm table (label, second addend,
+// third-source constant, nop distance) and the expectation model live beside
+// the builder in envelope.cpp, so a measured row and its prediction cannot
+// drift apart.
+struct CarryExpect {
+  std::uint32_t base;      // a + b: what a lane reads with no carry-in
+  std::uint32_t dst_mask;  // lanes whose destination word is base + 1
+  std::uint32_t s6;        // the pair's low word after the target
+  std::uint32_t s7;        // the pair's high word after the target
+  std::uint32_t p0;        // the launch mask; the target does not write p0
+};
+
+unsigned carry_arm_count();
+const char* carry_arm_label(unsigned arm);
+std::uint32_t carry_arm_x(unsigned arm);
+std::uint32_t carry_arm_b(unsigned arm);
+unsigned carry_arm_nops(unsigned arm);
+// Argument-BO offset of the arm's block: +0x00 s6, +0x04 s7, +0x08 p0, +0x0c
+// p1, +0x10 + 4*lane the destination word (one cell per lane).
+std::uint32_t carry_arm_cell(unsigned arm);
+std::uint32_t carry_dst_base(unsigned arm);
+
+// hypothesis: 0 = H1 per-lane low word, 1 = H2 stale pair, 2 = H3 high word,
+// 3 = H4 one scalar flag.  Everything is a function of (arm, hypothesis,
+// lanes): no device state is involved, so the table is checkable host-side.
+CarryExpect carry_expect(unsigned arm, unsigned hypothesis, unsigned lanes);
+
+// Builds the arm window [first_arm, first_arm + arm_count).  Every arm emits the
+// same preamble (the result BO's descriptor in s0-s3, a = 0xffffffff, b, the v9
+// zero store address, s16 as the immediate temp), stages X into the RD8 pair's
+// low word and 0 into its high word, runs
+// `v_addc_u32 p0, v10, v8, v12, vcc(s6)`, nops arm.nops times, then reads s6,
+// s7, p0 (selector 0x7c), p1 (0x7d) and the destination word per lane.  The
+// destination cells are preloaded with 0xdeadbeef, so a lane that did not
+// execute is not read as a lane that carried to zero.
+std::optional<EnvelopeProgram> build_cs_carry_probe(unsigned first_arm,
+                                                    unsigned arm_count,
+                                                    std::string& error,
+                                                    unsigned lanes);
+
 // The same mask-register sequence through the graphics PS carrier (4x4 = 16
 // lanes, fragment stage).  Same write/read mechanism and output offsets; the
 // point is whether the fragment stage's mask window behaves like the compute

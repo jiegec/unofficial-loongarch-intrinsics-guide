@@ -1455,6 +1455,20 @@ std::optional<EnvelopeProgram> build_generic(
               std::to_string(built.offsets.size());
       return std::nullopt;
     }
+    // [2026-11-03] What the destination cell actually holds when the lanes
+    // disagree.  This carrier stages one cell per case and every lane stores to
+    // it, so the word the host reads is not one lane's value - it is the OR over
+    // the lanes.  That matters for the alu-carry family, whose two result words
+    // are the sum (which differs per lane when the carry-in differs) and the
+    // carry-out mask.  Reproduced host-side: the oracle sum spelling s|(s+1)
+    // reproduces 122 of v_addc_u32's 127 rows ONLY under the OR readback
+    // (106/127 if the cell were lane 0's value, 103/127 for lane 15), and it
+    // reproduces those 122 with exactly the same five second-word failures.  So
+    // s|(s+1) is a readback artifact rather than per-lane arithmetic, and any
+    // row whose lanes can differ is compared against that OR.  The carry probe
+    // (lgpu-gpu carry) settles it per lane in one dispatch: each destination
+    // word reads base or base+1, and a single OR value means the cell is shared.
+
     built.expected = def.expected;
     program.cases.push_back(std::move(built));
     case_offset += 4 * static_cast<std::uint32_t>(def.expected.size());
@@ -4348,6 +4362,246 @@ std::optional<EnvelopeProgram> build_cs_mask_lifetime_probe(unsigned variant,
   program.probe = true;
   // Class 3 and the mixed chain stage one cell in shared memory.
   if (klass == 3 || klass == 7) program.shared_bytes = kLdsWindowBytes;
+  if (!finalize_program(builder, program, error)) return std::nullopt;
+  return program;
+}
+
+namespace {
+
+// ---- P1: the alu-carry class's second word --------------------------------
+//
+// `v_addc_u32`'s RD8 field is the VCC pair: the per-lane carry-IN the
+// instruction reads and the per-lane carry-OUT it writes.  On the compute pipe
+// that pair is s[6:7] - the same registers the kernel descriptor hands the
+// launch as the kernarg pointer - and the measured second word has come back in
+// three different spellings, the full active mask (0x0000ffff at 16 lanes),
+// 0x1, and 0xfffe, for rows whose oracle calls the same thing one boolean.  A
+// word that is a MASK for one row and a BOOLEAN for another is not two
+// behaviours: it is one behaviour plus one readback path, and this probe is the
+// carrier-side measurement that separates them without touching a case row.
+//
+// Shape: one program, sixteen arms.  Everything the instruction can see is
+// pinned - a = 0xffffffff, b = 0x0, the result BO's descriptor in s0-s3, v9 as
+// the zero store address, s16 as the immediate staging temp - and only three
+// things vary, each of which is a measurement in its own right:
+//
+//   * X, the constant staged into the pair's low word (s6): twelve fixed
+//     values, and the only value variable.
+//   * b: only the functional control arm sets b = 0x1, so the add carries out
+//     by itself and the carry-out stops being a function of the carry-in.
+//   * the nop distance between the target and the first read of s6 (0/4/16/64),
+//     which separates "the pair was never written" from "the read got there
+//     before the write did".
+//
+// Each arm then reads the four places the second word could live, all of them
+// BEFORE any vector store: a vector memory op clobbers the lane masks (the
+// mask-probe hazard), so p0/p1 must be read first, and s6 is read first of all
+// because the distance arms put their nops immediately before it.
+
+struct CarryArm {
+  const char* label;
+  // Second addend.  Zero everywhere but the functional control arm, whose whole
+  // purpose is a carry the addends produce on their own.
+  std::uint32_t b;
+  // The third-source constant staged into the pair's low word: the probe's only
+  // value variable.
+  std::uint32_t x;
+  // Nops between the target and the first read of s6 (distance arms only).
+  unsigned nops;
+};
+
+// a is pinned.  With b = 0 it makes "carried" mean exactly "carry-in was 1",
+// which is the quantity under test, and it puts base at 0xffffffff, so a lane
+// that carried reads 0 while a cell nothing wrote keeps its sentinel.
+constexpr std::uint32_t kCarryA = 0xffffffffu;
+// Arm block: 0x00 s6, 0x04 s7, 0x08 p0, 0x0c p1, 0x10 + 4*lane destination.
+constexpr std::uint32_t kCarryCellBase = 0x100u;
+constexpr std::uint32_t kCarryCellStride = 0x80u;
+constexpr std::uint32_t kCarryDstSentinel = 0xdeadbeefu;
+
+constexpr CarryArm kCarryArms[] = {
+    {"x0",         0u, 0x00000000u, 0u},   // 0
+    {"x1",         0u, 0x00000001u, 0u},   // 1
+    {"x3",         0u, 0x00000003u, 0u},   // 2
+    {"x_fffe",     0u, 0x0000fffeu, 0u},   // 3
+    {"x_ffff",     0u, 0x0000ffffu, 0u},   // 4
+    {"x_10000",    0u, 0x00010000u, 0u},   // 5
+    {"x_deadbeef", 0u, 0xdeadbeefu, 0u},   // 6  distance 0
+    {"x_00aa",     0u, 0x000000aau, 0u},   // 7
+    {"x_0055",     0u, 0x00000055u, 0u},   // 8
+    {"x_80000000", 0u, 0x80000000u, 0u},   // 9
+    {"x_3fffffff", 0u, 0x3fffffffu, 0u},   // 10
+    {"x_7fffffff", 0u, 0x7fffffffu, 0u},   // 11
+    {"ctl_b1",     1u, 0xdeadbeefu, 0u},   // 12 functional control
+    {"dist_4",     0u, 0xdeadbeefu, 4u},   // 13
+    {"dist_16",    0u, 0xdeadbeefu, 16u},  // 14
+    {"dist_64",    0u, 0xdeadbeefu, 64u},  // 15
+};
+constexpr unsigned kCarryArmCount =
+    sizeof(kCarryArms) / sizeof(kCarryArms[0]);
+
+std::uint32_t carry_active_mask(unsigned lanes) {
+  return lanes >= 32 ? 0xffffffffu : ((1u << lanes) - 1u);
+}
+
+// One arm's fixed preamble.  Every instruction here is byte-identical in all
+// sixteen arms except the one `b` immediate of the functional control arm,
+// which is what makes a per-arm diff of the listing a meaningful check.
+void emit_carry_preamble(Builder& builder, const CarrierEnv& env,
+                         std::uint32_t b) {
+  // The result BO's buffer descriptor in s0-s3, plus the flat store's
+  // architectural zero base pair in s20:s21.
+  emit_env_prelude(builder, env);
+  builder.s_mov_imm_b32(isa::sgpr(16), kCarryA);
+  builder.v_mov_b32(isa::vgpr(8), isa::sgpr(16), isa::predicate(0));
+  builder.s_mov_imm_b32(isa::sgpr(16), b);
+  builder.v_mov_b32(isa::vgpr(12), isa::sgpr(16), isa::predicate(0));
+  // v9 is the zero address every store in this probe names; v10 is VD8, the
+  // destination the readback records.
+  builder.s_mov_imm_b32(isa::sgpr(16), 0u);
+  builder.v_mov_b32(isa::vgpr(9), isa::sgpr(16), isa::predicate(0));
+}
+
+// The readback: the pair's two words, the mask file's p0/p1 through the
+// probe-only selector spelling, and the destination word per lane.
+void emit_carry_readback(Builder& builder, const CarrierEnv& env,
+                         std::uint32_t cell) {
+  // s6 first: the distance arms put their nops between the target and this
+  // read, and the pair's low word is the one the four models disagree about.
+  builder.s_mov_b32(isa::sgpr(10), isa::sgpr(6));
+  builder.s_mov_b32(isa::sgpr(11), isa::sgpr(7));
+  // p0/p1 through the probe-only selector spelling the mask-lifetime probe
+  // uses (0x7c/0x7d), into the same two scratch registers it uses.
+  builder.append(isa::McInst{"s_mov_b32", "(scc)",
+                             {isa::op_reg(isa::sgpr(8)),
+                              isa::op_raw_selector(0x7cu)}});
+  builder.append(isa::McInst{"s_mov_b32", "(scc)",
+                             {isa::op_reg(isa::sgpr(9)),
+                              isa::op_raw_selector(0x7du)}});
+  // 0x00 s6, 0x04 s7, 0x08 p0, 0x0c p1.
+  builder.v_mov_b32(isa::vgpr(11), isa::sgpr(10), isa::predicate(0));
+  emit_result_store(builder, env, isa::vgpr(11), isa::vgpr(9), cell + 0x00u);
+  builder.v_mov_b32(isa::vgpr(11), isa::sgpr(11), isa::predicate(0));
+  emit_result_store(builder, env, isa::vgpr(11), isa::vgpr(9), cell + 0x04u);
+  builder.v_mov_b32(isa::vgpr(11), isa::sgpr(8), isa::predicate(0));
+  emit_result_store(builder, env, isa::vgpr(11), isa::vgpr(9), cell + 0x08u);
+  builder.v_mov_b32(isa::vgpr(11), isa::sgpr(9), isa::predicate(0));
+  emit_result_store(builder, env, isa::vgpr(11), isa::vgpr(9), cell + 0x0cu);
+  emit_lane_record(builder, env, isa::vgpr(10), cell + 0x10u);
+}
+
+}  // namespace
+
+unsigned carry_arm_count() { return kCarryArmCount; }
+
+const char* carry_arm_label(unsigned arm) {
+  return arm < kCarryArmCount ? kCarryArms[arm].label : "?";
+}
+std::uint32_t carry_arm_x(unsigned arm) {
+  return arm < kCarryArmCount ? kCarryArms[arm].x : 0u;
+}
+std::uint32_t carry_arm_b(unsigned arm) {
+  return arm < kCarryArmCount ? kCarryArms[arm].b : 0u;
+}
+unsigned carry_arm_nops(unsigned arm) {
+  return arm < kCarryArmCount ? kCarryArms[arm].nops : 0u;
+}
+std::uint32_t carry_arm_cell(unsigned arm) {
+  return kCarryCellBase + kCarryCellStride * arm;
+}
+std::uint32_t carry_dst_base(unsigned arm) {
+  return kCarryA + carry_arm_b(arm);
+}
+
+CarryExpect carry_expect(unsigned arm, unsigned hypothesis, unsigned lanes) {
+  CarryExpect e{};
+  if (arm >= kCarryArmCount) return e;
+  const CarryArm& a = kCarryArms[arm];
+  const std::uint32_t active = carry_active_mask(lanes);
+  std::uint32_t cin = 0u;
+  switch (hypothesis) {
+    case 0:
+      // H1: lane i's carry-in is bit i of the pair's low word.
+      cin = a.x;
+      break;
+    case 1:
+      // H2: the staged value never reaches the adder and the pair is not
+      // written - the readback shows exactly what was staged.
+      cin = 0u;
+      break;
+    case 2:
+      // H3: the window is offset by half a word - lane i reads bit i of the
+      // pair's HIGH word, so the pattern is the constant's upper half (the low
+      // word this probe stages as X is then never the carry source).
+      cin = (a.x >> 16) & 0xffffu;
+      break;
+    default:
+      // H4: the third source is one scalar flag for the whole wave.
+      cin = a.x != 0u ? active : 0u;
+      break;
+  }
+  std::uint32_t carried = 0u;
+  for (unsigned i = 0; i < lanes && i < 32; ++i) {
+    const std::uint64_t wide = static_cast<std::uint64_t>(kCarryA) + a.b +
+                               ((cin >> i) & 1u);
+    if ((wide >> 32) != 0u) carried |= 1u << i;
+  }
+  e.base = kCarryA + a.b;
+  e.dst_mask = cin & active;
+  // A stale pair is not written at all, so its low word still holds X; every
+  // other model writes the per-lane carry-out mask it just produced.
+  e.s6 = hypothesis == 1 ? a.x : carried;
+  e.s7 = 0u;
+  e.p0 = active;
+  return e;
+}
+
+std::optional<EnvelopeProgram> build_cs_carry_probe(unsigned first_arm,
+                                                    unsigned arm_count,
+                                                    std::string& error,
+                                                    unsigned lanes) {
+  if (arm_count == 0 || first_arm >= kCarryArmCount ||
+      arm_count > kCarryArmCount - first_arm) {
+    error = "carry probe: arm window out of range (0.." +
+            std::to_string(kCarryArmCount - 1) + ")";
+    return std::nullopt;
+  }
+  if (lanes == 0 || lanes > 32) {
+    error = "carry probe: the lane count must be 1..32";
+    return std::nullopt;
+  }
+  const CarrierEnv env = CarrierEnv::compute(lanes);
+  Builder builder;
+  EnvelopeProgram program;
+  program.probe = true;
+  // Sentinel every destination cell: with b = 0 a carried lane reads base + 1 =
+  // 0, which is also what an untouched cell reads, so the preload is what makes
+  // "did not execute" distinguishable from "carried to zero".
+  for (unsigned k = 0; k < arm_count; ++k) {
+    const std::uint32_t cell = carry_arm_cell(first_arm + k);
+    for (unsigned lane = 0; lane < lanes; ++lane)
+      program.arg_preloads.emplace_back(cell + 0x10u + 4u * lane,
+                                        kCarryDstSentinel);
+  }
+  for (unsigned k = 0; k < arm_count; ++k) {
+    const CarryArm& arm = kCarryArms[first_arm + k];
+    const std::uint32_t cell = carry_arm_cell(first_arm + k);
+    emit_carry_preamble(builder, env, arm.b);
+    // The single value variable: the pair's low word.  The high word is staged
+    // to zero, so the pair is the known 64-bit constant (0 : X).
+    builder.s_mov_imm_b32(isa::vcc(6), arm.x);
+    builder.s_mov_imm_b32(isa::sgpr(7), 0u);
+    builder.append_target(isa::McInst{
+        "v_addc_u32", "",
+        {isa::op_reg(isa::predicate(0)), isa::op_reg(isa::vgpr(10)),
+         isa::op_reg(isa::vgpr(8)), isa::op_reg(isa::vgpr(12)),
+         isa::op_reg(isa::vcc(6))}});
+    for (unsigned n = 0; n < arm.nops; ++n) builder.nop();
+    emit_carry_readback(builder, env, cell);
+  }
+  builder.check_k_vm_vs_sm();
+  builder.nop();
+  builder.exit();
   if (!finalize_program(builder, program, error)) return std::nullopt;
   return program;
 }
