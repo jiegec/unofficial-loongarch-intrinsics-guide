@@ -129,6 +129,12 @@ def run_one(mnemonic, rows, dry, timeout_s, pipe, env=None):
             # this tool, not a hardware result: nothing was submitted.
             merged.update({"status": "PREFLIGHT-FAIL", "detail": last})
             break
+        if rc == 4:
+            # The host-side LDS-window preflight refused the stream: nothing
+            # was submitted, so this is a defect in the carrier declaration and
+            # not a hardware result.
+            merged.update({"status": "PREFLIGHT-FAIL", "detail": last})
+            break
         if rc not in (0, 1):
             merged.update({"status": "ERROR", "detail": last})
             break
