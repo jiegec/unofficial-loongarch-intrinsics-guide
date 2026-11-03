@@ -22,4 +22,7 @@ CASE_FP(finite-max-pos, rtne, 0x7bff, 0xffffffe0)
 CASE_FP(finite-max-neg, rtne, 0xfbff, 0x20)
 CASE_FP(finite-min-pos, rtne, 0x400, 0x0)
 CASE_FP(finite-min-neg, rtne, 0x8400, 0x0)
+CASE_FP(i16-max-exact, rtne, 0x77ff, 0x7ff0)
+CASE_FP(i16-neg-max-exact, rtne, 0xf7ff, 0xffff8010)
+CASE_FP(i16-min-exact, rtne, 0xf800, 0xffff8000)
 LG200_CASE_END

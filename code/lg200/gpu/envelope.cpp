@@ -3391,6 +3391,10 @@ std::optional<EnvelopeProgram> build_carrier_env(
       mnemonic.rfind("v_mma_", 0) == 0 ||
       mnemonic == "v_sqrt_f64" || mnemonic == "v_rsq_f64" ||
       mnemonic == "v_s2v_b32" || mnemonic == "v_cmpclass_f64" ||
+      // [HW 2026-11-03] v_add_imm_i32 and v_sub_imm_i32 belong here for a
+      // reason of their own: every case of both rows returns the constant
+      // 0x3f4fffff - the canary - on BOTH pipes, so the store never writes the
+      // result and the row cannot be compared until that staging is fixed.
       mnemonic == "v_add_imm_i32" || mnemonic == "v_sub_imm_i32" ||
       mnemonic == "v_perm_sm_b32" || mnemonic == "v_bperm_sm_b32" ||
       mnemonic == "s_cmp_eq_u64" || mnemonic == "s_cmp_ne_u64";
