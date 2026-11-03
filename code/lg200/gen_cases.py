@@ -258,6 +258,16 @@ SUBWORD_OK = re.compile(r"^(load|store)_(sm|v_buff|v_flat)_"
 # two rows keep their three hand vectors until the carrier can chunk a submit.
 WIDE_OK = re.compile(r"^(load|store)_s_(buff|flat)_w(1|2|4|8)$|"
                      r"^(load|store)_v_(buff|flat)_b(96|128)$")
+# The payload rows proper: their models pass a dword through (dst[0] = src[0]),
+# so the class space is the raw 32-bit pattern, and the column that is not a
+# datum is an address or coordinate that must stay inside the carrier's window.
+# Until 2026-11-03 the coverage gate asked these rows nothing at all, because
+# their names carry no [uibf]NN tag; it asks now, and this grid is the answer.
+PAYLOAD_OK = re.compile(r"^(samp|gather|getlod|getresinfo)(_|$)|"
+                        r"^load_s_(buff|flat)_w16$|"
+                        r"^(load|store)_v_tex(_|$)|"
+                        r"^(load|store)_v_buff_fmt(desc|inst)_c[1-4]$|"
+                        r"^load_sm_(interp|matrix_x[124])$")
 
 
 def case_targets() -> list:
@@ -284,6 +294,9 @@ def case_targets() -> list:
         # Wide payload rows stage the whole block from the case inputs, so a
         # boundary grid is stageable even though the name carries no type tag.
         if WIDE_OK.match(mnemonic) and nin_of(mnemonic) in (2, 3, 4):
+            out.append(mnemonic)
+            continue
+        if PAYLOAD_OK.match(mnemonic) and nin_of(mnemonic) in (1, 2, 3, 4):
             out.append(mnemonic)
             continue
         # Rows whose last input is an immediate: the register columns keep the
@@ -400,14 +413,37 @@ def main() -> int:
               (SUBWORD_OK.match(mnemonic) and "b64" not in mnemonic)) and nin == 2:
             # content | address offset (held in-window)
             gen = grid_cols([base, [0]])
-        elif WIDE_OK.match(mnemonic):
+        elif WIDE_OK.match(mnemonic) or PAYLOAD_OK.match(mnemonic):
             # The wide payload rows reduce the block to the dwords the model
             # returns (code/lg200/load_s_buff_w8.h:3-5), so the 32-bit INT set is
             # this row's class space.  An input the model never reads is the
             # address offset, held inside the carrier's window like SUBWORD_OK's.
             body = (ROOT / f"{mnemonic}.h").read_text(encoding="utf-8")
-            used = {int(i) for i in re.findall(r"src\[(\d+)\]", body)}
-            gen = grid_cols([base if i in used else [0] for i in range(nin)])
+            # [HW 2026-11-03] A model that reads a word pair writes src[0+1], not
+            # src[1], so a plain index regex saw only column 0 and pinned the
+            # second datum to zero - which is why the pair rows reported a gap in
+            # a column they actually read.  Both spellings count, and a range
+            # marks every index it spans.
+            used = set()
+            for a, b in re.findall(r"src\[(\d+)(?:\s*\+\s*(\d+))?\]", body):
+                lo = int(a)
+                used.update(range(lo, lo + (int(b) if b else 0) + 1))
+            if mnemonic in ("load_s_buff_w16", "load_s_flat_w16"):
+                # The cross product is 36 cases of sixteen-dword payloads, and the
+                # runner's one-page BO refuses that before submission ("payload
+                # exceeds one GPU page"), which is why these two rows were left
+                # out of the grid.  A class only has to appear in each column
+                # once, so vary one column at a time: 12 cases instead of 39.
+                gen = []
+                for j in range(nin):
+                    if j not in used:
+                        continue
+                    for v in base:
+                        row = [0] * nin
+                        row[j] = v
+                        gen.append(row)
+            else:
+                gen = grid_cols([base if i in used else [0] for i in range(nin)])
         else:
             gen = grids(base, nin)
         for row in gen:

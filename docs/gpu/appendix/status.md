@@ -6,7 +6,7 @@ the pages linked from each row; this page is the index.
 
 Verified together on 2026-10-12: chapter invariants hold (`check_gpu.py`: 768
 rows, 12 formats, 7 families, 33 state blocks), the table is intact (768 rows, 23
-columns, unique), the offline oracle passes (**768 instructions, 87,183
+columns, unique), the offline oracle passes (**768 instructions, 88,245
 vectors**), and the hardware runner builds.
 
 ## Phase 1 - the PS/CS carrier
@@ -157,7 +157,7 @@ Boundary coverage of the required classes, as measured by `case_coverage.py`:
 | type-token selection, texture atomics, 64-bit integer compares | 710 |
 | the six-dword three-pair shape, the type union, pair low words | 753 |
 | the sub-word loads | 765 |
-| the plain-width (`bNN`) rows, and separating launch-shape rows | **633 of 738 value-expressible** (90 still have gaps, 15 have no result) |
+| the plain-width (`bNN`) rows, and separating launch-shape rows | **723 of 738 value-expressible** (15 have no result) |
 
 The vector count went 20,732 -> 83,547.  The auditor now separates the rows whose
 result is **launch state rather than an operand** - the environment and SIO reads,
@@ -180,7 +180,7 @@ hardware plan.
 
 `code/lg200/gpu/audit.py` reads the runner's own listings, not the source, so it audits
 the programs that were actually assembled.  Over a freshly regenerated corpus
-(`run_gpu.py --dry`, host only, 768 PASS / **87,183** rows in **54 s**; two runs, 53.7
+(`run_gpu.py --dry`, host only, 768 PASS / **88,245** rows in **54 s**; two runs, 53.7
 and 56.6, on 2026-10-13, replacing an earlier 23.4 s measurement taken before the 252
 rounding-mode cases were added) it reports **768
 programs audited, 0 refused, 0 problems**.
