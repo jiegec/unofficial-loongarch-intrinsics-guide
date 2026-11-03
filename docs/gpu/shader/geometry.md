@@ -308,7 +308,10 @@ vertex count, then the SIO1 export commits the record's published export count.
 
 Static point streams initialize their separator payload VGPR, `v35`, to zero in
 the prologue before an emit can read it. Runtime recipes also initialize it once
-and preserve it across iterations. Leaving the static value uninitialized caused
+and preserve it across iterations. Runtime point separators are written for
+every active invocation, without the line/triangle recipe's GA-based lane gate.
+Applying that gate to points dropped a single runtime output; emitting additional
+points could conceal the loss. Leaving the static value uninitialized caused
 intermittent missing points when several invocations shared a launch; reducing
 the thread count concealed the failure. Initialization repairs the focused
 point-depth controls without reducing their thread count.
@@ -360,10 +363,6 @@ still be refused when its LG200 record cannot be represented.
   single emitted vertex reserves the same miscellaneous quad as multiple
   vertices. Focused probes cover 1–8 distances and static/runtime point output;
   arbitrary record capacities and divergent emission remain unproven.
-* A focused point shader that stores its outputs before a runtime emit loop
-  still renders black when the loop should emit once. Straight-line conditional
-  emission controls pass. Position values are still present in the generated
-  SIO writes; the cause of this runtime-loop failure remains unresolved.
 * Divergent loop-carried clip/cull outputs, transform feedback, and the complete
   SIO1 record-capacity boundary need
   additional direct probes and full CTS coverage.
@@ -395,6 +394,7 @@ conformance.
 | Distance output probes | 12 cases: 1/4/8 distances, static/runtime point and triangle output | 12 pass after matching the physical distance count to the point-size record |
 | Distance record boundary probes | 16 cases: 1–4 distances, clip enable off/on, fragment distance read off/on; 24 cases: 1–8 distances, point size off/on and static/runtime point output | 40 pass; the first matrix previously had 12 failures |
 | Single-vertex point records | 7 cases: no distances or 1/4/8 distances, positive/negative distance, with point-size footprint checks | 7 pass; reserving the miscellaneous quad repairs the negative 1/4-distance cases |
+| Runtime point emission boundaries | 0–3 loop iterations, all/mixed/no active emit conditions, two independent processes per shape; varying values and distinct output rows | 24 pass after removing the strip separator gate from point output |
 | Vulkan point clip-volume controls | `inside`, `outside`, `depth_clamp`, `depth_clip`, and `clipped.large_points`, three separate processes each | 15 pass after initializing the static separator and completing the meta depth predicate |
 | Piglit geometry corpus | 37 cases | 24 pass, 1 fail (`max-input-components`), 12 skip |
 | Vulkan CTS geometry matrix | 199 cases | 179 pass, 10 fail, 10 NotSupported, no GPU fault in this matrix |
