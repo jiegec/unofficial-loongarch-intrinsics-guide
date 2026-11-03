@@ -64,8 +64,19 @@ For `V` linked generic varying quads, the current implementation chooses the
 SIO0 window in channels as:
 
 ```text
-max(position_channels + 4*V, 4*(V + 2), 12)
+minimum_window = max(position_channels + 4*V, 4*(V + 2), 12)
+window = minimum_window, if minimum_window <= 32
+         32 * ceil(minimum_window / 32), otherwise
 ```
+
+Wide records reserve complete 32-channel rows. With the previous unrounded
+policy, matching producer/consumer widths and ascending reads still produced
+input quads from adjacent vertices in focused six-vertex probes. For example,
+128 generic components used a 136-channel window and failed; a 160-channel
+window passes. This rounding is the current conservative layout policy, not a
+claim that every partial-row window fails. A 156-channel window also passes
+that particular varying-only probe. The complete hardware condition for partial
+rows remains `UNRESOLVED`.
 
 Both stages receive the same producer-derived dimensions. All producer writes
 and consumer reads must agree on that window. The vertex stage feeding geometry
@@ -74,6 +85,34 @@ directly. SIO reads are issued in ascending ring-channel order; the compiler
 copies each four-channel result out of the hardware's fixed destination sequence
 before issuing a later read. The sequence and its wrap are documented in
 [SIO](sio.md#reading-channels).
+
+### Input scheduling and register pressure
+
+A geometry stage can consume six vertices with 128 components each. Copying
+all 192 four-channel input reads into persistent temporaries exceeds the
+256-VGPR file even though the shader can reduce the values incrementally.
+The shared LCO selector therefore streams eligible constant entry-block inputs:
+
+* sort reads stably by their physical SIO0 channel;
+* copy each c4 result immediately out of its fixed destination window;
+* schedule pure SSA computations after their last required input;
+* reassociate single-use scalar boolean `iand`, `ior`, and `ixor` reductions by
+  input availability, so intermediate comparisons can die early;
+* preserve the relative order of output stores, emits, and primitive cuts.
+
+This route applies to entry blocks containing constant per-vertex input loads,
+ALU instructions, constants, and output/emission intrinsics. Other shapes retain
+the prologue cache or per-site path; this optimization does not establish a GS
+scratch-memory ABI. Both channel-selection sites materialize ring-channel
+indices with `v_mov_imm_b32`: an index above 64 does not fit the integer inline
+constant range of `v_mov_b32`.
+
+Gallium and loongvk request the same stage-specific NIR compiler options. GS
+permits 128 unroll iterations and forces indirect shader-input unrolling, so
+constant input loops can resolve before indirect IO becomes a large selection
+tree. Other stages retain the default limit of 32. Shared early IO preparation
+only runs its extra unrolling when indirect input dereferences exist; it must
+not rewrite unrelated emit loops merely to prepare input loads.
 
 ## Compiler control-flow and distance IO contracts
 
@@ -293,6 +332,10 @@ emitted are distinct quantities.
 
 The current compiler reserves `v33` for the window counter, `v35` for the
 separator, `v19` for the final separator copy, and `v45` for the emit index.
+Static point and strip emitters materialize that index with `v_mov_imm_b32`.
+Ordinals 65 through 127 exceed the integer inline-constant range of
+`v_mov_b32`; unrolling a 128-vertex output loop must still produce encodable
+instructions at every emit site.
 These are compiler register choices. The ABI inputs `s4:s5` remain live as a
 64-bit constant root: saving an execution mask into `s5` corrupts later constant
 or UBO loads. Window maintenance must use a temporary whose lifetime is
@@ -377,6 +420,8 @@ kernel event.
 
 The source of the layout equations is the open Mesa LoongGPU backend:
 `src/mesa/src/loonggpu/compiler/instruction_selection/lco_gs_plan.c`. Input
+scheduling is in
+`src/mesa/src/loonggpu/compiler/instruction_selection/lco_gs_input_schedule.c`;
 selection and output setup are split into
 `src/mesa/src/loonggpu/compiler/instruction_selection/lco_select_gs_input.c` and
 `src/mesa/src/loonggpu/compiler/instruction_selection/lco_select_gs_setup.c`.
@@ -397,9 +442,16 @@ conformance.
 | Single-vertex point records | 7 cases: no distances or 1/4/8 distances, positive/negative distance, with point-size footprint checks | 7 pass; reserving the miscellaneous quad repairs the negative 1/4-distance cases |
 | Runtime point emission boundaries | 0–3 loop iterations, all/mixed/no active emit conditions, two independent processes per shape; varying values and distinct output rows | 24 pass after removing the strip separator gate from point output |
 | Vulkan point clip-volume controls | `inside`, `outside`, `depth_clamp`, `depth_clip`, and `clipped.large_points`, three separate processes each | 15 pass after initializing the static separator and completing the meta depth predicate |
-| Piglit geometry corpus | 37 cases | 24 pass, 1 fail (`max-input-components`), 12 skip |
+| Piglit geometry corpus (historical aggregate) | 37 cases | 24 pass, 1 fail (`max-input-components`), 12 skip |
 | Vulkan CTS geometry matrix | 199 cases | 179 pass, 10 fail, 10 NotSupported, no GPU fault in this matrix |
 | Vulkan CTS clip/cull matrix | 64 `vert_geom` cases, static/dynamic indexing, with/without fragment distance reads | 64 pass, no GPU fault |
+
+A later focused `max-input-components` check passes after input scheduling,
+full-width channel materialization, and wide SIO0 row rounding. Its negative
+control changes every producer value by one and correctly renders the failure
+colour. Ten selected input-width cases, including 20, 24, 28, 32, 56, 64, 96,
+120, 124, and 128 components, pass with the corrected layout. These targeted
+results do not replace the historical aggregate with an inferred suite total.
 
 The aggregate geometry result above predates the null-position correction.
 Subsequent targeted checks pass nine previously failing layered cases in three
