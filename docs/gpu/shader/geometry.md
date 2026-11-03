@@ -308,7 +308,7 @@ component, and `a` a varying ordinal):
 | Mode | Position channel | Varying channel |
 |------|------------------|-----------------|
 | Adjacent, for `N>1` or `N=1` and more than four sites | `2*c` | `2*(4+4*a+c)` |
-| Position only, more than eight sites | `9+c` | none |
+| Position only, more than eight sites (diagnostic static layout) | `9+c` | none |
 | Other static records | `4+4*e+c` | `varying_base+4*a+c` |
 
 Here `varying_base = 4 + 4*P*(adjacent ? 5 : site_count)`. Distance descriptors
@@ -330,6 +330,16 @@ a separation bound, not proof that an arbitrary control-flow shape is correct.
 The declared maximum, static emit-site count, and number of vertices actually
 emitted are distinct quantities.
 
+Normal line and triangle routing compares the static site count with this
+descriptor-plane capacity, as well as the emitter's 16-site bookkeeping limit.
+A position-only compact record with `P=1` has position descriptors 32–63 and a
+varying base of 64, hence capacity eight. Nine through sixteen static strip
+sites use the runtime recipe even though their site indices fit the compiler's
+bookkeeping arrays. A larger declaration alone does not exhaust the static
+plane when the actual sites fit. Static point emission has an independent
+layout and is not subject to this strip-plan routing gate. Explicit diagnostic
+route overrides retain their validation checks; they do not expand the plane.
+
 The current compiler reserves `v33` for the window counter, `v35` for the
 separator, `v19` for the final separator copy, and `v45` for the emit index.
 Static point and strip emitters materialize that index with `v_mov_imm_b32`.
@@ -340,6 +350,22 @@ These are compiler register choices. The ABI inputs `s4:s5` remain live as a
 64-bit constant root: saving an execution mask into `s5` corrupts later constant
 or UBO loads. Window maintenance must use a temporary whose lifetime is
 represented to the register allocator.
+
+The runtime separator mask constant `0xfcffffff` has a short scalar lifetime,
+ending at its vector AND. It uses an allocated SGPR. Fixing it to `s10` removes
+one of the four mask slots available to surrounding GS control flow for the
+entire allocation, and can make a conditional twelve-site strip fail register
+allocation even though the constant itself needs only two instructions.
+
+Runtime emit recipes append continuation blocks. A following NIR conditional
+may therefore have neither successor adjacent in machine-block order. The
+conditional falls through to a new trampoline that branches to the other
+successor; conditional and unconditional terminators occupy separate blocks.
+This is a compiler control-flow requirement, independent of SIO ordering.
+Selection/encoding regressions cover eight, nine, twelve and sixteen
+position-only strip sites, including both uniform and varying-input conditions
+around the middle four emits. They do not prove arbitrary per-lane runtime
+ordinal handling.
 
 ## Emit and export sequence
 
@@ -487,19 +513,49 @@ absolute output prefix. Each submission produces `.meta` and `.ib` files, plus
 the used `.root` and `.resource` prefixes when present. Unlike
 `LOONGVK_DUMP_IB`, which captures draw construction, this records the final IB
 length and submission residency. `LOONG_DUMP_VAMAP_FILE` adds the exact pinned
-BO mappings, submission token and returned kernel fence sequence. Match the
+BO mappings, submission token and returned kernel fence sequence. A terminal
+`fence_result` record also reports the kernel result, queue point, reset epoch
+and whether retirement authorizes reclamation. Successful submit-ioctl return
+alone does not establish completion. Match the
 captures by process, IB address/length and timestamp/token, rather than assuming
 file sequence numbers identify the same submission across processes.
 
-With this instrumentation, one planned hardware replay of the isolated
-inherited-framebuffer case passes without a new fault or reset. Its three
-submissions contain 12 initialization records and 24 GS records. Direct shader,
-root/resource and render-target addresses match resident VA mappings; this
-check does not validate shader-computed addresses, nested descriptors or lifetime
-races. The original fault therefore remains unresolved. Ten historical geometry
+An initial planned hardware replay of the isolated inherited-framebuffer case
+passes without a new fault or reset. Its three submissions contain 12
+initialization records and 24 GS records. A subsequent bounded replay adds the
+missing kernel-retirement observations and also passes. The offline audit now
+checks direct shader/root/resource addresses, full constant-root spans and
+fixed scalar windows through offset `0x4120`, attribute buffer spans, and the
+captured set-0/binding-0 RGBA8 storage cube-array descriptor. The 64×64×12 image
+has a `0x30000`-byte span, 256-byte row pitch and 16384-byte layer stride. The
+selected layer and its last pixel are checked against the mapped resource.
+The following three image metadata records have zero addresses and carry sizes;
+they are not interpreted as additional image pointers. Negative controls reject
+the historical unmapped fault address and a span crossing the BO end.
+
+For these captured submissions, the exact token/kernel sequence reports
+successful reclamation-safe retirement before observed unmaps or overlapping
+root/resource reuse. The audit is specific to this descriptor shape and the
+observed trace: it is not a general interpreter of shader-computed addresses,
+does not cover every render-target access, and cannot exclude lifetime races in
+the historical faulting execution. The original fault remains `UNRESOLVED`.
+Ten historical geometry
 failures also pass in two separate processes each with the default configuration
 and diagnostics disabled; these focused checks do not replace the earlier
 aggregate results.
+
+A desktop GLSL port of Piglit's OES `nonuniform-vertex-count` shader exercises
+four input points with twelve versus eight emitted vertices, including a
+conditionally omitted middle strip and no varying outputs. With Piglit's
+standard `-auto -fbo` invocation it passes three independent processes; a second
+matrix adds direct-VS, all-true and all-false controls and passes twelve checks.
+Window-mode runs retain intermittent extra triangles, including when drawing
+each input separately and when every input omits the middle strip. Divergent
+per-invocation counts are therefore not required by the observed failure. Its
+cause remains open; the FBO passes do not establish general correctness of the
+stream state. The original GLES test is still skipped because ES 3.1 context
+creation returns `EGL_BAD_MATCH`; the desktop port does not validate that API
+admission path.
 
 `LOONG_NO_SUBMIT=1` supports offline construction and capture by completing
 the caller's binary and timeline syncobjs on the CPU. It executes no GPU
