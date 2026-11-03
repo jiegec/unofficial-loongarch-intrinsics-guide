@@ -1988,8 +1988,14 @@ std::optional<EnvelopeProgram> build_buff(const std::string& mnemonic,
     } else if (fmtinst || subword) {
       const std::uint32_t cell = carrier::kLoadWindow + off;
       if (is_store) {
+        // [HW 2026-11-03] Bound the read by what the row actually carries: the
+        // fmtinst c3/c4 rows declare two inputs while their instruction stages
+        // three and four dwords, so this loop read past the vector (undefined
+        // behaviour, and a value that looked like a case datum).  An input the
+        // case does not state is zero - the column is not under test.
         for (unsigned p = 0; p < width; ++p) {
-          builder.s_mov_imm_b32(imm_temp, def.inputs[p]);
+          const std::uint32_t value = p < def.inputs.size() ? def.inputs[p] : 0u;
+          builder.s_mov_imm_b32(imm_temp, value);
           builder.v_mov_b32(isa::vgpr(8 + p), imm_temp, isa::predicate(0));
         }
         // store_v_buff_b16 carries an address VGPR (RA8 RK8x4 VQ8 VJ8 UO12)
