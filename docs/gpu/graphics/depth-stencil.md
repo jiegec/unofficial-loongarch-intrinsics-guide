@@ -33,9 +33,9 @@ Each face has a 4-byte record: front at `0x334`, back at `0x338`.
 |------|-------|---------|
 | `[0]` | Enable | Run the stencil test for this face. |
 | `[3:1]` | Function | Compare function. |
-| `[6:4]` | Fail operation | Applied when the stencil test fails. |
-| `[9:7]` | Depth-pass operation | Applied when both tests pass. |
-| `[12:10]` | Depth-fail operation | Applied when stencil passes and depth fails. |
+| `[7:4]` | Fail operation | Applied when the stencil test fails. |
+| `[11:8]` | Depth-pass operation | Applied when both tests pass. |
+| `[15:12]` | Depth-fail operation | Applied when stencil passes and depth fails. |
 | `[23:16]` | Value mask | Bits compared against the reference. |
 | `[31:24]` | Write mask | Bits written back. |
 

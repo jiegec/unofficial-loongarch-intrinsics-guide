@@ -56,7 +56,7 @@ An IB command is:
 | 1 | `SCMD32(0x80, 0)` |
 | 2 | IB address, low 32 bits |
 | 3 | IB address, high 32 bits |
-| 4 | `length_dwords[23:0] | vmid[31:24]` |
+| 4 | `length_dwords[23:0]` OR `vmid[31:24]` |
 
 The address MUST be mapped executable. The length is in dwords.
 

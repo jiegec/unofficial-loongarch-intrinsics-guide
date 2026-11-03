@@ -20,6 +20,8 @@ attachment.
 
 ## Per-target blend word
 
+This word is the Blend RT record.
+
 Each target has a 4-byte word at `0x340 + 4 * n`.
 
 | Bits | Field | Meaning |
@@ -93,6 +95,13 @@ The values 11 through 16, 22 and 27 through 31 are not assigned by the encoding.
 ## Blend constants
 
 Four float patterns at `0x360` supply the constant colour and constant alpha.
+
+| Bits | Field | Meaning |
+|------|-------|---------|
+| `[31:0]` | Red bits | Red float pattern. |
+| `[63:32]` | Green bits | Green float pattern. |
+| `[95:64]` | Blue bits | Blue float pattern. |
+| `[127:96]` | Alpha bits | Alpha float pattern. |
 
 ## Rules
 

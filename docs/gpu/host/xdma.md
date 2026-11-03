@@ -30,20 +30,20 @@ driver emits:
 
 | Operation | Configuration word |
 |-----------|--------------------|
-| Copy | `(1 << 0) | (1 << 8)` |
-| Fill | `(1 << 0) | (7 << 8) | (page_size << 26)` |
+| Copy | `(1 << 0) OR (1 << 8)` |
+| Fill | `(1 << 0) OR (7 << 8) OR (page_size << 26)` |
 
 The page-size field is 1 for a 4 KiB kernel and 3 for a 16 KiB kernel. The
 element size is encoded in the operation field by the driver; the interface
 defines 4-byte and 8-byte elements.
 
-## Copy
+## XDMA Copy
 
 | Word | Content |
 |-----:|---------|
 | 0 | `SCMD32(STSCFG, 8 << 20)` |
 | 1 | Configuration: copy. |
-| 2 | `(height << 16) | width`. |
+| 2 | `(height << 16) OR width`. |
 | 3 | Source address, low 32 bits. |
 | 4 | Source address, high 32 bits, OR the UMAP flag. |
 | 5 | Destination address, low 32 bits. |
@@ -52,13 +52,13 @@ defines 4-byte and 8-byte elements.
 | 8 | Destination pitch in bytes. |
 | 9 | `SCMD32(SBMT, 0)`. |
 
-## Fill
+## XDMA Fill
 
 | Word | Content |
 |-----:|---------|
 | 0 | `SCMD32(STSCFG, 8 << 20)` |
 | 1 | Configuration: fill, with the page-size field. |
-| 2 | `(height << 16) | width`. |
+| 2 | `(height << 16) OR width`. |
 | 3 | Fill value, low 32 bits. |
 | 4 | Fill value, high 32 bits, OR the UMAP flag. |
 | 5 | Destination address, low 32 bits. |

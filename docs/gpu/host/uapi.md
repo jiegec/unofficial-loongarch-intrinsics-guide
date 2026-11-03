@@ -101,6 +101,7 @@ payload.
 | `DRM_IOCTL_LOONGGPU_USERQ` | `0x1b` | Create, free or ring a user compute queue. |
 | `DRM_IOCTL_LOONGGPU_VM` | `0x13` | Reserve or unreserve a VMID. |
 | `DRM_IOCTL_LOONGGPU_HWSEMA_OP` | `0x16` | Acquire or release a hardware semaphore. |
+| `DRM_IOCTL_LOONGGPU_INFO` | `0x05` | Query device information, firmware and the timestamp. |
 
 `CS` takes:
 

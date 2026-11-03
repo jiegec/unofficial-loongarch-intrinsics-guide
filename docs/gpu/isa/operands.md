@@ -39,6 +39,10 @@ An 8-bit general-source field carries a base selector:
 | `0xf0..0xfa` | 0.5, -0.5, 1.0, -1.0, 2.0, -2.0, 4.0, -4.0, pi, e, `1/(2*pi)`. |
 | `0xfb..0xff` | Special values with no established role; read zero. |
 
+The texture-buffer format also carries `RA9x8`, a nine-bit descriptor base: the
+low eight bits are in `INST_LO[15:8]` and the ninth is `INST_HI[11]`. The
+corresponding operands are `RK8x4` and `RK9x8`.
+
 The unmodelled ranges are not ordinary scalar registers. They MUST NOT enter a
 scalar allocation pool, and a decoder SHOULD reject them. Their read value is
 zero, which is the default outcome for an unmodelled selector and carries no

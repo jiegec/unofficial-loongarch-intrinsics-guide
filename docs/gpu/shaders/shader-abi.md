@@ -18,11 +18,11 @@ the record, the size rules and the entry and exit sequence.
 | `[127:64]` | Alignment padding | Not a field. |
 | `[191:128]` | Kernel entry | GPU virtual address of the first instruction. |
 | `[255:192]` | Kernel config | Zero in the current path. |
-| `[319:256]` | Root 1 | Read-write buffer root. |
-| `[383:320]` | Root 2 | Constant-buffer root; written but with no launch effect. |
-| `[447:384]` | Root 3 | Constant root; hydrated into `s4:s5`. |
-| `[511:448]` | Root 4 | Image and sampler descriptor root; hydrated into `s6:s7`. |
-| `[575:512]` | Root 5 | Attribute descriptor root. |
+| `[319:256]` | Root 1 (RW Buffer) | Read-write buffer root. |
+| `[383:320]` | Root 2 (Const Buffer) | Constant-buffer root; written but with no launch effect. |
+| `[447:384]` | Root 3 (Constant) | Constant root; hydrated into `s4:s5`. |
+| `[511:448]` | Root 4 (Resource Sampler Descriptors) | Image and sampler descriptor root; hydrated into `s6:s7`. |
+| `[575:512]` | Root 5 (Attributes) | Attribute descriptor root. |
 | `[607:576]` | Argument 0 | Stage-defined 32-bit argument. |
 | `[639:608]` | Argument 1 | Stage-defined 32-bit argument. |
 | `[671:640]` | Argument 2 | Stage-defined 32-bit argument. |

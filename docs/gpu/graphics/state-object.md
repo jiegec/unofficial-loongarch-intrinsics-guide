@@ -125,29 +125,53 @@ A colour buffer record is 32 bytes at `0x370 + 0x20 * n`.
 
 ## Depth buffer
 
-A depth buffer record is 32 bytes at `0x470`. It has the same fields as a colour
-buffer, except that bits `[91:80]` (swizzle) and `[92]` (swizzle reverse) are not
-present.
+A depth buffer record is 32 bytes at `0x470`.
+
+| Bits | Field | Meaning |
+|------|-------|---------|
+| `[63:0]` | Base | GPU virtual address of the attachment. |
+| `[71:64]` | Hardware format | Depth hardware format. |
+| `[75:72]` | Type | Surface type. |
+| `[79:76]` | Tiling mode | 0 linear, 2 tile2. |
+| `[93]` | Power-of-two pad | Padded layout. |
+| `[111:96]` | Width | Extent in elements. |
+| `[127:112]` | Height | Extent in elements. |
+| `[143:128]` | Depth | Extent in elements. |
+| `[159:144]` | Pitch | Row span in elements. |
+| `[171:160]` | Base layer | First layer. |
+| `[183:172]` | Last layer | Last layer. |
+| `[187:184]` | Base level | First mip level. |
+| `[191:188]` | Last level | Last mip level. |
+| `[195:192]` | Level | Attached level. |
+| `[199:196]` | Alignment | Mip-chain alignment code. |
 
 ## Shader config
+
+A Shader Output Sizes record is 4 bytes.
+
+| Bits | Field | Meaning |
+|------|-------|---------|
+| `[7:0]` | Position size | Position record size. |
+| `[15:8]` | Total size | Total output size. |
+| `[23:16]` | Attribute count | Number of attributes. |
 
 Shader Config is 8 bytes at `0x4c0`.
 
 | Bits | Field | Meaning |
 |------|-------|---------|
-| `[0]` | Vertex enable | Run the vertex slot. |
-| `[1]` | Hull enable | Run the hull slot. |
-| `[2]` | Domain enable | Run the domain slot. |
-| `[3]` | Geometry enable | Run the geometry slot. |
-| `[4]` | Streamout enable | Run the streamout slot. |
-| `[5]` | Domain as vertex | The domain slot carries the vertex role. |
-| `[6]` | Domain includes geometry | Fuse geometry into the domain slot. |
-| `[7]` | Vertex includes hull | Fuse the hull into the vertex slot. |
-| `[15:12]` | Geometry primitive type | Output primitive. |
-| `[17:16]` | Domain primitive type | Tessellation mode. |
-| `[18]` | Domain point mode | Point mode. |
-| `[19]` | Domain clockwise | Winding. |
-| `[21:20]` | Domain spacing | Tessellation spacing. |
+| `[0]` | VS enable (vertex) | Run the vertex slot. |
+| `[1]` | HS enable (hull) | Run the hull slot. |
+| `[2]` | DS enable (domain) | Run the domain slot. |
+| `[3]` | GS enable (geometry) | Run the geometry slot. |
+| `[4]` | SS enable (streamout) | Run the streamout slot. |
+| `[5]` | DS as VS (domain as vertex) | The domain slot carries the vertex role. |
+| `[6]` | DS includes GS | Fuse geometry into the domain slot. |
+| `[7]` | VS includes HS | Fuse the hull into the vertex slot. |
+| `[15:12]` | GS primitive type | Output primitive. |
+| `[17:16]` | DS primitive type | Tessellation mode. |
+| `[18]` | DS point mode | Point mode. |
+| `[19]` | DS clockwise | Winding. |
+| `[21:20]` | DS spacing | Tessellation spacing. |
 | `[36:32]` | DT vertex max | Domain vertex maximum. |
 | `[41:37]` | DT primitive max | Domain primitive maximum. |
 | `[42]` | DT reuse disable | Disable domain reuse. |
@@ -230,7 +254,7 @@ UNRESOLVED.
 
 ## Fragment state
 
-The fragment attribute map is 32 entries of 2 bytes at `0x4f0`.
+The fragment attribute map is 32 Fragment Attribute Map Entry records of 2 bytes at `0x4f0`.
 
 | Bits | Field | Meaning |
 |------|-------|---------|
@@ -252,9 +276,11 @@ The fragment input config is 8 bytes at `0x530`.
 | `[44]` | Sample mask output | Export a sample mask. |
 | `[48]` | Scalar init align | Scalar-initialization alignment. |
 
-The fragment output config is 4 bytes at `0x538`. It holds one MRT format word
-at `[31:0]`: one format when a single target is bound, or four bits per target
-when several are bound.
+The fragment output config is 4 bytes at `0x538`.
+
+| Bits | Field | Meaning |
+|------|-------|---------|
+| `[31:0]` | MRT format | One format, or four bits per target. |
 
 ## Shader info slots
 

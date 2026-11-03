@@ -94,6 +94,12 @@ rule behind the partial fill is UNRESOLVED.
 - Swizzle forms load or store a 64-bit element with a permutation. The offset
   unit, the permutation's action and whether it is an involution are UNRESOLVED.
 
+## Scalar memory
+
+A scalar load reads memory into the scalar register file. The address is a
+scalar pair or a descriptor, plus a 20-bit constant offset. A wide load writes a
+tuple of scalar registers and is modelled by its leading words.
+
 ## Atomics
 
 Atomics perform a read-modify-write on a location in shared memory, a buffer, a

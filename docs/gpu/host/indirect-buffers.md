@@ -73,10 +73,10 @@ Three packet families sit between state records. They do not fit the fixed
 
 | Purpose | Packet | Placement |
 |---------|--------|-----------|
-| Query begin | `selector << 8 | 0x0d` | Front of the buffer. |
-| Query end | `0x3`, `selector << 8 | 0x0c`, address low, address high | After the state terminator. |
-| Timestamp begin | `(1 << 8) | 0x13`, address low, address high | Front of the buffer. |
-| Timestamp end | `0x3`, `(0x200 << 8) | 0x13`, address low, address high | Before the end command; the second sample is eight bytes past the first. |
+| Query begin | `(selector << 8) OR 0x0d` | Front of the buffer. |
+| Query end | `0x3`, `(selector << 8) OR 0x0c`, address low, address high | After the state terminator. |
+| Timestamp begin | `(1 << 8) OR 0x13`, address low, address high | Front of the buffer. |
+| Timestamp end | `0x3`, `(0x200 << 8) OR 0x13`, address low, address high | Before the end command; the second sample is eight bytes past the first. |
 | Streamout end | `0x0200_000c`, address low, address high, `0x16` | Between the state terminator and the end command. |
 
 Query selectors are occlusion `0x400000`, primitives generated `0x2000` and

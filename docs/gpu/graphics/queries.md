@@ -40,7 +40,7 @@ MUST NOT assume that the hardware writes a packed array.
 
 ## Timestamps
 
-A timestamp is the same begin/end shape with the timestamp selector:
+The Timestamp Query packet is the same begin/end shape with the timestamp selector:
 
 ```text
 begin:  (1 << 8) OR 0x13, address_low, address_high

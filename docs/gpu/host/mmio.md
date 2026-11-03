@@ -79,6 +79,34 @@ previous command is running.
 The operation names are the kernel's names. A user-mode driver never emits an
 immediate command.
 
+## Stream packets
+
+The stream-command records have fixed shapes. Their fields are defined with the
+pipe that consumes them.
+
+| Record | Opcode | Purpose |
+|--------|-------:|---------|
+| Stream Command | — | The 32-bit command word itself. |
+| Stream No Operation | `0x00` | No operation. |
+| Stream Submit | `0x03` | Submit the queued work. |
+| Stream Interrupt | `0x14` | Raise an interrupt at end of pipe. |
+| Stream DBAR | `0x16` | Order command-processor writes. |
+| Stream VMID | `0x0f` | Select a virtual-memory domain. |
+| Stream Writeback 32 | `0x10` | Write a 32-bit word. |
+| Stream Writeback 64 | `0x11` | Write a 64-bit word. |
+| Stream Event | `0x12` | Sample an event counter. |
+| Stream Indirect Buffer | `0x80` | Execute an indirect buffer. |
+| Stream Write Register | `0x81` | Write a register. |
+| Stream Poll | `0x83` | Poll a memory location. |
+| Stream VM Bind | `0x84` | Bind a page directory to a ring. |
+| Stream Map Process | `0xe0` | Map a process address space. |
+| Stream Map Queue | `0xe2` | Map a user queue. |
+| Stream Unmap Queue | `0xe3` | Unmap a user queue. |
+| Stream Doorbell | `0xe4` | Ring a user queue. |
+
+The packet layouts are in [GPIPE](gpipe.md), [CPIPE](cpipe.md) and
+[XDMA](xdma.md).
+
 ## Ring provisioning
 
 A ring is a circular buffer of command words in GPU memory. Provisioning a ring

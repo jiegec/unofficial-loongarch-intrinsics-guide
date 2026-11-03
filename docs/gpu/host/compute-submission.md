@@ -116,6 +116,33 @@ granulated field can represent at most 262,016 bytes.
 > UNRESOLVED: the per-workgroup LDS capacity, the maximum private segment per
 > invocation, and whether the AQL completion signal is honoured on LG200.
 
+## Local-size and dispatch records
+
+Two fixed records describe a compute launch to the firmware. The current AQL
+path does not use them; they are documented because a queue built around the
+older record pair still reaches the same CPIPE.
+
+A **Compute Local Size** record is 8 bytes:
+
+| Bits | Field | Meaning |
+|------|-------|---------|
+| `[31:0]` | Command | `0x00100189`. |
+| `[41:32]` | Local size X | 10-bit workgroup extent. |
+| `[51:42]` | Local size Y | 10-bit workgroup extent. |
+| `[61:52]` | Local size Z | 10-bit workgroup extent. |
+
+A **Compute Dispatch** record is 16 bytes:
+
+| Bits | Field | Meaning |
+|------|-------|---------|
+| `[31:0]` | Command | `0x00000787`. |
+| `[63:32]` | Dimension 0 | Grid extent. |
+| `[95:64]` | Dimension 1 | Grid extent. |
+| `[127:96]` | Dimension 2 | Grid extent. |
+
+The order of the three dimension fields is not implied by the command word; each
+is programmed independently.
+
 ## Floating-point mode
 
 The resource word's floating-point mode has four 2-bit fields: rounding for

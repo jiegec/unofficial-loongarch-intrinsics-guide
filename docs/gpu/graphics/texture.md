@@ -85,6 +85,7 @@ The sampler descriptor is 16 bytes.
 | `[20]` | Force degamma | Not used. |
 | `[26:21]` | Anisotropy bias | Not used. |
 | `[27]` | Truncate coordinates | Not used. |
+| `[28]` | Disable cube wrap | Disable seamless cube filtering. |
 | `[30:29]` | Filter mode | Not used. |
 | `[31]` | Compatibility mode | Not used. |
 | `[43:32]` | Minimum LOD | Unsigned 8.8 fixed point. |
