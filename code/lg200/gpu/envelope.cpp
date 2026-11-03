@@ -1012,6 +1012,14 @@ std::optional<EnvelopeProgram> build_generic(
   // Filter rows using the fixed case shape.
   std::vector<EnvelopeCase> active;
   std::uint32_t offset = 0;
+  // The all-active-lane mask of this dispatch.  Every per-lane-mask result word
+  // (the v_cmp family's mask and the alu-carry family's VCC carry/borrow-out)
+  // is spelled by the oracle as "all reference lanes true" and lands here as
+  // the launch's own all-true value.
+  const std::uint32_t active_mask =
+      env.lanes == 0 ? 0u
+                     : (env.lanes >= 32 ? 0xffffffffu
+                                        : ((1u << env.lanes) - 1u));
   for (const auto& row : rows) {
     if (row.expected.size() != 1 && row.expected.size() != 2) {
       continue;
@@ -1020,8 +1028,18 @@ std::optional<EnvelopeProgram> build_generic(
       continue;
     }
     std::vector<std::uint32_t> expect = row.expected;
-    if (has_vcc_output) {
-      expect = {expect.front()};
+    // The alu-carry class (v_add/v_sub/v_addc/v_subb/v_subbrev) writes its
+    // carry/borrow-OUT into the VCC pair the RD8 operand names, and the manual
+    // calls that "a separate per-lane bit".  The oracle spells the same bit as
+    // one dword, 0 or 1.  This carrier used to DROP that word right here, which
+    // made a two-word result look like a one-word result: the case slot stayed
+    // reserved (case_offset steps by expected.size()) but nothing ever wrote or
+    // compared it, so 44/44 v_sub_u32 PASS compared the difference and never
+    // looked at the borrow.  Map the oracle's two spellings onto the launch's
+    // mask instead - the same model the v_cmp block below uses - and let
+    // build_valu store and compare it.
+    if (has_vcc_output && env.lanes > 0 && expect.size() > 1) {
+      expect[1] = expect[1] != 0u ? active_mask : 0u;
     }
     // Lane-mask outputs are a function of the launch's lane count.  Measured
     // pattern on the saved CS matrix: every v_cmp row whose oracle mask is
@@ -1033,10 +1051,8 @@ std::optional<EnvelopeProgram> build_generic(
     // A wrong mask width keeps the row FAILing rather than turning it PASS, so
     // this cannot manufacture a false PASS; the lane sweep is the confirmation.
     if (is_lane_mask_family(spec->mnemonic) && env.lanes > 0) {
-      const std::uint32_t lane_mask =
-          env.lanes >= 32 ? 0xffffffffu : ((1u << env.lanes) - 1u);
       for (auto& value : expect) {
-        if (value == 0x0000ffffu) value = lane_mask;
+        if (value == 0x0000ffffu) value = active_mask;
       }
     }
     EnvelopeCase c = row;
@@ -1172,6 +1188,10 @@ std::optional<EnvelopeProgram> build_generic(
     isa::Reg dst_sgpr = isa::sgpr(8);
     bool has_vgpr_dst = false;
     bool has_sgpr_dst = false;
+    // True when the template carries the VCC (RD8) field of the alu-carry
+    // class: that field is an output as well as the carry-in a case stages, so
+    // the pair it names holds the second result word after the target runs.
+    bool has_vcc_dst = false;
     std::uint32_t scc_borrow = 0;
     bool scc_staged = false;
     if (is_mma) {
@@ -1275,6 +1295,7 @@ std::optional<EnvelopeProgram> build_generic(
           }
           break;
         case isa::FieldSem::Vcc8: {
+          has_vcc_dst = true;
           const std::uint32_t value =
               input_index < def.inputs.size() ? def.inputs.at(input_index++)
                                               : 0u;
@@ -1354,6 +1375,29 @@ std::optional<EnvelopeProgram> build_generic(
                           result_offset + 4 * part);
         built.offsets.push_back(result_offset + 4 * part);
       }
+    }
+    // The second result word: the per-lane carry/borrow-out the instruction
+    // left in the VCC pair its RD8 operand names - the same pair the Vcc8 rule
+    // stages the carry-in into.  Read it out and store it in the slot the case
+    // layout already reserves for it.  Until this existed the word was a hole
+    // in the readback: compare_cases walks built.offsets, so a two-word result
+    // was graded on its first word only.
+    if (has_vcc_dst && def.expected.size() > built.offsets.size()) {
+      const std::uint32_t vcc_offset =
+          result_offset + 4u * static_cast<std::uint32_t>(built.offsets.size());
+      builder.v_mov_b32(isa::vgpr(11), isa::sgpr(6), isa::predicate(0));
+      emit_result_store(builder, env, isa::vgpr(11), zero_address, vcc_offset);
+      built.offsets.push_back(vcc_offset);
+    }
+    // Invariant, for the family this store exists for: a carry-class row may
+    // not reserve a result word the carrier did not write.  Rows of other
+    // shapes that reserve an unstoreable word keep their old behaviour and are
+    // reported as a separate defect instead of being papered over here.
+    if (has_vcc_dst && def.expected.size() > built.offsets.size()) {
+      error = "case " + built.id + ": " + std::to_string(def.expected.size()) +
+              " expected words, carrier stores " +
+              std::to_string(built.offsets.size());
+      return std::nullopt;
     }
     built.expected = def.expected;
     program.cases.push_back(std::move(built));
