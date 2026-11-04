@@ -397,6 +397,8 @@ The current loongvk execution policy uses the following completion boundaries:
 |---|---|
 | CPIPE dispatch | Complete the flushed GFX submissions before preparing descriptor aliases or publishing the dispatch. |
 | Indirect CPIPE dispatch | Complete GFX before the CPU reads the three group-count words, then launch the dispatch. |
+| Conditional-rendering predicate | Complete GFX before mapping and reading the predicate word; an inactive condition needs no read. |
+| Indirect draw or indexed draw | Complete GFX before reading either the optional count word or the command records. |
 | Host transfer or XDMA image readback | Complete GFX before accessing or copying the produced resource. |
 | A GS draw after an internal GFX batch split | Use the same synchronous batch policy for direct and indirect GS draw commands. |
 
@@ -406,6 +408,17 @@ only on a wait at the end of an API queue submission. CPU ownership of a
 resource, a valid mapping, and a completion wait after the consumer has already
 run cannot replace the dependency before that consumer. A failed completion
 wait must prevent the dependent operation from executing.
+
+Indirect draw parameters are acquired as an execution-time host snapshot. The
+optional count is clamped to the API maximum before allocating the snapshot;
+records are copied from the API stride into packed direct or indexed command
+records. Buffer-binding offsets and API command/count offsets both contribute
+to each source address. Neither the count nor the records may be read before
+the producer completes, even if their allocations are already mapped. A failed
+flush or completion wait must leave the snapshot unpublished. This also applies
+to host submission-count calculations that use the same reader. It does not
+make a look-ahead query scan observe producer commands that have not yet
+executed; that requires a separate execution-order contract.
 
 In loongvk, compute dispatches execute synchronously and contain their own
 cache-maintenance tail. A recorded pipeline barrier does not submit a separate
