@@ -72,13 +72,45 @@ to complete 32-channel rows so that the input quads of adjacent vertices do not
 overlap; whether a partial row would overlap is UNRESOLVED, so the rounding is
 required.
 
-An input read takes a channel number and returns an aligned quad; a scalar
-declaration issues one read per component and keeps one lane. Reads SHOULD be
-issued in non-decreasing channel order, because a read that moves backwards in
-the ring stalls every later export of the stage and raises no fault. The read's
-own register field does not select its destination; the window is fixed by the
-read's position in the sequence, so the lanes MUST be copied out before the next
-read.
+A `siordrot_id_c4` input read returns four consecutive channels into a fixed
+register quad. The register field does not select an arbitrary destination;
+the read ordinal selects one of the fifteen quads listed in [SIO](io.md#reading).
+Copy the result before a subsequent read can reuse that quad.
+
+The shared LCO selector uses one aligned request for each 1–4 component load
+contained in a quad. For logical channel `ch`, component count `n`, and producer
+window `W`:
+
+```text
+q                 = ch & ~3
+component         = ch & 3
+request           = channels [q, q + 4)
+load[j]           = copied[component + j], 0 <= j < n
+required bounds   = 1 <= n <= 4 - component, q + 4 <= W
+```
+
+Alignment here is a compiler choice; it does not assert that the hardware
+requires an aligned source channel. The complete request must stay in the
+producer window. Scalar loads select one copied component; vec2 and vec3 loads
+also issue one request, rather than one request per component. Each issued
+request advances the fixed destination sequence once, independently of `n`.
+This lowers the request count for partial vectors without changing the ABI,
+producer window, or vertex-selector formula.
+
+Reads must be issued in non-decreasing channel order. Sorting only the starting
+channels of NIR loads is insufficient if selecting one load expands it into
+several requests: two vertices loading a vec3 at channel 4 would issue
+`4, 5, 6, 4, 5, 6`. The aligned single-request form issues `4, 4` instead. A read
+that moves backwards can stall later exports without a fault interrupt.
+
+For constant input indices, LCO either caches ordered reads in the prologue or
+schedules eligible entry-block loads and their consumers incrementally. The
+latter route starts at sixteen input loads to limit live register pressure.
+Both routes use the same request, bounds, copy and component-extraction code.
+Their regression coverage must inspect actual requests, including wrap after the fifteenth
+destination, as well as the final component values. API linkers can pack
+several declared varyings into fewer loads; declaration count alone does not
+establish that the incremental route ran.
 
 ## Output record
 

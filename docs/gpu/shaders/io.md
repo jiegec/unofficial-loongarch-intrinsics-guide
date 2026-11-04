@@ -136,6 +136,13 @@ which channel: a consumer needing more than fifteen live reads must copy each qu
 out of its window before the next read, and must issue reads in ascending channel
 order even when the shader names its inputs in another order.
 
+The geometry compiler may read the aligned quad containing a partial input and
+select the requested components from its copied result. This uses one request
+for a scalar, vec2 or vec3 that fits in that quad; the destination sequence still
+advances once. Source alignment is a compiler policy, separate from the fixed
+aligned destination tuple. See [Geometry input record](geometry.md#input-record)
+for the request and component-selection formulas and their bounds.
+
 ## Export
 
 `sioexport` commits the first channels of one stream, from channel 0 up to the
