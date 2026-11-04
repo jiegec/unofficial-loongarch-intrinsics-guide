@@ -4186,24 +4186,18 @@ std::optional<EnvelopeProgram> build_cs(const std::string& mnemonic,
             "the device (2026-10-12); it is excluded from every compute run";
     return std::nullopt;
   }
-  // [HW 2026-11-04] load_s_buff_w16 and load_s_flat_w16 hung the compute ring on
-  // the first run that gave them a boundary grid - fifteen cases of sixteen-dword
-  // payloads.  The failure is a queue timeout ("submitted ring=0x100020000
-  // queue_...") and every row after it fails to open the device, so it parks the
-  // machine rather than failing one case.
+  // [HW 2026-11-04] load_s_buff_w16 and load_s_flat_w16 were refused here for a
+  // few hours and the refusal is withdrawn the same day, because the cause was
+  // not the row.  Measured: through the per-mnemonic path (`csrun`) the dispatch
+  // COMPLETES - "signal=0x0, the dispatch completed but the queue teardown
+  // failed; the ring is left mapped for the DRM file teardown" - and the kernel
+  // then logs "CP microcode re-pushed after reset"; every later row fails to open
+  // the device.  The SAME fifteen cases through `csrun-batch` pass twice, at the
+  // default 3000 ms timeout, and the graphics pipe passes them 15 of 15.
   //
-  // The graphics pipe passes the SAME program 15 of 15, so this is not the row
-  // being illegal; it is the compute staging of a sixteen-dword block, which is
-  // not understood yet.  Refused here rather than retried: a case that parks the
-  // device is worth more as a recorded hazard than as a second data point.
-  if (mnemonic == "load_s_buff_w16" || mnemonic == "load_s_flat_w16") {
-    error = "compute carrier refuses the sixteen-dword payload rows: on "
-            "2026-11-04 the fifteen-case grid timed out the ring and the device "
-            "stopped admitting submissions for every row after it; the graphics "
-            "pipe passes the same program, so the compute staging of the block is "
-            "the open question";
-    return std::nullopt;
-  }
+  // So the hazard is the per-submission queue create/destroy pair that the
+  // compute path pays once per mnemonic, which run_gpu.py documents as "the churn
+  // hazard" and which is now avoided by default: the compute pipe batches.
   return build_carrier(mnemonic, rows, LaunchEnvironment::Compute, error,
                        lanes);
 }

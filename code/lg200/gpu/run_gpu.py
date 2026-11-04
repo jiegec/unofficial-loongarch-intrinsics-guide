@@ -518,7 +518,18 @@ def main() -> int:
         return 2
     dry = "--dry" in sys.argv[1:]
     only_ok = "--only-ok" in sys.argv[1:]
-    batch = "--batch" in sys.argv[1:]
+    # [HW 2026-11-04] The compute pipe runs in batch mode by DEFAULT, because the
+    # per-mnemonic path is the one that parks the device.  Measured on
+    # load_s_buff_w16: through `csrun` the dispatch completes ("signal=0") and then
+    # the queue teardown fails - "the dispatch completed but the queue teardown
+    # failed; the ring is left mapped for the DRM file teardown" - the kernel logs
+    # "CP microcode re-pushed after reset", and the device stops admitting
+    # submissions for every row after it.  The SAME fifteen cases through
+    # `csrun-batch` pass twice, with the default 3000 ms timeout.  The difference
+    # is the session: batch pays one create/destroy pair for a whole group, the
+    # default path pays one per mnemonic.
+    batch = ("--batch" in sys.argv[1:] or
+             (pipe == "cs" and "--no-batch" not in sys.argv[1:]))
     batch_size = 48
     for i, a in enumerate(sys.argv):
         if a == "--batch-size" and i + 1 < len(sys.argv):
@@ -555,7 +566,7 @@ def main() -> int:
     targets = [only] if only else avail
     results = []
     t0 = time.time()
-    if batch and only is None:
+    if batch:
         # One DRM session per group of mnemonics instead of one per mnemonic.
         #
         # A batch can stop early: a submission in a fresh process occasionally
@@ -601,7 +612,11 @@ def main() -> int:
             stalls += 1
             print(f"  batch stopped at {stalled}; retrying it in a fresh "
                   f"process (stall {stalls})")
-            retry = run_one(stalled, by.get(stalled, []), dry, timeout_s, pipe)
+            # [HW 2026-11-04] The retry goes through the BATCH path too.  It used
+            # to call run_one, i.e. the per-mnemonic `csrun` path - the one whose
+            # queue teardown is what parks the device - so a stall was retried by
+            # repeating the operation that caused it.
+            retry = dict(run_batch([stalled], by, dry, 900)[stalled])
             retry["mnemonic"] = stalled
             retry["detail"] = "retry after batch stall: " + retry["detail"]
             retry_out = retry.pop("out", "") or ""
