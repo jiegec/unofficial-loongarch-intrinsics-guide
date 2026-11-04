@@ -2208,7 +2208,16 @@ std::optional<EnvelopeProgram> build_lds(const std::string& mnemonic,
   std::uint32_t off = carrier::kResultBase;
   for (std::size_t ci = 0; ci < rows.size(); ++ci) {
     const auto& def = rows[ci];
-    const std::uint32_t cell = kLdsBase + 4 * width * ci;
+    // [HW 2026-11-04] A matrix load reads one word per lane from base +
+    // 4*(lane&3) - the row and plane terms vanish because the carrier's address is
+    // uniform across lanes.  Staging one cell per case therefore left three of the
+    // four cells holding launch state, and the graded dword is an OR over lanes,
+    // which is why this row read a mixture of its datum and the window's startup
+    // content.  For the single-plane form, stage the datum into all four cells the
+    // lanes read and widen the per-case stride to match.
+    const bool matrix_fill4 = matrix && width == 1;
+    const std::uint32_t cell =
+        kLdsBase + (matrix_fill4 ? 16u : 4u * width) * ci;
     builder.s_mov_imm_b32(imm_temp, cell);
     builder.v_mov_b32(addr_v, imm_temp, isa::predicate(0));
     if (is_atomic) {
@@ -2327,9 +2336,23 @@ std::optional<EnvelopeProgram> build_lds(const std::string& mnemonic,
       // LDS starts undefined: store the input with the matching store op
       const std::string store_mne =
           width == 2 ? "store_sm_b64" : "store_sm_b32";
-      builder.sm_op(store_mne, isa::predicate(0), isa::vgpr(9, width),
-                    addr_v);
-      builder.check_k_vm_vs_sm();
+      if (matrix_fill4) {
+        // The datum is already in v9.  Write it to the four cells the lanes read,
+        // then put the address back on the first one for the load.
+        for (unsigned j = 0; j < 4; ++j) {
+          builder.s_mov_imm_b32(imm_temp, cell + 4 * j);
+          builder.v_mov_b32(addr_v, imm_temp, isa::predicate(0));
+          builder.sm_op("store_sm_b32", isa::predicate(0), isa::vgpr(9),
+                        addr_v);
+          builder.check_k_vm_vs_sm();
+        }
+        builder.s_mov_imm_b32(imm_temp, cell);
+        builder.v_mov_b32(addr_v, imm_temp, isa::predicate(0));
+      } else {
+        builder.sm_op(store_mne, isa::predicate(0), isa::vgpr(9, width),
+                      addr_v);
+        builder.check_k_vm_vs_sm();
+      }
       builder.sm_op(mnemonic, isa::predicate(0), isa::vgpr(10, width),
                     addr_v);
       builder.check_k_vm_vs_sm();
@@ -4027,7 +4050,11 @@ std::optional<EnvelopeProgram> build_carrier_env(
        (flat_family && std::getenv("LGPU_FLAT_COMPARE")));
   const bool launch_state =
       mbcnt_wide || (flat_family && !flat_compare) ||
-      mnemonic.rfind("load_sm_matrix_", 0) == 0 ||
+      // [HW 2026-11-04] load_sm_matrix_x1 left this bucket: with the datum staged
+      // in all four cells the four lanes read, its graded dword is the datum.  x2
+      // and x4 need sixteen and thirty-two lanes before their planes are filled.
+      (mnemonic.rfind("load_sm_matrix_", 0) == 0 &&
+       mnemonic != "load_sm_matrix_x1") ||
       // [HW 2026-11-03] The whole buff bucket left here, because the mechanism it
       // recorded was an encoding defect: eighteen buffer rows had bit 27 clear
       // in their instruction word (0x21xxxxxx where the family is 0x29xxxxxx),
