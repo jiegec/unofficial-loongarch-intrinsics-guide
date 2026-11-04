@@ -36,6 +36,21 @@ re-establishes the whole state block refreshes that copy, so a delta record
 leaves the previous one in place; the slot is excluded from the per-draw
 argument-base patch and from the delta write log for that reason.
 
+When a cached state block starts a new batch, the VS copy MUST be rebuilt from
+the current DS record after its argument roots have been relocated. A cache
+entry created partway through an earlier batch can contain that batch's first
+vertex program in the VS slot, even though its DS slot describes a later
+program. Reusing the inherited copy would name code and descriptor roots that
+the new submission does not retain. Retaining the copy within one batch and
+refreshing it at the next batch boundary are separate requirements; neither a
+cache hit nor an unchanged application pipeline transfers resource ownership
+from an earlier submission.
+
+The cached-state verifier therefore compares the VS copy when establishing a
+fresh block. It excludes the copy only while a batch's established state is
+still valid. The rule applies with and without a geometry stage and also to
+independently built state blocks.
+
 ## Domain as vertex
 
 The domain-stage config at `0x4d8` is the vertex role's config; no separate
