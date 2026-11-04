@@ -65,6 +65,9 @@ PHRASES = {
     # [HW 2026-11-04] v_emit2/3: the operand the carrier grades is VJ8, and the
     # instruction's descriptor side effect overwrites it.
     "the emit's descriptor side effect overwrites the separator": ['separator VGPR'],
+    # [HW 2026-11-04] v_sqrt_f64 / v_rsq_f64: graded, they disagree with the model
+    # on a third of their vectors - the same one-ulp divergence the f32 page records.
+    'the hardware root is not the correctly rounded result': ['correctly rounded'],
 }
 
 

@@ -4093,6 +4093,14 @@ std::optional<EnvelopeProgram> build_carrier_env(
       // the case data) and getresinfo (placeholder model, channel mapping
       // UNRESOLVED).
       mnemonic == "load_v_tex" ||
+      // [HW 2026-11-04] v_sqrt_f64 and v_rsq_f64 belong here, and now the reason
+      // says why instead of leaving them in the generic bucket.  Graded, they fail
+      // 18 of 46 and 14 of 44 on graphics and 26 of 46 and 21 of 44 on compute -
+      // the hardware's square root and reciprocal square root are not the correctly
+      // rounded results the model computes, the same one-ulp divergence the f32
+      // square-root page records for its own vectors.  Whether the hardware rounds
+      // differently or the model's precision is short is not established, so they
+      // observe rather than being re-graded against a guess.
       mnemonic == "v_sqrt_f64" || mnemonic == "v_rsq_f64" ||
       mnemonic == "v_s2v_b32" ||
       // [HW 2026-11-03, corrected] v_add_imm_i32 and v_sub_imm_i32: the STORE
@@ -4141,6 +4149,8 @@ std::optional<EnvelopeProgram> build_carrier_env(
     const char* why = "launch-state group in build_carrier";
     if (mnemonic == "v_add_imm_i32" || mnemonic == "v_sub_imm_i32")
       why = "the instruction leaves its VD8 destination unwritten";
+    else if (mnemonic == "v_sqrt_f64" || mnemonic == "v_rsq_f64")
+      why = "the hardware root is not the correctly rounded result";
     else if (mbcnt_wide)
       why = "the popcount window follows no single rule above four lanes";
     else if (flat_multiwave)

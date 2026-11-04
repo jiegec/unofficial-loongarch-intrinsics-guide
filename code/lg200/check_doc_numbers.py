@@ -125,6 +125,10 @@ def main() -> int:
         'rows-unresolved': rows,
         'sentences': sents,
         'occurrences': occ,
+        # The page also states how many rows have boundaries expressible as an
+        # input value at all, which is the denominator of the "723 of" claim.
+        'value-expressible': int(re.search(r'instructions: ([0-9]+) value-expressible',
+                                           cov).group(1)),
         'covered': int(m.group(1)),
         'gaps': int(m.group(2)),
         'launch-shape': int(launch.group(1)),
