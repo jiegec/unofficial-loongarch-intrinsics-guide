@@ -263,6 +263,17 @@ component mask is 4 bits and MUST be non-zero on the forms that carry one.
   Test these edges separately from an independent load that may still move.
   The width belongs to each source operand; a four-word sampler window does
   not bound the adjacent image operand's eight-word window.
+- Wait placement and hazard verification use that same source window. A ready
+  base register does not make its tail ready: if an asynchronous load defines
+  `s20` while an image operand names `s16:s23`, a check must complete that load
+  before the image access, even though only `s16` appears as its encoded base.
+  This applies to buffer and sampler tails as well as image tails.
+- Deferring an existing completion check must preserve the whole descriptor
+  operand. For example, a check after an access through `s16:s23` cannot move
+  past a scalar instruction replacing `s20`. Enumerate the implicit words when
+  testing both result readiness and operand reuse; inspecting only `s16` misses
+  these edges. The compiler applies this rule to temporary tuples and allocated
+  registers, using the allocator's descriptor widths.
 
 > UNRESOLVED: whether a misaligned tuple is representable at all, and what a
 > misaligned base does. Usage shows aligned bases only, and an allocator that
