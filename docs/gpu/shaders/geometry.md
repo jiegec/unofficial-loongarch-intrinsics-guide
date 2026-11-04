@@ -383,6 +383,36 @@ application resource bindings are unchanged; the submission must retain all
 allocations named by its earlier draws as well as its final draw. Caching
 descriptor state does not remove this requirement.
 
+## Host ordering between consumers
+
+Shader ordering instructions and host submission dependencies serve different
+purposes. A shader check can drain work from its selected instruction domains;
+it does not wait for an independently submitted graphics or compute workload.
+Flushing a graphics batch queues its commands and does not establish that its
+outputs are ready for another consumer.
+
+The current loongvk execution policy uses the following completion boundaries:
+
+| Consumer of earlier graphics writes | Completion boundary |
+|---|---|
+| CPIPE dispatch | Complete the flushed GFX submissions before preparing descriptor aliases or publishing the dispatch. |
+| Indirect CPIPE dispatch | Complete GFX before the CPU reads the three group-count words, then launch the dispatch. |
+| Host transfer or XDMA image readback | Complete GFX before accessing or copying the produced resource. |
+| A GS draw after an internal GFX batch split | Use the same synchronous batch policy for direct and indirect GS draw commands. |
+
+These are host implementation policies, not new shader instructions or SIO
+capacity formulas. The GS policy covers internal splits, rather than relying
+only on a wait at the end of an API queue submission. CPU ownership of a
+resource, a valid mapping, and a completion wait after the consumer has already
+run cannot replace the dependency before that consumer. A failed completion
+wait must prevent the dependent operation from executing.
+
+In loongvk, compute dispatches execute synchronously and contain their own
+cache-maintenance tail. A recorded pipeline barrier does not submit a separate
+CPIPE maintenance stream. That implementation detail cannot supply a missing
+GFX-to-CPIPE dependency; the command executor establishes it explicitly. It also
+does not establish the finer memory-scope semantics of the Vulkan memory model.
+
 ## Validating a compiled pipeline
 
 Transform feedback and raster output observe different consumers of the emitted

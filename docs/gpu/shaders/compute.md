@@ -150,6 +150,15 @@ instruction, while a workgroup barrier suffices inside one workgroup.
 LG200 has no subgroup-scope execution barrier. A subgroup is one wave, whose lanes
 run in lockstep, so a subgroup barrier carries only memory ordering.
 
+Dependencies between GFX and CPIPE belong to host submission ordering. Completing
+one CPIPE dispatch does not complete an earlier asynchronous GFX producer. In
+the current loongvk path, the command executor completes flushed GFX work before
+either a direct dispatch or the CPU read of indirect dispatch counts. It waits
+before descriptor-alias preparation as well. See
+[Host ordering between consumers](geometry.md#host-ordering-between-consumers)
+for the graphics, compute and readback boundaries. These host waits do not
+change the domain bits or semantics of a shader ordering instruction.
+
 ## Floating-point mode
 
 Resource word 1 bits 21:14 hold four 2-bit fields: rounding for 32-bit values at
