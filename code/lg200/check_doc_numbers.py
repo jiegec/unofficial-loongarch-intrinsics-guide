@@ -20,7 +20,11 @@ _sys.path.insert(0, str(Path(__file__).resolve().parent))
 import gen_cases
 
 ROOT = Path(__file__).resolve().parent
-DOCS = ROOT.parent.parent / 'docs' / 'gpu' / 'appendix'
+# [HW 2026-11-04] The manual was restructured and the process appendix pages - which
+# is where these figures used to live - were replaced by appendices/.  The numbers
+# are manual content, not process narrative, so they moved rather than vanished:
+# appendices/verification.md states them, and this checker reads it there.
+DOCS = ROOT.parent.parent / 'docs' / 'gpu' / 'appendices'
 TSV = ROOT.parent / 'lg200-instructions.tsv'
 
 
@@ -140,32 +144,18 @@ def main() -> int:
                            for f in sorted(ROOT.glob('*.cpp'))),
     }
     checks = [
-        ('unresolved.md', r'([0-9]+) of the 768', 'rows-unresolved'),
-        ('status.md', r'\\?\| rows stating an .UNRESOLVED. \| [0-9]+ \| \*\*([0-9]+)\*\*', 'rows-unresolved'),
-        ('status.md', r'distinct UNRESOLVED sentences \| [0-9]+ \| \*\*([0-9]+)\*\*', 'sentences'),
-        ('status.md', r'rows whose every open clause states a reason \| \u2014 \| \*\*([0-9]+)\*\*', 'explained-rows'),
-        # The pattern used to be (1,[0-9]+), which assumed a thousands separator and
-        # could not match once the count fell below a thousand on 2026-10-13.  The
-        # status.md copy and the unresolved-status.md one now accept both forms.
-        ('status.md', r'([0-9,]+) occurrences', 'occurrences'),
-        ('case-boundaries.md', r'\*\*([0-9]+) of [0-9]+ value-expressible', 'covered'),
-        ('status.md', r'([0-9]+) of [0-9]+ value-expressible', 'covered'),
-        # unresolved-status.md keeps a dated snapshot, so its current figures carry a
-        # date and are anchored by it.  This file had no anchor at all until 2026-10-13:
-        # it is the fourth page with count claims and the only one the check did not read.
-        ('case-boundaries.md', r'rows still with gaps \| \*\*([0-9]+)\*\*', 'gaps'),
-        ('status.md', r'768 PASS / \*\*([0-9,]+)\*\* rows', 'vectors'),
-        ('case-boundaries.md', r'still \*\*([0-9]+)\*\*', 'targets'),
-        ('case-boundaries.md', r'The \*\*([0-9]+)\*\* that remain are ' +
-                                r'\*\*launch-shape\*\*', 'launch-shape'),
-        ('unresolved-status.md', r'\*\*([0-9]+) as of 2026-1[01]-[0-9]{2}\*\*', 'rows-unresolved'),
-        ('unresolved-status.md', r'is ([0-9]+) distinct sentences', 'sentences'),
-        ('unresolved-status.md', r'The rest of the ([0-9]+) sentences', 'sentences'),
-        ('status.md', r'oracle passes \(\*\*768 instructions, ([0-9,]+)', 'vectors'),
-        ('unresolved-status.md', r'passes throughout \(768 instructions, ([0-9,]+)', 'vectors'),
-        ('case-boundaries.md', r'files plus ([0-9,]+) rows in `generated_cases.tsv`', 'generated-rows'),
-        ('case-boundaries.md', r'([0-9,]+) hand-written `CASE`', 'hand-cases'),
-        ('unresolved-status.md', r'distinct sentences and ([0-9,]+) occurrences', 'occurrences'),
+        ('verification.md', r'rows carrying every required boundary class \| \*\*([0-9]+)\*\*', 'covered'),
+        ('verification.md', r'rows still with gaps \| \*\*([0-9]+)\*\*', 'gaps'),
+        ('verification.md', r'\| vectors \| \*\*([0-9,]+)\*\*', 'vectors'),
+        ('verification.md', r'\| generated vectors \| ([0-9,]+) \|', 'generated-rows'),
+        ('verification.md', r'\| hand-written cases \| ([0-9,]+) \|', 'hand-cases'),
+        ('verification.md', r'\| rows that need a launch shape rather than a case \| ([0-9]+) \|', 'launch-shape'),
+        ('verification.md', r'rows whose boundaries are expressible[^|]*\| ([0-9]+) \|', 'value-expressible'),
+        ('verification.md', r'\| rows the boundary grid is built for \| ([0-9]+) \|', 'targets'),
+        ('verification.md', r'state \*\*([0-9]+)\*\* of the 768', 'rows-unresolved'),
+        ('verification.md', r'\*\*([0-9]+)\*\*\ndistinct sentences', 'sentences'),
+        ('verification.md', r'([0-9,]+) occurrences in total', 'occurrences'),
+        ('verification.md', r'([0-9]+) of those rows name', 'explained-rows'),
     ]
     bad = 0
     for doc, pat, key in checks:

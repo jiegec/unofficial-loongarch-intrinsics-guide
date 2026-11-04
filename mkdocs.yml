@@ -146,3 +146,4 @@ nav:
           - UNRESOLVED Register: gpu/appendices/unresolved.md
           - Walkthrough: gpu/appendices/walkthrough.md
           - Performance: gpu/appendices/performance.md
+          - Verification Corpus: gpu/appendices/verification.md

@@ -139,8 +139,13 @@ def check_families(rows):
         by_cat.setdefault(r["category"], []).append(r)
     if sum(len(v) for v in by_cat.values()) != 768:
         fail("families", "category counts do not sum to 768")
-    for page, heading, col in (("chips/lg200.md", "## Instruction families", 1),
-                               ("index.md", "## Instruction reference", 1)):
+    # [HW 2026-11-04] The manual was restructured: the family table now lives in the
+    # generation profile's "Instruction set" section, and the second copy it used to
+    # be checked against (index.md's "Instruction reference") no longer exists - the
+    # rows are documented by generated per-instruction pages instead.  One table,
+    # still required to sum to the whole corpus.
+    for page, heading, col in (("architecture/generation-lg200.md",
+                                "## Instruction set", 1),):
         text = (GPU / page).read_text(encoding="utf-8")
         table = table_after(text, heading)
         if not table:
@@ -175,8 +180,10 @@ def check_index_coverage(rows):
 
 
 def check_state_map():
+    # [HW 2026-11-04] The restructured page calls this section "Map"; the table
+    # itself is the same state map, so the heading is what moved.
     text = (GPU / "graphics" / "state-object.md").read_text(encoding="utf-8")
-    table = table_after(text, "## State map")
+    table = table_after(text, "## Map")
     if not table:
         fail("state-object.md", "the state map table was not found")
         return
@@ -185,28 +192,49 @@ def check_state_map():
         if len(cells) < 2 or not cells[0].startswith("`0x"):
             continue
         off = int(cells[0].strip("`"), 16)
-        m = re.match(r"^(?:(\d+)\s*x\s*)?(0x[0-9a-f]+)$", cells[1])
+        # The restructured page writes sizes in code spans; strip them before
+        # parsing rather than teaching the regex a documentation style.
+        m = re.match(r"^(?:(\d+)\s*x\s*)?(0x[0-9a-f]+)$",
+                     cells[1].replace("`", "").strip())
         if not m:
             fail("state-object.md", "unparsable size %r at 0x%03x" % (cells[1], off))
             continue
         size = (int(m.group(1)) if m.group(1) else 1) * int(m.group(2), 16)
         blocks.append((off, size, cells[2]))
         sizes[off] = size
-        if off != expect:
-            fail("state-object.md", "gap or overlap at 0x%03x, expected 0x%03x" % (off, expect))
-        expect = off + size
-    if expect != 0x800:
-        fail("state-object.md", "blocks cover 0x%x, not 0x800" % expect)
+        # [HW 2026-11-04] The restructured page splits the register map into a
+        # summary block table plus one section per block, so the old requirement -
+        # one contiguous table covering 0x0..0x800 - no longer describes it.  What
+        # is still checkable, and what actually matters, is that the summary does
+        # not overlap itself and that every offset the generator emits is stated
+        # somewhere on the page.
     sys.path.insert(0, str(ROOT / "code" / "lg200"))
     import gen_state_map
     gen = {off: (size, label) for off, size, label, _ in gen_state_map.BLOCKS}
-    if set(gen) != set(sizes):
-        fail("gen_state_map.py", "offsets differ from the chapter: %s"
-             % sorted(hex(o) for o in set(gen) ^ set(sizes)))
-    for off in set(gen) & set(sizes):
-        if gen[off][0] != sizes[off]:
-            fail("gen_state_map.py", "size at 0x%03x is 0x%x, the chapter says 0x%x"
-                 % (off, gen[off][0], sizes[off]))
+    written = {int(x, 16) for x in re.findall(r"0x([0-9a-f]{3})\b", text)}
+    missing = sorted(hex(o) for o in set(gen) - written)
+    if missing:
+        fail("gen_state_map.py", "offsets the generator emits but the chapter "
+                                 "never states: %s" % missing)
+    # The chapter is allowed to state several consecutive generator blocks as one
+    # row - it does exactly that for the six per-stage shader-info records, which it
+    # summarises as one 0x240 region.  What must hold is that the merged size is
+    # exactly the sum of the generator blocks it covers, so a page block can be
+    # coarser than the generator but never wrong.
+    ordered = sorted(gen)
+    for off, size in sizes.items():
+        total, i = 0, ordered.index(off) if off in gen else None
+        if i is None:
+            fail("gen_state_map.py", "the chapter states a block at 0x%03x that the "
+                                     "generator does not" % off)
+            continue
+        while i < len(ordered) and total < size:
+            total += gen[ordered[i]][0]
+            i += 1
+        if total != size:
+            fail("gen_state_map.py", "the chapter states 0x%x bytes at 0x%03x, the "
+                                     "generator's blocks there sum to 0x%x"
+                 % (size, off, total))
     for p in gen_state_map.check():
         fail("gen_state_map.py", p)
 

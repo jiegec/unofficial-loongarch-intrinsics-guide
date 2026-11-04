@@ -62,6 +62,9 @@ PHRASES = {
     # write its VD8 destination on this silicon, so the graded cell holds the
     # previous dispatch's value.
     'leaves its VD8 destination unwritten': ['leaves its VD8 destination'],
+    # [HW 2026-11-04] v_emit2/3: the operand the carrier grades is VJ8, and the
+    # instruction's descriptor side effect overwrites it.
+    "the emit's descriptor side effect overwrites the separator": ['separator VGPR'],
 }
 
 

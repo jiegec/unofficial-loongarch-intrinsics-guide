@@ -253,7 +253,7 @@ ordering between buffer stores and rasterization.
 
 `PointSize` keeps its fixed-function payload quad even when transform feedback
 captures it. It does not consume a generic varying plane. A capture declaration
-must not disable this carrier: rasterization still needs the value while capture
+must not remove it: rasterization still needs the value while capture
 is active, paused, or inactive. The vertex stage writes position channel 4;
 the geometry stage uses the point-size slot in its position record, so `P` must
 include that quad in both cases.
@@ -270,7 +270,7 @@ can retain that default.
 For captured sizes, the compiler preserves the original value for buffer
 stores and applies `v_max_f32` followed by `v_min_f32` only to the raster copy.
 Bounds that are not inline VOP constants must first be materialized in an
-encodable source. The point-size carrier and its position-record width remain
+encodable source. The point-size word and its position-record width remain
 present when capture stores are disabled. VS and GS share this rule; it does
 not add Vulkan transform-feedback support or change Vulkan's advertised point
 size features.
