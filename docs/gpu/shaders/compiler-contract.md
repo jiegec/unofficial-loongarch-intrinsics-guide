@@ -40,6 +40,33 @@ postconditions catch.
 > mask is legal without dominating the read. Whether such a program is well
 > formed is not established.
 
+## Source modifiers during optimization
+
+The two sign bits in an 11-bit vector source selector act before the
+instruction: `ABS` clears bit 31 and `NEG` then flips it. They also apply to
+inline constants. See [Vector Family](../isa/families/vector.md) for the
+selector encoding; these are source bits, separate from `M.mod2`.
+
+A register copy with either modifier computes a new bit pattern. Replacing a
+use of that copy must compose the copy's modifiers with the use's modifiers,
+in that order. An outer `ABS` replaces the inner sign operations; without an
+outer `ABS`, the absolute flag survives and the two negations cancel when both
+are present. This applies to every bit pattern, including signed zero,
+infinity and NaN payloads.
+
+For example, `r = -d; d = select(mask, s, r)` can become
+`d = select(mask, s, -d)` when the register and execution-mask lifetimes allow
+the fold. Dropping the minus changes the false arm. A select whose two data
+operands name its destination is an identity only when both operands are
+unmodified: `select(mask, d, -d)` still changes some lanes. Replacing a
+materialized constant with an inline selector must likewise preserve the
+consumer's modifiers.
+
+These are compiler transformation requirements shared by all shader stages.
+An API early return may already have become a select before instruction
+selection, so validation must check the selected values as well as control
+flow and register allocation.
+
 ## Condition register
 
 SCC is one flag per wave, named by the fixed scalar selector `0x80`. A compare
