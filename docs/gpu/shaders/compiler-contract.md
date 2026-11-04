@@ -18,6 +18,7 @@ well-formedness every boundary gets.
 |---|---|
 | phi elimination, optimization | No phi instruction exists; the optimizer never sees one. |
 | wait placement, both runs | A nonzero wait domain is a subset of the four classes. |
+| uniform-load sinking | Each moved load retains a completion wait before its first reader; a shared wait remains available to the other producers. |
 | allocation, SSA destruction, cleanup | Every operand is a physical register or a constant; no temporary survives. |
 | value spill | A reload of a spill slot has an ordering instruction after the store that wrote it. |
 | pseudo lowering | No pseudo remains and every operand is physical. |
@@ -30,15 +31,46 @@ ends in a terminator**, and that is checked when the program becomes bytes, not
 at a stage boundary, because a middle block may fall through and the last block
 may have had its fall-through branch dropped.
 
-Reordering is the one thing a stage may do without changing the program, and
-only the two scheduling stages do it. A stage that succeeds without doing its
-job leaves well-formed IR that breaks the next step, which is the failure the
-postconditions catch.
+The two scheduling stages only reorder instructions. Uniform-load sinking is
+a separate transformation because it may also insert a completion check. A
+stage that succeeds without doing its job leaves well-formed IR that breaks
+the next step, which is the failure the postconditions catch.
 
 > UNRESOLVED: dominance under predication. A read under an empty lane mask
 > observes nothing, so a value defined only in the region that installed that
 > mask is legal without dominating the read. Whether such a program is well
 > formed is not established.
+
+## Uniform-load placement
+
+**Host policy:** uniform-buffer row loads may move toward their first reader
+within a basic block to shorten scalar-register lifetimes. A prologue that
+loads many independent rows and waits once can otherwise exhaust the scalar
+file even when each row is consumed separately. This is a placement problem;
+it does not change the hardware register capacity or the shader ABI shared by
+the graphics APIs.
+
+A check belongs to every outstanding producer in its domain. An adjacent check
+can move with a load only if no other undrained producer needs that check.
+Searching backward for those producers must account for check domains: a
+vector-memory check does not retire a scalar load. If a load moves past a
+shared check, leave the original check with the other producers and insert a
+scalar-memory check (`k = 0x1`) after the moved load, before its first reader.
+Later wait placement may merge, narrow or defer these checks while preserving
+the completion dependencies.
+
+Movement stops at a reader, an address or destination redefinition, a memory
+write, a workgroup barrier, a control-flow terminator, an explicit execution-mask
+write, or a geometry/stream-output side effect. Uniform row loads do not use
+the temporary predicates clobbered by texture or vector-buffer accesses; those
+clobbers alone do not prevent movement of an independent scalar row load.
+Descriptor and push-constant flat loads have different lifetime tradeoffs and
+are outside this row-load sinking policy.
+
+The first-reader position must follow the current instruction order. Cached
+numeric positions become stale when earlier moves insert checks or rotate an
+instruction range. Allocation failure while adding a check must preserve the
+original instructions and their existing completion waits.
 
 ## Source modifiers during optimization
 
