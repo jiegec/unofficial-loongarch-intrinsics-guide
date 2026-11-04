@@ -232,6 +232,20 @@ LANE_SWEEP_OK = ("PASS", "SKIP-ENVELOPE", "NO-VECTORS")
 # rather than spending the rest of the matrix on a dead pipe.
 LANE_SWEEP_FATAL = ("HANG/FAULT", "TIMEOUT", "ERROR", "PREFLIGHT-FAIL")
 
+# [HW 2026-11-04] "Every row failed" and "the device is gone" read the same way in
+# a matrix, and they are not the same thing: after a reset the kernel says "device
+# is offline (reset-failed) ... nothing is admitted until the module is reloaded",
+# every submission then fails to open the node, and the sweep happily writes 700+
+# HANG rows that look like row defects.  Measured once already: a whole compute
+# matrix had to be discarded because it was 763 phantom failures.  Stop instead.
+DEVICE_GONE = ("cannot open /dev/dri", "device is offline", "reset-failed",
+               "device cannot submit")
+
+
+def device_is_gone(detail: str) -> bool:
+    d = (detail or "").lower()
+    return any(marker in d for marker in DEVICE_GONE)
+
 
 def run_batch(mnemonics, by, dry, timeout_s, env=None):
     """Submit many mnemonics through ONE process and ONE DRM session.
@@ -589,6 +603,12 @@ def main() -> int:
             for m in group:
                 res = dict(res_map[m])
                 res["mnemonic"] = m
+                if device_is_gone(res.get("detail", "")):
+                    print(f"run_gpu: the device is offline - '{res['detail'][:80]}'")
+                    print("run_gpu: nothing is admitted until the module is "
+                          "reloaded; stopping instead of writing a matrix of "
+                          "phantom failures")
+                    return 6
                 if res["status"] in LANE_SWEEP_FATAL:
                     stalled = m
                     break
@@ -668,6 +688,11 @@ def main() -> int:
             out = res.pop("out", "") or ""
             res["obs"] = obs_samples(out)
             (LOGDIR / f"{m}.log").write_text(out, encoding="utf-8")
+        if device_is_gone(res.get("detail", "")):
+            print(f"run_gpu: the device is offline - '{res['detail'][:80]}'")
+            print("run_gpu: nothing is admitted until the module is reloaded; "
+                  "stopping instead of writing a matrix of phantom failures")
+            return 6
         results.append(res)
         print(f"[{i:3d}/{len(targets)}] {m:36s} {res['status']:14s} "
               f"pass={res['pass']:3d} fail={res['fail']:3d} "
