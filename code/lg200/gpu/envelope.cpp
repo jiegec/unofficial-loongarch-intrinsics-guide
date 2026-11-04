@@ -4152,6 +4152,26 @@ std::optional<EnvelopeProgram> build_carrier_env(
       // measured, and the four-way discriminator is a probe
       // (LGPU_SCMP_PROBE=rd8|scc with an s8 sentinel, a VCC sentinel and a nop
       // distance; the patch is preserved under build/pending-w3).
+      //
+      // [HW 2026-11-04] THE PROBE RAN, on both pipes, and this is what it says.
+      // With s8 preloaded to 0xdeadbeef, the VCC pair to 0xa5a5a5a5/0x5a5a5a5a and
+      // s9/s10 to 0xffff/0, then "s_cmp_eq_u64 s8, s[12:13], s[14:15]" followed by
+      // "s_select_b32 s19, s9, s10, scc", read back at nop distance 0, 1, 2, 4, 8
+      // and 16:
+      //
+      //   s8    (RD8)  0xdeadbeef              - the named scalar is NOT written
+      //   s6:s7 (VCC)  0xa5a5a5a5 / 0x5a5a5a5a - VCC is NOT written either
+      //   s19   (SCC materialised) 0x0000ffff  - SCC IS written, at every distance
+      //
+      // So the result leaves through the condition register, and the RD8 field is
+      // not a value destination on this silicon.  Grading through SCC in the
+      // DEFAULT path was then tried and failed 33 of 41 with every graded word
+      // zero; the difference from the probe is the source staging - the default
+      // emits the second pair at s6:s7, which IS VCC, while the probe used
+      // s12:s15.  Naming SCC in RD8 (0x80) was tried in the same pass and writes
+      // nothing at all.  The remaining step is small and named: stage these pairs
+      // at s12 and up, then grade the select.  The rows keep observing until that
+      // is done and measured.
       mnemonic == "s_cmp_eq_u64" || mnemonic == "s_cmp_ne_u64";
   if (launch_state) {
     p->observe = true;
