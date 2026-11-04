@@ -373,6 +373,16 @@ for the storage table. A host that sizes the argument block from the vertex and
 fragment layouts truncates the geometry tables, so the range MUST cover the
 geometry layout whenever a geometry stage can be bound.
 
+Descriptor lifetime and submission residency are separate requirements. Every
+allocation reached through a descriptor root MUST be included in the host's
+submission residency set. Retaining an allocation in a CPU pool alone does not
+arrange its page-table updates or access dependencies. A batch can span several
+argument allocations, especially when geometry tables enlarge each draw's
+block. Switching allocations MUST refresh residency even when the shaders and
+application resource bindings are unchanged; the submission must retain all
+allocations named by its earlier draws as well as its final draw. Caching
+descriptor state does not remove this requirement.
+
 ## Validating a compiled pipeline
 
 Transform feedback and raster output observe different consumers of the emitted
