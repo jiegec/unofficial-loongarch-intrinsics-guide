@@ -434,6 +434,28 @@ to host submission-count calculations that use the same reader. It does not
 make a look-ahead query scan observe producer commands that have not yet
 executed; that requires a separate execution-order contract.
 
+Query accounting follows the physical draw expansion. For each indirect
+record, decode its element and instance counts, apply the execution path's
+chunk limit, and segment restart indices **within each chunk**. The number
+of physical draws is
+
+\[
+N = \sum_{\text{records }r}\;\sum_{\text{chunks }c}
+    S_{r,c}\, I_r\, V_r\, L_r,
+\]
+
+where \(S_{r,c}\) counts nonempty restart segments, \(I_r\) is the instance
+count, \(V_r\) counts active multiview bits (one without multiview), and
+\(L_r\) is the GS layer replay span (one for constant-layer output or
+multiview). Empty records contribute zero. A synthesized point-expansion GS
+retains the ordinary point-draw chunk policy; a user GS uses its own policy.
+This is host query bookkeeping, not a hardware capacity equation. Counting
+only API records can end a query before later chunks or layers execute.
+Multiplying an unsplit restart-segment count by the chunk count is also
+incorrect: a restart marker on a chunk boundary can leave a chunk empty or
+change the number of segments in it. Conditional skips must consume the same
+physical count as execution would have consumed.
+
 In loongvk, compute dispatches execute synchronously and contain their own
 cache-maintenance tail. A recorded pipeline barrier does not submit a separate
 CPIPE maintenance stream. That implementation detail cannot supply a missing
