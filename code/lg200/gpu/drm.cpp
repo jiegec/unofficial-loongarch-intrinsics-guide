@@ -763,8 +763,22 @@ void close_cached_session() {
   if (!s.open) return;
   if (s.queue_open) {
     std::string detail;
-    if (s.ring_open) ring_drained(s.ring.handle, s.slot, 250u, detail);
-    if (loonggpu_userq_free(s.device, s.qid) != 0) {
+    // [HW 2026-11-04] The drain result used to be ignored: the queue was freed
+    // whether or not the ring had been confirmed consumed.  That is the shape the
+    // kernel answers with a failed reset - "GPU reset(2) failed (proof: path=3
+    // acked=0x0 stopped=0x0), device is offline (reset-failed) ... nothing is
+    // admitted until the module is reloaded" - and it costs the whole machine, not
+    // one run.  A queue that cannot be confirmed drained is now LEAKED instead:
+    // the DRM file teardown reclaims it, and a leaked queue slot is a far cheaper
+    // outcome than a park.  The budget also grew, because a 640-case batch can
+    // still be draining when 250 ms elapse.
+    const bool drained =
+        s.ring_open && ring_drained(s.ring.handle, s.slot, 2000u, detail);
+    if (!drained) {
+      s.ring.leaked = true;
+      s.queue_open = false;
+      // fall through to drop the handles; the queue stays with the fd
+    } else if (loonggpu_userq_free(s.device, s.qid) != 0) {
       // The queue could not be confirmed gone.  Leave the ring mapped for the
       // DRM file teardown instead of unmapping a ring the firmware may still
       // own - that unmapped-then-recycled ring VA is the K16 fault shape.
