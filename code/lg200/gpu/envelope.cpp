@@ -2052,6 +2052,17 @@ std::optional<EnvelopeProgram> build_buff(const std::string& mnemonic,
         // [HW 2026-08-25] same window-relative offset as the b32 form - but
         // the b32 form enables the offset and this one did not, so the case's
         // offset never entered the address.
+        // [HW 2026-11-04] Two experiments, both recorded because both are
+        // negative results worth not repeating:
+        //
+        // * the rows are emitted with bl1 set, and a bounds check is what a fixed
+        //   zero reading looks like when the descriptor's record window does not
+        //   cover the staged cell.  Cleared it and ran load_v_buff_fmtinst_c1: still
+        //   0x00000000 for a staged 0x12345678.  bl1 is not the cause.
+        // * materialising the offset into the index VGPR instead of the UO12
+        //   immediate never reached the device: it went offline ("GPU reset(2)
+        //   failed ... device is offline (reset-failed)") before that build ran, so
+        //   that route is untested rather than rejected.
         builder.buff_subword_load(mnemonic, isa::predicate(0),
                                   isa::vgpr(10, width), load_desc,
                                   isa::zero_reg(), off, true, true);
