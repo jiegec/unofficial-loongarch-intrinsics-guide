@@ -429,32 +429,68 @@ records are copied from the API stride into packed direct or indexed command
 records. Buffer-binding offsets and API command/count offsets both contribute
 to each source address. Neither the count nor the records may be read before
 the producer completes, even if their allocations are already mapped. A failed
-flush or completion wait must leave the snapshot unpublished. This also applies
-to host submission-count calculations that use the same reader. It does not
-make a look-ahead query scan observe producer commands that have not yet
-executed; that requires a separate execution-order contract.
+flush or completion wait must leave the snapshot unpublished. The reads occur
+when execution reaches the consuming draw command. A query begin MUST NOT scan
+future indirect, count, or restart-index buffers: a producer inside the query
+range may not have executed yet, and waiting for earlier submissions cannot
+execute that future producer.
 
-Query accounting follows the physical draw expansion. For each indirect
-record, decode its element and instance counts, apply the execution path's
-chunk limit, and segment restart indices **within each chunk**. The number
-of physical draws is
+The physical draw expansion can be described by
 
 \[
 N = \sum_{\text{records }r}\;\sum_{\text{chunks }c}
     S_{r,c}\, I_r\, V_r\, L_r,
 \]
 
-where \(S_{r,c}\) counts nonempty restart segments, \(I_r\) is the instance
-count, \(V_r\) counts active multiview bits (one without multiview), and
-\(L_r\) is the GS layer replay span (one for constant-layer output or
-multiview). Empty records contribute zero. A synthesized point-expansion GS
-retains the ordinary point-draw chunk policy; a user GS uses its own policy.
-This is host query bookkeeping, not a hardware capacity equation. Counting
-only API records can end a query before later chunks or layers execute.
-Multiplying an unsplit restart-segment count by the chunk count is also
-incorrect: a restart marker on a chunk boundary can leave a chunk empty or
-change the number of segments in it. Conditional skips must consume the same
-physical count as execution would have consumed.
+where \(S_{r,c}\) counts nonempty restart segments **within each executed
+chunk**, \(I_r\) is the instance count, \(V_r\) counts active multiview bits
+(one without multiview), and \(L_r\) is the GS layer replay span (one for
+constant-layer output or multiview). Empty records contribute zero. A
+synthesized point-expansion GS retains the ordinary point-draw chunk policy;
+a user GS uses its own policy. This describes actual expansion, not a hardware
+capacity equation or a reservation to compute at query begin. Multiplying an
+unsplit restart-segment count by the chunk count is incorrect: a restart
+marker on a chunk boundary can leave a chunk empty or change its segmentation.
+CPU pipeline statistics accumulate from the draws and dispatch chunks actually
+executed. Conditional skips and zero-work commands contribute zero and consume
+no reserved budget.
+
+### Query boundaries and internal rendering
+
+In loongvk, a hardware counter begins with the first actual application draw
+in a segment. Query end samples it independently of how many API records,
+restart segments, instances, views, or layer replays executed. A standalone
+sample stream is `[QueryEnd][va_lo][va_hi][0xf05]`; a range with no live segment
+also emits `QueryBegin` before that tuple to obtain zero. These are host
+commands, not shader ISA instructions. There is no state header `0x3` before
+the standalone query packet. The query result BO remains resident, and its
+value is read only after the submission's retirement is confirmed.
+
+Internal clears, resolves, and blits must not enter application query results.
+Before internal rendering, the driver samples the current segment and retains
+its value. The next application draw resets the counter and starts another
+segment. Recorded internal blit/resolve draws carry an explicit internal-draw
+flag and contribute neither CPU pipeline statistics nor application counter
+boundaries. For segments \(s\), the published counter value is
+
+\[
+Q = \sum_s H_s,
+\]
+
+where \(H_s\) is the retired hardware sample for that segment. Internal work
+after the last application draw is discarded by the empty reset/sample at query
+end; earlier accumulated segments remain intact. A failed flush, wait, sample
+submission, or result mapping must prevent result availability. Ending a query
+after a conditional skip, a zero-work indirect command, or an internal draw
+therefore does not require identifying a last application draw in advance.
+
+CPU-only statistics use the normal graphics batch and require no hardware query
+packet. Counter-backed draws retain their synchronous submission path; each
+counter segment adds one small sample submission, rather than a sample for
+every physical draw. This is an implementation contract, not a claim that a
+covered-sample counter implements every Vulkan pipeline statistic: the
+pre-clip/generated-primitive counter still cannot establish the number of
+primitives that survive clipping.
 
 In loongvk, compute dispatches execute synchronously and contain their own
 cache-maintenance tail. A recorded pipeline barrier does not submit a separate
