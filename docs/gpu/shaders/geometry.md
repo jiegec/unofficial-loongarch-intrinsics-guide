@@ -391,6 +391,20 @@ it does not wait for an independently submitted graphics or compute workload.
 Flushing a graphics batch queues its commands and does not establish that its
 outputs are ready for another consumer.
 
+For a Gallium draw that samples an attachment written by pending draws, the
+producer and consumer MUST enter separate submissions. The kernel records an
+access-retirement fence on each resident BO and imports that fence when the
+next submission names the same BO, including submissions from the same owner.
+The CPU can therefore continue queuing the consumer without waiting. This
+requires the resource to remain in both submissions' residency lists.
+
+Chaining another IB inside one submission is insufficient: its leading
+preamble reloads descriptor roots, but introduces no inter-submission BO
+access dependency. A full state block and a shader `check` do not replace that
+dependency. A changed texture binding with no attachment dependency can still
+use a new IB segment; independent draws can remain in one batch. Failure to
+submit the producer MUST prevent the dependent draw from being queued.
+
 The current loongvk execution policy uses the following completion boundaries:
 
 | Consumer of earlier graphics writes | Completion boundary |
@@ -454,6 +468,15 @@ producer, but the resulting binaries and state still need comparison. A
 constant fragment program also does not bypass coefficient generation when
 the host requests coefficient groups. Record that request independently of
 the shader's coefficient loads.
+
+Distinguish production from readback by observing one draw through both small
+regions and a complete image, using an independent value oracle. Add a producer
+completion control before the first readback. If that control changes the
+result, vary the submission boundary and CPU wait separately: a successful
+blocking control alone does not prove a CPU wait is required. Retain failed
+observations as well as successful controls. A passing capture path can have a
+different submission policy from the raster-only path and can mask this kind
+of dependency defect.
 
 Inspect wait domains in the encoded instructions. An unassigned compiler IR
 domain can select a default during packing; it is not necessarily an encoded
