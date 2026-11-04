@@ -171,7 +171,10 @@ three subfields of the row:
 | shared load, store, atomic | sm | the same, before the address or data register is reused |
 
 - A load's result MUST NOT be read before a check that names its class; a
-  sampler is `vm`.
+  sampler or gather is `vm`. This includes the first ALU consumer that packs
+  sampled values for fragment output. A check after that packing or after an
+  SIO write is too late. Restoring the execution mask does not wait for a
+  texture result, and gather suffixes and array forms retain this requirement.
 - A store leaves its family outstanding until a check drains it, and a store
   and a load do not share a class: a reload's own check covers the load, not
   the store before it.
@@ -217,10 +220,17 @@ component mask is 4 bits and MUST be non-zero on the forms that carry one.
 - A 64-bit vector source is either an aligned VGPR pair, whose base occupies
   the ordinary selector, or a single inline constant replicated across both
   halves.
-- A memory row's operand is a window, not a register: a buffer descriptor is
-  four words the load copies as a unit. Moving a load across a write to one
-  word of its descriptor changes what the load reads even though no single
-  operand overlaps.
+- A descriptor operand names the base of an implicit register window. Buffer
+  and sampler descriptors read four consecutive SGPRs; an image descriptor
+  reads eight. For base `b` and width `W`, every register in `[b, b + W)` is a
+  source dependency, including image words `b + 4` through `b + 7`.
+- Register allocation and scheduling MUST preserve both directions of that
+  dependency. A texture access cannot move above an instruction that fills
+  any descriptor word. A later load that reuses those SGPRs cannot move above
+  the texture access either: it would replace the descriptor before use.
+  Test these edges separately from an independent load that may still move.
+  The width belongs to each source operand; a four-word sampler window does
+  not bound the adjacent image operand's eight-word window.
 
 > UNRESOLVED: whether a misaligned tuple is representable at all, and what a
 > misaligned base does. Usage shows aligned bases only, and an allocator that
