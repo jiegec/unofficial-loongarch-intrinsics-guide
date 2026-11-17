@@ -4,7 +4,7 @@ version = "0.1.0"
 description = ""
 authors = [{ name = "Jiajie Chen", email = "c@jia.je" }]
 readme = "README.md"
-requires-python = ">=3.11,<3.15"
+requires-python = ">=3.12,<3.15"
 dependencies = [
     "mkdocs>=1.5.3,<2",
     "mkdocs-macros-plugin>=1.0.5,<2",
