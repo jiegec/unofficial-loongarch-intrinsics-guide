@@ -42,12 +42,21 @@ def _format_throughput(ipc_field, cpi_field):
     """Render the throughput column of a measure-*.csv row.
 
     A cell is either a single IPC ("4.00", "0.25") or, for data-dependent
-    instructions, a "min-max" span ("0.03-0.07"). Sub-IPC values carry the
-    CPI too ("0.25(1/4)"), which is easier to read than the fraction.
+    instructions, a "min-max" span ("0.03-0.07").  Sub-IPC values carry the
+    CPI as well ("0.25(1/4)"), which is easier to read than the fraction; a
+    span keeps the matching CPI span ("0.03-0.07(1/35-1/15)"), each end
+    paired with the end of the IPC span it belongs to.
     """
     ipc = [_format_ipc(float(part)) for part in ipc_field.split("-")]
     if len(ipc) > 1 and ipc[0] != ipc[-1]:
-        return "\u2013".join(f"{value:g}" for value in ipc)
+        text = "\u2013".join(f"{value:g}" for value in ipc)
+        if ipc[-1] >= 1.0:
+            return text
+        cpi = [_format_ipc(float(part)) for part in cpi_field.split("-")]
+        if len(cpi) > 1 and cpi[0] != cpi[-1]:
+            # cpi_min belongs to the high end of the IPC span and vice versa.
+            return f"{text}(1/{cpi[-1]:g}\u20131/{cpi[0]:g})"
+        return f"{text}(1/{cpi[0]:g})"
 
     if ipc[0] < 1.0:
         cpi = _format_ipc(float(cpi_field.split("-")[-1]))
