@@ -1,7 +1,7 @@
 import glob
 import re
 
-# Update site directory before running: `poetry run mkdocs build`
+# Update site directory before running: `uv run mkdocs build`
 
 for ext in ["lsx", "lasx"]:
     arg_counts = {}

@@ -1,6 +1,6 @@
 import glob
 
-# Update site directory before running: `poetry run mkdocs build`
+# Update site directory before running: `uv run mkdocs build`
 
 for ext in ["lsx", "lasx"]:
     encoding = {}

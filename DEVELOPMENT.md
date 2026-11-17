@@ -1,5 +1,6 @@
 # Notes for Developer
 
+- Dependencies are managed with [uv](https://docs.astral.sh/uv/): `uv sync` to create `.venv/`, `uv run mkdocs serve` to preview the site, `uv run mkdocs build` to build it. Add a dependency with `uv add`, never by hand-editing `uv.lock`.
 - `main.py`: used for mkdocs-macros-plugin, implement functions used in markdown.
 - `check.py`: check generated docs against gcc intrinsics document.
 - `check_instr.py`: check generated docs against binutils opcodes.

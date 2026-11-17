@@ -1,21 +1,16 @@
-[tool.poetry]
+[project]
 name = "loongarch-simd"
 version = "0.1.0"
 description = ""
-authors = ["Jiajie Chen <c@jia.je>"]
+authors = [{ name = "Jiajie Chen", email = "c@jia.je" }]
 readme = "README.md"
-package-mode = false
-
-[tool.poetry.dependencies]
-python = ">=3.11,<3.15"
-mkdocs = "^1.5.3"
-mkdocs-macros-plugin = "^1.0.5"
-mkdocs-glightbox = "^0.5.2"
-mkdocs-llmstxt = "^0.5.0"
-# selectolax 1.0.1 is incompatible with mkdocs-glightbox 0.5.2: images are dropped.
-# 1.0.2 fixes the DOM regression; require it explicitly.
-selectolax = ">=1.0.2,<1.1"
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires-python = ">=3.11,<3.15"
+dependencies = [
+    "mkdocs>=1.5.3,<2",
+    "mkdocs-macros-plugin>=1.0.5,<2",
+    "mkdocs-glightbox>=0.5.2,<0.6",
+    "mkdocs-llmstxt>=0.5.0,<0.6",
+    # selectolax 1.0.1 is incompatible with mkdocs-glightbox 0.5.2: images are dropped.
+    # 1.0.2 fixes the DOM regression; require it explicitly.
+    "selectolax>=1.0.2,<1.1",
+]
