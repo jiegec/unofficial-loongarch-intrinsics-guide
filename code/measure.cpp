@@ -20,8 +20,6 @@
 
 #if MACHINE_3C5000
 #define OUTPUT_FILENAME "measure-3C5000.csv"
-#elif MACHINE_3A6000
-#define OUTPUT_FILENAME "measure-3A6000.csv"
 #elif MACHINE_3C6000
 #define OUTPUT_FILENAME "measure-3C6000.csv"
 #elif MACHINE_2K1000LA

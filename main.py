@@ -11,45 +11,72 @@ cur_simd = "lsx"
 cur_vlen = 128
 
 # read latency & throughput
-cpus = ["3C5000", "3A6000", "3C6000", "2K1000LA", "2K3000"]
+cpus = ["3C5000", "3C6000", "2K1000LA", "2K3000"]
 uarches = {
     "2K1000LA": "LA264",
     "2K3000": "LA364E",
     "3C5000": "LA464",
-    "3A6000": "LA664",
     "3C6000": "LA664",
 }
+
+
+def _format_cycles(value):
+    """Round cycle counts that are within 2% of an integer (28.96 -> 29)."""
+    if value and abs((value - round(value)) / value) < 0.02:
+        return round(value)
+    return value
+
+
+def _format_latency(field):
+    """Render the latency column of a measure-*.csv row.
+
+    A cell is either the legacy "/"-separated list of per-chain latencies
+    ("8.00/16.50") or, for data-dependent instructions, "min-max" ranges
+    ("8.00-37.00", written by tools/import_loongperf.py).
+    """
+    entries = []
+    for part in field.split("/"):
+        if part == "":
+            entries.append((math.inf, math.inf, "N/A"))
+            continue
+        if part.startswith("-"):
+            low, high = part, ""
+        else:
+            low, _, high = part.partition("-")
+        low = _format_cycles(float(low))
+        high = _format_cycles(float(high)) if high else low
+        entries.append((low, high, str(low) if low == high else f"{low}\u2013{high}"))
+
+    latency = []
+    for _, _, text in sorted(entries):
+        if text not in latency:
+            latency.append(text)
+    return ", ".join(latency)
+
 
 measure = {x: {} for x in cpus}
 for cpu in cpus:
     with open(f"code/measure-{cpu}.csv", newline="") as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
-            latency = []
-            for part in row["latency"].split("/"):
-                if part == "":
-                    lat = "N/A"
-                else:
-                    lat = float(part)
-                    if abs((lat - round(lat)) / lat) < 0.02:
-                        lat = round(lat)
-                latency.append(lat)
-            latency = sorted(list(set(latency)))
-
             throughput_ipc = float(row["throughput(ipc)"])
-            if abs(throughput_ipc - round(throughput_ipc)) < 0.03:
-                throughput_ipc = round(throughput_ipc)
+            # Snap noisy measurements to integers, but never to zero: a slow
+            # instruction with IPC 0.02 is not "0 instructions per cycle".
+            rounded_ipc = round(throughput_ipc)
+            if rounded_ipc and abs(throughput_ipc - rounded_ipc) < 0.03:
+                throughput_ipc = rounded_ipc
 
             # handle small ipc better by 1/cpi
             if throughput_ipc < 1.0:
                 throughput_cpi = float(row["throughput(cpi)"])
-                if abs(throughput_cpi - round(throughput_cpi)) < 0.03:
-                    throughput_cpi = round(throughput_cpi)
+                rounded_cpi = round(throughput_cpi)
+                if rounded_cpi and abs(throughput_cpi - rounded_cpi) < 0.03:
+                    throughput_cpi = rounded_cpi
 
                 throughput_ipc = f"{throughput_ipc}(1/{throughput_cpi})"
 
             measure[cpu][row["name"]] = {
-                "latency": ", ".join(map(str, latency)),
+                "latency": _format_latency(row["latency"]),
                 "throughput(ipc)": throughput_ipc,
             }
 

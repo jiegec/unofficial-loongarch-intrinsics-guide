@@ -5,10 +5,6 @@
 #define MACHINE_3C5000 1
 #endif
 
-#ifndef MACHINE_3A6000
-#define MACHINE_3A6000 1
-#endif
-
 #ifndef MACHINE_3C6000
 #define MACHINE_3C6000 0
 #endif
@@ -25,7 +21,7 @@
 #define UARCH_LA264 (MACHINE_2K1000LA)
 #define UARCH_LA364E (MACHINE_2K3000)
 #define UARCH_LA464 (MACHINE_3C5000)
-#define UARCH_LA664 (MACHINE_3A6000 || MACHINE_3C6000)
+#define UARCH_LA664 (MACHINE_3C6000)
 
 /* capabilities */
 

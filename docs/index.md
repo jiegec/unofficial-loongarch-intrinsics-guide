@@ -6,7 +6,7 @@ This is the Unofficial LoongArch Intrinsics Guide by Jiajie Chen et al. The docu
 
 - QEMU
 - GCC
-- Observations from real hardware incl. 3C5000(LA464), 3A6000(LA664), 3C6000(LA664), 2K1000LA(LA264) and 2K3000(LA364E)
+- Observations from real hardware incl. 3C5000(LA464), 3C6000(LA664), 2K1000LA(LA264) and 2K3000(LA364E)
 
 Beyond SIMD intrinsics, this guide also documents the **LBT** (LoongArch Binary Translation) instruction set, used for emulating x86, ARM, and MIPS ISAs. See the [LBT Basics](lbt_basics.md) page for an overview.
 
