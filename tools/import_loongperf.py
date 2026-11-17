@@ -81,12 +81,22 @@ def latency_field(entry: dict) -> str | None:
 
 
 def throughput_field(entry: dict) -> tuple[str, str] | None:
+    """Format the throughput cell: IPC and CPI, as a "min-max" span if measured."""
     if not entry.get("throughput"):
         return None
     stats = entry["throughput"][0].get("throughput")
     if not stats or "ipc" not in stats or "cpi" not in stats:
         return None
-    return f"{stats['ipc']:.2f}", f"{stats['cpi']:.2f}"
+
+    ipc_low = round(stats.get("ipc_min", stats["ipc"]), 2)
+    ipc_high = round(stats.get("ipc_max", stats["ipc"]), 2)
+    if ipc_low == ipc_high:
+        # A range that rounds away carries no information; keep the sample.
+        return f"{stats['ipc']:.2f}", f"{stats['cpi']:.2f}"
+
+    cpi_low = round(stats.get("cpi_min", stats["cpi"]), 2)
+    cpi_high = round(stats.get("cpi_max", stats["cpi"]), 2)
+    return f"{ipc_low:.2f}-{ipc_high:.2f}", f"{cpi_low:.2f}-{cpi_high:.2f}"
 
 
 def import_machine(

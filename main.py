@@ -27,6 +27,34 @@ def _format_cycles(value):
     return value
 
 
+def _format_ipc(value):
+    """Snap noisy throughput measurements to integers, but never to zero.
+
+    A slow instruction measured at IPC 0.02 is not "0 instructions per cycle".
+    """
+    rounded = round(value)
+    if rounded and abs(value - rounded) < 0.03:
+        return rounded
+    return value
+
+
+def _format_throughput(ipc_field, cpi_field):
+    """Render the throughput column of a measure-*.csv row.
+
+    A cell is either a single IPC ("4.00", "0.25") or, for data-dependent
+    instructions, a "min-max" span ("0.03-0.07"). Sub-IPC values carry the
+    CPI too ("0.25(1/4)"), which is easier to read than the fraction.
+    """
+    ipc = [_format_ipc(float(part)) for part in ipc_field.split("-")]
+    if len(ipc) > 1 and ipc[0] != ipc[-1]:
+        return "\u2013".join(f"{value:g}" for value in ipc)
+
+    if ipc[0] < 1.0:
+        cpi = _format_ipc(float(cpi_field.split("-")[-1]))
+        return f"{ipc[0]:g}(1/{cpi:g})"
+    return f"{ipc[0]:g}"
+
+
 def _format_latency(field):
     """Render the latency column of a measure-*.csv row.
 
@@ -59,25 +87,11 @@ for cpu in cpus:
     with open(f"code/measure-{cpu}.csv", newline="") as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
-            throughput_ipc = float(row["throughput(ipc)"])
-            # Snap noisy measurements to integers, but never to zero: a slow
-            # instruction with IPC 0.02 is not "0 instructions per cycle".
-            rounded_ipc = round(throughput_ipc)
-            if rounded_ipc and abs(throughput_ipc - rounded_ipc) < 0.03:
-                throughput_ipc = rounded_ipc
-
-            # handle small ipc better by 1/cpi
-            if throughput_ipc < 1.0:
-                throughput_cpi = float(row["throughput(cpi)"])
-                rounded_cpi = round(throughput_cpi)
-                if rounded_cpi and abs(throughput_cpi - rounded_cpi) < 0.03:
-                    throughput_cpi = rounded_cpi
-
-                throughput_ipc = f"{throughput_ipc}(1/{throughput_cpi})"
-
             measure[cpu][row["name"]] = {
                 "latency": _format_latency(row["latency"]),
-                "throughput(ipc)": throughput_ipc,
+                "throughput(ipc)": _format_throughput(
+                    row["throughput(ipc)"], row["throughput(cpi)"]
+                ),
             }
 
 # read examples
