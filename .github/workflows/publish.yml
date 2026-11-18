@@ -3,19 +3,45 @@ on:
   push:
     branches:
       - master
+  workflow_dispatch:
+
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
+
+# Only one Pages deployment at a time; do not cancel a run that is publishing.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/cache@v4
-        with:
-          key: ${{ github.ref }}
-          path: .cache
+      - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v6
         with:
           enable-cache: true
       - run: uv sync --locked
-      - run: uv run mkdocs gh-deploy --force
+      - uses: actions/configure-pages@v5
+      - name: Build site
+        run: |
+          uv run mkdocs build
+          # Many pages live in `__lsx_*`/`__lasx_*` directories.  The artifact
+          # is served as-is, but keep the marker `mkdocs gh-deploy` used to
+          # write so nothing is filtered out.
+          touch site/.nojekyll
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
